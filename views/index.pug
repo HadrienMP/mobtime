@@ -1,0 +1,27 @@
+doctype html
+html
+    head
+        title Extreme Planning Poker
+        link(rel="preconnect" href="https://fonts.gstatic.com")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        link(href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700;900&display=swap" rel="stylesheet")
+        link(rel='stylesheet', href='/css/main.css')
+        script(src="https://kit.fontawesome.com/36321d34e2.js" crossorigin="anonymous")
+    body
+        div#myapp
+        script(src="/js/main.js")
+        script.
+            const app = Elm.Main.init(
+                {
+                    node: document.getElementById('myapp'),
+                    flags: window.localStorage.getItem("nickname") || ""
+                }
+            )
+            // app.ports.connectSse.subscribe(id => {
+            const evtSource = new EventSource(`/sse`);
+            evtSource.onerror = console.log;
+            evtSource.onmessage = raw => {
+                let event = JSON.parse(raw.data);
+                app.ports.messageReceiver.send([event.name, event.data]);
+            };
+            // });
