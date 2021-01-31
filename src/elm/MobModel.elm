@@ -1,1 +1,0 @@
-module MobModel exposing (..)

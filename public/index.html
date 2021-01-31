@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700;900&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/36321d34e2.js" crossorigin="anonymous"></script>
+    <title>tenpo kulupu</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+<pre id="elm"></pre>
+
+<script src="js/main.js"></script>
+<script>
+    Elm.Main.init(
+        {
+            node: document.getElementById('elm'),
+            flags: window.localStorage.getItem("nickname") || ""
+        }
+    )
+</script>
+</body>
+</html>
