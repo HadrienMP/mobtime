@@ -4,8 +4,9 @@ const app = express()
 const port = 3000
 
 app.use(express.static(path.join(path.dirname(__dirname), 'public')));
-app.get('/', (req, res) => {
-    res.redirect("index.html")
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
 })
 
 app.listen(port, () => {

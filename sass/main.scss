@@ -1,12 +1,149 @@
 @import "compass";
 @import "compass/reset";
 
-html {
-    font-family: 'Roboto', sans-serif;
+@mixin gradient-background {
+  background: #56ab2f; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #a8e063, #56ab2f); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #a8e063, #56ab2f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
+
+html {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+}
+
 body {
-    margin: 0;
-    background: #56ab2f;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #a8e063, #56ab2f);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #a8e063, #56ab2f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  color: white;
+  text-shadow: 1px 1px 1px #666;
+}
+
+body * {
+  box-sizing: border-box;
+}
+
+#container {
+  margin: auto;
+  max-width: 600px;
+}
+
+$shadow-shade: 120;
+$shadow-color: rgba($shadow-shade, $shadow-shade, $shadow-shade, .4);
+$border-shade: 250;
+$border-color: rgba($border-shade, $border-shade, $border-shade, .6);
+
+// ===========================================
+// NAV
+// ===========================================
+
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  //box-shadow: 0 -4px 8px $shadow-color;
+  border-top: 2px solid $border-color;
+  z-index: 10;
+
+  a {
+    font-size: 1.2em;
+    background: #56ab2f;
+    color: white;
+    width: 33.33%;
+    display: inline-block;
+    text-align: center;
+    padding: 12px 0;
+    border-left: 1px solid $border-color;
+    text-shadow: 1px 1px 1px #666;
+
+    &:first-child {
+      border-left: 0;
+    }
+
+    &.active {
+      background: #a8e063;
+    }
+  }
+}
+
+// ===========================================
+// TABS
+// ===========================================
+
+.tab {
+  position: absolute;
+  top: 0;
+  bottom: 44px;
+  left: 0;
+  right: 0;
+  overflow: auto;
+  @include gradient-background;
+}
+
+#mobbers {
+  padding: 20px;
+
+  #add {
+    display: flex;
+
+    input {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+
+    button {
+      flex-shrink: 0;
+    }
+  }
+
+  ul {
+
+    li {
+      display: flex;
+      align-items: center;
+
+      i {
+        padding-right: 10px;
+        flex-shrink: 0;
+      }
+
+      div {
+        width: 100%;
+        flex-grow: 1;
+
+        input {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+// -------------------------------------------
+// SETTINGS
+// -------------------------------------------
+
+#settings {
+  form {
+    padding: 20px;
+  }
+
+  h2 {
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid rgba(100, 100, 100, .5);
+    background: #56ab2f;
+
+    i {
+      padding: 16px 20px;
+      margin-right: 20px;
+      border-right: 1px solid $border-color;
+    }
+  }
+
+  label, input {
+    display: block;
+  }
+
+  input {
+    width: 100%;
+  }
 }

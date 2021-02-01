@@ -4,3 +4,4 @@ package-lock.json
 elm-stuff
 public/js/main.js
 public/css/main.css
+.sass-cache
