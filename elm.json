@@ -13,10 +13,11 @@
             "elm/html": "1.0.0",
             "elm/http": "2.0.0",
             "elm/json": "1.1.3",
+            "elm/random": "1.0.0",
+            "elm/svg": "1.0.1",
             "elm/url": "1.0.0",
             "ericgj/elm-validation": "2.0.0",
-            "jzxhuang/http-extras": "2.1.0",
-            "elm/random": "1.0.0"
+            "jzxhuang/http-extras": "2.1.0"
         },
         "indirect": {
             "elm/file": "1.0.5",

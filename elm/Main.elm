@@ -2,9 +2,13 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (Html, a, button, div, form, h1, h2, i, input, label, li, nav, option, p, select, text, ul)
+import Circle
+import Html exposing (Html, a, button, div, form, h2, i, input, label, li, nav, option, p, select, text, ul)
 import Html.Attributes exposing (class, classList, for, href, id, placeholder, type_, value)
 import Json.Encode
+import Ratio exposing (Ratio)
+import Svg exposing (Svg, svg)
+import Svg.Attributes as Svg
 import Url
 
 
@@ -63,12 +67,13 @@ type alias Model =
     , url : Url.Url
     , tab : Tab
     , nickName : String
+    , timeRatio : Ratio
     }
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init nickname url key =
-    ( Model key url (pageFrom url |> Maybe.withDefault timerPage) nickname, Cmd.none )
+    ( Model key url (pageFrom url |> Maybe.withDefault timerPage) nickname (Ratio.from 0.1), Cmd.none )
 
 
 pageFrom : Url.Url -> Maybe Tab
@@ -105,8 +110,6 @@ update msg model =
 
 
 
---_ ->
---    ( model, Cmd.none )
 -- SUBSCRIPTIONS
 
 
@@ -127,14 +130,14 @@ view model =
             [ id "container" ]
             [ nav [] <| navLinks model.url
             , case model.tab.type_ of
+                Timer ->
+                    timerView model
+
                 Mobbers ->
                     mobbersView model
 
                 Settings ->
                     settingsView model
-
-                _ ->
-                    p [] [ text "I don't know this page..." ]
             ]
         ]
     }
@@ -154,6 +157,34 @@ navLinks current =
 activeClass : Url.Url -> String -> ( String, Bool )
 activeClass current tabUrl =
     ( "active", current.path == tabUrl )
+
+
+timerView : Model -> Html msg
+timerView model =
+    let
+        totalWidth =
+            220
+
+        outerRadiant = 104
+
+        pomodoroCircle =
+            Circle.Circle
+                outerRadiant
+                (Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
+                (Circle.Stroke 10 "#999")
+
+        mobCircle =
+            Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
+    in
+    div [ id "timer", class "tab" ]
+        [ svg
+            [ Svg.width <| String.fromInt totalWidth
+            , Svg.height <| String.fromInt totalWidth
+            ]
+            (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
+                ++ Circle.draw mobCircle model.timeRatio
+            )
+        ]
 
 
 mobbersView : Model -> Html msg
