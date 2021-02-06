@@ -1,5 +1,6 @@
 module Circle exposing (Circle, Coordinates, Stroke, draw, drawWithoutInsideBorder, inside)
 
+import Html.Attributes as Html
 import Ratio exposing (Ratio)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
@@ -98,6 +99,6 @@ draw_ circle ratio =
         , Svg.strokeWidth <| String.fromInt circle.stroke.width
         , Svg.fillOpacity "0"
         , Svg.strokeDasharray <| String.fromFloat perimeter
-        , Svg.strokeDashoffset <| String.fromFloat <| Ratio.apply ratio perimeter
+        , Html.style "stroke-dashoffset" <| String.fromFloat <| Ratio.apply ratio perimeter
         ]
         []

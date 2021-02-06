@@ -9,7 +9,7 @@
 		"prod:build-front": "./elm-make.sh",
 		"prod:server": "node server/app.js",
 		"dev:all": "concurrently --kill-others \"npm run dev:build-front\" \"npm run dev:server\"",
-		"dev:build-front": "elm-live elm/Main.elm --dir=./public/js --no-server -- --output=./public/js/main.js",
+		"dev:build-front": "elm-live elm/Main.elm --dir=./public/js --no-server -- --output=./public/js/main.js --debug",
 		"dev:server": "nodemon server/app.js"
 	},
 	"keywords": [],

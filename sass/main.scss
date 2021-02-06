@@ -79,6 +79,68 @@ nav {
   @include gradient-background;
 }
 
+#timer {
+  section {
+    width: 220px;
+    height: 220px;
+    position: relative;
+    margin: 40px auto;
+
+    svg {
+      margin: auto;
+      display: block;
+      transform: rotateZ(-90deg);;
+
+      circle {
+        transition: stroke-dashoffset 1s linear;
+      }
+    }
+
+    button {
+      position: absolute;
+      top: 0;
+
+      width: 100%;
+      height: 100%;
+
+      cursor: pointer;
+      color: white;
+
+      background: none;
+      border: none;
+      border-radius: 100%;
+      font-weight: bold;
+
+      &.off {
+        i {
+          display: block;
+        }
+        span {
+          display: none;
+        }
+      }
+
+      i {
+        display: none;
+        font-size: 4em;
+      }
+
+      span {
+        font-size: 3em;
+      }
+
+      &:hover {
+        span {
+          display: none;
+        }
+        i {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
 #mobbers {
   padding: 20px;
 

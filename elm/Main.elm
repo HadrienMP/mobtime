@@ -3,12 +3,14 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
-import Html exposing (Html, a, button, div, form, h2, i, input, label, li, nav, option, p, select, text, ul)
+import Html exposing (Html, a, button, div, form, h2, i, input, label, li, nav, option, p, section, select, span, text, ul)
 import Html.Attributes exposing (class, classList, for, href, id, placeholder, type_, value)
+import Html.Events exposing (onClick)
 import Json.Encode
 import Ratio exposing (Ratio)
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
+import Time
 import Url
 
 
@@ -62,18 +64,41 @@ pages =
     ]
 
 
+type Action
+    = Start
+    | Stop
+
+
+actionMessage : Action -> Msg
+actionMessage action =
+    case action of
+        Start ->
+            StartRequest
+
+        Stop ->
+            StopRequest
+
+
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
     , nickName : String
-    , timeRatio : Ratio
+    , turn : Turn
+    , action : Action
     }
+
+
+type Turn
+    = Off
+    | On { timeLeft : Float, turnLength : Float }
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init nickname url key =
-    ( Model key url (pageFrom url |> Maybe.withDefault timerPage) nickname (Ratio.from 0.1), Cmd.none )
+    ( Model key url (pageFrom url |> Maybe.withDefault timerPage) nickname Off Start
+    , Cmd.none
+    )
 
 
 pageFrom : Url.Url -> Maybe Tab
@@ -90,6 +115,9 @@ pageFrom url =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | TimePassed Time.Posix
+    | StartRequest
+    | StopRequest
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -108,6 +136,24 @@ update msg model =
             , Cmd.none
             )
 
+        TimePassed _ ->
+            case model.turn of
+                On turn ->
+                    ( { model | turn = On { turn | timeLeft = turn.timeLeft - 1 } }, Cmd.none )
+
+                Off ->
+                    ( model, Cmd.none )
+
+        StartRequest ->
+            ( { model | turn = On { timeLeft = 30, turnLength = 30 } }
+            , Cmd.none
+            )
+
+        StopRequest ->
+            ( { model | turn = Off }
+            , Cmd.none
+            )
+
 
 
 -- SUBSCRIPTIONS
@@ -115,7 +161,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Time.every 1000 TimePassed
 
 
 
@@ -159,13 +205,14 @@ activeClass current tabUrl =
     ( "active", current.path == tabUrl )
 
 
-timerView : Model -> Html msg
+timerView : Model -> Html Msg
 timerView model =
     let
         totalWidth =
             220
 
-        outerRadiant = 104
+        outerRadiant =
+            104
 
         pomodoroCircle =
             Circle.Circle
@@ -177,14 +224,66 @@ timerView model =
             Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
     in
     div [ id "timer", class "tab" ]
-        [ svg
-            [ Svg.width <| String.fromInt totalWidth
-            , Svg.height <| String.fromInt totalWidth
+        [ section []
+            [ svg
+                [ Svg.width <| String.fromInt totalWidth
+                , Svg.height <| String.fromInt totalWidth
+                ]
+                (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
+                    ++ Circle.draw mobCircle (ratio model)
+                )
+            , button
+                [ onClick <| actionMessage <| actionOf model.turn
+                , class <| turnToString model.turn  
+                ]
+                [ span [] [ text (timeLeft model.turn) ]
+                , actionIcon <| actionOf model.turn
+                ]
             ]
-            (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
-                ++ Circle.draw mobCircle model.timeRatio
-            )
         ]
+
+turnToString : Turn -> String
+turnToString turn =
+    case turn of
+         On _ -> "on"
+         Off -> "off"
+
+
+timeLeft : Turn -> String
+timeLeft turn =
+    case turn of
+        On t -> (String.fromFloat t.timeLeft) ++ "s"
+        Off -> ""
+
+
+actionOf : Turn -> Action
+actionOf turn =
+    case turn of
+        On _ ->
+            Stop
+
+        Off ->
+            Start
+
+
+actionIcon : Action -> Html msg
+actionIcon action =
+    case action of
+        Start ->
+            i [ class "fas fa-play" ] []
+
+        Stop ->
+            i [ class "fas fa-square" ] []
+
+
+ratio : Model -> Ratio
+ratio model =
+    case model.turn of
+        On turn ->
+            Ratio.from (1 - (turn.timeLeft - 1) / turn.turnLength)
+
+        Off ->
+            Ratio.full
 
 
 mobbersView : Model -> Html msg
