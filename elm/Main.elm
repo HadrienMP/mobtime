@@ -3,11 +3,13 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
-import Html exposing (Html, a, button, div, form, h2, i, input, label, li, nav, option, p, section, select, span, text, ul)
-import Html.Attributes exposing (class, classList, for, href, id, placeholder, type_, value)
+import Html exposing (Html, a, audio, button, div, form, h2, i, input, label, li, nav, option, p, section, select, span, text, ul)
+import Html.Attributes exposing (class, classList, for, href, id, placeholder, src, type_, value)
 import Html.Events exposing (onClick)
 import Json.Encode
+import Random
 import Ratio exposing (Ratio)
+import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -31,6 +33,12 @@ main =
 
 
 port store : Json.Encode.Value -> Cmd msg
+
+
+port soundCommands : String -> Cmd msg
+
+
+port soundEnded : (String -> msg) -> Sub msg
 
 
 
@@ -67,6 +75,7 @@ pages =
 type Action
     = Start
     | Stop
+    | StopSound
 
 
 actionMessage : Action -> Msg
@@ -78,6 +87,20 @@ actionMessage action =
         Stop ->
             StopRequest
 
+        StopSound ->
+            StopSoundRequest
+
+
+type alias Audio =
+    { state : SoundStatus
+    , sound : Sounds.Sound
+    }
+
+
+type SoundStatus
+    = Playing
+    | NotPlaying
+
 
 type alias Model =
     { key : Nav.Key
@@ -85,7 +108,7 @@ type alias Model =
     , tab : Tab
     , nickName : String
     , turn : Turn
-    , action : Action
+    , audio : Audio
     }
 
 
@@ -96,7 +119,16 @@ type Turn
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init nickname url key =
-    ( Model key url (pageFrom url |> Maybe.withDefault timerPage) nickname Off Start
+    ( { key = key
+      , url = url
+      , tab = pageFrom url |> Maybe.withDefault timerPage
+      , nickName = nickname
+      , turn = Off
+      , audio =
+            { state = NotPlaying
+            , sound = Sounds.default
+            }
+      }
     , Cmd.none
     )
 
@@ -118,6 +150,9 @@ type Msg
     | TimePassed Time.Posix
     | StartRequest
     | StopRequest
+    | PickedSound Sounds.Sound
+    | SoundEnded String
+    | StopSoundRequest
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -139,19 +174,42 @@ update msg model =
         TimePassed _ ->
             case model.turn of
                 On turn ->
-                    ( { model | turn = On { turn | timeLeft = turn.timeLeft - 1 } }, Cmd.none )
+                    if turn.timeLeft == 1 then
+                        ( { model | turn = Off, audio = { state = Playing, sound = model.audio.sound } }
+                        , soundCommands "play"
+                        )
+
+                    else
+                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - 1 } }
+                        , Cmd.none
+                        )
 
                 Off ->
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | turn = On { timeLeft = 30, turnLength = 30 } }
-            , Cmd.none
+            ( { model | turn = On { timeLeft = 10, turnLength = 10 } }
+            , Random.generate PickedSound Sounds.pick
             )
 
         StopRequest ->
             ( { model | turn = Off }
             , Cmd.none
+            )
+
+        PickedSound sound ->
+            ( { model | audio = { state = NotPlaying, sound = sound } }
+            , Cmd.none
+            )
+
+        SoundEnded _ ->
+            ( { model | audio = { state = NotPlaying, sound = model.audio.sound } }
+            , Cmd.none
+            )
+
+        StopSoundRequest ->
+            ( { model | audio = { state = NotPlaying, sound = model.audio.sound } }
+            , soundCommands "stop"
             )
 
 
@@ -161,7 +219,10 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Time.every 1000 TimePassed
+    Sub.batch
+        [ Time.every 1000 TimePassed
+        , soundEnded SoundEnded
+        ]
 
 
 
@@ -233,36 +294,50 @@ timerView model =
                     ++ Circle.draw mobCircle (ratio model)
                 )
             , button
-                [ onClick <| actionMessage <| actionOf model.turn
-                , class <| turnToString model.turn  
+                [ onClick <| actionMessage <| actionOf model
+                , class <| turnToString model.turn
                 ]
                 [ span [] [ text (timeLeft model.turn) ]
-                , actionIcon <| actionOf model.turn
+                , actionIcon <| actionOf model
                 ]
             ]
+        , audio [ src <| "/sound/" ++ model.audio.sound ] []
         ]
+
 
 turnToString : Turn -> String
 turnToString turn =
     case turn of
-         On _ -> "on"
-         Off -> "off"
+        On _ ->
+            "on"
+
+        Off ->
+            "off"
 
 
 timeLeft : Turn -> String
 timeLeft turn =
     case turn of
-        On t -> (String.fromFloat t.timeLeft) ++ "s"
-        Off -> ""
-
-
-actionOf : Turn -> Action
-actionOf turn =
-    case turn of
-        On _ ->
-            Stop
+        On t ->
+            String.fromFloat t.timeLeft ++ "s"
 
         Off ->
+            ""
+
+
+actionOf : Model -> Action
+actionOf model =
+    case ( model.turn, model.audio.state ) of
+        ( On _, NotPlaying ) ->
+            Stop
+
+        ( On _, Playing ) ->
+            StopSound
+
+        ( Off, Playing ) ->
+            StopSound
+
+        ( Off, NotPlaying ) ->
             Start
 
 
@@ -274,6 +349,9 @@ actionIcon action =
 
         Stop ->
             i [ class "fas fa-square" ] []
+
+        StopSound ->
+            i [ class "fas fa-volume-mute" ] []
 
 
 ratio : Model -> Ratio

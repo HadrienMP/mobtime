@@ -17,12 +17,26 @@
 
 <script src="js/main.js"></script>
 <script>
-    Elm.Main.init(
+    let app = Elm.Main.init(
         {
             node: document.getElementById('elm'),
             flags: window.localStorage.getItem("nickname") || ""
         }
     )
+    app.ports.soundCommands.subscribe(command => {
+        let audio = document.getElementsByTagName("audio")[0];
+        audio.onended = () => app.ports.soundEnded.send("");
+
+        switch (command) {
+            case "play":
+                audio.play();
+                break;
+            case "stop":
+                audio.pause();
+                break;
+        }
+
+    });
 </script>
 </body>
 </html>
