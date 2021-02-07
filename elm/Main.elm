@@ -3,9 +3,9 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
-import Html exposing (Html, a, audio, button, div, form, h2, i, input, label, li, nav, option, p, section, select, span, text, ul)
+import Html exposing (Html, a, audio, button, div, form, h1, h2, header, i, input, label, li, nav, option, p, section, select, span, strong, text, ul)
 import Html.Attributes exposing (class, classList, for, href, id, placeholder, src, type_, value)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Json.Encode
 import Random
 import Ratio exposing (Ratio)
@@ -48,7 +48,6 @@ port soundEnded : (String -> msg) -> Sub msg
 type TabType
     = Timer
     | Mobbers
-    | Settings
 
 
 type alias Tab =
@@ -68,7 +67,6 @@ pages : List Tab
 pages =
     [ timerPage
     , Tab Mobbers "/mobbers" "Mobbers" "fa-users"
-    , Tab Settings "/settings" "Settings" "fa-cog"
     ]
 
 
@@ -102,6 +100,20 @@ type SoundStatus
     | NotPlaying
 
 
+type alias Roles =
+    List String
+
+
+type alias Mobbers =
+    List String
+
+
+type alias MobberRole =
+    { role : String
+    , name : String
+    }
+
+
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
@@ -109,6 +121,9 @@ type alias Model =
     , nickName : String
     , turn : Turn
     , audio : Audio
+    , roles : List String
+    , newMobberName : String
+    , mobbers : Mobbers
     }
 
 
@@ -128,6 +143,9 @@ init nickname url key =
             { state = NotPlaying
             , sound = Sounds.default
             }
+      , roles = [ "Driver", "Navigator" ]
+      , newMobberName = ""
+      , mobbers = []
       }
     , Cmd.none
     )
@@ -153,6 +171,10 @@ type Msg
     | PickedSound Sounds.Sound
     | SoundEnded String
     | StopSoundRequest
+    | NewMobberNameChanged String
+    | AddMobber
+    | DeleteMobber String
+    | OnABreak String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -212,6 +234,26 @@ update msg model =
             , soundCommands "stop"
             )
 
+        NewMobberNameChanged newMobberName ->
+            ( { model | newMobberName = newMobberName }
+            , Cmd.none
+            )
+
+        AddMobber ->
+            ( { model | newMobberName = "", mobbers = model.mobbers ++ [ model.newMobberName ] }
+            , Cmd.none
+            )
+
+        DeleteMobber mobber ->
+            ( { model | mobbers = List.filter (\m -> m /= mobber) model.mobbers }
+            , Cmd.none
+            )
+
+        OnABreak _ ->
+            ( model
+            , Cmd.none
+            )
+
 
 
 -- SUBSCRIPTIONS
@@ -235,16 +277,20 @@ view model =
     , body =
         [ div
             [ id "container" ]
-            [ nav [] <| navLinks model.url
+            [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    timerView model
+                    div [ id "timer", class "tab" ]
+                        [ a [ id "share-link" ]
+                            [ text "You are in the "
+                            , strong [] [ text "Agicap" ]
+                            , text " mob"
+                            , i [ id "share-button", class "fas fa-share-alt" ] []
+                            ]
+                        ]
 
                 Mobbers ->
                     mobbersView model
-
-                Settings ->
-                    settingsView model
             ]
         ]
     }
@@ -266,8 +312,8 @@ activeClass current tabUrl =
     ( "active", current.path == tabUrl )
 
 
-timerView : Model -> Html Msg
-timerView model =
+headerView : Model -> Html Msg
+headerView model =
     let
         totalWidth =
             220
@@ -284,7 +330,7 @@ timerView model =
         mobCircle =
             Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
     in
-    div [ id "timer", class "tab" ]
+    header []
         [ section []
             [ svg
                 [ Svg.width <| String.fromInt totalWidth
@@ -302,6 +348,7 @@ timerView model =
                 ]
             ]
         , audio [ src <| "/sound/" ++ model.audio.sound ] []
+        , nav [] <| navLinks model.url
         ]
 
 
@@ -364,69 +411,48 @@ ratio model =
             Ratio.full
 
 
-mobbersView : Model -> Html msg
+mobbersView : Model -> Html Msg
 mobbersView model =
     div [ id "mobbers", class "tab" ]
         [ div
             [ id "add" ]
-            [ input [ type_ "text", placeholder "Mobber name" ] []
-            , button [] [ i [ class "fas fa-plus" ] [] ]
+            [ input [ type_ "text", placeholder "Mobber name", onInput NewMobberNameChanged, value model.newMobberName ] []
+            , button [ onClick AddMobber ] [ i [ class "fas fa-plus" ] [] ]
             ]
         , ul
             []
-            [ li []
-                [ i [ class "fas fa-bars" ] []
-                , div
-                    []
-                    [ p [] [ text "Navigator" ]
-                    , input [ type_ "text", value "John" ] []
-                    ]
-                ]
-            , li []
-                [ i [ class "fas fa-bars" ] []
-                , div
-                    []
-                    [ p [] [ text "Navigator" ]
-                    , input [ type_ "text", value "Jane" ] []
-                    ]
-                ]
-            ]
+            (assignRoles model.mobbers model.roles
+                |> List.map
+                    (\mobber ->
+                        li []
+                            [ p [] [ text mobber.role ]
+                            , div
+                                []
+                                [ input [ type_ "text", value <| capitalize mobber.name ] []
+                                , button [ onClick <| OnABreak mobber.name ] [ i [ class "fas fa-mug-hot" ] [] ]
+                                , button [ onClick <| DeleteMobber mobber.name ] [ i [ class "fas fa-times" ] [] ]
+                                ]
+                            ]
+                    )
+            )
         ]
 
 
-settingsView : Model -> Html msg
-settingsView model =
-    div [ id "settings", class "tab" ]
-        [ div []
-            [ h2 []
-                [ i [ class "fas fa-share-alt" ] []
-                , text " Shared with the mob"
-                ]
-            , form
-                []
-                [ label [ for "length" ] [ text "Turn length (min)" ]
-                , input [ id "length", type_ "number", Html.Attributes.min "1", Html.Attributes.max "99", value "4" ] []
-                , label [ for "turns" ] [ text "Number of turns before break" ]
-                , input [ id "turns", type_ "number", Html.Attributes.min "1", Html.Attributes.max "9", value "6" ] []
-                , label [ for "roles" ] [ text "Roles" ]
-                , input [ id "roles", type_ "text", value "Driver, Mavigator" ] []
-                , label [ for "theme" ] [ text "Sounds" ]
-                , select
-                    []
-                    [ option [] [ text "Classic" ] ]
-                ]
-            ]
-        , div []
-            [ h2 []
-                [ i [ class "fas fa-user-lock" ] []
-                , text " Private"
-                ]
-            , form
-                []
-                [ label [ for "volume" ] [ text "Volume" ]
-                , input
-                    [ id "length", type_ "range", Html.Attributes.min "0", Html.Attributes.max "100", value "60" ]
-                    []
-                ]
-            ]
-        ]
+capitalize : String -> String
+capitalize string =
+    (String.left 1 string |> String.toUpper)
+    ++ (String.dropLeft 1 string |> String.toLower)
+
+assignRoles : Mobbers -> Roles -> List MobberRole
+assignRoles mobbers roles =
+    List.indexedMap Tuple.pair mobbers
+        |> List.map (\( i, name ) -> { role = getRole i roles, name = name })
+
+
+getRole : Int -> Roles -> String
+getRole index roles =
+    List.indexedMap Tuple.pair roles
+        |> List.filter (\( i, _ ) -> i == index)
+        |> List.map Tuple.second
+        |> List.head
+        |> Maybe.withDefault "Mobber"
