@@ -17,4 +17,12 @@
       font-size: 1.1em;
     }
   }
+
+  #volume-field {
+    label[for="volume"] {}
+    #volume {
+      flex: 1 1;
+      margin: 0 10px;
+    }
+  }
 }

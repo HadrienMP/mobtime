@@ -28,12 +28,15 @@
         let audio = document.getElementsByTagName("audio")[0];
         audio.onended = () => app.ports.soundEnded.send("");
 
-        switch (command) {
+        switch (command.name) {
             case "play":
                 audio.play();
                 break;
             case "stop":
                 audio.pause();
+                break;
+            case "volume":
+                audio.volume = parseInt(command.data.volume) / 100.0;
                 break;
         }
 

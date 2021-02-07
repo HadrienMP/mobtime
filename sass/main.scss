@@ -62,7 +62,17 @@ button {
   }
 }
 
+.form-field {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+
+  label {
+    margin-right: 20px;
+  }
+}
+
 @import "header";
-@import "tabs/main";
+@import "tabs/timer";
 @import "tabs/mobbers";
 @import "tabs/settings";

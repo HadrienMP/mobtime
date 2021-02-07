@@ -3,8 +3,8 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
-import Html exposing (Html, a, audio, button, div, form, h1, h2, header, i, input, label, li, nav, option, p, section, select, span, strong, text, ul)
-import Html.Attributes exposing (class, classList, for, href, id, placeholder, src, type_, value)
+import Html exposing (Html, a, audio, button, div, form, header, i, input, li, nav, p, section, span, strong, text, ul)
+import Html.Attributes exposing (class, classList, href, id, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Encode
 import Random
@@ -12,6 +12,7 @@ import Ratio exposing (Ratio)
 import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
+import Tabs.Timer as Timer
 import Time
 import Url
 
@@ -35,7 +36,7 @@ main =
 port store : Json.Encode.Value -> Cmd msg
 
 
-port soundCommands : String -> Cmd msg
+port soundCommands : Json.Encode.Value -> Cmd msg
 
 
 port soundEnded : (String -> msg) -> Sub msg
@@ -92,6 +93,7 @@ actionMessage action =
 type alias Audio =
     { state : SoundStatus
     , sound : Sounds.Sound
+    , volume : Int
     }
 
 
@@ -118,7 +120,6 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
-    , nickName : String
     , turn : Turn
     , audio : Audio
     , roles : List String
@@ -133,15 +134,15 @@ type Turn
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init nickname url key =
+init _ url key =
     ( { key = key
       , url = url
       , tab = pageFrom url |> Maybe.withDefault timerPage
-      , nickName = nickname
       , turn = Off
       , audio =
             { state = NotPlaying
             , sound = Sounds.default
+            , volume = 50
             }
       , roles = [ "Driver", "Navigator" ]
       , newMobberName = ""
@@ -175,6 +176,7 @@ type Msg
     | AddMobber
     | DeleteMobber String
     | OnABreak String
+    | TimerMsg Timer.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -197,8 +199,8 @@ update msg model =
             case model.turn of
                 On turn ->
                     if turn.timeLeft == 1 then
-                        ( { model | turn = Off, audio = { state = Playing, sound = model.audio.sound } }
-                        , soundCommands "play"
+                        ( { model | turn = Off, audio = (\audio -> { audio | state = Playing }) model.audio }
+                        , soundCommands playCommand
                         )
 
                     else
@@ -220,18 +222,18 @@ update msg model =
             )
 
         PickedSound sound ->
-            ( { model | audio = { state = NotPlaying, sound = sound } }
+            ( { model | audio = (\audio -> { audio | state = NotPlaying, sound = sound }) model.audio }
             , Cmd.none
             )
 
         SoundEnded _ ->
-            ( { model | audio = { state = NotPlaying, sound = model.audio.sound } }
+            ( { model | audio = (\audio -> { audio | state = NotPlaying }) model.audio }
             , Cmd.none
             )
 
         StopSoundRequest ->
-            ( { model | audio = { state = NotPlaying, sound = model.audio.sound } }
-            , soundCommands "stop"
+            ( { model | audio = (\audio -> { audio | state = NotPlaying }) model.audio }
+            , soundCommands stopCommand
             )
 
         NewMobberNameChanged newMobberName ->
@@ -253,6 +255,40 @@ update msg model =
             ( model
             , Cmd.none
             )
+
+        TimerMsg timerMsg ->
+            case timerMsg of
+                Timer.VolumeChanged volume ->
+                    ( { model | audio = (\audio -> { audio | volume = String.toInt volume |> Maybe.withDefault audio.volume }) model.audio }
+                    , soundCommands <| changeVolume volume
+                    )
+
+
+playCommand : Json.Encode.Value
+playCommand =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string "play" )
+        , ( "data", Json.Encode.object [] )
+        ]
+
+
+stopCommand : Json.Encode.Value
+stopCommand =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string "stop" )
+        , ( "data", Json.Encode.object [] )
+        ]
+
+
+changeVolume : String -> Json.Encode.Value
+changeVolume volume =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string "volume" )
+        , ( "data"
+          , Json.Encode.object
+                [ ( "volume", Json.Encode.string volume ) ]
+          )
+        ]
 
 
 
@@ -280,14 +316,7 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    div [ id "timer", class "tab" ]
-                        [ a [ id "share-link" ]
-                            [ text "You are in the "
-                            , strong [] [ text "Agicap" ]
-                            , text " mob"
-                            , i [ id "share-button", class "fas fa-share-alt" ] []
-                            ]
-                        ]
+                    Timer.view model.audio.volume |> Html.map TimerMsg
 
                 Mobbers ->
                     mobbersView model
@@ -296,20 +325,10 @@ view model =
     }
 
 
-navLinks : Url.Url -> List (Html msg)
-navLinks current =
-    List.map
-        (\page ->
-            a
-                [ href page.url, classList [ activeClass current page.url ] ]
-                [ i [ class <| "fas " ++ page.icon ] [] ]
-        )
-        pages
 
-
-activeClass : Url.Url -> String -> ( String, Bool )
-activeClass current tabUrl =
-    ( "active", current.path == tabUrl )
+-- ############################################################
+-- HEADER
+-- ############################################################
 
 
 headerView : Model -> Html Msg
@@ -350,6 +369,22 @@ headerView model =
         , audio [ src <| "/sound/" ++ model.audio.sound ] []
         , nav [] <| navLinks model.url
         ]
+
+
+navLinks : Url.Url -> List (Html msg)
+navLinks current =
+    List.map
+        (\page ->
+            a
+                [ href page.url, classList [ activeClass current page.url ] ]
+                [ i [ class <| "fas " ++ page.icon ] [] ]
+        )
+        pages
+
+
+activeClass : Url.Url -> String -> ( String, Bool )
+activeClass current tabUrl =
+    ( "active", current.path == tabUrl )
 
 
 turnToString : Turn -> String
@@ -411,6 +446,12 @@ ratio model =
             Ratio.full
 
 
+
+-- ############################################################
+-- MOBBERS
+-- ############################################################
+
+
 mobbersView : Model -> Html Msg
 mobbersView model =
     div [ id "mobbers", class "tab" ]
@@ -441,7 +482,8 @@ mobbersView model =
 capitalize : String -> String
 capitalize string =
     (String.left 1 string |> String.toUpper)
-    ++ (String.dropLeft 1 string |> String.toLower)
+        ++ (String.dropLeft 1 string |> String.toLower)
+
 
 assignRoles : Mobbers -> Roles -> List MobberRole
 assignRoles mobbers roles =
