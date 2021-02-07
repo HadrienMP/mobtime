@@ -5,7 +5,7 @@ import Browser.Navigation as Nav
 import Circle
 import Html exposing (Html, a, audio, button, div, form, h1, h2, header, i, input, label, li, nav, option, p, section, select, span, strong, text, ul)
 import Html.Attributes exposing (class, classList, for, href, id, placeholder, src, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Encode
 import Random
 import Ratio exposing (Ratio)
@@ -414,10 +414,10 @@ ratio model =
 mobbersView : Model -> Html Msg
 mobbersView model =
     div [ id "mobbers", class "tab" ]
-        [ div
-            [ id "add" ]
+        [ form
+            [ id "add", onSubmit AddMobber ]
             [ input [ type_ "text", placeholder "Mobber name", onInput NewMobberNameChanged, value model.newMobberName ] []
-            , button [ onClick AddMobber ] [ i [ class "fas fa-plus" ] [] ]
+            , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
             ]
         , ul
             []

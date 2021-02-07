@@ -1,0 +1,30 @@
+
+// -------------------------------------------
+// SETTINGS
+// -------------------------------------------
+
+#settings {
+  form {
+    padding: 20px;
+  }
+
+  h2 {
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid rgba(100, 100, 100, .5);
+    background: $dark-bg-color;
+
+    i {
+      padding: 16px 20px;
+      margin-right: 20px;
+      border-right: 1px solid $border-color;
+    }
+  }
+
+  label, input {
+    display: block;
+  }
+
+  input {
+    width: 100%;
+  }
+}

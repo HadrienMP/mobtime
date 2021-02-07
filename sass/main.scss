@@ -1,10 +1,7 @@
 @import "compass";
 @import "compass/reset";
+@import "theme";
 
-$width: 433px;
-$light-bg-color: #ffffff;
-$dark-bg-color: #c9c9c9;
-$color: black;
 @mixin gradient-background {
   background: $dark-bg-color; /* fallback for old browsers */
   background: -webkit-linear-gradient(to right, $light-bg-color, $dark-bg-color); /* Chrome 10-25, Safari 5.1-6 */
@@ -19,8 +16,6 @@ html {
 
 body {
   color: $color;
-  //text-shadow: 1px 1px 1px #666;
-  //@include gradient-background;
 }
 
 body * {
@@ -32,11 +27,6 @@ body * {
   max-width: $width;
 }
 
-$shadow-shade: 120;
-$shadow-color: rgba($shadow-shade, $shadow-shade, $shadow-shade, .4);
-$border-shade: 250;
-$border-color: rgba($border-shade, $border-shade, $border-shade, .6);
-
 h1 {
   border-top: 2px solid $color;
   border-bottom: 2px solid $color;
@@ -46,232 +36,33 @@ h1 {
   font-family: 'Fredericka the Great', fantasy;
 }
 
-// ===========================================
-// NAV
-// ===========================================
 
-nav {
-  background: #666;
-  display: flex;
 
-  a {
-    flex: 1 1;
-    display: inline-block;
-    font-size: 1.2em;
-    text-align: center;
-    padding: 12px 0;
-    text-shadow: 1px 1px 1px #666;
-    border-left: 1px solid $border-color;
-    color: white;
+input {
+  border: none;
+  border-bottom: 1px solid;
+  font-weight: bold;
+  font-size: 1.1em;
+}
 
-    &:first-child {
-      border-left: none;
-    }
+a, button {
+  cursor: pointer;
+}
 
-    &.active {
-      background: #999;
-    }
+button {
+  border-radius: 0;
+  border: none;
+  background: $dark-button-color;
+  color: white;
+  padding: 0 20px;
+  outline: none;
+
+  &:hover {
+    background: $light-button-color;
   }
 }
 
-// ===========================================
-// TABS
-// ===========================================
-
-.tab {
-}
-
-header {
-  section {
-    position: relative;
-    margin: 0   auto 10px;
-    padding: 50px 0 20px;
-
-    &::before {
-      content: "";
-      background: url("/images/mob.png") center;
-      background-size: cover;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      opacity: .2;
-    }
-
-    svg {
-      margin: auto;
-      display: block;
-      transform: rotateZ(-90deg);
-      background: rgba(255,255,255,.7);
-      border-radius: 100%;
-
-      circle {
-        transition: stroke-dashoffset 1s linear;
-      }
-    }
-
-    button {
-      position: absolute;
-      top: 50px;
-      left: 0;
-      right: 0;
-      display: block;
-
-      width: 220px;
-      height: 220px;
-      margin: auto;
-
-      cursor: pointer;
-      color: #666666;
-
-      background: none;
-      border: none;
-      border-radius: 100%;
-      font-weight: bold;
-
-      &.off {
-        i {
-          display: block;
-        }
-        span {
-          display: none;
-        }
-      }
-      &.on {
-        i {
-          display: none;
-        }
-        span {
-          display: block;
-        }
-
-        &:hover {
-          span {
-            display: none;
-          }
-          i {
-            display: block;
-          }
-        }
-      }
-
-      i {
-        display: none;
-        font-size: 6em;
-      }
-
-      span {
-        font-size: 3em;
-      }
-    }
-  }
-}
-
-#timer {
-  margin: 20px 0 0;
-
-  #share-link {
-    padding: 0 20px;
-    cursor: pointer;
-    position: relative;
-    display: block;
-
-    strong {
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-    i {
-      position: absolute;
-      top: 4px;
-      right: 20px;
-      font-size: 1.1em;
-    }
-  }
-}
-
-#mobbers {
-  padding: 20px;
-
-  #add {
-    display: flex;
-
-    input {
-      flex-grow: 1;
-      flex-shrink: 1;
-    }
-
-    button {
-      flex-shrink: 0;
-    }
-  }
-
-  ul {
-    li {
-      margin: 20px 0;
-      p {
-        font-size: .8em;
-        margin-bottom: 5px;
-      }
-
-      div {
-        display: flex;
-        align-items: center;
-        width: 100%;
-
-        & > i {
-          padding-right: 10px;
-          flex-shrink: 0;
-          flex-grow: 0;
-        }
-
-        input {
-          width: 50%;
-          flex-grow: 1;
-          flex-shrink: 1;
-          border: none;
-          border-bottom: 1px solid;
-          font-weight: bold;
-          font-size: 1.1em;
-        }
-
-        button {
-          flex-shrink: 0;
-          border: none;
-          background: none;
-          font-size: 1em;
-        }
-      }
-    }
-  }
-}
-
-// -------------------------------------------
-// SETTINGS
-// -------------------------------------------
-
-#settings {
-  form {
-    padding: 20px;
-  }
-
-  h2 {
-    border-top: 1px solid $border-color;
-    border-bottom: 1px solid rgba(100, 100, 100, .5);
-    background: $dark-bg-color;
-
-    i {
-      padding: 16px 20px;
-      margin-right: 20px;
-      border-right: 1px solid $border-color;
-    }
-  }
-
-  label, input {
-    display: block;
-  }
-
-  input {
-    width: 100%;
-  }
-}
+@import "header";
+@import "tabs/main";
+@import "tabs/mobbers";
+@import "tabs/settings";

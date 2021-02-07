@@ -1,0 +1,59 @@
+#mobbers {
+  padding: 20px 0;
+
+  #add {
+    display: flex;
+
+    input {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+
+    button {
+      flex-shrink: 0;
+    }
+  }
+
+  ul {
+    li {
+      margin: 20px 0;
+      p {
+        font-size: .8em;
+        margin-bottom: 5px;
+      }
+
+      div {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        & > i {
+          padding-right: 10px;
+          flex-shrink: 0;
+          flex-grow: 0;
+        }
+
+        input {
+          width: 50%;
+          flex-grow: 1;
+          flex-shrink: 1;
+          border: none;
+          border-bottom: 1px solid;
+        }
+
+        button {
+          flex-shrink: 0;
+          border: none;
+          background: none;
+          font-size: 1em;
+          color: #999;
+          padding: 0 0 0 20px;
+
+          &:hover {
+            color: black;
+          }
+        }
+      }
+    }
+  }
+}

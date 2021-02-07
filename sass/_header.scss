@@ -1,0 +1,118 @@
+header {
+  section {
+    position: relative;
+    margin: 0   auto 10px;
+    padding: 50px 0 20px;
+
+    &::before {
+      content: "";
+      background: url("/images/mob.png") center;
+      background-size: cover;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      opacity: .2;
+    }
+
+    svg {
+      margin: auto;
+      display: block;
+      transform: rotateZ(-90deg);
+      background: rgba(255,255,255,.7);
+      border-radius: 100%;
+
+      circle {
+        transition: stroke-dashoffset 1s linear;
+      }
+    }
+
+    button {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      right: 0;
+      display: block;
+
+      width: 220px;
+      height: 220px;
+      margin: auto;
+
+      cursor: pointer;
+      color: $dark-button-color;
+
+      background: none;
+      border: none;
+      border-radius: 100%;
+      font-weight: bold;
+
+      &:hover {
+        background: none;
+      }
+
+      &.off {
+        i {
+          display: block;
+        }
+        span {
+          display: none;
+        }
+      }
+      &.on {
+        i {
+          display: none;
+        }
+        span {
+          display: block;
+        }
+
+        &:hover {
+          span {
+            display: none;
+          }
+          i {
+            display: block;
+          }
+        }
+      }
+
+      i {
+        display: none;
+        font-size: 6em;
+      }
+
+      span {
+        font-size: 3em;
+      }
+    }
+  }
+}
+
+// ===========================================
+// NAV
+// ===========================================
+
+nav {
+  background: #666;
+  display: flex;
+
+  a {
+    flex: 1 1;
+    display: inline-block;
+    font-size: 1.2em;
+    text-align: center;
+    padding: 12px 0;
+    text-shadow: 1px 1px 1px #666;
+    border-left: 1px solid $border-color;
+    color: white;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &.active {
+      background: #999;
+    }
+  }
+}
