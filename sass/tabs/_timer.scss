@@ -1,6 +1,10 @@
 #timer {
   margin: 20px 0 0;
 
+  label {
+    flex: 0 0 30%;
+  }
+
   #share-link {
     cursor: pointer;
     position: relative;
@@ -17,40 +21,40 @@
       font-size: 1.1em;
     }
   }
+}
 
-  input[type="range"] {
-    flex: 1 1 0;
-    margin: 0 10px;
-    width: 25%;
-  }
+input[type="range"] {
+  flex: 1 1 0;
+  margin: 0 10px;
+  width: 25%;
+}
 
-  #sounds-field {
-    display: block;
+#sounds-field {
+  display: block;
 
-    #sound-cards {
-      display: flex;
-      align-items: start;
+  #sound-cards {
+    display: flex;
+    align-items: start;
 
-      button {
-        flex: 1 0;
-        width: 130px;
-        background: none;
-        text-align: center;
-        padding: 20px;
-        color: black;
-        vertical-align: top;
+    button {
+      flex: 1 0;
+      width: 130px;
+      background: none;
+      text-align: center;
+      padding: 20px;
+      color: black;
+      vertical-align: top;
 
+      i {
+        font-size: 2em;
+        padding: 30px;
+        background: $dark-button-color;
+        color: white;
+      }
+
+      &.active {
         i {
-          font-size: 2em;
-          padding: 30px;
-          background: $dark-button-color;
-          color: white;
-        }
-
-        &.active {
-          i {
-            background: $light-button-color;
-          }
+          background: $light-button-color;
         }
       }
     }

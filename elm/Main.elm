@@ -14,6 +14,7 @@ import Ratio exposing (Ratio)
 import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
+import Tabs.Sound
 import Tabs.Timer as Timer
 import Time
 import Url
@@ -51,6 +52,7 @@ port soundEnded : (String -> msg) -> Sub msg
 type TabType
     = Timer
     | Mobbers
+    | SoundTab
 
 
 type alias Tab =
@@ -70,6 +72,7 @@ pages : List Tab
 pages =
     [ timerPage
     , Tab Mobbers "/mobbers" "Mobbers" "fa-users"
+    , Tab SoundTab "/audio" "Sound" "fa-volume-up"
     ]
 
 
@@ -185,6 +188,7 @@ type Msg
     | DeleteMobber String
     | OnABreak String
     | TimerMsg Timer.Msg
+    | SoundMsg Tabs.Sound.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -266,11 +270,6 @@ update msg model =
 
         TimerMsg timerMsg ->
             case timerMsg of
-                Timer.VolumeChanged volume ->
-                    ( { model | audio = (\audio -> { audio | volume = String.toInt volume |> Maybe.withDefault audio.volume }) model.audio }
-                    , soundCommands <| changeVolume volume
-                    )
-
                 Timer.TurnLengthChanged turnLength ->
                     ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 }
                     , Cmd.none
@@ -281,7 +280,14 @@ update msg model =
                     , Cmd.none
                     )
 
-                Timer.SelectedSoundProfile profile ->
+        SoundMsg timerMsg ->
+            case timerMsg of
+                Tabs.Sound.VolumeChanged volume ->
+                    ( { model | audio = (\audio -> { audio | volume = String.toInt volume |> Maybe.withDefault audio.volume }) model.audio }
+                    , soundCommands <| changeVolume volume
+                    )
+
+                Tabs.Sound.SelectedSoundProfile profile ->
                     ( { model | audio = (\audio -> { audio | profile = profile }) model.audio }
                     , Cmd.none
                     )
@@ -332,18 +338,22 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Mob Time !"
+    { title = timeLeft model ++ " | Mob Time !"
     , body =
         [ div
             [ id "container" ]
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Timer.view model.displaySeconds model.turnLength model.audio.volume model.audio.profile
+                    Timer.view model.displaySeconds model.turnLength
                     |> Html.map TimerMsg
 
                 Mobbers ->
                     mobbersView model
+
+                SoundTab ->
+                    Tabs.Sound.view model.audio.volume model.audio.profile
+                    |> Html.map SoundMsg
             ]
         ]
     }
@@ -444,7 +454,7 @@ timeLeft model =
 
                 secondsText =
                     if secondsLeft /= 0 then
-                        String.fromInt secondsLeft ++ " s"
+                        String.fromInt secondsLeft ++ " " ++ "s"
 
                     else
                         ""
