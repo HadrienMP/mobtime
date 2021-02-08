@@ -18,11 +18,9 @@
     }
   }
 
-  #volume-field {
-    label[for="volume"] {}
-    #volume {
-      flex: 1 1;
-      margin: 0 10px;
-    }
+  input[type="range"] {
+    flex: 1 1 0;
+    margin: 0 10px;
+    width: 25%;
   }
 }

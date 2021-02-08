@@ -69,7 +69,13 @@ button {
 
   label {
     margin-right: 20px;
+    flex: 0 0 30%;
   }
+}
+
+hr {
+  margin: 20px 0;
+  color: $light-button-color;
 }
 
 @import "header";

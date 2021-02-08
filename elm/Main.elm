@@ -1,11 +1,13 @@
 port module Main exposing (..)
 
 import Browser
+import Browser.Events
 import Browser.Navigation as Nav
 import Circle
-import Html exposing (Html, a, audio, button, div, form, header, i, input, li, nav, p, section, span, strong, text, ul)
+import Html exposing (Html, a, audio, button, div, form, header, i, input, li, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, classList, href, id, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Json.Decode as Decode
 import Json.Encode
 import Random
 import Ratio exposing (Ratio)
@@ -120,7 +122,9 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
+    , turnLength : Int
     , turn : Turn
+    , displaySeconds : Bool
     , audio : Audio
     , roles : List String
     , newMobberName : String
@@ -130,7 +134,7 @@ type alias Model =
 
 type Turn
     = Off
-    | On { timeLeft : Float, turnLength : Float }
+    | On { timeLeft : Int, length : Int }
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -138,6 +142,8 @@ init _ url key =
     ( { key = key
       , url = url
       , tab = pageFrom url |> Maybe.withDefault timerPage
+      , turnLength = 8
+      , displaySeconds = False
       , turn = Off
       , audio =
             { state = NotPlaying
@@ -212,7 +218,7 @@ update msg model =
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | turn = On { timeLeft = 10, turnLength = 10 } }
+            ( { model | turn = On { timeLeft = model.turnLength * 60, length = model.turnLength } }
             , Random.generate PickedSound Sounds.pick
             )
 
@@ -263,6 +269,17 @@ update msg model =
                     , soundCommands <| changeVolume volume
                     )
 
+                Timer.TurnLengthChanged turnLength ->
+                    ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 }
+                    , Cmd.none
+                    )
+
+                Timer.DisplaySecondsChanged displaySeconds ->
+                    ( { model | displaySeconds = displaySeconds }
+                    , Cmd.none
+                    )
+
+
 
 playCommand : Json.Encode.Value
 playCommand =
@@ -303,7 +320,6 @@ subscriptions _ =
         ]
 
 
-
 -- VIEW
 
 
@@ -316,7 +332,7 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Timer.view model.audio.volume |> Html.map TimerMsg
+                    Timer.view model.displaySeconds model.turnLength model.audio.volume |> Html.map TimerMsg
 
                 Mobbers ->
                     mobbersView model
@@ -362,7 +378,7 @@ headerView model =
                 [ onClick <| actionMessage <| actionOf model
                 , class <| turnToString model.turn
                 ]
-                [ span [] [ text (timeLeft model.turn) ]
+                [ span [] [ text <| timeLeft model ]
                 , actionIcon <| actionOf model
                 ]
             ]
@@ -397,11 +413,39 @@ turnToString turn =
             "off"
 
 
-timeLeft : Turn -> String
-timeLeft turn =
-    case turn of
+timeLeft : Model -> String
+timeLeft model =
+    case model.turn of
         On t ->
-            String.fromFloat t.timeLeft ++ "s"
+            let
+                floatMinutes =
+                    toFloat t.timeLeft / 60.0
+
+                intMinutes =
+                    floor floatMinutes
+
+                secondsLeft =
+                    t.timeLeft - (floor floatMinutes * 60)
+
+                minutesText =
+                    if intMinutes /= 0 then
+                        (String.fromInt intMinutes) ++ " min "
+
+                    else
+                        ""
+
+                secondsText =
+                    if secondsLeft /= 0 then
+                        String.fromInt secondsLeft ++ " s"
+
+                    else
+                        ""
+            in
+            if model.displaySeconds || t.timeLeft < 60 then
+                minutesText ++ secondsText
+
+            else
+                (String.fromInt <| ceiling floatMinutes) ++ " min"
 
         Off ->
             ""
@@ -440,7 +484,9 @@ ratio : Model -> Ratio
 ratio model =
     case model.turn of
         On turn ->
-            Ratio.from (1 - (turn.timeLeft - 1) / turn.turnLength)
+            (1 - (toFloat (turn.timeLeft - 1) / (toFloat turn.length * 60)))
+                |> Debug.log ""
+                |> Ratio.from
 
         Off ->
             Ratio.full
