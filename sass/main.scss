@@ -78,6 +78,10 @@ hr {
   color: $light-button-color;
 }
 
+.active {
+  background: #999;
+}
+
 @import "header";
 @import "tabs/timer";
 @import "tabs/mobbers";

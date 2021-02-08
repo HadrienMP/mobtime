@@ -95,6 +95,7 @@ actionMessage action =
 type alias Audio =
     { state : SoundStatus
     , sound : Sounds.Sound
+    , profile : Sounds.Profile
     , volume : Int
     }
 
@@ -149,6 +150,7 @@ init _ url key =
             { state = NotPlaying
             , sound = Sounds.default
             , volume = 50
+            , profile = Sounds.ClassicWeird
             }
       , roles = [ "Driver", "Navigator" ]
       , newMobberName = ""
@@ -219,7 +221,7 @@ update msg model =
 
         StartRequest ->
             ( { model | turn = On { timeLeft = model.turnLength * 60, length = model.turnLength } }
-            , Random.generate PickedSound Sounds.pick
+            , Random.generate PickedSound <| Sounds.pick model.audio.profile
             )
 
         StopRequest ->
@@ -279,6 +281,11 @@ update msg model =
                     , Cmd.none
                     )
 
+                Timer.SelectedSoundProfile profile ->
+                    ( { model | audio = (\audio -> { audio | profile = profile }) model.audio }
+                    , Cmd.none
+                    )
+
 
 
 playCommand : Json.Encode.Value
@@ -332,7 +339,8 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Timer.view model.displaySeconds model.turnLength model.audio.volume |> Html.map TimerMsg
+                    Timer.view model.displaySeconds model.turnLength model.audio.volume model.audio.profile
+                    |> Html.map TimerMsg
 
                 Mobbers ->
                     mobbersView model

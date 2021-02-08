@@ -1,18 +1,20 @@
 module Tabs.Timer exposing (..)
 
-import Html exposing (Html, a, div, hr, i, input, label, strong, text)
-import Html.Attributes exposing (checked, class, for, id, step, type_, value)
-import Html.Events exposing (onCheck, onInput)
+import Html exposing (Html, a, button, div, hr, i, input, label, p, strong, text)
+import Html.Attributes exposing (checked, class, classList, for, href, id, step, type_, value)
+import Html.Events exposing (onCheck, onClick, onInput)
+import Sounds
 
 
 type Msg
     = VolumeChanged String
     | TurnLengthChanged String
     | DisplaySecondsChanged Bool
+    | SelectedSoundProfile Sounds.Profile
 
 
-view : Bool -> Int -> Int -> Html Msg
-view displaySeconds turnLength volume =
+view : Bool -> Int -> Int -> Sounds.Profile -> Html Msg
+view displaySeconds turnLength volume profile =
     div [ id "timer", class "tab" ]
         [ a [ id "share-link" ]
             [ text "You are in the "
@@ -68,5 +70,26 @@ view displaySeconds turnLength volume =
                 ]
                 []
             , i [ class "fas fa-volume-up" ] []
+            ]
+        , div
+            [ id "sounds-field", class "form-field" ]
+            [ label [] [ text "Sounds" ]
+            , div
+                [ id "sound-cards" ]
+                [ button
+                    [ classList [ ( "active", profile == Sounds.ClassicWeird ) ]
+                    , onClick <| SelectedSoundProfile Sounds.ClassicWeird
+                    ]
+                    [ i [ class "fas fa-grin-stars" ] []
+                    , p [] [ text "Classic Weird" ]
+                    ]
+                , button
+                    [ classList [ ( "active", profile == Sounds.Riot ) ]
+                    , onClick <| SelectedSoundProfile Sounds.Riot
+                    ]
+                    [ i [ class "fas fa-hand-rock" ] []
+                    , p [] [ text "Riot" ]
+                    ]
+                ]
             ]
         ]

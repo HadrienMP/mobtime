@@ -1,64 +1,101 @@
-module Sounds exposing (..)
+module Sounds exposing (default, pick, Sound, Profile(..))
 
 import Random
-type alias Sound = String
+
+
+type alias Sound =
+    String
+
+
+type Profile
+    = ClassicWeird
+    | Riot
+
 
 default : Sound
-default = "celebration.mp3"
+default =
+    "celebration.mp3"
 
-pick : Random.Generator Sound
-pick = Random.uniform default all
 
-all : List Sound
-all =
-    [ "007-james-bond-theme.mp3"
-    , "007-sound-final.mp3"
-    , "a-ha-take-on-me-cut-mp3.mp3"
-    , "anthologie-de-julien-lepers.mp3"
-    , "breaking-bad-intro.mp3"
-    , "cantina-band.mp3"
-    , "celebration.mp3"
-    , "complotiste.mp3"
-    , "denis-brogniart-ah-original.mp3"
-    , "donald-trump-fake-news-sound-effect.mp3"
-    , "drwho.mp3"
-    , "fake-news-great.mp3"
-    , "flashgordontheme.mp3"
-    , "george-micael-wham-careless-whisper-1.mp3"
-    , "got.mp3"
-    , "hallelujahshort.swf.mp3"
-    , "harry-potter-hedwigs-theme-short.mp3"
-    , "i-am-your-father_rCXrfcX.mp3"
-    , "imperial_march.mp3"
-    , "inceptionbutton.mp3"
-    , "indiana-jones-theme-song.mp3"
-    , "its-me-mario.mp3"
-    , "jurrasic-theme-2-hq.mp3"
-    , "kaamelott-theme.mp3"
-    , "knight-rider.mp3"
-    , "lemon-grab-unacceptable.mp3"
-    , "macron_projet_final.mp3"
-    , "mc-hammer-u-cant-touch-this.mp3"
-    , "mission-impossible.mp3"
-    , "music-missionimpossibletheme.mp3"
-    , "nyan-cat_1.mp3"
-    , "o-bom-o-mal-e-o-feio-velho-oeste-desafio-dont-talk-duelo-desafio-armas.mp3"
-    , "over9000.swf.mp3"
-    , "perlin.mp3"
-    , "poudreperlinpinpin_fqw6cN8.mp3"
-    , "psy-gangnam-style-1.mp3"
-    , "robin-hood-1973-whistle-stop.mp3"
-    , "star-wars-john-williams-duel-of-the-fates.mp3"
-    , "super-mario-bros-ost-8-youre-dead.mp3"
-    , "tetris-theme.mp3"
-    , "the-addams-family-intro-theme-song.mp3"
-    , "the-benny-hill-show-theme-short-sound-clip-and-quote-hark.mp3"
-    , "the-it-crowd-theme.mp3"
-    , "the-pink-panther-theme-song-original-version.mp3"
-    , "the-simpsons-nelsons-haha.mp3"
-    , "the-weather-girls-its-raining-men-1-cut-mp3.mp3"
-    , "untitled_3.mp3"
-    , "utini.mp3"
-    , "we-are-the-champions-copia.mp3"
-    , "zelda.mp3"
+pick : Profile -> Random.Generator Sound
+pick profile =
+    Random.uniform default <| soundsOf profile
+
+
+soundsOf : Profile -> List Sound
+soundsOf profile =
+    case profile of
+        ClassicWeird ->
+            classicWeird
+
+        Riot ->
+            riot
+
+
+riot : List Sound
+riot =
+    [ "riot/ca cest paris.mp3"
+    , "riot/el pueblo unido.mp3"
+    , "riot/faut plus de gouvernement.mp3"
+    , "riot/france qui ferme sa gueule.mp3"
+    , "riot/internationale.mp3"
+    , "riot/internationale2.mp3"
+    , "riot/milliards contre une elite.mp3"
+    , "riot/mort aux patrons.mp3"
+    , "riot/ravachole.mp3"
+    ]
+
+
+classicWeird : List Sound
+classicWeird =
+    [ "classic-weird/007-james-bond-theme.mp3"
+    , "classic-weird/007-sound-final.mp3"
+    , "classic-weird/a-ha-take-on-me-cut-mp3.mp3"
+    , "classic-weird/anthologie-de-julien-lepers.mp3"
+    , "classic-weird/breaking-bad-intro.mp3"
+    , "classic-weird/cantina-band.mp3"
+    , "classic-weird/celebration.mp3"
+    , "classic-weird/complotiste.mp3"
+    , "classic-weird/denis-brogniart-ah-original.mp3"
+    , "classic-weird/donald-trump-fake-news-sound-effect.mp3"
+    , "classic-weird/drwho.mp3"
+    , "classic-weird/fake-news-great.mp3"
+    , "classic-weird/flashgordontheme.mp3"
+    , "classic-weird/george-micael-wham-careless-whisper-1.mp3"
+    , "classic-weird/got.mp3"
+    , "classic-weird/hallelujahshort.swf.mp3"
+    , "classic-weird/harry-potter-hedwigs-theme-short.mp3"
+    , "classic-weird/i-am-your-father_rCXrfcX.mp3"
+    , "classic-weird/imperial_march.mp3"
+    , "classic-weird/inceptionbutton.mp3"
+    , "classic-weird/indiana-jones-theme-song.mp3"
+    , "classic-weird/its-me-mario.mp3"
+    , "classic-weird/jurrasic-theme-2-hq.mp3"
+    , "classic-weird/kaamelott-theme.mp3"
+    , "classic-weird/knight-rider.mp3"
+    , "classic-weird/lemon-grab-unacceptable.mp3"
+    , "classic-weird/macron_projet_final.mp3"
+    , "classic-weird/mc-hammer-u-cant-touch-this.mp3"
+    , "classic-weird/mission-impossible.mp3"
+    , "classic-weird/music-missionimpossibletheme.mp3"
+    , "classic-weird/nyan-cat_1.mp3"
+    , "classic-weird/o-bom-o-mal-e-o-feio-velho-oeste-desafio-dont-talk-duelo-desafio-armas.mp3"
+    , "classic-weird/over9000.swf.mp3"
+    , "classic-weird/perlin.mp3"
+    , "classic-weird/poudreperlinpinpin_fqw6cN8.mp3"
+    , "classic-weird/psy-gangnam-style-1.mp3"
+    , "classic-weird/robin-hood-1973-whistle-stop.mp3"
+    , "classic-weird/star-wars-john-williams-duel-of-the-fates.mp3"
+    , "classic-weird/super-mario-bros-ost-8-youre-dead.mp3"
+    , "classic-weird/tetris-theme.mp3"
+    , "classic-weird/the-addams-family-intro-theme-song.mp3"
+    , "classic-weird/the-benny-hill-show-theme-short-sound-clip-and-quote-hark.mp3"
+    , "classic-weird/the-it-crowd-theme.mp3"
+    , "classic-weird/the-pink-panther-theme-song-original-version.mp3"
+    , "classic-weird/the-simpsons-nelsons-haha.mp3"
+    , "classic-weird/the-weather-girls-its-raining-men-1-cut-mp3.mp3"
+    , "classic-weird/untitled_3.mp3"
+    , "classic-weird/utini.mp3"
+    , "classic-weird/we-are-the-champions-copia.mp3"
+    , "classic-weird/zelda.mp3"
     ]
