@@ -189,7 +189,6 @@ type Msg
     | NewMobberNameChanged String
     | AddMobber
     | DeleteMobber String
-    | OnABreak String
     | TimerMsg Timer.Msg
     | SoundMsg Tabs.Sound.Msg
     | DevMsg Tabs.Dev.Msg
@@ -215,7 +214,11 @@ update msg model =
             case model.turn of
                 On turn ->
                     if turn.timeLeft <= 1 then
-                        ( { model | turn = Off, audio = (\audio -> { audio | state = Playing }) model.audio }
+                        ( { model
+                            | turn = Off
+                            , audio = (\audio -> { audio | state = Playing }) model.audio
+                            , mobbers = rotate model.mobbers
+                          }
                         , soundCommands playCommand
                         )
 
@@ -267,11 +270,6 @@ update msg model =
             , Cmd.none
             )
 
-        OnABreak _ ->
-            ( model
-            , Cmd.none
-            )
-
         TimerMsg timerMsg ->
             case timerMsg of
                 Timer.TurnLengthChanged turnLength ->
@@ -300,6 +298,13 @@ update msg model =
             Tabs.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
 
+
+rotate : Mobbers -> Mobbers
+rotate mobbers =
+    (List.tail mobbers, List.head mobbers)
+    |> Tuple.mapSecond (Maybe.map (\it -> [it]))
+    |> Tuple.mapBoth (Maybe.withDefault []) (Maybe.withDefault [])
+    |> (\(tail, head) -> tail ++ head)
 
 playCommand : Json.Encode.Value
 playCommand =
@@ -546,7 +551,6 @@ mobbersView model =
                             , div
                                 []
                                 [ input [ type_ "text", value <| capitalize mobber.name ] []
-                                , button [ onClick <| OnABreak mobber.name ] [ i [ class "fas fa-mug-hot" ] [] ]
                                 , button [ onClick <| DeleteMobber mobber.name ] [ i [ class "fas fa-times" ] [] ]
                                 ]
                             ]
