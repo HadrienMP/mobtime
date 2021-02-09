@@ -72,6 +72,17 @@ button {
   }
 }
 
+.toggles {
+  display: flex;
+  align-items: center;
+  flex: 1 1;
+
+  button {
+    flex: 1 1;
+    padding: 6px;
+  }
+}
+
 hr {
   margin: 20px 0;
   color: $light-button-color;

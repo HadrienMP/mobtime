@@ -1,19 +1,18 @@
 port module Main exposing (..)
 
 import Browser
-import Browser.Events
 import Browser.Navigation as Nav
 import Circle
 import Html exposing (Html, a, audio, button, div, form, header, i, input, li, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, classList, href, id, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Json.Decode as Decode
 import Json.Encode
 import Random
 import Ratio exposing (Ratio)
 import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
+import Tabs.Dev
 import Tabs.Sound
 import Tabs.Timer as Timer
 import Time
@@ -53,6 +52,7 @@ type TabType
     = Timer
     | Mobbers
     | SoundTab
+    | DevTab
 
 
 type alias Tab =
@@ -73,6 +73,7 @@ pages =
     [ timerPage
     , Tab Mobbers "/mobbers" "Mobbers" "fa-users"
     , Tab SoundTab "/audio" "Sound" "fa-volume-up"
+    , Tab DevTab "/dev" "Dev" "fa-code"
     ]
 
 
@@ -133,6 +134,7 @@ type alias Model =
     , roles : List String
     , newMobberName : String
     , mobbers : Mobbers
+    , dev : Tabs.Dev.Model
     }
 
 
@@ -158,6 +160,7 @@ init _ url key =
       , roles = [ "Driver", "Navigator" ]
       , newMobberName = ""
       , mobbers = []
+      , dev = Tabs.Dev.init
       }
     , Cmd.none
     )
@@ -189,6 +192,7 @@ type Msg
     | OnABreak String
     | TimerMsg Timer.Msg
     | SoundMsg Tabs.Sound.Msg
+    | DevMsg Tabs.Dev.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -210,13 +214,13 @@ update msg model =
         TimePassed _ ->
             case model.turn of
                 On turn ->
-                    if turn.timeLeft == 1 then
+                    if turn.timeLeft <= 1 then
                         ( { model | turn = Off, audio = (\audio -> { audio | state = Playing }) model.audio }
                         , soundCommands playCommand
                         )
 
                     else
-                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - 1 } }
+                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - Tabs.Dev.seconds model.dev } }
                         , Cmd.none
                         )
 
@@ -292,6 +296,9 @@ update msg model =
                     , Cmd.none
                     )
 
+        DevMsg devMsg ->
+            Tabs.Dev.update devMsg model.dev
+                |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
 
 
 playCommand : Json.Encode.Value
@@ -333,6 +340,7 @@ subscriptions _ =
         ]
 
 
+
 -- VIEW
 
 
@@ -346,14 +354,18 @@ view model =
             , case model.tab.type_ of
                 Timer ->
                     Timer.view model.displaySeconds model.turnLength
-                    |> Html.map TimerMsg
+                        |> Html.map TimerMsg
 
                 Mobbers ->
                     mobbersView model
 
                 SoundTab ->
                     Tabs.Sound.view model.audio.volume model.audio.profile
-                    |> Html.map SoundMsg
+                        |> Html.map SoundMsg
+
+                DevTab ->
+                    Tabs.Dev.view model.dev
+                        |> Html.map DevMsg
             ]
         ]
     }
@@ -447,7 +459,7 @@ timeLeft model =
 
                 minutesText =
                     if intMinutes /= 0 then
-                        (String.fromInt intMinutes) ++ " min "
+                        String.fromInt intMinutes ++ " min "
 
                     else
                         ""

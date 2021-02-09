@@ -14,7 +14,7 @@ type Profile
 
 default : Sound
 default =
-    "celebration.mp3"
+    "classic-weird/celebration.mp3"
 
 
 pick : Profile -> Random.Generator Sound
