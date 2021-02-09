@@ -9,12 +9,12 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Encode
 import Random
 import Ratio exposing (Ratio)
+import Settings.Dev
+import Settings.Sound
+import Settings.Timer
 import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
-import Settings.Dev
-import Settings.Sound
-import Settings.Timer as Timer
 import Time
 import Url
 
@@ -127,14 +127,13 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
-    , turnLength : Int
+    , timer : Settings.Timer.Model
+    , dev : Settings.Dev.Model
     , turn : Turn
-    , displaySeconds : Bool
     , audio : Audio
     , roles : List String
     , newMobberName : String
     , mobbers : Mobbers
-    , dev : Settings.Dev.Model
     }
 
 
@@ -148,8 +147,8 @@ init _ url key =
     ( { key = key
       , url = url
       , tab = pageFrom url |> Maybe.withDefault timerPage
-      , turnLength = 8
-      , displaySeconds = False
+      , timer = Settings.Timer.init
+      , dev = Settings.Dev.init
       , turn = Off
       , audio =
             { state = NotPlaying
@@ -160,7 +159,6 @@ init _ url key =
       , roles = [ "Driver", "Navigator" ]
       , newMobberName = ""
       , mobbers = []
-      , dev = Settings.Dev.init
       }
     , Cmd.none
     )
@@ -189,7 +187,7 @@ type Msg
     | NewMobberNameChanged String
     | AddMobber
     | DeleteMobber String
-    | TimerMsg Timer.Msg
+    | TimerMsg Settings.Timer.Msg
     | SoundMsg Settings.Sound.Msg
     | DevMsg Settings.Dev.Msg
 
@@ -231,7 +229,7 @@ update msg model =
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | turn = On { timeLeft = model.turnLength * 60, length = model.turnLength } }
+            ( { model | turn = On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
             , Random.generate PickedSound <| Sounds.pick model.audio.profile
             )
 
@@ -271,16 +269,10 @@ update msg model =
             )
 
         TimerMsg timerMsg ->
-            case timerMsg of
-                Timer.TurnLengthChanged turnLength ->
-                    ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 }
-                    , Cmd.none
-                    )
-
-                Timer.DisplaySecondsChanged displaySeconds ->
-                    ( { model | displaySeconds = displaySeconds }
-                    , Cmd.none
-                    )
+            Settings.Timer.update timerMsg model.timer
+                |> Tuple.mapBoth
+                    (\it -> { model | timer = it })
+                    (Cmd.map TimerMsg)
 
         SoundMsg timerMsg ->
             case timerMsg of
@@ -301,10 +293,11 @@ update msg model =
 
 rotate : Mobbers -> Mobbers
 rotate mobbers =
-    (List.tail mobbers, List.head mobbers)
-    |> Tuple.mapSecond (Maybe.map (\it -> [it]))
-    |> Tuple.mapBoth (Maybe.withDefault []) (Maybe.withDefault [])
-    |> (\(tail, head) -> tail ++ head)
+    ( List.tail mobbers, List.head mobbers )
+        |> Tuple.mapSecond (Maybe.map (\it -> [ it ]))
+        |> Tuple.mapBoth (Maybe.withDefault []) (Maybe.withDefault [])
+        |> (\( tail, head ) -> tail ++ head)
+
 
 playCommand : Json.Encode.Value
 playCommand =
@@ -358,8 +351,7 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Timer.view model.displaySeconds model.turnLength
-                        |> Html.map TimerMsg
+                    Settings.Timer.view model.timer |> Html.map TimerMsg
 
                 Mobbers ->
                     mobbersView model
@@ -369,8 +361,7 @@ view model =
                         |> Html.map SoundMsg
 
                 DevTab ->
-                    Settings.Dev.view model.dev
-                        |> Html.map DevMsg
+                    Settings.Dev.view model.dev |> Html.map DevMsg
             ]
         ]
     }
@@ -476,7 +467,7 @@ timeLeft model =
                     else
                         ""
             in
-            if model.displaySeconds || t.timeLeft < 60 then
+            if model.timer.displaySeconds || t.timeLeft < 60 then
                 minutesText ++ secondsText
 
             else

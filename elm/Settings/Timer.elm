@@ -5,13 +5,38 @@ import Html.Attributes exposing (checked, class, for, id, step, type_, value)
 import Html.Events exposing (onCheck, onInput)
 
 
+type alias Model =
+    { turnLength : Int
+    , displaySeconds : Bool
+    }
+
+
+init : Model
+init =
+    { turnLength = 8
+    , displaySeconds = False
+    }
+
+
 type Msg
     = TurnLengthChanged String
     | DisplaySecondsChanged Bool
 
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+    case msg of
+        TurnLengthChanged turnLength ->
+            ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 }
+            , Cmd.none
+            )
 
-view : Bool -> Int -> Html Msg
-view displaySeconds turnLength =
+        DisplaySecondsChanged displaySeconds ->
+            ( { model | displaySeconds = displaySeconds }
+            , Cmd.none
+            )
+
+view : Model -> Html Msg
+view model =
     div [ id "timer", class "tab" ]
         [ a [ id "share-link" ]
             [ text "You are in the "
@@ -27,7 +52,7 @@ view displaySeconds turnLength =
                 [ id "seconds"
                 , type_ "checkbox"
                 , onCheck DisplaySecondsChanged
-                , checked displaySeconds
+                , checked model.displaySeconds
                 ]
                 []
             ]
@@ -37,7 +62,7 @@ view displaySeconds turnLength =
                 [ for "turn-length" ]
                 [ text <|
                     "Turn : "
-                        ++ String.fromInt turnLength
+                        ++ String.fromInt model.turnLength
                         ++ " min"
                 ]
             , i [ class "fas fa-dove" ] []
@@ -48,7 +73,7 @@ view displaySeconds turnLength =
                 , onInput TurnLengthChanged
                 , Html.Attributes.min "2"
                 , Html.Attributes.max "20"
-                , value <| String.fromInt turnLength
+                , value <| String.fromInt model.turnLength
                 ]
                 []
             , i [ class "fas fa-hippo" ] []
