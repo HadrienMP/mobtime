@@ -10,6 +10,7 @@ import Json.Encode
 import Random
 import Ratio exposing (Ratio)
 import Settings.Dev
+import Settings.Mobbers
 import Settings.Sound
 import Settings.Timer
 import Sounds
@@ -129,11 +130,9 @@ type alias Model =
     , tab : Tab
     , timer : Settings.Timer.Model
     , dev : Settings.Dev.Model
+    , mobbers : Settings.Mobbers.Model
     , turn : Turn
     , audio : Audio
-    , roles : List String
-    , newMobberName : String
-    , mobbers : Mobbers
     }
 
 
@@ -149,6 +148,7 @@ init _ url key =
       , tab = pageFrom url |> Maybe.withDefault timerPage
       , timer = Settings.Timer.init
       , dev = Settings.Dev.init
+      , mobbers = Settings.Mobbers.init
       , turn = Off
       , audio =
             { state = NotPlaying
@@ -156,9 +156,6 @@ init _ url key =
             , volume = 50
             , profile = Sounds.ClassicWeird
             }
-      , roles = [ "Driver", "Navigator" ]
-      , newMobberName = ""
-      , mobbers = []
       }
     , Cmd.none
     )
@@ -184,12 +181,10 @@ type Msg
     | PickedSound Sounds.Sound
     | SoundEnded String
     | StopSoundRequest
-    | NewMobberNameChanged String
-    | AddMobber
-    | DeleteMobber String
     | TimerMsg Settings.Timer.Msg
     | SoundMsg Settings.Sound.Msg
     | DevMsg Settings.Dev.Msg
+    | MobbersMsg Settings.Mobbers.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -215,7 +210,7 @@ update msg model =
                         ( { model
                             | turn = Off
                             , audio = (\audio -> { audio | state = Playing }) model.audio
-                            , mobbers = rotate model.mobbers
+                            , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
                           }
                         , soundCommands playCommand
                         )
@@ -253,20 +248,10 @@ update msg model =
             , soundCommands stopCommand
             )
 
-        NewMobberNameChanged newMobberName ->
-            ( { model | newMobberName = newMobberName }
-            , Cmd.none
-            )
+        MobbersMsg mobberMsg ->
+            Settings.Mobbers.update mobberMsg model.mobbers
+                |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersMsg)
 
-        AddMobber ->
-            ( { model | newMobberName = "", mobbers = model.mobbers ++ [ model.newMobberName ] }
-            , Cmd.none
-            )
-
-        DeleteMobber mobber ->
-            ( { model | mobbers = List.filter (\m -> m /= mobber) model.mobbers }
-            , Cmd.none
-            )
 
         TimerMsg timerMsg ->
             Settings.Timer.update timerMsg model.timer
@@ -289,14 +274,6 @@ update msg model =
         DevMsg devMsg ->
             Settings.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
-
-
-rotate : Mobbers -> Mobbers
-rotate mobbers =
-    ( List.tail mobbers, List.head mobbers )
-        |> Tuple.mapSecond (Maybe.map (\it -> [ it ]))
-        |> Tuple.mapBoth (Maybe.withDefault []) (Maybe.withDefault [])
-        |> (\( tail, head ) -> tail ++ head)
 
 
 playCommand : Json.Encode.Value
@@ -354,7 +331,7 @@ view model =
                     Settings.Timer.view model.timer |> Html.map TimerMsg
 
                 Mobbers ->
-                    mobbersView model
+                    Settings.Mobbers.view model.mobbers |> Html.map MobbersMsg
 
                 SoundTab ->
                     Settings.Sound.view model.audio.volume model.audio.profile
@@ -516,56 +493,3 @@ ratio model =
 
         Off ->
             Ratio.full
-
-
-
--- ############################################################
--- MOBBERS
--- ############################################################
-
-
-mobbersView : Model -> Html Msg
-mobbersView model =
-    div [ id "mobbers", class "tab" ]
-        [ form
-            [ id "add", onSubmit AddMobber ]
-            [ input [ type_ "text", placeholder "Mobber name", onInput NewMobberNameChanged, value model.newMobberName ] []
-            , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
-            ]
-        , ul
-            []
-            (assignRoles model.mobbers model.roles
-                |> List.map
-                    (\mobber ->
-                        li []
-                            [ p [] [ text mobber.role ]
-                            , div
-                                []
-                                [ input [ type_ "text", value <| capitalize mobber.name ] []
-                                , button [ onClick <| DeleteMobber mobber.name ] [ i [ class "fas fa-times" ] [] ]
-                                ]
-                            ]
-                    )
-            )
-        ]
-
-
-capitalize : String -> String
-capitalize string =
-    (String.left 1 string |> String.toUpper)
-        ++ (String.dropLeft 1 string |> String.toLower)
-
-
-assignRoles : Mobbers -> Roles -> List MobberRole
-assignRoles mobbers roles =
-    List.indexedMap Tuple.pair mobbers
-        |> List.map (\( i, name ) -> { role = getRole i roles, name = name })
-
-
-getRole : Int -> Roles -> String
-getRole index roles =
-    List.indexedMap Tuple.pair roles
-        |> List.filter (\( i, _ ) -> i == index)
-        |> List.map Tuple.second
-        |> List.head
-        |> Maybe.withDefault "Mobber"
