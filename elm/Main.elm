@@ -3,9 +3,9 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
-import Html exposing (Html, a, audio, button, div, form, header, i, input, li, nav, p, section, span, text, ul)
-import Html.Attributes exposing (class, classList, href, id, placeholder, src, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html exposing (Html, a, audio, button, div, header, i, nav, p, section, span, text)
+import Html.Attributes exposing (class, classList, href, id, src)
+import Html.Events exposing (onClick)
 import Json.Encode
 import Random
 import Ratio exposing (Ratio)
@@ -100,8 +100,6 @@ actionMessage action =
 type alias Audio =
     { state : SoundStatus
     , sound : Sounds.Sound
-    , profile : Sounds.Profile
-    , volume : Int
     }
 
 
@@ -131,6 +129,7 @@ type alias Model =
     , timer : Settings.Timer.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
+    , sound: Settings.Sound.Model
     , turn : Turn
     , audio : Audio
     }
@@ -149,12 +148,11 @@ init _ url key =
       , timer = Settings.Timer.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
+      , sound = Settings.Sound.init
       , turn = Off
       , audio =
             { state = NotPlaying
             , sound = Sounds.default
-            , volume = 50
-            , profile = Sounds.ClassicWeird
             }
       }
     , Cmd.none
@@ -225,7 +223,7 @@ update msg model =
 
         StartRequest ->
             ( { model | turn = On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
-            , Random.generate PickedSound <| Sounds.pick model.audio.profile
+            , Random.generate PickedSound <| Sounds.pick model.sound.profile
             )
 
         StopRequest ->
@@ -259,17 +257,11 @@ update msg model =
                     (\it -> { model | timer = it })
                     (Cmd.map TimerMsg)
 
-        SoundMsg timerMsg ->
-            case timerMsg of
-                Settings.Sound.VolumeChanged volume ->
-                    ( { model | audio = (\audio -> { audio | volume = String.toInt volume |> Maybe.withDefault audio.volume }) model.audio }
-                    , soundCommands <| changeVolume volume
-                    )
-
-                Settings.Sound.SelectedSoundProfile profile ->
-                    ( { model | audio = (\audio -> { audio | profile = profile }) model.audio }
-                    , Cmd.none
-                    )
+        SoundMsg soundMsg ->
+            Settings.Sound.update soundMsg model.sound soundCommands
+                |> Tuple.mapBoth
+                    (\it -> { model | sound = it })
+                    (Cmd.map SoundMsg)
 
         DevMsg devMsg ->
             Settings.Dev.update devMsg model.dev
@@ -328,17 +320,20 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Settings.Timer.view model.timer |> Html.map TimerMsg
+                    Settings.Timer.view model.timer
+                        |> Html.map TimerMsg
 
                 Mobbers ->
-                    Settings.Mobbers.view model.mobbers |> Html.map MobbersMsg
+                    Settings.Mobbers.view model.mobbers
+                        |> Html.map MobbersMsg
 
                 SoundTab ->
-                    Settings.Sound.view model.audio.volume model.audio.profile
+                    Settings.Sound.view model.sound
                         |> Html.map SoundMsg
 
                 DevTab ->
-                    Settings.Dev.view model.dev |> Html.map DevMsg
+                    Settings.Dev.view model.dev
+                        |> Html.map DevMsg
             ]
         ]
     }
