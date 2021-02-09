@@ -12,9 +12,9 @@ import Ratio exposing (Ratio)
 import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
-import Tabs.Dev
-import Tabs.Sound
-import Tabs.Timer as Timer
+import Settings.Dev
+import Settings.Sound
+import Settings.Timer as Timer
 import Time
 import Url
 
@@ -134,7 +134,7 @@ type alias Model =
     , roles : List String
     , newMobberName : String
     , mobbers : Mobbers
-    , dev : Tabs.Dev.Model
+    , dev : Settings.Dev.Model
     }
 
 
@@ -160,7 +160,7 @@ init _ url key =
       , roles = [ "Driver", "Navigator" ]
       , newMobberName = ""
       , mobbers = []
-      , dev = Tabs.Dev.init
+      , dev = Settings.Dev.init
       }
     , Cmd.none
     )
@@ -190,8 +190,8 @@ type Msg
     | AddMobber
     | DeleteMobber String
     | TimerMsg Timer.Msg
-    | SoundMsg Tabs.Sound.Msg
-    | DevMsg Tabs.Dev.Msg
+    | SoundMsg Settings.Sound.Msg
+    | DevMsg Settings.Dev.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -223,7 +223,7 @@ update msg model =
                         )
 
                     else
-                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - Tabs.Dev.seconds model.dev } }
+                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - Settings.Dev.seconds model.dev } }
                         , Cmd.none
                         )
 
@@ -284,18 +284,18 @@ update msg model =
 
         SoundMsg timerMsg ->
             case timerMsg of
-                Tabs.Sound.VolumeChanged volume ->
+                Settings.Sound.VolumeChanged volume ->
                     ( { model | audio = (\audio -> { audio | volume = String.toInt volume |> Maybe.withDefault audio.volume }) model.audio }
                     , soundCommands <| changeVolume volume
                     )
 
-                Tabs.Sound.SelectedSoundProfile profile ->
+                Settings.Sound.SelectedSoundProfile profile ->
                     ( { model | audio = (\audio -> { audio | profile = profile }) model.audio }
                     , Cmd.none
                     )
 
         DevMsg devMsg ->
-            Tabs.Dev.update devMsg model.dev
+            Settings.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
 
 
@@ -365,11 +365,11 @@ view model =
                     mobbersView model
 
                 SoundTab ->
-                    Tabs.Sound.view model.audio.volume model.audio.profile
+                    Settings.Sound.view model.audio.volume model.audio.profile
                         |> Html.map SoundMsg
 
                 DevTab ->
-                    Tabs.Dev.view model.dev
+                    Settings.Dev.view model.dev
                         |> Html.map DevMsg
             ]
         ]

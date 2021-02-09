@@ -1,4 +1,4 @@
-module Tabs.Sound exposing (..)
+module Settings.Sound exposing (..)
 
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)

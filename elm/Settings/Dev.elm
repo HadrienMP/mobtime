@@ -1,4 +1,4 @@
-module Tabs.Dev exposing (..)
+module Settings.Dev exposing (..)
 
 import Html exposing (Html, button, div, i, label, text)
 import Html.Attributes exposing (class, classList, for, id)
