@@ -43,6 +43,9 @@ input {
   border-bottom: 1px solid;
   font-weight: bold;
   font-size: 1.1em;
+  &:focus {
+    outline: none;
+  }
 }
 
 a, button {
