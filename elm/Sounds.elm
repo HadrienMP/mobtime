@@ -1,4 +1,4 @@
-module Sounds exposing (default, pick, Sound, Profile(..))
+module Sounds exposing (Profile(..), Sound, default, pick)
 
 import Random
 
@@ -19,24 +19,28 @@ default =
 
 pick : Profile -> Random.Generator Sound
 pick profile =
-    Random.uniform default <| soundsOf profile
+    soundsOf profile
+    |> (\(d, list) -> Random.uniform d list)
 
 
-soundsOf : Profile -> List Sound
+soundsOf : Profile -> ( Sound, List Sound )
 soundsOf profile =
     case profile of
         ClassicWeird ->
-            classicWeird
+            ( "classic-weird/celebration.mp3"
+            , classicWeird
+            )
 
         Riot ->
-            riot
+            ( "riot/faut plus de gouvernement.mp3"
+            , riot
+            )
 
 
 riot : List Sound
 riot =
     [ "riot/ca cest paris.mp3"
     , "riot/el pueblo unido.mp3"
-    , "riot/faut plus de gouvernement.mp3"
     , "riot/france qui ferme sa gueule.mp3"
     , "riot/internationale.mp3"
     , "riot/internationale2.mp3"
@@ -54,7 +58,6 @@ classicWeird =
     , "classic-weird/anthologie-de-julien-lepers.mp3"
     , "classic-weird/breaking-bad-intro.mp3"
     , "classic-weird/cantina-band.mp3"
-    , "classic-weird/celebration.mp3"
     , "classic-weird/complotiste.mp3"
     , "classic-weird/denis-brogniart-ah-original.mp3"
     , "classic-weird/donald-trump-fake-news-sound-effect.mp3"

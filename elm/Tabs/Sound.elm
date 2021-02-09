@@ -44,8 +44,8 @@ view volume profile =
                     [ classList [ ( "active", profile == Sounds.Riot ) ]
                     , onClick <| SelectedSoundProfile Sounds.Riot
                     ]
-                    [ i [ class "fas fa-hand-rock" ] []
-                    , p [] [ text "Riot" ]
+                    [ i [ class "fas fa-flag" ] []
+                    , p [] [ text "Revolution" ]
                     ]
                 ]
             ]
