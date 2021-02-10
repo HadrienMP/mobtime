@@ -1,7 +1,7 @@
-module Clock exposing (..)
+module Other.Clock exposing (..)
 
 import Graphics.Circle
-import Ratio exposing (Ratio)
+import Lib.Ratio as Ratio exposing (Ratio)
 import Svg exposing (Svg)
 
 

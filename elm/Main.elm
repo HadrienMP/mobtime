@@ -2,20 +2,18 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Clock
+import Other.Clock as Clock
 import Graphics.Circle as Circle
 import Html exposing (Html, a, audio, button, div, header, i, nav, p, section, span, text)
 import Html.Attributes exposing (class, classList, href, id, src)
 import Html.Events exposing (onClick)
 import Json.Encode
-import Random
-import Ratio exposing (Ratio)
+import Lib.Ratio as Ratio exposing (Ratio)
 import Settings.Dev
 import Settings.Mobbers
 import Settings.SoundSettings
 import Settings.TimerSettings
-import Data.SoundLibrary as SoundLibrary
-import SoundCommands
+import Other.Sound as Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -96,18 +94,8 @@ actionMessage action =
             StopRequest
 
         StopSound ->
-            StopSoundRequest
+            SoundMsg Sound.Stop
 
-
-type alias Audio =
-    { state : SoundStatus
-    , sound : SoundLibrary.Sound
-    }
-
-
-type SoundStatus
-    = Playing
-    | NotPlaying
 
 
 type alias Roles =
@@ -128,12 +116,12 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
-    , timer : Settings.TimerSettings.Model
+    , timerSettings : Settings.TimerSettings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
-    , sound: Settings.SoundSettings.Model
+    , soundSettings: Settings.SoundSettings.Model
     , mobClock : Clock.State
-    , audio : Audio
+    , audio : Sound.Model
     }
 
 
@@ -142,15 +130,12 @@ init _ url key =
     ( { key = key
       , url = url
       , tab = pageFrom url |> Maybe.withDefault timerTab
-      , timer = Settings.TimerSettings.init
+      , timerSettings = Settings.TimerSettings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
-      , sound = Settings.SoundSettings.init
+      , soundSettings = Settings.SoundSettings.init
       , mobClock = Clock.Off
-      , audio =
-            { state = NotPlaying
-            , sound = SoundLibrary.default
-            }
+      , audio = Sound.init
       }
     , Cmd.none
     )
@@ -176,10 +161,7 @@ type Msg
     | StartRequest
     | StopRequest
 
-    -- Sound Messages
-    | PickedSound SoundLibrary.Sound
-    | SoundEnded String
-    | StopSoundRequest
+    | SoundMsg Sound.Msg
 
     -- Settings messages
     | TimerSettingsMsg Settings.TimerSettings.Msg
@@ -208,12 +190,15 @@ update msg model =
             case model.mobClock of
                 Clock.On turn ->
                     if turn.timeLeft <= 1 then
+                        let
+                            soundUpdate = Sound.turnEnded model.audio
+                        in
                         ( { model
                             | mobClock = Clock.Off
-                            , audio = (\audio -> { audio | state = Playing }) model.audio
+                            , audio = Tuple.first soundUpdate
                             , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
                           }
-                        , SoundCommands.play
+                        , Tuple.second soundUpdate
                         )
 
                     else
@@ -225,8 +210,8 @@ update msg model =
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | mobClock = Clock.On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
-            , Random.generate PickedSound <| SoundLibrary.pick model.sound.profile
+            ( { model | mobClock = Clock.On { timeLeft = model.timerSettings.turnLength * 60, length = model.timerSettings.turnLength } }
+            , Sound.pick model.soundSettings.profile |> Cmd.map SoundMsg
             )
 
         StopRequest ->
@@ -234,20 +219,12 @@ update msg model =
             , Cmd.none
             )
 
-        PickedSound sound ->
-            ( { model | audio = (\audio -> { audio | state = NotPlaying, sound = sound }) model.audio }
-            , Cmd.none
-            )
+        SoundMsg soundMsg ->
+            Sound.update model.audio soundMsg
+            |> Tuple.mapBoth
+                (\updated -> {model | audio = updated})
+                (Cmd.map SoundMsg)
 
-        SoundEnded _ ->
-            ( { model | audio = (\audio -> { audio | state = NotPlaying }) model.audio }
-            , Cmd.none
-            )
-
-        StopSoundRequest ->
-            ( { model | audio = (\audio -> { audio | state = NotPlaying }) model.audio }
-            , SoundCommands.stop
-            )
 
         MobbersSettingsMsg mobberMsg ->
             Settings.Mobbers.update mobberMsg model.mobbers
@@ -255,15 +232,15 @@ update msg model =
 
 
         TimerSettingsMsg timerMsg ->
-            Settings.TimerSettings.update timerMsg model.timer
+            Settings.TimerSettings.update timerMsg model.timerSettings
                 |> Tuple.mapBoth
-                    (\it -> { model | timer = it })
+                    (\it -> { model | timerSettings = it })
                     (Cmd.map TimerSettingsMsg)
 
         SoundSettingMsg soundMsg ->
-            Settings.SoundSettings.update soundMsg model.sound soundCommands
+            Settings.SoundSettings.update soundMsg model.soundSettings soundCommands
                 |> Tuple.mapBoth
-                    (\it -> { model | sound = it })
+                    (\it -> { model | soundSettings = it })
                     (Cmd.map SoundSettingMsg)
 
         DevSettingsMsg devMsg ->
@@ -279,7 +256,8 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Time.every 1000 TimePassed
-        , soundEnded SoundEnded
+        -- todo cette subscription devrait être dans le module sound
+        , soundEnded <| SoundMsg << Sound.Ended
         ]
 
 
@@ -296,7 +274,7 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Settings.TimerSettings.view model.timer
+                    Settings.TimerSettings.view model.timerSettings
                         |> Html.map TimerSettingsMsg
 
                 Mobbers ->
@@ -304,7 +282,7 @@ view model =
                         |> Html.map MobbersSettingsMsg
 
                 SoundTab ->
-                    Settings.SoundSettings.view model.sound
+                    Settings.SoundSettings.view model.soundSettings
                         |> Html.map SoundSettingMsg
 
                 DevTab ->
@@ -415,7 +393,7 @@ timeLeft model =
                     else
                         ""
             in
-            if model.timer.displaySeconds || t.timeLeft < 60 then
+            if model.timerSettings.displaySeconds || t.timeLeft < 60 then
                 minutesText ++ secondsText
 
             else
@@ -428,16 +406,16 @@ timeLeft model =
 actionOf : Model -> Action
 actionOf model =
     case ( model.mobClock, model.audio.state ) of
-        ( Clock.On _, NotPlaying ) ->
+        ( Clock.On _, Sound.NotPlaying ) ->
             Stop
 
-        ( Clock.On _, Playing ) ->
+        ( Clock.On _, Sound.Playing ) ->
             StopSound
 
-        ( Clock.Off, Playing ) ->
+        ( Clock.Off, Sound.Playing ) ->
             StopSound
 
-        ( Clock.Off, NotPlaying ) ->
+        ( Clock.Off, Sound.NotPlaying ) ->
             Start
 
 
