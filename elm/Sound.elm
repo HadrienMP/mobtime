@@ -13,3 +13,12 @@ play =
             [ ( "name", Json.Encode.string "play" )
             , ( "data", Json.Encode.object [] )
             ]
+
+
+stop : Cmd msg
+stop =
+    externalCommands <|
+        Json.Encode.object
+            [ ( "name", Json.Encode.string "stop" )
+            , ( "data", Json.Encode.object [] )
+            ]

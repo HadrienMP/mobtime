@@ -244,7 +244,7 @@ update msg model =
 
         StopSoundRequest ->
             ( { model | audio = (\audio -> { audio | state = NotPlaying }) model.audio }
-            , soundCommands stopCommand
+            , Sound.stop
             )
 
         MobbersMsg mobberMsg ->
@@ -267,25 +267,6 @@ update msg model =
         DevMsg devMsg ->
             Settings.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
-
-
-stopCommand : Json.Encode.Value
-stopCommand =
-    Json.Encode.object
-        [ ( "name", Json.Encode.string "stop" )
-        , ( "data", Json.Encode.object [] )
-        ]
-
-
-changeVolume : String -> Json.Encode.Value
-changeVolume volume =
-    Json.Encode.object
-        [ ( "name", Json.Encode.string "volume" )
-        , ( "data"
-          , Json.Encode.object
-                [ ( "volume", Json.Encode.string volume ) ]
-          )
-        ]
 
 
 
