@@ -17,7 +17,6 @@ import Sounds
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
-import Timer
 import Url
 
 
@@ -79,6 +78,25 @@ pages =
     ]
 
 
+type Action
+    = Start
+    | Stop
+    | StopSound
+
+
+actionMessage : Action -> Msg
+actionMessage action =
+    case action of
+        Start ->
+            StartRequest
+
+        Stop ->
+            StopRequest
+
+        StopSound ->
+            StopSoundRequest
+
+
 type alias Audio =
     { state : SoundStatus
     , sound : Sounds.Sound
@@ -108,12 +126,18 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
-    , timerSettings : Settings.Timer.Model
+    , timer : Settings.Timer.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
-    , soundSettings: Settings.Sound.Model
-    , timer : Timer.Model
+    , sound: Settings.Sound.Model
+    , turn : Turn
+    , audio : Audio
     }
+
+
+type Turn
+    = Off
+    | On { timeLeft : Int, length : Int }
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -121,11 +145,15 @@ init _ url key =
     ( { key = key
       , url = url
       , tab = pageFrom url |> Maybe.withDefault timerPage
-      , timerSettings = Settings.Timer.init
+      , timer = Settings.Timer.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
-      , soundSettings = Settings.Sound.init
-      , timer = Timer.init
+      , sound = Settings.Sound.init
+      , turn = Off
+      , audio =
+            { state = NotPlaying
+            , sound = Sounds.default
+            }
       }
     , Cmd.none
     )
@@ -146,10 +174,12 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | TimePassed Time.Posix
+    | StartRequest
+    | StopRequest
     | PickedSound Sounds.Sound
     | SoundEnded String
-    | TimerMsg Timer.Msg
-    | TimerSettingsMsg Settings.Timer.Msg
+    | StopSoundRequest
+    | TimerMsg Settings.Timer.Msg
     | SoundMsg Settings.Sound.Msg
     | DevMsg Settings.Dev.Msg
     | MobbersMsg Settings.Mobbers.Msg
@@ -171,32 +201,29 @@ update msg model =
             , Cmd.none
             )
 
-        TimePassed currentTime ->
-            case model.timer.turn of
-                Timer.On turn ->
+        TimePassed _ ->
+            case model.turn of
+                On turn ->
                     if turn.timeLeft <= 1 then
-                        let
-                            decision : (Timer.Model, Cmd Timer.Msg)
-                            decision = Timer.turnOff model.timer soundCommands
-                        in
                         ( { model
-                            | timer = Tuple.first decision
-                            , mobbers = Settings.Mobbers.rotate model.mobbers
+                            | turn = Off
+                            , audio = (\audio -> { audio | state = Playing }) model.audio
+                            , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
                           }
-                        , Tuple.second decision |> Cmd.map TimerMsg
+                        , soundCommands playCommand
                         )
 
                     else
-                        ( { model | timer = Timer.timePassed model.timer model.dev.speed }
+                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - Settings.Dev.seconds model.dev } }
                         , Cmd.none
                         )
 
-                Timer.Off ->
+                Off ->
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | turn = On { timeLeft = model.timerSettings.turnLength * 60, length = model.timerSettings.turnLength } }
-            , Random.generate PickedSound <| Sounds.pick model.soundSettings.profile
+            ( { model | turn = On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
+            , Random.generate PickedSound <| Sounds.pick model.sound.profile
             )
 
         StopRequest ->
@@ -224,16 +251,16 @@ update msg model =
                 |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersMsg)
 
 
-        TimerSettingsMsg timerMsg ->
-            Settings.Timer.update timerMsg model.timerSettings
+        TimerMsg timerMsg ->
+            Settings.Timer.update timerMsg model.timer
                 |> Tuple.mapBoth
-                    (\it -> { model | timerSettings = it })
-                    (Cmd.map TimerSettingsMsg)
+                    (\it -> { model | timer = it })
+                    (Cmd.map TimerMsg)
 
         SoundMsg soundMsg ->
-            Settings.Sound.update soundMsg model.soundSettings soundCommands
+            Settings.Sound.update soundMsg model.sound soundCommands
                 |> Tuple.mapBoth
-                    (\it -> { model | soundSettings = it })
+                    (\it -> { model | sound = it })
                     (Cmd.map SoundMsg)
 
         DevMsg devMsg ->
@@ -257,6 +284,17 @@ stopCommand =
         ]
 
 
+changeVolume : String -> Json.Encode.Value
+changeVolume volume =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string "volume" )
+        , ( "data"
+          , Json.Encode.object
+                [ ( "volume", Json.Encode.string volume ) ]
+          )
+        ]
+
+
 
 -- SUBSCRIPTIONS
 
@@ -275,22 +313,22 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = (Timer.timeLeft model.timer model.timerSettings) ++ " | Mob Time !"
+    { title = timeLeft model ++ " | Mob Time !"
     , body =
         [ div
             [ id "container" ]
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Settings.Timer.view model.timerSettings
-                        |> Html.map TimerSettingsMsg
+                    Settings.Timer.view model.timer
+                        |> Html.map TimerMsg
 
                 Mobbers ->
                     Settings.Mobbers.view model.mobbers
                         |> Html.map MobbersMsg
 
                 SoundTab ->
-                    Settings.Sound.view model.soundSettings
+                    Settings.Sound.view model.sound
                         |> Html.map SoundMsg
 
                 DevTab ->
@@ -326,7 +364,23 @@ headerView model =
             Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
     in
     header []
-        [ Timer.view model.timer model.timerSettings |> Html.map TimerMsg
+        [ section []
+            [ svg
+                [ Svg.width <| String.fromInt totalWidth
+                , Svg.height <| String.fromInt totalWidth
+                ]
+                (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
+                    ++ Circle.draw mobCircle (ratio model)
+                )
+            , button
+                [ onClick <| actionMessage <| actionOf model
+                , class <| turnToString model.turn
+                ]
+                [ span [] [ text <| timeLeft model ]
+                , actionIcon <| actionOf model
+                ]
+            ]
+        , audio [ src <| "/sound/" ++ model.audio.sound ] []
         , nav [] <| navLinks model.url
         ]
 
@@ -345,3 +399,92 @@ navLinks current =
 activeClass : Url.Url -> String -> ( String, Bool )
 activeClass current tabUrl =
     ( "active", current.path == tabUrl )
+
+
+turnToString : Turn -> String
+turnToString turn =
+    case turn of
+        On _ ->
+            "on"
+
+        Off ->
+            "off"
+
+
+timeLeft : Model -> String
+timeLeft model =
+    case model.turn of
+        On t ->
+            let
+                floatMinutes =
+                    toFloat t.timeLeft / 60.0
+
+                intMinutes =
+                    floor floatMinutes
+
+                secondsLeft =
+                    t.timeLeft - (floor floatMinutes * 60)
+
+                minutesText =
+                    if intMinutes /= 0 then
+                        String.fromInt intMinutes ++ " min "
+
+                    else
+                        ""
+
+                secondsText =
+                    if secondsLeft /= 0 then
+                        String.fromInt secondsLeft ++ " " ++ "s"
+
+                    else
+                        ""
+            in
+            if model.timer.displaySeconds || t.timeLeft < 60 then
+                minutesText ++ secondsText
+
+            else
+                (String.fromInt <| ceiling floatMinutes) ++ " min"
+
+        Off ->
+            ""
+
+
+actionOf : Model -> Action
+actionOf model =
+    case ( model.turn, model.audio.state ) of
+        ( On _, NotPlaying ) ->
+            Stop
+
+        ( On _, Playing ) ->
+            StopSound
+
+        ( Off, Playing ) ->
+            StopSound
+
+        ( Off, NotPlaying ) ->
+            Start
+
+
+actionIcon : Action -> Html msg
+actionIcon action =
+    case action of
+        Start ->
+            i [ class "fas fa-play" ] []
+
+        Stop ->
+            i [ class "fas fa-square" ] []
+
+        StopSound ->
+            i [ class "fas fa-volume-mute" ] []
+
+
+ratio : Model -> Ratio
+ratio model =
+    case model.turn of
+        On turn ->
+            (1 - (toFloat (turn.timeLeft - 1) / (toFloat turn.length * 60)))
+                |> Debug.log ""
+                |> Ratio.from
+
+        Off ->
+            Ratio.full

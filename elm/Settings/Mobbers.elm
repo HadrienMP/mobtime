@@ -38,6 +38,7 @@ type Msg
     = AddMobber
     | NewMobberNameChanged String
     | DeleteMobber String
+    | TurnOver
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,14 +59,14 @@ update msg model =
             , Cmd.none
             )
 
+        TurnOver ->
+            ( { model | mobbers = rotate model.mobbers }
+            , Cmd.none
+            )
 
-rotate : Model -> Model
-rotate model =
-    { model | mobbers = rotateMobbers model.mobbers }
 
-
-rotateMobbers : Mobbers -> Mobbers
-rotateMobbers mobbers =
+rotate : Mobbers -> Mobbers
+rotate mobbers =
     ( List.tail mobbers, List.head mobbers )
         |> Tuple.mapSecond (Maybe.map (\it -> [ it ]))
         |> Tuple.mapBoth (Maybe.withDefault []) (Maybe.withDefault [])

@@ -23,8 +23,8 @@ type Msg
     = SpeedChanged Speed
 
 
-seconds speed =
-    case speed of
+seconds model =
+    case model.speed of
         Normal -> 1
         Fast -> 20
 
