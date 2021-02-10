@@ -11,9 +11,9 @@ import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
 import Settings.Dev
 import Settings.Mobbers
-import Sound.SoundSettings
+import Sound.Settings
 import Settings.TimerSettings
-import Sound.Sound as Sound
+import Sound.Main as Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -116,7 +116,7 @@ type alias Model =
     , timerSettings : Settings.TimerSettings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
-    , soundSettings: Sound.SoundSettings.Model
+    , soundSettings: Sound.Settings.Model
     , mobClock : Clock.State
     , audio : Sound.Model
     }
@@ -130,7 +130,7 @@ init _ url key =
       , timerSettings = Settings.TimerSettings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
-      , soundSettings = Sound.SoundSettings.init
+      , soundSettings = Sound.Settings.init
       , mobClock = Clock.Off
       , audio = Sound.init
       }
@@ -162,7 +162,7 @@ type Msg
 
     -- Settings messages
     | TimerSettingsMsg Settings.TimerSettings.Msg
-    | SoundSettingMsg Sound.SoundSettings.Msg
+    | SoundSettingMsg Sound.Settings.Msg
     | DevSettingsMsg Settings.Dev.Msg
     | MobbersSettingsMsg Settings.Mobbers.Msg
 
@@ -235,7 +235,7 @@ update msg model =
                     (Cmd.map TimerSettingsMsg)
 
         SoundSettingMsg soundMsg ->
-            Sound.SoundSettings.update soundMsg model.soundSettings soundCommands
+            Sound.Settings.update soundMsg model.soundSettings soundCommands
                 |> Tuple.mapBoth
                     (\it -> { model | soundSettings = it })
                     (Cmd.map SoundSettingMsg)
@@ -278,7 +278,7 @@ view model =
                         |> Html.map MobbersSettingsMsg
 
                 SoundTab ->
-                    Sound.SoundSettings.view model.soundSettings
+                    Sound.Settings.view model.soundSettings
                         |> Html.map SoundSettingMsg
 
                 DevTab ->

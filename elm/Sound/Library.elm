@@ -1,4 +1,4 @@
-module Sound.SoundLibrary exposing (Profile(..), Sound, default, pick)
+module Sound.Library exposing (Profile(..), Sound, default, pick)
 
 import Random
 

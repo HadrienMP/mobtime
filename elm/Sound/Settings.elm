@@ -1,6 +1,6 @@
-module Sound.SoundSettings exposing (..)
+module Sound.Settings exposing (..)
 
-import Sound.SoundLibrary as SoundLibrary
+import Sound.Library as SoundLibrary
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
