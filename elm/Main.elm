@@ -158,11 +158,12 @@ type Msg
     | StartRequest
     | StopRequest
 
+    -- Sound messages
     | SoundMsg Sound.Msg
+    | SoundSettingMsg Sound.Settings.Msg
 
     -- Settings messages
     | TimerSettingsMsg Settings.TimerSettings.Msg
-    | SoundSettingMsg Sound.Settings.Msg
     | DevSettingsMsg Settings.Dev.Msg
     | MobbersSettingsMsg Settings.Mobbers.Msg
 
