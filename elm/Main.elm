@@ -2,6 +2,7 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Clock
 import Graphics.Circle as Circle
 import Html exposing (Html, a, audio, button, div, header, i, nav, p, section, span, text)
 import Html.Attributes exposing (class, classList, href, id, src)
@@ -131,14 +132,9 @@ type alias Model =
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
     , sound: Settings.SoundSettings.Model
-    , turn : Turn
+    , mobClock : Clock.State
     , audio : Audio
     }
-
-
-type Turn
-    = Off
-    | On { timeLeft : Int, length : Int }
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -150,7 +146,7 @@ init _ url key =
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
       , sound = Settings.SoundSettings.init
-      , turn = Off
+      , mobClock = Clock.Off
       , audio =
             { state = NotPlaying
             , sound = SoundLibrary.default
@@ -209,11 +205,11 @@ update msg model =
             )
 
         TimePassed _ ->
-            case model.turn of
-                On turn ->
+            case model.mobClock of
+                Clock.On turn ->
                     if turn.timeLeft <= 1 then
                         ( { model
-                            | turn = Off
+                            | mobClock = Clock.Off
                             , audio = (\audio -> { audio | state = Playing }) model.audio
                             , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
                           }
@@ -221,20 +217,20 @@ update msg model =
                         )
 
                     else
-                        ( { model | turn = On { turn | timeLeft = turn.timeLeft - Settings.Dev.seconds model.dev } }
+                        ( { model | mobClock = Clock.On { turn | timeLeft = turn.timeLeft - Settings.Dev.seconds model.dev } }
                         , Cmd.none
                         )
 
-                Off ->
+                Clock.Off ->
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | turn = On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
+            ( { model | mobClock = Clock.On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
             , Random.generate PickedSound <| SoundLibrary.pick model.sound.profile
             )
 
         StopRequest ->
-            ( { model | turn = Off }
+            ( { model | mobClock = Clock.Off }
             , Cmd.none
             )
 
@@ -350,11 +346,11 @@ headerView model =
                 , Svg.height <| String.fromInt totalWidth
                 ]
                 (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
-                    ++ Circle.draw mobCircle (ratio model.turn)
+                    ++ Clock.view mobCircle model.mobClock
                 )
             , button
                 [ onClick <| actionMessage <| actionOf model
-                , class <| turnToString model.turn
+                , class <| turnToString model.mobClock
                 ]
                 [ span [] [ text <| timeLeft model ]
                 , actionIcon <| actionOf model
@@ -381,20 +377,20 @@ activeClass current tabUrl =
     ( "active", current.path == tabUrl )
 
 
-turnToString : Turn -> String
+turnToString : Clock.State -> String
 turnToString turn =
     case turn of
-        On _ ->
+        Clock.On _ ->
             "on"
 
-        Off ->
+        Clock.Off ->
             "off"
 
 
 timeLeft : Model -> String
 timeLeft model =
-    case model.turn of
-        On t ->
+    case model.mobClock of
+        Clock.On t ->
             let
                 floatMinutes =
                     toFloat t.timeLeft / 60.0
@@ -425,23 +421,23 @@ timeLeft model =
             else
                 (String.fromInt <| ceiling floatMinutes) ++ " min"
 
-        Off ->
+        Clock.Off ->
             ""
 
 
 actionOf : Model -> Action
 actionOf model =
-    case ( model.turn, model.audio.state ) of
-        ( On _, NotPlaying ) ->
+    case ( model.mobClock, model.audio.state ) of
+        ( Clock.On _, NotPlaying ) ->
             Stop
 
-        ( On _, Playing ) ->
+        ( Clock.On _, Playing ) ->
             StopSound
 
-        ( Off, Playing ) ->
+        ( Clock.Off, Playing ) ->
             StopSound
 
-        ( Off, NotPlaying ) ->
+        ( Clock.Off, NotPlaying ) ->
             Start
 
 
@@ -457,14 +453,3 @@ actionIcon action =
         StopSound ->
             i [ class "fas fa-volume-mute" ] []
 
-
-ratio : Turn -> Ratio
-ratio turn =
-    case turn of
-        On on ->
-            (1 - (toFloat (on.timeLeft - 1) / (toFloat on.length * 60)))
-                |> Debug.log ""
-                |> Ratio.from
-
-        Off ->
-            Ratio.full
