@@ -174,16 +174,22 @@ pageFrom url =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+
+    -- Timer messages
     | TimePassed Time.Posix
     | StartRequest
     | StopRequest
+
+    -- Sound Messages
     | PickedSound SoundLibrary.Sound
     | SoundEnded String
     | StopSoundRequest
-    | TimerMsg Settings.TimerSettings.Msg
-    | SoundMsg Settings.SoundSettings.Msg
-    | DevMsg Settings.Dev.Msg
-    | MobbersMsg Settings.Mobbers.Msg
+
+    -- Settings messages
+    | TimerSettingsMsg Settings.TimerSettings.Msg
+    | SoundSettingMsg Settings.SoundSettings.Msg
+    | DevSettingsMsg Settings.Dev.Msg
+    | MobbersSettingsMsg Settings.Mobbers.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -247,26 +253,26 @@ update msg model =
             , Sound.stop
             )
 
-        MobbersMsg mobberMsg ->
+        MobbersSettingsMsg mobberMsg ->
             Settings.Mobbers.update mobberMsg model.mobbers
-                |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersMsg)
+                |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersSettingsMsg)
 
 
-        TimerMsg timerMsg ->
+        TimerSettingsMsg timerMsg ->
             Settings.TimerSettings.update timerMsg model.timer
                 |> Tuple.mapBoth
                     (\it -> { model | timer = it })
-                    (Cmd.map TimerMsg)
+                    (Cmd.map TimerSettingsMsg)
 
-        SoundMsg soundMsg ->
+        SoundSettingMsg soundMsg ->
             Settings.SoundSettings.update soundMsg model.sound soundCommands
                 |> Tuple.mapBoth
                     (\it -> { model | sound = it })
-                    (Cmd.map SoundMsg)
+                    (Cmd.map SoundSettingMsg)
 
-        DevMsg devMsg ->
+        DevSettingsMsg devMsg ->
             Settings.Dev.update devMsg model.dev
-                |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
+                |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevSettingsMsg)
 
 
 
@@ -295,19 +301,19 @@ view model =
             , case model.tab.type_ of
                 Timer ->
                     Settings.TimerSettings.view model.timer
-                        |> Html.map TimerMsg
+                        |> Html.map TimerSettingsMsg
 
                 Mobbers ->
                     Settings.Mobbers.view model.mobbers
-                        |> Html.map MobbersMsg
+                        |> Html.map MobbersSettingsMsg
 
                 SoundTab ->
                     Settings.SoundSettings.view model.sound
-                        |> Html.map SoundMsg
+                        |> Html.map SoundSettingMsg
 
                 DevTab ->
                     Settings.Dev.view model.dev
-                        |> Html.map DevMsg
+                        |> Html.map DevSettingsMsg
             ]
         ]
     }
