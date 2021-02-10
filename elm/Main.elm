@@ -14,6 +14,7 @@ import Settings.Mobbers
 import Settings.SoundSettings
 import Settings.TimerSettings
 import Data.SoundLibrary as SoundLibrary
+import Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -210,7 +211,7 @@ update msg model =
                             , audio = (\audio -> { audio | state = Playing }) model.audio
                             , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
                           }
-                        , soundCommands playCommand
+                        , Sound.play
                         )
 
                     else
@@ -266,14 +267,6 @@ update msg model =
         DevMsg devMsg ->
             Settings.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevMsg)
-
-
-playCommand : Json.Encode.Value
-playCommand =
-    Json.Encode.object
-        [ ( "name", Json.Encode.string "play" )
-        , ( "data", Json.Encode.object [] )
-        ]
 
 
 stopCommand : Json.Encode.Value
