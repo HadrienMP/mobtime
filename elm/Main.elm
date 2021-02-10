@@ -350,7 +350,7 @@ headerView model =
                 , Svg.height <| String.fromInt totalWidth
                 ]
                 (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
-                    ++ Circle.draw mobCircle (ratio model)
+                    ++ Circle.draw mobCircle (ratio model.turn)
                 )
             , button
                 [ onClick <| actionMessage <| actionOf model
@@ -458,11 +458,11 @@ actionIcon action =
             i [ class "fas fa-volume-mute" ] []
 
 
-ratio : Model -> Ratio
-ratio model =
-    case model.turn of
-        On turn ->
-            (1 - (toFloat (turn.timeLeft - 1) / (toFloat turn.length * 60)))
+ratio : Turn -> Ratio
+ratio turn =
+    case turn of
+        On on ->
+            (1 - (toFloat (on.timeLeft - 1) / (toFloat on.length * 60)))
                 |> Debug.log ""
                 |> Ratio.from
 
