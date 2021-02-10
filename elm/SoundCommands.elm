@@ -1,4 +1,4 @@
-port module Sound exposing (..)
+port module SoundCommands exposing (..)
 
 import Json.Encode
 

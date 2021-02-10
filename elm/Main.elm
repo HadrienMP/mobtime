@@ -14,7 +14,7 @@ import Settings.Mobbers
 import Settings.SoundSettings
 import Settings.TimerSettings
 import Data.SoundLibrary as SoundLibrary
-import Sound
+import SoundCommands
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -217,7 +217,7 @@ update msg model =
                             , audio = (\audio -> { audio | state = Playing }) model.audio
                             , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
                           }
-                        , Sound.play
+                        , SoundCommands.play
                         )
 
                     else
@@ -250,7 +250,7 @@ update msg model =
 
         StopSoundRequest ->
             ( { model | audio = (\audio -> { audio | state = NotPlaying }) model.audio }
-            , Sound.stop
+            , SoundCommands.stop
             )
 
         MobbersSettingsMsg mobberMsg ->
