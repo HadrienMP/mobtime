@@ -66,14 +66,14 @@ type alias Tab =
     }
 
 
-timerPage : Tab
-timerPage =
+timerTab : Tab
+timerTab =
     Tab Timer "/timer" "Timer" "fa-clock"
 
 
-pages : List Tab
-pages =
-    [ timerPage
+tabs : List Tab
+tabs =
+    [ timerTab
     , Tab Mobbers "/mobbers" "Mobbers" "fa-users"
     , Tab SoundTab "/audio" "Sound" "fa-volume-up"
     , Tab DevTab "/dev" "Dev" "fa-code"
@@ -141,7 +141,7 @@ init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
     ( { key = key
       , url = url
-      , tab = pageFrom url |> Maybe.withDefault timerPage
+      , tab = pageFrom url |> Maybe.withDefault timerTab
       , timer = Settings.TimerSettings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
@@ -158,7 +158,7 @@ init _ url key =
 
 pageFrom : Url.Url -> Maybe Tab
 pageFrom url =
-    pages
+    tabs
         |> List.filter (\p -> p.url == url.path)
         |> List.head
 
@@ -200,7 +200,7 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model | url = url, tab = pageFrom url |> Maybe.withDefault timerPage }
+            ( { model | url = url, tab = pageFrom url |> Maybe.withDefault timerTab }
             , Cmd.none
             )
 
@@ -369,7 +369,7 @@ navLinks current =
                 [ href page.url, classList [ activeClass current page.url ] ]
                 [ i [ class <| "fas " ++ page.icon ] [] ]
         )
-        pages
+        tabs
 
 
 activeClass : Url.Url -> String -> ( String, Bool )
