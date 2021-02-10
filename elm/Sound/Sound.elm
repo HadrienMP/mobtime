@@ -1,6 +1,6 @@
-port module Other.Sound exposing (..)
+port module Sound.Sound exposing (..)
 
-import Data.SoundLibrary as SoundLibrary
+import Sound.SoundLibrary as SoundLibrary
 import Json.Encode
 import Random
 

@@ -11,9 +11,9 @@ import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
 import Settings.Dev
 import Settings.Mobbers
-import Settings.SoundSettings
+import Sound.SoundSettings
 import Settings.TimerSettings
-import Other.Sound as Sound
+import Sound.Sound as Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -116,7 +116,7 @@ type alias Model =
     , timerSettings : Settings.TimerSettings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
-    , soundSettings: Settings.SoundSettings.Model
+    , soundSettings: Sound.SoundSettings.Model
     , mobClock : Clock.State
     , audio : Sound.Model
     }
@@ -130,7 +130,7 @@ init _ url key =
       , timerSettings = Settings.TimerSettings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
-      , soundSettings = Settings.SoundSettings.init
+      , soundSettings = Sound.SoundSettings.init
       , mobClock = Clock.Off
       , audio = Sound.init
       }
@@ -162,7 +162,7 @@ type Msg
 
     -- Settings messages
     | TimerSettingsMsg Settings.TimerSettings.Msg
-    | SoundSettingMsg Settings.SoundSettings.Msg
+    | SoundSettingMsg Sound.SoundSettings.Msg
     | DevSettingsMsg Settings.Dev.Msg
     | MobbersSettingsMsg Settings.Mobbers.Msg
 
@@ -235,7 +235,7 @@ update msg model =
                     (Cmd.map TimerSettingsMsg)
 
         SoundSettingMsg soundMsg ->
-            Settings.SoundSettings.update soundMsg model.soundSettings soundCommands
+            Sound.SoundSettings.update soundMsg model.soundSettings soundCommands
                 |> Tuple.mapBoth
                     (\it -> { model | soundSettings = it })
                     (Cmd.map SoundSettingMsg)
@@ -278,7 +278,7 @@ view model =
                         |> Html.map MobbersSettingsMsg
 
                 SoundTab ->
-                    Settings.SoundSettings.view model.soundSettings
+                    Sound.SoundSettings.view model.soundSettings
                         |> Html.map SoundSettingMsg
 
                 DevTab ->
