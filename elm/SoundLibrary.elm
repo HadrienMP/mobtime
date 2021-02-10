@@ -1,4 +1,4 @@
-module Sounds exposing (Profile(..), Sound, default, pick)
+module SoundLibrary exposing (Profile(..), Sound, default, pick)
 
 import Random
 

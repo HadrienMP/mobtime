@@ -4,24 +4,24 @@ import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Encode
-import Sounds
+import SoundLibrary
 
 
 type alias Model =
-    { profile : Sounds.Profile
+    { profile : SoundLibrary.Profile
     , volume : Int
     }
 
 init : Model
 init =
-    { profile = Sounds.ClassicWeird
+    { profile = SoundLibrary.ClassicWeird
     , volume = 50
     }
 
 
 type Msg
     = VolumeChanged String
-    | SelectedSoundProfile Sounds.Profile
+    | SelectedSoundProfile SoundLibrary.Profile
 
 
 update : Msg -> Model -> (Json.Encode.Value -> Cmd Msg) -> ( Model, Cmd Msg )
@@ -73,15 +73,15 @@ view model =
             , div
                 [ id "sound-cards" ]
                 [ button
-                    [ classList [ ( "active", model.profile == Sounds.ClassicWeird ) ]
-                    , onClick <| SelectedSoundProfile Sounds.ClassicWeird
+                    [ classList [ ( "active", model.profile == SoundLibrary.ClassicWeird ) ]
+                    , onClick <| SelectedSoundProfile SoundLibrary.ClassicWeird
                     ]
                     [ i [ class "fas fa-grin-stars" ] []
                     , p [] [ text "Classic Weird" ]
                     ]
                 , button
-                    [ classList [ ( "active", model.profile == Sounds.Riot ) ]
-                    , onClick <| SelectedSoundProfile Sounds.Riot
+                    [ classList [ ( "active", model.profile == SoundLibrary.Riot ) ]
+                    , onClick <| SelectedSoundProfile SoundLibrary.Riot
                     ]
                     [ i [ class "fas fa-flag" ] []
                     , p [] [ text "Revolution" ]

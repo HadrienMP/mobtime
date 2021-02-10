@@ -13,7 +13,7 @@ import Settings.Dev
 import Settings.Mobbers
 import Settings.Sound
 import Settings.Timer
-import Sounds
+import SoundLibrary
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -99,7 +99,7 @@ actionMessage action =
 
 type alias Audio =
     { state : SoundStatus
-    , sound : Sounds.Sound
+    , sound : SoundLibrary.Sound
     }
 
 
@@ -152,7 +152,7 @@ init _ url key =
       , turn = Off
       , audio =
             { state = NotPlaying
-            , sound = Sounds.default
+            , sound = SoundLibrary.default
             }
       }
     , Cmd.none
@@ -176,7 +176,7 @@ type Msg
     | TimePassed Time.Posix
     | StartRequest
     | StopRequest
-    | PickedSound Sounds.Sound
+    | PickedSound SoundLibrary.Sound
     | SoundEnded String
     | StopSoundRequest
     | TimerMsg Settings.Timer.Msg
@@ -223,7 +223,7 @@ update msg model =
 
         StartRequest ->
             ( { model | turn = On { timeLeft = model.timer.turnLength * 60, length = model.timer.turnLength } }
-            , Random.generate PickedSound <| Sounds.pick model.sound.profile
+            , Random.generate PickedSound <| SoundLibrary.pick model.sound.profile
             )
 
         StopRequest ->
