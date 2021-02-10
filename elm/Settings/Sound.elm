@@ -1,10 +1,10 @@
 module Settings.Sound exposing (..)
 
+import Data.SoundLibrary as SoundLibrary
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Encode
-import SoundLibrary
 
 
 type alias Model =

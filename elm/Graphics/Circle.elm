@@ -1,4 +1,4 @@
-module Circle exposing (Circle, Coordinates, Stroke, draw, drawWithoutInsideBorder, inside)
+module Graphics.Circle exposing (Circle, Coordinates, Stroke, draw, drawWithoutInsideBorder, inside)
 
 import Html.Attributes as Html
 import Ratio exposing (Ratio)

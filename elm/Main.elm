@@ -2,7 +2,7 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Circle
+import Graphics.Circle as Circle
 import Html exposing (Html, a, audio, button, div, header, i, nav, p, section, span, text)
 import Html.Attributes exposing (class, classList, href, id, src)
 import Html.Events exposing (onClick)
@@ -13,7 +13,7 @@ import Settings.Dev
 import Settings.Mobbers
 import Settings.Sound
 import Settings.Timer
-import SoundLibrary
+import Data.SoundLibrary as SoundLibrary
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
