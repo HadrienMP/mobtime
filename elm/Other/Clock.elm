@@ -20,7 +20,6 @@ ratio state =
     case state of
         On on ->
             (1 - (toFloat (on.timeLeft - 1) / (toFloat on.length * 60)))
-                |> Debug.log ""
                 |> Ratio.from
 
         Off ->

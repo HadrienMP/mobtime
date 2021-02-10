@@ -5,7 +5,10 @@ import Json.Encode
 import Random
 
 
-port externalCommands : Json.Encode.Value -> Cmd msg
+port soundEnded : (String -> msg) -> Sub msg
+
+
+port soundCommands2 : Json.Encode.Value -> Cmd msg
 
 
 
@@ -47,7 +50,8 @@ type Msg
     | Ended String
     | Stop
 
-update : Model -> Msg -> (Model, Cmd Msg)
+
+update : Model -> Msg -> ( Model, Cmd Msg )
 update model msg =
     case msg of
         Picked sound ->
@@ -56,19 +60,31 @@ update model msg =
         Ended _ ->
             ( { model | state = NotPlaying }, Cmd.none )
 
-
         Stop ->
             ( { model | state = NotPlaying }, stop )
+
+
+
+--
+-- SUBSCRIPTIONS
+--
+
+
+subscriptions : Sub Msg
+subscriptions = soundEnded Ended
+
 
 
 --
 -- Other stuff
 --
 
+
 pick : SoundLibrary.Profile -> Cmd Msg
 pick soundProfile =
     -- todo il faudrait que ce module porte ses settings
     Random.generate Picked <| SoundLibrary.pick soundProfile
+
 
 turnEnded : Model -> ( Model, Cmd msg )
 turnEnded model =
@@ -77,7 +93,7 @@ turnEnded model =
 
 play : Cmd msg
 play =
-    externalCommands <|
+    soundCommands2 <|
         Json.Encode.object
             [ ( "name", Json.Encode.string "play" )
             , ( "data", Json.Encode.object [] )
@@ -86,7 +102,7 @@ play =
 
 stop : Cmd msg
 stop =
-    externalCommands <|
+    soundCommands2 <|
         Json.Encode.object
             [ ( "name", Json.Encode.string "stop" )
             , ( "data", Json.Encode.object [] )

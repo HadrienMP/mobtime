@@ -24,7 +24,8 @@
             flags: window.localStorage.getItem("nickname") || ""
         }
     )
-    app.ports.soundCommands.subscribe(command => {
+
+    function soundCommandHandler(command) {
         let audio = document.getElementsByTagName("audio")[0];
         audio.onended = () => app.ports.soundEnded.send("");
 
@@ -39,8 +40,10 @@
                 audio.volume = parseInt(command.data.volume) / 100.0;
                 break;
         }
+    }
 
-    });
+    app.ports.soundCommands.subscribe(soundCommandHandler);
+    app.ports.soundCommands2.subscribe(soundCommandHandler);
 </script>
 </body>
 </html>

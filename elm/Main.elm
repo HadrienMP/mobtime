@@ -42,9 +42,6 @@ port store : Json.Encode.Value -> Cmd msg
 port soundCommands : Json.Encode.Value -> Cmd msg
 
 
-port soundEnded : (String -> msg) -> Sub msg
-
-
 
 -- MODEL
 
@@ -256,8 +253,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Time.every 1000 TimePassed
-        -- todo cette subscription devrait être dans le module sound
-        , soundEnded <| SoundMsg << Sound.Ended
+        , Sound.subscriptions |> Sub.map SoundMsg
         ]
 
 
