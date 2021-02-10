@@ -1,4 +1,4 @@
-module Settings.Sound exposing (..)
+module Settings.SoundSettings exposing (..)
 
 import Data.SoundLibrary as SoundLibrary
 import Html exposing (Html, button, div, i, input, label, p, text)

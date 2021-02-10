@@ -1,4 +1,4 @@
-module Settings.Timer exposing (..)
+module Settings.TimerSettings exposing (..)
 
 import Html exposing (Html, a, div, hr, i, input, label, strong, text)
 import Html.Attributes exposing (checked, class, for, id, step, type_, value)

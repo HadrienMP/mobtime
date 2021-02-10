@@ -11,8 +11,8 @@ import Random
 import Ratio exposing (Ratio)
 import Settings.Dev
 import Settings.Mobbers
-import Settings.Sound
-import Settings.Timer
+import Settings.SoundSettings
+import Settings.TimerSettings
 import Data.SoundLibrary as SoundLibrary
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
@@ -126,10 +126,10 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , tab : Tab
-    , timer : Settings.Timer.Model
+    , timer : Settings.TimerSettings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
-    , sound: Settings.Sound.Model
+    , sound: Settings.SoundSettings.Model
     , turn : Turn
     , audio : Audio
     }
@@ -145,10 +145,10 @@ init _ url key =
     ( { key = key
       , url = url
       , tab = pageFrom url |> Maybe.withDefault timerPage
-      , timer = Settings.Timer.init
+      , timer = Settings.TimerSettings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
-      , sound = Settings.Sound.init
+      , sound = Settings.SoundSettings.init
       , turn = Off
       , audio =
             { state = NotPlaying
@@ -179,8 +179,8 @@ type Msg
     | PickedSound SoundLibrary.Sound
     | SoundEnded String
     | StopSoundRequest
-    | TimerMsg Settings.Timer.Msg
-    | SoundMsg Settings.Sound.Msg
+    | TimerMsg Settings.TimerSettings.Msg
+    | SoundMsg Settings.SoundSettings.Msg
     | DevMsg Settings.Dev.Msg
     | MobbersMsg Settings.Mobbers.Msg
 
@@ -252,13 +252,13 @@ update msg model =
 
 
         TimerMsg timerMsg ->
-            Settings.Timer.update timerMsg model.timer
+            Settings.TimerSettings.update timerMsg model.timer
                 |> Tuple.mapBoth
                     (\it -> { model | timer = it })
                     (Cmd.map TimerMsg)
 
         SoundMsg soundMsg ->
-            Settings.Sound.update soundMsg model.sound soundCommands
+            Settings.SoundSettings.update soundMsg model.sound soundCommands
                 |> Tuple.mapBoth
                     (\it -> { model | sound = it })
                     (Cmd.map SoundMsg)
@@ -320,7 +320,7 @@ view model =
             [ headerView model
             , case model.tab.type_ of
                 Timer ->
-                    Settings.Timer.view model.timer
+                    Settings.TimerSettings.view model.timer
                         |> Html.map TimerMsg
 
                 Mobbers ->
@@ -328,7 +328,7 @@ view model =
                         |> Html.map MobbersMsg
 
                 SoundTab ->
-                    Settings.Sound.view model.sound
+                    Settings.SoundSettings.view model.sound
                         |> Html.map SoundMsg
 
                 DevTab ->
