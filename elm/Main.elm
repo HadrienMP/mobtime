@@ -2,13 +2,13 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Other.Clock as Clock
 import Graphics.Circle as Circle
-import Html exposing (Html, a, audio, button, div, header, i, nav, p, section, span, text)
-import Html.Attributes exposing (class, classList, href, id, src)
+import Html exposing (Html, a, button, div, header, i, nav, p, section, span, text)
+import Html.Attributes exposing (class, classList, href, id)
 import Html.Events exposing (onClick)
 import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
+import Other.Clock as Clock
 import Settings.Dev
 import Settings.Mobbers
 import Settings.TimerSettings
@@ -36,8 +36,6 @@ main =
 
 
 port store : Json.Encode.Value -> Cmd msg
-
-
 
 
 
@@ -90,7 +88,6 @@ actionMessage action =
 
         StopSound ->
             SoundMsg Sound.Stop
-
 
 
 type alias Roles =
@@ -148,15 +145,12 @@ pageFrom url =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-
-    -- Timer messages
+      -- Timer messages
     | TimePassed Time.Posix
     | StartRequest
     | StopRequest
-
     | SoundMsg Sound.Msg
-
-    -- Settings messages
+      -- Settings messages
     | TimerSettingsMsg Settings.TimerSettings.Msg
     | DevSettingsMsg Settings.Dev.Msg
     | MobbersSettingsMsg Settings.Mobbers.Msg
@@ -183,7 +177,8 @@ update msg model =
                 Clock.On turn ->
                     if turn.timeLeft <= 1 then
                         let
-                            soundUpdate = Sound.turnEnded model.audio
+                            soundUpdate =
+                                Sound.turnEnded model.audio
                         in
                         ( { model
                             | mobClock = Clock.Off
@@ -213,15 +208,13 @@ update msg model =
 
         SoundMsg soundMsg ->
             Sound.update model.audio soundMsg
-            |> Tuple.mapBoth
-                (\updated -> {model | audio = updated})
-                (Cmd.map SoundMsg)
-
+                |> Tuple.mapBoth
+                    (\updated -> { model | audio = updated })
+                    (Cmd.map SoundMsg)
 
         MobbersSettingsMsg mobberMsg ->
             Settings.Mobbers.update mobberMsg model.mobbers
                 |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersSettingsMsg)
-
 
         TimerSettingsMsg timerMsg ->
             Settings.TimerSettings.update timerMsg model.timerSettings
@@ -256,7 +249,11 @@ view model =
     , body =
         [ div
             [ id "container" ]
-            [ headerView model
+            [ header []
+                [ clockView model
+                , Sound.view model.audio |> Html.map SoundMsg
+                , nav [] <| navLinks model.url
+                ]
             , case model.tab.type_ of
                 Timer ->
                     Settings.TimerSettings.view model.timerSettings
@@ -279,49 +276,7 @@ view model =
 
 
 
--- ############################################################
--- HEADER
--- ############################################################
-
-
-headerView : Model -> Html Msg
-headerView model =
-    let
-        totalWidth =
-            220
-
-        outerRadiant =
-            104
-
-        pomodoroCircle =
-            Circle.Circle
-                outerRadiant
-                (Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
-                (Circle.Stroke 10 "#999")
-
-        mobCircle =
-            Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
-    in
-    header []
-        [ section []
-            [ svg
-                [ Svg.width <| String.fromInt totalWidth
-                , Svg.height <| String.fromInt totalWidth
-                ]
-                (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
-                    ++ Clock.view mobCircle model.mobClock
-                )
-            , button
-                [ onClick <| actionMessage <| actionOf model
-                , class <| turnToString model.mobClock
-                ]
-                [ span [] [ text <| timeLeft model ]
-                , actionIcon <| actionOf model
-                ]
-            ]
-        , audio [ src <| "/sound/" ++ model.audio.sound ] []
-        , nav [] <| navLinks model.url
-        ]
+-- NAV
 
 
 navLinks : Url.Url -> List (Html msg)
@@ -338,6 +293,46 @@ navLinks current =
 activeClass : Url.Url -> String -> ( String, Bool )
 activeClass current tabUrl =
     ( "active", current.path == tabUrl )
+
+
+
+-- CLOCK
+
+
+clockView : Model -> Html Msg
+clockView model =
+    let
+        totalWidth =
+            220
+
+        outerRadiant =
+            104
+
+        pomodoroCircle =
+            Circle.Circle
+                outerRadiant
+                (Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
+                (Circle.Stroke 10 "#999")
+
+        mobCircle =
+            Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
+    in
+    section []
+        [ svg
+            [ Svg.width <| String.fromInt totalWidth
+            , Svg.height <| String.fromInt totalWidth
+            ]
+            (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
+                ++ Clock.view mobCircle model.mobClock
+            )
+        , button
+            [ onClick <| actionMessage <| actionOf model
+            , class <| turnToString model.mobClock
+            ]
+            [ span [] [ text <| timeLeft model ]
+            , actionIcon <| actionOf model
+            ]
+        ]
 
 
 turnToString : Clock.State -> String
@@ -415,4 +410,3 @@ actionIcon action =
 
         StopSound ->
             i [ class "fas fa-volume-mute" ] []
-

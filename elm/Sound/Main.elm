@@ -1,9 +1,10 @@
 port module Sound.Main exposing (..)
 
-import Html exposing (Html)
-import Sound.Library as SoundLibrary
+import Html exposing (Html, audio)
+import Html.Attributes exposing (src)
 import Json.Encode
 import Random
+import Sound.Library as SoundLibrary
 import Sound.Settings
 
 
@@ -14,9 +15,7 @@ port soundCommands : Json.Encode.Value -> Cmd msg
 
 
 
---
 -- MODEL
---
 
 
 type SoundStatus
@@ -40,9 +39,7 @@ init =
 
 
 
---
 -- UPDATE
---
 
 
 type Msg
@@ -72,27 +69,35 @@ update model msg =
 
 
 
---
 -- SUBSCRIPTIONS
---
 
 
 subscriptions : Sub Msg
-subscriptions = soundEnded Ended
+subscriptions =
+    soundEnded Ended
 
 
---
+
+-- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    audio [ src <| "/sound/" ++ model.sound ] []
+
+
+
 -- SETTINGS VIEW
---
+
+
 settingsView : Model -> Html Msg
-settingsView model=
+settingsView model =
     Sound.Settings.view model.settings
         |> Html.map SettingsMsg
 
 
---
+
 -- Other stuff
---
 
 
 pick : Model -> Cmd Msg
