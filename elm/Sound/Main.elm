@@ -1,14 +1,16 @@
 port module Sound.Main exposing (..)
 
+import Html exposing (Html)
 import Sound.Library as SoundLibrary
 import Json.Encode
 import Random
+import Sound.Settings
 
 
 port soundEnded : (String -> msg) -> Sub msg
 
 
-port soundCommands2 : Json.Encode.Value -> Cmd msg
+port soundCommands : Json.Encode.Value -> Cmd msg
 
 
 
@@ -22,13 +24,10 @@ type SoundStatus
     | NotPlaying
 
 
-
--- todo ranger tout ce qui concerne le son dans un même dossier ?
-
-
 type alias Model =
     { state : SoundStatus
     , sound : SoundLibrary.Sound
+    , settings : Sound.Settings.Model
     }
 
 
@@ -36,6 +35,7 @@ init : Model
 init =
     { state = NotPlaying
     , sound = SoundLibrary.default
+    , settings = Sound.Settings.init
     }
 
 
@@ -49,6 +49,7 @@ type Msg
     = Picked SoundLibrary.Sound
     | Ended String
     | Stop
+    | SettingsMsg Sound.Settings.Msg
 
 
 update : Model -> Msg -> ( Model, Cmd Msg )
@@ -63,6 +64,12 @@ update model msg =
         Stop ->
             ( { model | state = NotPlaying }, stop )
 
+        SettingsMsg soundMsg ->
+            Sound.Settings.update soundMsg model.settings soundCommands
+                |> Tuple.mapBoth
+                    (\it -> { model | settings = it })
+                    (Cmd.map SettingsMsg)
+
 
 
 --
@@ -74,16 +81,23 @@ subscriptions : Sub Msg
 subscriptions = soundEnded Ended
 
 
+--
+-- SETTINGS VIEW
+--
+settingsView : Model -> Html Msg
+settingsView model=
+    Sound.Settings.view model.settings
+        |> Html.map SettingsMsg
+
 
 --
 -- Other stuff
 --
 
 
-pick : SoundLibrary.Profile -> Cmd Msg
-pick soundProfile =
-    -- todo il faudrait que ce module porte ses settings
-    Random.generate Picked <| SoundLibrary.pick soundProfile
+pick : Model -> Cmd Msg
+pick model =
+    Random.generate Picked <| SoundLibrary.pick model.settings.profile
 
 
 turnEnded : Model -> ( Model, Cmd msg )
@@ -93,7 +107,7 @@ turnEnded model =
 
 play : Cmd msg
 play =
-    soundCommands2 <|
+    soundCommands <|
         Json.Encode.object
             [ ( "name", Json.Encode.string "play" )
             , ( "data", Json.Encode.object [] )
@@ -102,7 +116,7 @@ play =
 
 stop : Cmd msg
 stop =
-    soundCommands2 <|
+    soundCommands <|
         Json.Encode.object
             [ ( "name", Json.Encode.string "stop" )
             , ( "data", Json.Encode.object [] )
