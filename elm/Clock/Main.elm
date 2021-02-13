@@ -1,6 +1,6 @@
-module Other.Clock exposing (..)
+module Clock.Main exposing (..)
 
-import Graphics.Circle
+import Clock.Circle
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio as Ratio exposing (Ratio)
 import Svg exposing (Svg)
@@ -37,9 +37,9 @@ timePassed state duration =
                 (On { on | timeLeft = timeLeft }, TimePassed)
 
 
-view : Graphics.Circle.Circle -> State -> List (Svg msg)
+view : Clock.Circle.Circle -> State -> List (Svg msg)
 view mobCircle turn =
-    Graphics.Circle.draw mobCircle (ratio turn)
+    Clock.Circle.draw mobCircle (ratio turn)
 
 
 ratio : State -> Ratio
