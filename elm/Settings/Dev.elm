@@ -3,6 +3,7 @@ module Settings.Dev exposing (..)
 import Html exposing (Html, button, div, i, label, text)
 import Html.Attributes exposing (class, classList, for, id)
 import Html.Events exposing (onClick)
+import Lib.Duration as Duration exposing (Duration)
 
 
 type Speed
@@ -23,10 +24,11 @@ type Msg
     = SpeedChanged Speed
 
 
+seconds : Model -> Duration
 seconds model =
     case model.speed of
-        Normal -> 1
-        Fast -> 20
+        Normal -> Duration.ofSeconds 1
+        Fast -> Duration.ofSeconds 20
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =

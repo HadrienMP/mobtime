@@ -176,7 +176,7 @@ update msg model =
         TimePassed _ ->
             case model.mobClock of
                 Clock.On turn ->
-                    if turn.timeLeft <= 1 then
+                    if Clock.finished model.mobClock then
                         let
                             soundUpdate =
                                 Sound.turnEnded model.audio
@@ -190,7 +190,7 @@ update msg model =
                         )
 
                     else
-                        ( { model | mobClock = Clock.On { turn | timeLeft = turn.timeLeft - Settings.Dev.seconds model.dev } }
+                        ( { model | mobClock = Clock.On { turn | timeLeft = Lib.Duration.subtract turn.timeLeft <| Settings.Dev.seconds model.dev } }
                         , Cmd.none
                         )
 
@@ -198,7 +198,7 @@ update msg model =
                     ( model, Cmd.none )
 
         StartRequest ->
-            ( { model | mobClock = Clock.On { timeLeft = model.timerSettings.turnLength * 60, length = model.timerSettings.turnLength } }
+            ( { model | mobClock = Clock.On { timeLeft = model.timerSettings.turnLength, length = model.timerSettings.turnLength } }
             , Sound.pick model.audio |> Cmd.map SoundMsg
             )
 
@@ -358,8 +358,7 @@ timeLeft : Model -> List String
 timeLeft model =
     case model.mobClock of
         Clock.On turn ->
-            Settings.TimerSettings.format model.timerSettings <|
-                Lib.Duration.ofSeconds turn.timeLeft
+            Settings.TimerSettings.format model.timerSettings turn.timeLeft
 
         Clock.Off ->
             []

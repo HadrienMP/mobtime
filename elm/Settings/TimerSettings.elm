@@ -3,18 +3,18 @@ module Settings.TimerSettings exposing (..)
 import Html exposing (Html, a, div, hr, i, input, label, strong, text)
 import Html.Attributes exposing (checked, class, for, id, step, type_, value)
 import Html.Events exposing (onCheck, onInput)
-import Lib.Duration
+import Lib.Duration as Duration exposing (Duration)
 
 
 type alias Model =
-    { turnLength : Int
+    { turnLength : Duration
     , displaySeconds : Bool
     }
 
 
 init : Model
 init =
-    { turnLength = 8
+    { turnLength = Duration.ofMinutes 8
     , displaySeconds = False
     }
 
@@ -28,7 +28,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TurnLengthChanged turnLength ->
-            ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 }
+            ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 |> Duration.ofMinutes }
             , Cmd.none
             )
 
@@ -38,13 +38,13 @@ update msg model =
             )
 
 
-format : Model -> Lib.Duration.Duration -> List String
+format : Model -> Duration -> List String
 format model duration =
     if model.displaySeconds then
-        Lib.Duration.toLongString duration
+        Duration.toLongString duration
 
     else
-        Lib.Duration.toShortString duration
+        Duration.toShortString duration
 
 
 view : Model -> Html Msg
@@ -74,7 +74,7 @@ view model =
                 [ for "turn-length" ]
                 [ text <|
                     "Turn : "
-                        ++ String.fromInt model.turnLength
+                        ++ (String.fromInt <| Duration.toMinutes model.turnLength)
                         ++ " min"
                 ]
             , i [ class "fas fa-dove" ] []
@@ -85,7 +85,7 @@ view model =
                 , onInput TurnLengthChanged
                 , Html.Attributes.min "2"
                 , Html.Attributes.max "20"
-                , value <| String.fromInt model.turnLength
+                , value <| String.fromInt <| Duration.toMinutes model.turnLength
                 ]
                 []
             , i [ class "fas fa-hippo" ] []
