@@ -3,6 +3,7 @@ module Settings.TimerSettings exposing (..)
 import Html exposing (Html, a, div, hr, i, input, label, strong, text)
 import Html.Attributes exposing (checked, class, for, id, step, type_, value)
 import Html.Events exposing (onCheck, onInput)
+import Lib.Duration
 
 
 type alias Model =
@@ -22,7 +23,8 @@ type Msg
     = TurnLengthChanged String
     | DisplaySecondsChanged Bool
 
-update : Msg -> Model -> (Model, Cmd Msg)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TurnLengthChanged turnLength ->
@@ -34,6 +36,16 @@ update msg model =
             ( { model | displaySeconds = displaySeconds }
             , Cmd.none
             )
+
+
+format : Model -> Lib.Duration.Duration -> List String
+format model duration =
+    if model.displaySeconds then
+        Lib.Duration.toLongString duration
+
+    else
+        Lib.Duration.toShortString duration
+
 
 view : Model -> Html Msg
 view model =

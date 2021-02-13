@@ -7,6 +7,7 @@ import Html exposing (Html, a, button, div, header, i, nav, p, section, span, te
 import Html.Attributes exposing (class, classList, href, id)
 import Html.Events exposing (onClick)
 import Json.Encode
+import Lib.Duration
 import Lib.Ratio as Ratio exposing (Ratio)
 import Other.Clock as Clock
 import Settings.Dev
@@ -245,15 +246,21 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = timeLeft model ++ " | Mob Time !"
+    { title =
+        timeLeft model
+        |> List.foldr (++) ""
+        |> (\it -> it ++ " | Mob Time !")
     , body =
         [ div
             [ id "container" ]
             [ header []
-                [ clockView model
-                , Sound.view model.audio |> Html.map SoundMsg
-                , nav [] <| navLinks model.url
+                [ section []
+                    [ clockView model
+                    , actionView model
+                    ]
                 ]
+            , Sound.view model.audio |> Html.map SoundMsg
+            , nav [] <| navLinks model.url
             , case model.tab.type_ of
                 Timer ->
                     Settings.TimerSettings.view model.timerSettings
@@ -317,21 +324,23 @@ clockView model =
         mobCircle =
             Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
     in
-    section []
-        [ svg
-            [ Svg.width <| String.fromInt totalWidth
-            , Svg.height <| String.fromInt totalWidth
-            ]
-            (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
-                ++ Clock.view mobCircle model.mobClock
-            )
-        , button
-            [ onClick <| actionMessage <| actionOf model
-            , class <| turnToString model.mobClock
-            ]
-            [ span [] [ text <| timeLeft model ]
-            , actionIcon <| actionOf model
-            ]
+    svg
+        [ Svg.width <| String.fromInt totalWidth
+        , Svg.height <| String.fromInt totalWidth
+        ]
+        (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
+            ++ Clock.view mobCircle model.mobClock
+        )
+
+
+actionView : Model -> Html Msg
+actionView model =
+    button
+        [ onClick <| actionMessage <| actionOf model
+        , class <| turnToString model.mobClock
+        ]
+        [ span [ id "time-left" ] (timeLeft model |> List.map (\it -> span [] [text it]))
+        , actionIcon <| actionOf model
         ]
 
 
@@ -345,42 +354,15 @@ turnToString turn =
             "off"
 
 
-timeLeft : Model -> String
+timeLeft : Model -> List String
 timeLeft model =
     case model.mobClock of
-        Clock.On t ->
-            let
-                floatMinutes =
-                    toFloat t.timeLeft / 60.0
-
-                intMinutes =
-                    floor floatMinutes
-
-                secondsLeft =
-                    t.timeLeft - (floor floatMinutes * 60)
-
-                minutesText =
-                    if intMinutes /= 0 then
-                        String.fromInt intMinutes ++ " min "
-
-                    else
-                        ""
-
-                secondsText =
-                    if secondsLeft /= 0 then
-                        String.fromInt secondsLeft ++ " " ++ "s"
-
-                    else
-                        ""
-            in
-            if model.timerSettings.displaySeconds || t.timeLeft < 60 then
-                minutesText ++ secondsText
-
-            else
-                (String.fromInt <| ceiling floatMinutes) ++ " min"
+        Clock.On turn ->
+            Settings.TimerSettings.format model.timerSettings <|
+                Lib.Duration.ofSeconds turn.timeLeft
 
         Clock.Off ->
-            ""
+            []
 
 
 actionOf : Model -> Action

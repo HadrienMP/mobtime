@@ -55,7 +55,7 @@ header {
         i {
           display: block;
         }
-        span {
+        #time-left {
           display: none;
         }
       }
@@ -63,12 +63,12 @@ header {
         i {
           display: none;
         }
-        span {
+        #time-left {
           display: block;
         }
 
         &:hover {
-          span {
+          #time-left {
             display: none;
           }
           i {
@@ -82,9 +82,13 @@ header {
         font-size: 6em;
       }
 
-      span {
+      #time-left {
         font-size: 3em;
         line-height: 1em;
+
+        span {
+          display: block;
+        }
       }
     }
   }
