@@ -8,20 +8,28 @@ type Duration
 div : Duration -> Duration -> Float
 div numerator denominator =
     let
-        numeratorSeconds = toSeconds numerator |> toFloat
-        denominatorSeconds = toSeconds denominator |> toFloat
+        numeratorSeconds =
+            toSeconds numerator |> toFloat
+
+        denominatorSeconds =
+            toSeconds denominator |> toFloat
     in
     numeratorSeconds / denominatorSeconds
+
 
 toSeconds : Duration -> Int
 toSeconds duration =
     case duration of
-        Duration s -> s
+        Duration s ->
+            s
+
 
 toMinutes : Duration -> Int
 toMinutes duration =
     case duration of
-        Duration s -> s // 60
+        Duration s ->
+            s // 60
+
 
 ofSeconds : Int -> Duration
 ofSeconds seconds =
@@ -35,8 +43,9 @@ ofMinutes minutes =
 
 subtract : Duration -> Duration -> Duration
 subtract a b =
-    toSeconds a - toSeconds b
-    |> ofSeconds
+    toSeconds a
+        - toSeconds b
+        |> ofSeconds
 
 
 toShortString : Duration -> List String

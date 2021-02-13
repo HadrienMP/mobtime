@@ -7,7 +7,6 @@ import Html exposing (Html, a, button, div, header, i, nav, p, section, span, te
 import Html.Attributes exposing (class, classList, href, id)
 import Html.Events exposing (onClick)
 import Json.Encode
-import Lib.Duration
 import Lib.Ratio as Ratio exposing (Ratio)
 import Other.Clock as Clock
 import Settings.Dev
@@ -174,31 +173,31 @@ update msg model =
             )
 
         TimePassed _ ->
-            case model.mobClock of
-                Clock.On turn ->
-                    if Clock.finished model.mobClock then
-                        let
-                            soundUpdate =
-                                Sound.turnEnded model.audio
-                        in
-                        ( { model
-                            | mobClock = Clock.Off
-                            , audio = Tuple.first soundUpdate
-                            , mobbers = Tuple.first <| Settings.Mobbers.update Settings.Mobbers.TurnOver model.mobbers
-                          }
-                        , Tuple.second soundUpdate
-                        )
+            let
+                (clock, clockEvent) =
+                    Clock.timePassed model.mobClock <| Settings.Dev.seconds model.dev
+            in
+            case clockEvent of
+                Clock.Finished ->
+                    let
+                        (sound, soundCmd) =
+                            Sound.turnEnded model.audio
+                    in
+                    ( { model
+                        | mobClock = clock
+                        , audio = sound
+                        , mobbers = Settings.Mobbers.turnEnded model.mobbers
+                      }
+                    , soundCmd
+                    )
 
-                    else
-                        ( { model | mobClock = Clock.On { turn | timeLeft = Lib.Duration.subtract turn.timeLeft <| Settings.Dev.seconds model.dev } }
-                        , Cmd.none
-                        )
-
-                Clock.Off ->
-                    ( model, Cmd.none )
+                _ ->
+                    ( { model | mobClock = clock }
+                    , Cmd.none
+                    )
 
         StartRequest ->
-            ( { model | mobClock = Clock.On { timeLeft = model.timerSettings.turnLength, length = model.timerSettings.turnLength } }
+            ( { model | mobClock = Clock.start model.timerSettings.turnLength }
             , Sound.pick model.audio |> Cmd.map SoundMsg
             )
 
@@ -248,8 +247,8 @@ view : Model -> Browser.Document Msg
 view model =
     { title =
         timeLeft model
-        |> List.foldr (++) ""
-        |> (\it -> it ++ " | Mob Time !")
+            |> List.foldr (++) ""
+            |> (\it -> it ++ " | Mob Time !")
     , body =
         [ div
             [ id "container" ]
@@ -339,7 +338,7 @@ actionView model =
         [ onClick <| actionMessage <| actionOf model
         , class <| turnToString model.mobClock
         ]
-        [ span [ id "time-left" ] (timeLeft model |> List.map (\it -> span [] [text it]))
+        [ span [ id "time-left" ] (timeLeft model |> List.map (\it -> span [] [ text it ]))
         , actionIcon <| actionOf model
         ]
 

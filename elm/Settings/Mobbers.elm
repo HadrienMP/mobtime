@@ -38,7 +38,6 @@ type Msg
     = AddMobber
     | NewMobberNameChanged String
     | DeleteMobber String
-    | TurnOver
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,10 +58,10 @@ update msg model =
             , Cmd.none
             )
 
-        TurnOver ->
-            ( { model | mobbers = rotate model.mobbers }
-            , Cmd.none
-            )
+
+turnEnded : Model -> Model
+turnEnded model =
+    { model | mobbers = rotate model.mobbers }
 
 
 rotate : Mobbers -> Mobbers
