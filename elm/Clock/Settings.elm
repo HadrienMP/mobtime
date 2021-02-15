@@ -50,14 +50,7 @@ format model duration =
 view : Model -> Html Msg
 view model =
     div [ id "timer", class "tab" ]
-        [ a [ id "share-link" ]
-            [ text "You are in the "
-            , strong [] [ text "Agicap" ]
-            , text " mob"
-            , i [ id "share-button", class "fas fa-share-alt" ] []
-            ]
-        , hr [] []
-        , div
+        [ div
             [ id "seconds-field", class "form-field" ]
             [ label [ for "seconds" ] [ text "Display seconds" ]
             , input

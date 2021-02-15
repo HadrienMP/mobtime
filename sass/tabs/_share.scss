@@ -1,0 +1,16 @@
+#share-link {
+  cursor: pointer;
+  position: relative;
+  display: block;
+
+  strong {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  i {
+    position: absolute;
+    top: 4px;
+    right: 0;
+    font-size: 1.1em;
+  }
+}

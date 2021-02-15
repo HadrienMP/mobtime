@@ -1,4 +1,4 @@
-module Settings.Mobbers exposing (..)
+module Tabs.Mobbers exposing (..)
 
 import Clock.Events
 import Html exposing (Html, button, div, form, i, input, li, p, text, ul)

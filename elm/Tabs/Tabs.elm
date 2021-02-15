@@ -1,9 +1,8 @@
-module Tabs exposing (..)
+module Tabs.Tabs exposing (..)
 
 import Html exposing (Html, a, i, nav)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
-import Url
 
 type Msg
     = Clicked Tab
@@ -11,38 +10,30 @@ type Msg
 type TabType
     = Timer
     | Mobbers
-    | SoundTab
-    | DevTab
+    | Sound
+    | Dev
+    | Share
 
 
 type alias Tab =
     { type_ : TabType
-    , url : String
-    , name : String
     , icon : String
     }
 
 
 timerTab : Tab
 timerTab =
-    Tab Timer "/timer" "Timer" "fa-clock"
+    Tab Timer "fa-clock"
 
 
 tabs : List Tab
 tabs =
     [ timerTab
-    , Tab Mobbers "/mobbers" "Mobbers" "fa-users"
-    , Tab SoundTab "/audio" "Sound" "fa-volume-up"
-    , Tab DevTab "/dev" "Dev" "fa-code"
+    , Tab Mobbers "fa-users"
+    , Tab Sound "fa-volume-up"
+    , Tab Share "fa-share-alt"
+    , Tab Dev "fa-code"
     ]
-
-
-tabFrom : Url.Url -> Tab
-tabFrom url =
-    tabs
-        |> List.filter (\p -> p.url == url.path)
-        |> List.head
-        |> Maybe.withDefault timerTab
 
 
 navView : Tab -> Html Msg

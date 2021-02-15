@@ -4,23 +4,6 @@
   label {
     flex: 0 0 30%;
   }
-
-  #share-link {
-    cursor: pointer;
-    position: relative;
-    display: block;
-
-    strong {
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-    i {
-      position: absolute;
-      top: 4px;
-      right: 0;
-      font-size: 1.1em;
-    }
-  }
 }
 
 input[type="range"] {

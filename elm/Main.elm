@@ -9,12 +9,13 @@ import Html exposing (Html, div, header, section)
 import Html.Attributes exposing (id)
 import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
-import Settings.Dev
-import Settings.Mobbers
+import Tabs.Dev
+import Tabs.Mobbers
 import Sound.Main as Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
-import Tabs
+import Tabs.Share
+import Tabs.Tabs
 import Time
 
 
@@ -40,10 +41,10 @@ port store : Json.Encode.Value -> Cmd msg
 
 
 type alias Model =
-    { tab : Tabs.Tab
+    { tab : Tabs.Tabs.Tab
     , timerSettings : Clock.Settings.Model
-    , dev : Settings.Dev.Model
-    , mobbers : Settings.Mobbers.Model
+    , dev : Tabs.Dev.Model
+    , mobbers : Tabs.Mobbers.Model
     , mobClock : Clock.Model
     , sound : Sound.Model
     }
@@ -51,10 +52,10 @@ type alias Model =
 
 init : String -> ( Model, Cmd Msg )
 init _ =
-    ( { tab = Tabs.timerTab
+    ( { tab = Tabs.Tabs.timerTab
       , timerSettings = Clock.Settings.init
-      , dev = Settings.Dev.init
-      , mobbers = Settings.Mobbers.init
+      , dev = Tabs.Dev.init
+      , mobbers = Tabs.Mobbers.init
       , mobClock = Clock.Off
       , sound = Sound.init
       }
@@ -71,9 +72,9 @@ type Msg
     | ClockMsg Clock.Msg
     | SoundMsg Sound.Msg
     | TimerSettingsMsg Clock.Settings.Msg
-    | DevSettingsMsg Settings.Dev.Msg
-    | MobbersSettingsMsg Settings.Mobbers.Msg
-    | TabsMsg Tabs.Msg
+    | DevSettingsMsg Tabs.Dev.Msg
+    | MobbersSettingsMsg Tabs.Mobbers.Msg
+    | TabsMsg Tabs.Tabs.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -94,7 +95,7 @@ update msg model =
                     (Cmd.map SoundMsg)
 
         MobbersSettingsMsg mobberMsg ->
-            Settings.Mobbers.update mobberMsg model.mobbers
+            Tabs.Mobbers.update mobberMsg model.mobbers
                 |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersSettingsMsg)
 
         TimerSettingsMsg timerMsg ->
@@ -104,12 +105,12 @@ update msg model =
                     (Cmd.map TimerSettingsMsg)
 
         DevSettingsMsg devMsg ->
-            Settings.Dev.update devMsg model.dev
+            Tabs.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevSettingsMsg)
 
         TabsMsg tabsMsg ->
             case tabsMsg of
-                Tabs.Clicked tab ->
+                Tabs.Tabs.Clicked tab ->
                     ( { model | tab = tab }, Cmd.none )
 
 
@@ -120,7 +121,7 @@ handleClockResult model clockResult =
             Sound.handleClockEvents model.sound clockResult.event
 
         mobbersResult =
-            Settings.Mobbers.handleClockEvents model.mobbers clockResult.event
+            Tabs.Mobbers.handleClockEvents model.mobbers clockResult.event
     in
     ( { model
         | mobClock = clockResult.model
@@ -166,23 +167,26 @@ view model =
                     ]
                 ]
             , Sound.view model.sound |> Html.map SoundMsg
-            , Tabs.navView model.tab |> Html.map TabsMsg
+            , Tabs.Tabs.navView model.tab |> Html.map TabsMsg
             , case model.tab.type_ of
-                Tabs.Timer ->
+                Tabs.Tabs.Timer ->
                     Clock.Settings.view model.timerSettings
                         |> Html.map TimerSettingsMsg
 
-                Tabs.Mobbers ->
-                    Settings.Mobbers.view model.mobbers
+                Tabs.Tabs.Mobbers ->
+                    Tabs.Mobbers.view model.mobbers
                         |> Html.map MobbersSettingsMsg
 
-                Tabs.SoundTab ->
+                Tabs.Tabs.Sound ->
                     Sound.settingsView model.sound
                         |> Html.map SoundMsg
 
-                Tabs.DevTab ->
-                    Settings.Dev.view model.dev
+                Tabs.Tabs.Dev ->
+                    Tabs.Dev.view model.dev
                         |> Html.map DevSettingsMsg
+
+                Tabs.Tabs.Share ->
+                    Tabs.Share.view
             ]
         ]
     }

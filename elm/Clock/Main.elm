@@ -5,7 +5,7 @@ import Clock.Events exposing (Event(..))
 import Clock.Settings
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio as Ratio exposing (Ratio)
-import Settings.Dev
+import Tabs.Dev
 import Svg exposing (Svg)
 
 
@@ -19,7 +19,7 @@ start duration =
     On { timeLeft = duration, length = duration }
 
 
-timePassed : Model -> Settings.Dev.Model -> UpdateResult
+timePassed : Model -> Tabs.Dev.Model -> UpdateResult
 timePassed model devSettings =
     case model of
         Off ->
@@ -31,7 +31,7 @@ timePassed model devSettings =
         On on ->
             let
                 timeLeft =
-                    Duration.subtract on.timeLeft (Settings.Dev.seconds devSettings)
+                    Duration.subtract on.timeLeft (Tabs.Dev.seconds devSettings)
             in
             if Duration.toSeconds timeLeft <= 0 then
                 { model = Off
