@@ -1,13 +1,17 @@
 module Clock.Main exposing (..)
 
 import Clock.Circle
+import Clock.Settings
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio as Ratio exposing (Ratio)
+import Settings.Dev
 import Svg exposing (Svg)
+import Time
+
 
 type Event
     = Finished
-    | TimePassed
+
 
 type State
     = Off
@@ -19,11 +23,11 @@ start duration =
     On { timeLeft = duration, length = duration }
 
 
-timePassed : State -> Duration -> (State, Event)
+timePassed : State -> Duration -> ( State, List Event )
 timePassed state duration =
     case state of
         Off ->
-            (state, TimePassed)
+            ( state, [] )
 
         On on ->
             let
@@ -31,10 +35,45 @@ timePassed state duration =
                     Duration.subtract on.timeLeft duration
             in
             if Duration.toSeconds timeLeft <= 0 then
-                (Off, Finished)
+                ( Off, [Finished] )
 
             else
-                (On { on | timeLeft = timeLeft }, TimePassed)
+                ( On { on | timeLeft = timeLeft }, [] )
+
+
+
+-- UPDATE
+
+
+type Msg
+    = TimePassed Time.Posix
+    | StartRequest
+    | StopRequest
+
+
+type alias UpdateResult =
+    { model : State, command : Cmd Msg, events : List Event }
+
+
+update : State -> Settings.Dev.Model -> Clock.Settings.Model -> Msg -> UpdateResult
+update state dev settings msg =
+    case msg of
+        TimePassed _ ->
+            let
+                ( clock, events ) =
+                    timePassed state <| Settings.Dev.seconds dev
+            in
+            {model = clock, command = Cmd.none, events = events}
+
+        StartRequest ->
+            { model = start settings.turnLength, command = Cmd.none, events = [] }
+
+        StopRequest ->
+            { model = Off, command = Cmd.none, events = [] }
+
+
+
+-- VIEW
 
 
 view : Clock.Circle.Circle -> State -> List (Svg msg)

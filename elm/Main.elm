@@ -178,7 +178,7 @@ update msg model =
                     Clock.timePassed model.mobClock <| Settings.Dev.seconds model.dev
             in
             case clockEvent of
-                Clock.Finished ->
+                [Clock.Finished] ->
                     let
                         ( sound, soundCmd ) =
                             Sound.turnEnded model.sound
