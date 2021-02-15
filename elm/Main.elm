@@ -175,7 +175,7 @@ update msg model =
 
 
         ClockMsg clockMsg ->
-            Clock.update model.mobClock model.dev model.timerSettings clockMsg
+            Clock.update model.timerSettings clockMsg
             |> handleClockResult model
 
 

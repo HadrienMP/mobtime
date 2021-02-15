@@ -60,8 +60,8 @@ type alias UpdateResult =
     { model : Model, command : Cmd Msg, event : Maybe Event }
 
 
-update : Model -> Settings.Dev.Model -> Clock.Settings.Model -> Msg -> UpdateResult
-update state dev settings msg =
+update : Clock.Settings.Model -> Msg -> UpdateResult
+update settings msg =
     case msg of
         StartRequest ->
             { model = start settings.turnLength, command = Cmd.none, event = Just Started }
