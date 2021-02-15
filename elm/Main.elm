@@ -3,15 +3,15 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Clock.Circle as Circle
+import Clock.Main as Clock
+import Clock.Settings
 import Html exposing (Html, a, button, div, header, i, nav, p, section, span, text)
 import Html.Attributes exposing (class, classList, href, id)
 import Html.Events exposing (onClick)
 import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
-import Clock.Main as Clock
 import Settings.Dev
 import Settings.Mobbers
-import Clock.Settings
 import Sound.Main as Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
@@ -174,13 +174,13 @@ update msg model =
 
         TimePassed _ ->
             let
-                (clock, clockEvent) =
+                ( clock, clockEvent ) =
                     Clock.timePassed model.mobClock <| Settings.Dev.seconds model.dev
             in
             case clockEvent of
                 Clock.Finished ->
                     let
-                        (sound, soundCmd) =
+                        ( sound, soundCmd ) =
                             Sound.turnEnded model.sound
                     in
                     ( { model
@@ -245,10 +245,7 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title =
-        timeLeft model
-            |> List.foldr (++) ""
-            |> (\it -> it ++ " | Mob Time !")
+    { title = pageTitle model
     , body =
         [ div
             [ id "container" ]
@@ -279,6 +276,19 @@ view model =
             ]
         ]
     }
+
+
+pageTitle model =
+    timeLeft model
+        |> List.foldr (++) ""
+        |> (\it ->
+                if String.isEmpty it then
+                    ""
+
+                else
+                    " | "
+           )
+        |> (\it -> it ++ "Mob Time !")
 
 
 
