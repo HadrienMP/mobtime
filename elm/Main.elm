@@ -81,10 +81,10 @@ actionMessage : Action -> Msg
 actionMessage action =
     case action of
         Start ->
-            StartRequest
+            ClockMsg Clock.StartRequest
 
         Stop ->
-            StopRequest
+            ClockMsg Clock.StopRequest
 
         StopSound ->
             SoundMsg Sound.Stop
@@ -111,7 +111,7 @@ type alias Model =
     , timerSettings : Clock.Settings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
-    , mobClock : Clock.State
+    , mobClock : Clock.Model
     , sound : Sound.Model
     }
 
@@ -145,12 +145,9 @@ pageFrom url =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-      -- Timer messages
     | TimePassed Time.Posix
-    | StartRequest
-    | StopRequest
+    | ClockMsg Clock.Msg
     | SoundMsg Sound.Msg
-      -- Settings messages
     | TimerSettingsMsg Clock.Settings.Msg
     | DevSettingsMsg Settings.Dev.Msg
     | MobbersSettingsMsg Settings.Mobbers.Msg
@@ -173,38 +170,14 @@ update msg model =
             )
 
         TimePassed _ ->
-            let
-                ( clock, clockEvent ) =
-                    Clock.timePassed model.mobClock <| Settings.Dev.seconds model.dev
-            in
-            case clockEvent of
-                [Clock.Finished] ->
-                    let
-                        ( sound, soundCmd ) =
-                            Sound.turnEnded model.sound
-                    in
-                    ( { model
-                        | mobClock = clock
-                        , sound = sound
-                        , mobbers = Settings.Mobbers.turnEnded model.mobbers
-                      }
-                    , soundCmd
-                    )
+            Clock.timePassed model.mobClock model.dev
+            |> handleClockResult model
 
-                _ ->
-                    ( { model | mobClock = clock }
-                    , Cmd.none
-                    )
 
-        StartRequest ->
-            ( { model | mobClock = Clock.start model.timerSettings.turnLength }
-            , Sound.pick model.sound |> Cmd.map SoundMsg
-            )
+        ClockMsg clockMsg ->
+            Clock.update model.mobClock model.dev model.timerSettings clockMsg
+            |> handleClockResult model
 
-        StopRequest ->
-            ( { model | mobClock = Clock.Off }
-            , Cmd.none
-            )
 
         SoundMsg soundMsg ->
             Sound.update model.sound soundMsg
@@ -225,6 +198,28 @@ update msg model =
         DevSettingsMsg devMsg ->
             Settings.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevSettingsMsg)
+
+
+handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
+handleClockResult model clockResult =
+    let
+        soundResult =
+            Sound.handleClockEvents model.sound clockResult.event
+
+        mobbersResult =
+            Settings.Mobbers.handleClockEvents model.mobbers clockResult.event
+    in
+    ( { model
+        | mobClock = clockResult.model
+        , sound = soundResult.model
+        , mobbers = mobbersResult.model
+      }
+    , Cmd.batch <|
+        [ soundResult.command |> Cmd.map SoundMsg
+        , clockResult.command |> Cmd.map ClockMsg
+        , mobbersResult.command |> Cmd.map MobbersSettingsMsg
+        ]
+    )
 
 
 
@@ -286,7 +281,7 @@ pageTitle model =
                     ""
 
                 else
-                    " | "
+                    it ++ " | "
            )
         |> (\it -> it ++ "Mob Time !")
 
@@ -353,7 +348,7 @@ actionView model =
         ]
 
 
-turnToString : Clock.State -> String
+turnToString : Clock.Model -> String
 turnToString turn =
     case turn of
         Clock.On _ ->

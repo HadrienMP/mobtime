@@ -1,5 +1,6 @@
 port module Sound.Main exposing (..)
 
+import Clock.Events
 import Html exposing (Html, audio)
 import Html.Attributes exposing (src)
 import Json.Encode
@@ -100,14 +101,30 @@ settingsView model =
 -- Other stuff
 
 
+type alias EventHandlingResult =
+    { model : Model
+    , command : Cmd Msg
+    }
+
+
+handleClockEvents : Model -> Maybe Clock.Events.Event -> EventHandlingResult
+handleClockEvents model maybeEvent =
+    case maybeEvent of
+        Just event ->
+            case event of
+                Clock.Events.Finished ->
+                    { model = { model | state = Playing }, command = play }
+
+                Clock.Events.Started ->
+                    { model = { model | state = NotPlaying }, command = pick model }
+
+        Nothing ->
+            { model = model, command = Cmd.none }
+
+
 pick : Model -> Cmd Msg
 pick model =
     Random.generate Picked <| SoundLibrary.pick model.settings.profile
-
-
-turnEnded : Model -> ( Model, Cmd msg )
-turnEnded model =
-    ( { model | state = Playing }, play )
 
 
 play : Cmd msg

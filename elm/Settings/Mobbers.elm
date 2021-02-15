@@ -1,5 +1,6 @@
 module Settings.Mobbers exposing (..)
 
+import Clock.Events
 import Html exposing (Html, button, div, form, i, input, li, p, text, ul)
 import Html.Attributes exposing (class, id, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -59,9 +60,25 @@ update msg model =
             )
 
 
-turnEnded : Model -> Model
-turnEnded model =
-    { model | mobbers = rotate model.mobbers }
+type alias EventHandlingResult =
+    { model : Model
+    , command : Cmd Msg
+    }
+
+
+handleClockEvents : Model -> Maybe Clock.Events.Event -> EventHandlingResult
+handleClockEvents model maybeEvent =
+    case maybeEvent of
+        Just event ->
+            case event of
+                Clock.Events.Finished ->
+                    EventHandlingResult { model | mobbers = rotate model.mobbers } Cmd.none
+
+                Clock.Events.Started ->
+                    EventHandlingResult model Cmd.none
+
+        Nothing ->
+            EventHandlingResult model Cmd.none
 
 
 rotate : Mobbers -> Mobbers

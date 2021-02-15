@@ -1,6 +1,7 @@
 module Clock.Main exposing (..)
 
 import Clock.Circle
+import Clock.Events exposing (Event(..))
 import Clock.Settings
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio as Ratio exposing (Ratio)
@@ -9,36 +10,41 @@ import Svg exposing (Svg)
 import Time
 
 
-type Event
-    = Finished
-
-
-type State
+type Model
     = Off
     | On { timeLeft : Duration, length : Duration }
 
 
-start : Duration -> State
+start : Duration -> Model
 start duration =
     On { timeLeft = duration, length = duration }
 
 
-timePassed : State -> Duration -> ( State, List Event )
-timePassed state duration =
-    case state of
+timePassed : Model -> Settings.Dev.Model -> UpdateResult
+timePassed model devSettings =
+    case model of
         Off ->
-            ( state, [] )
+            { model = model
+            , command = Cmd.none
+            , event = Nothing
+            }
 
         On on ->
             let
                 timeLeft =
-                    Duration.subtract on.timeLeft duration
+                    Duration.subtract on.timeLeft (Settings.Dev.seconds devSettings)
             in
             if Duration.toSeconds timeLeft <= 0 then
-                ( Off, [Finished] )
+                { model = Off
+                , command = Cmd.none
+                , event = Just Finished
+                }
 
             else
-                ( On { on | timeLeft = timeLeft }, [] )
+                { model = On { on | timeLeft = timeLeft }
+                , command = Cmd.none
+                , event = Nothing
+                }
 
 
 
@@ -46,42 +52,34 @@ timePassed state duration =
 
 
 type Msg
-    = TimePassed Time.Posix
-    | StartRequest
+    = StartRequest
     | StopRequest
 
 
 type alias UpdateResult =
-    { model : State, command : Cmd Msg, events : List Event }
+    { model : Model, command : Cmd Msg, event : Maybe Event }
 
 
-update : State -> Settings.Dev.Model -> Clock.Settings.Model -> Msg -> UpdateResult
+update : Model -> Settings.Dev.Model -> Clock.Settings.Model -> Msg -> UpdateResult
 update state dev settings msg =
     case msg of
-        TimePassed _ ->
-            let
-                ( clock, events ) =
-                    timePassed state <| Settings.Dev.seconds dev
-            in
-            {model = clock, command = Cmd.none, events = events}
-
         StartRequest ->
-            { model = start settings.turnLength, command = Cmd.none, events = [] }
+            { model = start settings.turnLength, command = Cmd.none, event = Just Started }
 
         StopRequest ->
-            { model = Off, command = Cmd.none, events = [] }
+            { model = Off, command = Cmd.none, event = Nothing }
 
 
 
 -- VIEW
 
 
-view : Clock.Circle.Circle -> State -> List (Svg msg)
+view : Clock.Circle.Circle -> Model -> List (Svg msg)
 view mobCircle turn =
     Clock.Circle.draw mobCircle (ratio turn)
 
 
-ratio : State -> Ratio
+ratio : Model -> Ratio
 ratio state =
     case state of
         On on ->
