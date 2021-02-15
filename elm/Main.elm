@@ -6,10 +6,11 @@ import Browser.Navigation as Nav
 import Clock.Circle as Circle
 import Clock.Main as Clock
 import Clock.Settings
-import Html exposing (Html, a, div, header, i, nav, p, section)
-import Html.Attributes exposing (class, classList, href, id)
+import Html exposing (Html, div, header, section)
+import Html.Attributes exposing (href, id)
 import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
+import Tabs
 import Settings.Dev
 import Settings.Mobbers
 import Sound.Main as Sound
@@ -42,39 +43,10 @@ port store : Json.Encode.Value -> Cmd msg
 -- MODEL
 
 
-type TabType
-    = Timer
-    | Mobbers
-    | SoundTab
-    | DevTab
-
-
-type alias Tab =
-    { type_ : TabType
-    , url : String
-    , name : String
-    , icon : String
-    }
-
-
-timerTab : Tab
-timerTab =
-    Tab Timer "/timer" "Timer" "fa-clock"
-
-
-tabs : List Tab
-tabs =
-    [ timerTab
-    , Tab Mobbers "/mobbers" "Mobbers" "fa-users"
-    , Tab SoundTab "/audio" "Sound" "fa-volume-up"
-    , Tab DevTab "/dev" "Dev" "fa-code"
-    ]
-
-
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
-    , tab : Tab
+    , tab : Tabs.Tab
     , timerSettings : Clock.Settings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
@@ -87,7 +59,7 @@ init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
     ( { key = key
       , url = url
-      , tab = pageFrom url |> Maybe.withDefault timerTab
+      , tab = Tabs.tabFrom url
       , timerSettings = Clock.Settings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
@@ -96,13 +68,6 @@ init _ url key =
       }
     , Cmd.none
     )
-
-
-pageFrom : Url.Url -> Maybe Tab
-pageFrom url =
-    tabs
-        |> List.filter (\p -> p.url == url.path)
-        |> List.head
 
 
 
@@ -132,7 +97,7 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model | url = url, tab = pageFrom url |> Maybe.withDefault timerTab }
+            ( { model | url = url, tab = Tabs.tabFrom url }
             , Cmd.none
             )
 
@@ -218,21 +183,21 @@ view model =
                     ]
                 ]
             , Sound.view model.sound |> Html.map SoundMsg
-            , nav [] <| navLinks model.url
+            , Tabs.navView model.url
             , case model.tab.type_ of
-                Timer ->
+                Tabs.Timer ->
                     Clock.Settings.view model.timerSettings
                         |> Html.map TimerSettingsMsg
 
-                Mobbers ->
+                Tabs.Mobbers ->
                     Settings.Mobbers.view model.mobbers
                         |> Html.map MobbersSettingsMsg
 
-                SoundTab ->
+                Tabs.SoundTab ->
                     Sound.settingsView model.sound
                         |> Html.map SoundMsg
 
-                DevTab ->
+                Tabs.DevTab ->
                     Settings.Dev.view model.dev
                         |> Html.map DevSettingsMsg
             ]
@@ -251,26 +216,6 @@ pageTitle model =
                     it ++ " | "
            )
         |> (\it -> it ++ "Mob Time !")
-
-
-
--- NAV
-
-
-navLinks : Url.Url -> List (Html msg)
-navLinks current =
-    List.map
-        (\page ->
-            a
-                [ href page.url, classList [ activeClass current page.url ] ]
-                [ i [ class <| "fas " ++ page.icon ] [] ]
-        )
-        tabs
-
-
-activeClass : Url.Url -> String -> ( String, Bool )
-activeClass current tabUrl =
-    ( "active", current.path == tabUrl )
 
 
 
