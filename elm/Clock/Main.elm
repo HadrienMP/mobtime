@@ -7,7 +7,6 @@ import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio as Ratio exposing (Ratio)
 import Settings.Dev
 import Svg exposing (Svg)
-import Time
 
 
 type Model
@@ -89,3 +88,16 @@ ratio state =
 
         Off ->
             Ratio.full
+
+
+-- OTHER
+
+
+humanReadableTimeLeft : Model -> Clock.Settings.Model -> List String
+humanReadableTimeLeft clock settings =
+    case clock of
+        On turn ->
+            Clock.Settings.format settings turn.timeLeft
+
+        Off ->
+            []

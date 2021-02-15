@@ -1,13 +1,13 @@
 port module Main exposing (..)
 
+import Action
 import Browser
 import Browser.Navigation as Nav
 import Clock.Circle as Circle
 import Clock.Main as Clock
 import Clock.Settings
-import Html exposing (Html, a, button, div, header, i, nav, p, section, span, text)
+import Html exposing (Html, a, div, header, i, nav, p, section)
 import Html.Attributes exposing (class, classList, href, id)
-import Html.Events exposing (onClick)
 import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
 import Settings.Dev
@@ -69,25 +69,6 @@ tabs =
     , Tab SoundTab "/audio" "Sound" "fa-volume-up"
     , Tab DevTab "/dev" "Dev" "fa-code"
     ]
-
-
-type Action
-    = Start
-    | Stop
-    | StopSound
-
-
-actionMessage : Action -> Msg
-actionMessage action =
-    case action of
-        Start ->
-            ClockMsg Clock.StartRequest
-
-        Stop ->
-            ClockMsg Clock.StopRequest
-
-        StopSound ->
-            SoundMsg Sound.Stop
 
 
 type alias Roles =
@@ -171,13 +152,11 @@ update msg model =
 
         TimePassed _ ->
             Clock.timePassed model.mobClock model.dev
-            |> handleClockResult model
-
+                |> handleClockResult model
 
         ClockMsg clockMsg ->
             Clock.update model.timerSettings clockMsg
-            |> handleClockResult model
-
+                |> handleClockResult model
 
         SoundMsg soundMsg ->
             Sound.update model.sound soundMsg
@@ -247,7 +226,9 @@ view model =
             [ header []
                 [ section []
                     [ clockView model
-                    , actionView model
+                    , Action.actionView
+                        { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
+                        { clock = ClockMsg, sound = SoundMsg }
                     ]
                 ]
             , Sound.view model.sound |> Html.map SoundMsg
@@ -274,7 +255,7 @@ view model =
 
 
 pageTitle model =
-    timeLeft model
+    Clock.humanReadableTimeLeft model.mobClock model.timerSettings
         |> List.foldr (++) ""
         |> (\it ->
                 if String.isEmpty it then
@@ -335,63 +316,3 @@ clockView model =
         (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
             ++ Clock.view mobCircle model.mobClock
         )
-
-
-actionView : Model -> Html Msg
-actionView model =
-    button
-        [ onClick <| actionMessage <| actionOf model
-        , class <| turnToString model.mobClock
-        ]
-        [ span [ id "time-left" ] (timeLeft model |> List.map (\it -> span [] [ text it ]))
-        , actionIcon <| actionOf model
-        ]
-
-
-turnToString : Clock.Model -> String
-turnToString turn =
-    case turn of
-        Clock.On _ ->
-            "on"
-
-        Clock.Off ->
-            "off"
-
-
-timeLeft : Model -> List String
-timeLeft model =
-    case model.mobClock of
-        Clock.On turn ->
-            Clock.Settings.format model.timerSettings turn.timeLeft
-
-        Clock.Off ->
-            []
-
-
-actionOf : Model -> Action
-actionOf model =
-    case ( model.mobClock, model.sound.state ) of
-        ( Clock.On _, Sound.NotPlaying ) ->
-            Stop
-
-        ( Clock.On _, Sound.Playing ) ->
-            StopSound
-
-        ( Clock.Off, Sound.Playing ) ->
-            StopSound
-
-        ( Clock.Off, Sound.NotPlaying ) ->
-            Start
-
-
-actionIcon : Action -> Html msg
-actionIcon action =
-    case action of
-        Start ->
-            i [ class "fas fa-play" ] []
-
-        Stop ->
-            i [ class "fas fa-square" ] []
-
-        StopSound ->
-            i [ class "fas fa-volume-mute" ] []
