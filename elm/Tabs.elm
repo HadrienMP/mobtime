@@ -1,9 +1,12 @@
 module Tabs exposing (..)
 
 import Html exposing (Html, a, i, nav)
-import Html.Attributes exposing (class, classList, href)
+import Html.Attributes exposing (class, classList)
+import Html.Events exposing (onClick)
 import Url
 
+type Msg
+    = Clicked Tab
 
 type TabType
     = Timer
@@ -42,19 +45,19 @@ tabFrom url =
         |> Maybe.withDefault timerTab
 
 
-navView : Url.Url -> Html msg
+navView : Tab -> Html Msg
 navView current =
     nav []
         (List.map
-            (\page ->
+            (\tab ->
                 a
-                    [ href page.url, classList [ activeClass current page.url ] ]
-                    [ i [ class <| "fas " ++ page.icon ] [] ]
+                    [ onClick <| Clicked tab, classList [ activeClass current tab ] ]
+                    [ i [ class <| "fas " ++ tab.icon ] [] ]
             )
             tabs
         )
 
 
-activeClass : Url.Url -> String -> ( String, Bool )
-activeClass current tabUrl =
-    ( "active", current.path == tabUrl )
+activeClass : Tab -> Tab -> ( String, Bool )
+activeClass current tab =
+    ( "active", current == tab )

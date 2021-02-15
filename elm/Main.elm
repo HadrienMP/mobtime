@@ -2,22 +2,20 @@ port module Main exposing (..)
 
 import Action
 import Browser
-import Browser.Navigation as Nav
 import Clock.Circle as Circle
 import Clock.Main as Clock
 import Clock.Settings
 import Html exposing (Html, div, header, section)
-import Html.Attributes exposing (href, id)
+import Html.Attributes exposing (id)
 import Json.Encode
 import Lib.Ratio as Ratio exposing (Ratio)
-import Tabs
 import Settings.Dev
 import Settings.Mobbers
 import Sound.Main as Sound
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
+import Tabs
 import Time
-import Url
 
 
 
@@ -26,13 +24,11 @@ import Url
 
 main : Program String Model Msg
 main =
-    Browser.application
+    Browser.document
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
-        , onUrlChange = UrlChanged
-        , onUrlRequest = LinkClicked
         }
 
 
@@ -44,9 +40,7 @@ port store : Json.Encode.Value -> Cmd msg
 
 
 type alias Model =
-    { key : Nav.Key
-    , url : Url.Url
-    , tab : Tabs.Tab
+    { tab : Tabs.Tab
     , timerSettings : Clock.Settings.Model
     , dev : Settings.Dev.Model
     , mobbers : Settings.Mobbers.Model
@@ -55,11 +49,9 @@ type alias Model =
     }
 
 
-init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url key =
-    ( { key = key
-      , url = url
-      , tab = Tabs.tabFrom url
+init : String -> ( Model, Cmd Msg )
+init _ =
+    ( { tab = Tabs.timerTab
       , timerSettings = Clock.Settings.init
       , dev = Settings.Dev.init
       , mobbers = Settings.Mobbers.init
@@ -75,32 +67,18 @@ init _ url key =
 
 
 type Msg
-    = LinkClicked Browser.UrlRequest
-    | UrlChanged Url.Url
-    | TimePassed Time.Posix
+    = TimePassed Time.Posix
     | ClockMsg Clock.Msg
     | SoundMsg Sound.Msg
     | TimerSettingsMsg Clock.Settings.Msg
     | DevSettingsMsg Settings.Dev.Msg
     | MobbersSettingsMsg Settings.Mobbers.Msg
+    | TabsMsg Tabs.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LinkClicked urlRequest ->
-            case urlRequest of
-                Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
-
-                Browser.External href ->
-                    ( model, Nav.load href )
-
-        UrlChanged url ->
-            ( { model | url = url, tab = Tabs.tabFrom url }
-            , Cmd.none
-            )
-
         TimePassed _ ->
             Clock.timePassed model.mobClock model.dev
                 |> handleClockResult model
@@ -128,6 +106,11 @@ update msg model =
         DevSettingsMsg devMsg ->
             Settings.Dev.update devMsg model.dev
                 |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevSettingsMsg)
+
+        TabsMsg tabsMsg ->
+            case tabsMsg of
+                Tabs.Clicked tab ->
+                    ( { model | tab = tab }, Cmd.none )
 
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
@@ -183,7 +166,7 @@ view model =
                     ]
                 ]
             , Sound.view model.sound |> Html.map SoundMsg
-            , Tabs.navView model.url
+            , Tabs.navView model.tab |> Html.map TabsMsg
             , case model.tab.type_ of
                 Tabs.Timer ->
                     Clock.Settings.view model.timerSettings
