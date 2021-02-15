@@ -71,20 +71,6 @@ tabs =
     ]
 
 
-type alias Roles =
-    List String
-
-
-type alias Mobbers =
-    List String
-
-
-type alias MobberRole =
-    { role : String
-    , name : String
-    }
-
-
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
