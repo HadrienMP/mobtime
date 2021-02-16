@@ -37,6 +37,10 @@ init =
     }
 
 
+
+-- UPDATE
+
+
 type Msg
     = AddMobber
     | NewMobberNameChanged String
@@ -76,14 +80,14 @@ update msg model =
             ( { model | mobbers = mobbers }, Cmd.none )
 
 
+
+-- CLOCK DEPENDENCY
+
+
 type alias EventHandlingResult =
     { model : Model
     , command : Cmd Msg
     }
-
-
-
--- UPDATE
 
 
 handleClockEvents : Model -> Maybe Clock.Events.Event -> EventHandlingResult
