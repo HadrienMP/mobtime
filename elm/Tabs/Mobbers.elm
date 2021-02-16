@@ -4,6 +4,8 @@ import Clock.Events
 import Html exposing (Html, button, div, form, i, input, li, p, text, ul)
 import Html.Attributes exposing (class, id, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Random
+import Random.List
 
 
 type alias Mobbers =
@@ -39,6 +41,9 @@ type Msg
     = AddMobber
     | NewMobberNameChanged String
     | DeleteMobber String
+    | Rotate
+    | Shuffle
+    | Shuffled Mobbers
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,11 +64,26 @@ update msg model =
             , Cmd.none
             )
 
+        Rotate ->
+            ( { model | mobbers = rotate model.mobbers }
+            , Cmd.none
+            )
+
+        Shuffle ->
+            ( model, Random.generate Shuffled <| Random.List.shuffle model.mobbers )
+
+        Shuffled mobbers ->
+            ( { model | mobbers = mobbers }, Cmd.none )
+
 
 type alias EventHandlingResult =
     { model : Model
     , command : Cmd Msg
     }
+
+
+
+-- UPDATE
 
 
 handleClockEvents : Model -> Maybe Clock.Events.Event -> EventHandlingResult
@@ -89,6 +109,10 @@ rotate mobbers =
         |> (\( tail, head ) -> tail ++ head)
 
 
+
+-- VIEW
+
+
 view : Model -> Html Msg
 view model =
     div [ id "mobbers", class "tab" ]
@@ -97,6 +121,7 @@ view model =
             [ input [ type_ "text", placeholder "Mobber name", onInput NewMobberNameChanged, value model.newMobberName ] []
             , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
             ]
+        , div [] (rotateButton model ++ shuffleButton model)
         , ul
             []
             (assignRoles model.mobbers model.roles
@@ -113,6 +138,24 @@ view model =
                     )
             )
         ]
+
+
+rotateButton : Model -> List (Html Msg)
+rotateButton model =
+    if List.length model.mobbers > 1 then
+        [ button [ onClick Rotate ] [ text "Rotate" ] ]
+
+    else
+        []
+
+
+shuffleButton : Model -> List (Html Msg)
+shuffleButton model =
+    if List.length model.mobbers > 2 then
+        [ button [ onClick Shuffle ] [ text "Shuffle" ] ]
+
+    else
+        []
 
 
 capitalize : String -> String

@@ -17,6 +17,7 @@
             "elm/svg": "1.0.1",
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
+            "elm-community/random-extra": "3.1.0",
             "ericgj/elm-validation": "2.0.0",
             "jzxhuang/http-extras": "2.1.0",
             "pablohirafuji/elm-qrcode": "4.0.1"
@@ -29,7 +30,8 @@
             "elm/virtual-dom": "1.0.2",
             "elm-community/list-extra": "8.2.4",
             "folkertdev/elm-flate": "2.0.5",
-            "justgook/elm-image": "4.0.0"
+            "justgook/elm-image": "4.0.0",
+            "owanturist/elm-union-find": "1.0.0"
         }
     },
     "test-dependencies": {
