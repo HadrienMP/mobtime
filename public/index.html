@@ -21,9 +21,14 @@
     let app = Elm.Main.init(
         {
             node: document.getElementById('elm'),
-            flags: window.localStorage.getItem("nickname") || ""
+            flags: JSON.parse(window.localStorage.getItem("preferences") || "")
         }
     )
+
+    app.ports.storePort.subscribe(userPreferences => {
+        window.localStorage.setItem("preferences", JSON.stringify(userPreferences));
+    });
+    app.ports.soundCommands.subscribe(soundCommandHandler);
 
     function soundCommandHandler(command) {
         let audio = document.getElementsByTagName("audio")[0];
@@ -41,8 +46,6 @@
                 break;
         }
     }
-
-    app.ports.soundCommands.subscribe(soundCommandHandler);
 </script>
 </body>
 </html>

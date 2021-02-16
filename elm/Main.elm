@@ -17,13 +17,14 @@ import Svg.Attributes as Svg
 import Tabs.Share
 import Tabs.Tabs
 import Time
+import UserPreferences
 
 
 
 -- MAIN
 
 
-main : Program String Model Msg
+main : Program Json.Encode.Value Model Msg
 main =
     Browser.document
         { init = init
@@ -33,7 +34,7 @@ main =
         }
 
 
-port store : Json.Encode.Value -> Cmd msg
+port storePort : Json.Encode.Value -> Cmd msg
 
 
 
@@ -50,14 +51,17 @@ type alias Model =
     }
 
 
-init : String -> ( Model, Cmd Msg )
-init _ =
+init : Json.Encode.Value -> ( Model, Cmd Msg )
+init rawUserPreferences =
+    let
+        userPreferences = UserPreferences.decode rawUserPreferences
+    in
     ( { tab = Tabs.Tabs.timerTab
       , timerSettings = Clock.Settings.init
       , dev = Tabs.Dev.init
       , mobbers = Tabs.Mobbers.init
       , mobClock = Clock.Off
-      , sound = Sound.init
+      , sound = Sound.init storePort userPreferences.volume
       }
     , Cmd.none
     )

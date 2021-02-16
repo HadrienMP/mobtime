@@ -31,11 +31,12 @@ type alias Model =
     }
 
 
-init : Model
-init =
+-- TODO ports should maybe be more general (like a port type)
+init : Sound.Settings.StorePort -> Int -> Model
+init storePort volume =
     { state = NotPlaying
     , sound = SoundLibrary.default
-    , settings = Sound.Settings.init
+    , settings = Sound.Settings.init soundCommands storePort volume
     }
 
 
@@ -63,7 +64,7 @@ update model msg =
             ( { model | state = NotPlaying }, stop )
 
         SettingsMsg soundMsg ->
-            Sound.Settings.update soundMsg model.settings soundCommands
+            Sound.Settings.update soundMsg model.settings
                 |> Tuple.mapBoth
                     (\it -> { model | settings = it })
                     (Cmd.map SettingsMsg)

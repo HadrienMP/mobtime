@@ -1,21 +1,29 @@
 module Sound.Settings exposing (..)
 
-import Sound.Library as SoundLibrary
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Encode
+import Sound.Library as SoundLibrary
+import UserPreferences
 
+type alias CommandPort = (Json.Encode.Value -> Cmd Msg)
+type alias StorePort = (Json.Encode.Value -> Cmd Msg)
 
 type alias Model =
     { profile : SoundLibrary.Profile
     , volume : Int
+    , commandPort : CommandPort
+    , storePort : StorePort
     }
 
-init : Model
-init =
+
+init : CommandPort -> StorePort -> Int -> Model
+init commandPort storePort volume =
     { profile = SoundLibrary.ClassicWeird
-    , volume = 50
+    , volume = volume
+    , commandPort = commandPort
+    , storePort = storePort
     }
 
 
@@ -24,12 +32,18 @@ type Msg
     | SelectedSoundProfile SoundLibrary.Profile
 
 
-update : Msg -> Model -> (Json.Encode.Value -> Cmd Msg) -> ( Model, Cmd Msg )
-update msg model soundCommandsPort =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
-        VolumeChanged volume ->
-            ( { model | volume = String.toInt volume |> Maybe.withDefault model.volume }
-            , soundCommandsPort <| changeVolume volume
+        VolumeChanged rawVolume ->
+            let
+                volume = String.toInt rawVolume|> Maybe.withDefault model.volume
+            in
+            ( { model | volume = volume }
+            , Cmd.batch
+                [ model.commandPort <| changeVolume volume
+                , model.storePort <| store volume
+                ]
             )
 
         SelectedSoundProfile profile ->
@@ -38,16 +52,19 @@ update msg model soundCommandsPort =
             )
 
 
-changeVolume : String -> Json.Encode.Value
+changeVolume : Int -> Json.Encode.Value
 changeVolume volume =
     Json.Encode.object
         [ ( "name", Json.Encode.string "volume" )
         , ( "data"
           , Json.Encode.object
-                [ ( "volume", Json.Encode.string volume ) ]
+                [ ( "volume", Json.Encode.int volume ) ]
           )
         ]
 
+store : Int -> Json.Encode.Value
+store volume =
+    UserPreferences.encode <| UserPreferences.Model volume
 
 
 view : Model -> Html Msg
