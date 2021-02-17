@@ -22,16 +22,11 @@ update msg =
                 |> Interface.Commands.send
 
 
-view : Html msg
-view =
+view : Url.Url -> Html Msg
+view url =
     div [ id "share", class "tab" ]
-        [ a [ id "share-link" ]
-            [ text "You are in the "
-            , strong [] [ text "Agicap" ]
-            , text " mob"
-            , i [ id "share-button", class "fas fa-share-alt" ] []
-            ]
-        , QRCode.fromString "http://localhost:3000"
+        [ shareButton url
+        , QRCode.fromString (Url.toString url)
             |> Result.map
                 (QRCode.toSvg
                     [ Svg.width "300px"
@@ -45,5 +40,11 @@ view =
 shareButton : Url.Url -> Html Msg
 shareButton url =
     button
-        [ onClick <| PutLinkInPasteBin url ]
-        [  ]
+        [ onClick <| PutLinkInPasteBin url
+        , id "share-link"
+        ]
+        [ text "You are in the "
+        , strong [] [ text "Agicap" ]
+        , text " mob"
+        , i [ id "share-button", class "fas fa-share-alt" ] []
+        ]

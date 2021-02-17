@@ -178,7 +178,8 @@ view model url =
                     |> Html.map DevSettingsMsg
 
             Mob.Tabs.Tabs.Share ->
-                Mob.Tabs.Share.view
+                Mob.Tabs.Share.view url
+                    |> Html.map ShareMsg
         ]
 
 
