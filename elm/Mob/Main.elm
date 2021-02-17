@@ -158,7 +158,6 @@ view model url =
                     { clock = ClockMsg, sound = SoundMsg }
                 ]
             ]
-        , Sound.view model.sound |> Html.map SoundMsg
         , h2 [] [ Mob.Tabs.Share.shareButton url |> Html.map ShareMsg ]
         , Mob.Tabs.Tabs.navView model.tab |> Html.map TabsMsg
         , case model.tab.type_ of

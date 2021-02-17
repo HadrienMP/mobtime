@@ -25,17 +25,22 @@
         }
     )
 
+    const audio = document.createElement("audio")
+    document.body.appendChild(audio);
+    audio.onended = () => app.ports.events.send({name: 'SoundEnded', value: ""});
+
     app.ports.commands.subscribe(command => {
-        let audio = document.getElementsByTagName("audio")[0];
-        audio.onended = () => app.ports.events.send({name: 'SoundEnded', value: ""});
         switch (command.name) {
             case 'ChangeVolume':
                 window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
                 audio.volume = parseInt(command.value) / 100.0;
                 break;
+            case 'ChangeSound':
+                audio.src = "/sound/" + command.value;
+                break;
             case 'SoundPlay':
                 audio.play();
-                break
+                break;
             case 'SoundStop':
                 audio.pause();
                 break;

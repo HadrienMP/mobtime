@@ -6,6 +6,7 @@ port commands : OutCommand -> Cmd msg
 
 type Command
     = CopyInPasteBin String
+    | ChangeSound String
     | SoundPlay
     | SoundStop
     | ChangeVolume Int
@@ -36,3 +37,7 @@ send command =
 
             StoreVolume volume ->
                 OutCommand "StoreVolume" <| String.fromInt volume
+
+            ChangeSound sound ->
+                OutCommand "ChangeSound" sound
+

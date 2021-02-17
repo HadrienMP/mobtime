@@ -50,7 +50,9 @@ update : Model -> Msg -> ( Model, Cmd Msg )
 update model msg =
     case msg of
         Picked sound ->
-            ( { model | sound = sound }, Cmd.none )
+            ( { model | sound = sound }
+            , Interface.Commands.send <| Interface.Commands.ChangeSound sound
+            )
 
         Ended _ ->
             ( { model | state = NotPlaying }, Cmd.none )
@@ -72,15 +74,6 @@ update model msg =
 subscriptions : Sub Msg
 subscriptions =
     Interface.Events.events Ended
-
-
-
--- VIEW
-
-
-view : Model -> Html Msg
-view model =
-    audio [ src <| "/sound/" ++ model.sound ] []
 
 
 
