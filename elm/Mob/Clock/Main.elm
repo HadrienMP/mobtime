@@ -1,11 +1,11 @@
-module Clock.Main exposing (..)
+module Mob.Clock.Main exposing (..)
 
-import Clock.Circle
-import Clock.Events exposing (Event(..))
-import Clock.Settings
-import Lib.Duration as Duration exposing (Duration)
-import Lib.Ratio as Ratio exposing (Ratio)
-import Tabs.Dev
+import Mob.Clock.Circle
+import Mob.Clock.Events exposing (Event(..))
+import Mob.Clock.Settings
+import Mob.Lib.Duration as Duration exposing (Duration)
+import Mob.Lib.Ratio as Ratio exposing (Ratio)
+import Mob.Tabs.Dev
 import Svg exposing (Svg)
 
 
@@ -19,7 +19,7 @@ start duration =
     On { timeLeft = duration, length = duration }
 
 
-timePassed : Model -> Tabs.Dev.Model -> UpdateResult
+timePassed : Model -> Mob.Tabs.Dev.Model -> UpdateResult
 timePassed model devSettings =
     case model of
         Off ->
@@ -31,7 +31,7 @@ timePassed model devSettings =
         On on ->
             let
                 timeLeft =
-                    Duration.subtract on.timeLeft (Tabs.Dev.seconds devSettings)
+                    Duration.subtract on.timeLeft (Mob.Tabs.Dev.seconds devSettings)
             in
             if Duration.toSeconds timeLeft <= 0 then
                 { model = Off
@@ -59,7 +59,7 @@ type alias UpdateResult =
     { model : Model, command : Cmd Msg, event : Maybe Event }
 
 
-update : Clock.Settings.Model -> Msg -> UpdateResult
+update : Mob.Clock.Settings.Model -> Msg -> UpdateResult
 update settings msg =
     case msg of
         StartRequest ->
@@ -73,9 +73,9 @@ update settings msg =
 -- VIEW
 
 
-view : Clock.Circle.Circle -> Model -> List (Svg msg)
+view : Mob.Clock.Circle.Circle -> Model -> List (Svg msg)
 view mobCircle turn =
-    Clock.Circle.draw mobCircle (ratio turn)
+    Mob.Clock.Circle.draw mobCircle (ratio turn)
 
 
 ratio : Model -> Ratio
@@ -93,11 +93,11 @@ ratio state =
 -- OTHER
 
 
-humanReadableTimeLeft : Model -> Clock.Settings.Model -> List String
+humanReadableTimeLeft : Model -> Mob.Clock.Settings.Model -> List String
 humanReadableTimeLeft clock settings =
     case clock of
         On turn ->
-            Clock.Settings.format settings turn.timeLeft
+            Mob.Clock.Settings.format settings turn.timeLeft
 
         Off ->
             []

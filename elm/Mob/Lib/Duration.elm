@@ -1,4 +1,4 @@
-module Lib.Duration exposing (..)
+module Mob.Lib.Duration exposing (..)
 
 
 type Duration

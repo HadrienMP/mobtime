@@ -1,4 +1,4 @@
-module Tabs.Share exposing (..)
+module Mob.Tabs.Share exposing (..)
 
 import Html exposing (Html, a, div, hr, i, strong, text)
 import Html.Attributes exposing (class, id)

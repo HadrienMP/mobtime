@@ -22,7 +22,7 @@ body * {
   box-sizing: border-box;
 }
 
-#container {
+.container {
   margin: auto;
   max-width: $width;
 }
@@ -31,7 +31,7 @@ h1 {
   border-top: 2px solid $color;
   border-bottom: 2px solid $color;
   padding: 20px 0;
-  font-size: 5.5em;
+  font-size: 4.5em;
   text-align: center;
   font-family: 'Fredericka the Great', fantasy;
 }
@@ -95,6 +95,7 @@ hr {
   background: #999;
 }
 
+@import "login";
 @import "header";
 @import "tabs/timer";
 @import "tabs/mobbers";

@@ -1,12 +1,12 @@
-port module Sound.Main exposing (..)
+port module Mob.Sound.Main exposing (..)
 
-import Clock.Events
+import Mob.Clock.Events
 import Html exposing (Html, audio)
 import Html.Attributes exposing (src)
 import Json.Encode
 import Random
-import Sound.Library as SoundLibrary
-import Sound.Settings
+import Mob.Sound.Library as SoundLibrary
+import Mob.Sound.Settings
 
 
 port soundEnded : (String -> msg) -> Sub msg
@@ -27,16 +27,16 @@ type SoundStatus
 type alias Model =
     { state : SoundStatus
     , sound : SoundLibrary.Sound
-    , settings : Sound.Settings.Model
+    , settings : Mob.Sound.Settings.Model
     }
 
 
 -- TODO ports should maybe be more general (like a port type)
-init : Sound.Settings.StorePort -> Int -> Model
+init : Mob.Sound.Settings.StorePort -> Int -> Model
 init storePort volume =
     { state = NotPlaying
     , sound = SoundLibrary.default
-    , settings = Sound.Settings.init soundCommands storePort volume
+    , settings = Mob.Sound.Settings.init soundCommands storePort volume
     }
 
 
@@ -48,7 +48,7 @@ type Msg
     = Picked SoundLibrary.Sound
     | Ended String
     | Stop
-    | SettingsMsg Sound.Settings.Msg
+    | SettingsMsg Mob.Sound.Settings.Msg
 
 
 update : Model -> Msg -> ( Model, Cmd Msg )
@@ -64,7 +64,7 @@ update model msg =
             ( { model | state = NotPlaying }, stop )
 
         SettingsMsg soundMsg ->
-            Sound.Settings.update soundMsg model.settings
+            Mob.Sound.Settings.update soundMsg model.settings
                 |> Tuple.mapBoth
                     (\it -> { model | settings = it })
                     (Cmd.map SettingsMsg)
@@ -94,7 +94,7 @@ view model =
 
 settingsView : Model -> Html Msg
 settingsView model =
-    Sound.Settings.view model.settings
+    Mob.Sound.Settings.view model.settings
         |> Html.map SettingsMsg
 
 
@@ -108,15 +108,15 @@ type alias EventHandlingResult =
     }
 
 
-handleClockEvents : Model -> Maybe Clock.Events.Event -> EventHandlingResult
+handleClockEvents : Model -> Maybe Mob.Clock.Events.Event -> EventHandlingResult
 handleClockEvents model maybeEvent =
     case maybeEvent of
         Just event ->
             case event of
-                Clock.Events.Finished ->
+                Mob.Clock.Events.Finished ->
                     { model = { model | state = Playing }, command = play }
 
-                Clock.Events.Started ->
+                Mob.Clock.Events.Started ->
                     { model = { model | state = NotPlaying }, command = pick model }
 
         Nothing ->

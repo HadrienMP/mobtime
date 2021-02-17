@@ -1,0 +1,15 @@
+@import "theme";
+
+#login {
+  header {
+    background: url("/images/mob.png") top no-repeat;
+    padding-top: 300px;
+
+    h1 {
+      font-size: 21vw;
+      @media (min-width: $width) {
+        font-size: 4.5em;
+      }
+    }
+  }
+}

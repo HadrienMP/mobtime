@@ -1,10 +1,10 @@
-module Sound.Settings exposing (..)
+module Mob.Sound.Settings exposing (..)
 
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Encode
-import Sound.Library as SoundLibrary
+import Mob.Sound.Library as SoundLibrary
 import UserPreferences
 
 type alias CommandPort = (Json.Encode.Value -> Cmd Msg)

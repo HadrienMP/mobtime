@@ -1,11 +1,11 @@
-module Action exposing (..)
+module Mob.Action exposing (..)
 
-import Clock.Main
-import Clock.Settings
+import Mob.Clock.Main
+import Mob.Clock.Settings
 import Html exposing (Html, button, i, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
-import Sound.Main
+import Mob.Sound.Main
 
 
 type Action
@@ -15,15 +15,15 @@ type Action
 
 
 type alias Model =
-    { clock : Clock.Main.Model
-    , sound : Sound.Main.Model
-    , clockSettings : Clock.Settings.Model
+    { clock : Mob.Clock.Main.Model
+    , sound : Mob.Sound.Main.Model
+    , clockSettings : Mob.Clock.Settings.Model
     }
 
 
 type alias Messages msg =
-    { clock : Clock.Main.Msg -> msg
-    , sound : Sound.Main.Msg -> msg
+    { clock : Mob.Clock.Main.Msg -> msg
+    , sound : Mob.Sound.Main.Msg -> msg
     }
 
 
@@ -33,7 +33,7 @@ actionView model messages =
         [ onClick <| actionMessage messages <| actionOf model
         , class <| turnToString model
         ]
-        [ span [ id "time-left" ] (Clock.Main.humanReadableTimeLeft model.clock model.clockSettings |> List.map (\it -> span [] [ text it ]))
+        [ span [ id "time-left" ] (Mob.Clock.Main.humanReadableTimeLeft model.clock model.clockSettings |> List.map (\it -> span [] [ text it ]))
         , actionIcon <| actionOf model
         ]
 
@@ -42,38 +42,38 @@ actionMessage : Messages msg -> Action -> msg
 actionMessage messages action =
     case action of
         Start ->
-            Clock.Main.StartRequest |> messages.clock
+            Mob.Clock.Main.StartRequest |> messages.clock
 
         Stop ->
-            Clock.Main.StopRequest |> messages.clock
+            Mob.Clock.Main.StopRequest |> messages.clock
 
         StopSound ->
-            Sound.Main.Stop |> messages.sound
+            Mob.Sound.Main.Stop |> messages.sound
 
 
 turnToString : Model -> String
 turnToString model =
     case model.clock of
-        Clock.Main.On _ ->
+        Mob.Clock.Main.On _ ->
             "on"
 
-        Clock.Main.Off ->
+        Mob.Clock.Main.Off ->
             "off"
 
 
 actionOf : Model -> Action
 actionOf model =
     case ( model.clock, model.sound.state ) of
-        ( Clock.Main.On _, Sound.Main.NotPlaying ) ->
+        ( Mob.Clock.Main.On _, Mob.Sound.Main.NotPlaying ) ->
             Stop
 
-        ( Clock.Main.On _, Sound.Main.Playing ) ->
+        ( Mob.Clock.Main.On _, Mob.Sound.Main.Playing ) ->
             StopSound
 
-        ( Clock.Main.Off, Sound.Main.Playing ) ->
+        ( Mob.Clock.Main.Off, Mob.Sound.Main.Playing ) ->
             StopSound
 
-        ( Clock.Main.Off, Sound.Main.NotPlaying ) ->
+        ( Mob.Clock.Main.Off, Mob.Sound.Main.NotPlaying ) ->
             Start
 
 

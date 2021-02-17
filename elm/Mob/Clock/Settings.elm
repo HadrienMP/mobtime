@@ -1,9 +1,9 @@
-module Clock.Settings exposing (..)
+module Mob.Clock.Settings exposing (..)
 
-import Html exposing (Html, a, div, hr, i, input, label, strong, text)
+import Html exposing (Html, div, i, input, label, text)
 import Html.Attributes exposing (checked, class, for, id, step, type_, value)
 import Html.Events exposing (onCheck, onInput)
-import Lib.Duration as Duration exposing (Duration)
+import Mob.Lib.Duration as Duration exposing (Duration)
 
 
 type alias Model =

@@ -1,22 +1,13 @@
-port module Main exposing (..)
+module Main exposing (..)
 
-import Action
 import Browser
-import Clock.Circle as Circle
-import Clock.Main as Clock
-import Clock.Settings
-import Html exposing (Html, div, header, section)
-import Html.Attributes exposing (id)
-import Json.Encode
-import Lib.Ratio as Ratio exposing (Ratio)
-import Tabs.Dev
-import Tabs.Mobbers
-import Sound.Main as Sound
-import Svg exposing (Svg, svg)
-import Svg.Attributes as Svg
-import Tabs.Share
-import Tabs.Tabs
-import Time
+import Browser.Navigation as Nav
+import Html exposing (..)
+import Json.Decode
+import Login
+import Mob.Main
+import Pages
+import Url
 import UserPreferences
 
 
@@ -24,17 +15,16 @@ import UserPreferences
 -- MAIN
 
 
-main : Program Json.Encode.Value Model Msg
+main : Program Json.Decode.Value Model Msg
 main =
-    Browser.document
+    Browser.application
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
         }
-
-
-port storePort : Json.Encode.Value -> Cmd msg
 
 
 
@@ -42,26 +32,21 @@ port storePort : Json.Encode.Value -> Cmd msg
 
 
 type alias Model =
-    { tab : Tabs.Tabs.Tab
-    , timerSettings : Clock.Settings.Model
-    , dev : Tabs.Dev.Model
-    , mobbers : Tabs.Mobbers.Model
-    , mobClock : Clock.Model
-    , sound : Sound.Model
+    { session : Pages.Session
+    , userPreferences : UserPreferences.Model
+    , pageModel : Pages.PageModel
     }
 
 
-init : Json.Encode.Value -> ( Model, Cmd Msg )
-init rawUserPreferences =
+init : Json.Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init rawUserPreferences url key =
     let
-        userPreferences = UserPreferences.decode rawUserPreferences
+        userPreferences =
+            UserPreferences.decode rawUserPreferences
     in
-    ( { tab = Tabs.Tabs.timerTab
-      , timerSettings = Clock.Settings.init
-      , dev = Tabs.Dev.init
-      , mobbers = Tabs.Mobbers.init
-      , mobClock = Clock.Off
-      , sound = Sound.init storePort userPreferences.volume
+    ( { session = Pages.Session key url
+      , userPreferences = userPreferences
+      , pageModel = Pages.pageOf url userPreferences
       }
     , Cmd.none
     )
@@ -72,72 +57,46 @@ init rawUserPreferences =
 
 
 type Msg
-    = TimePassed Time.Posix
-    | ClockMsg Clock.Msg
-    | SoundMsg Sound.Msg
-    | TimerSettingsMsg Clock.Settings.Msg
-    | DevSettingsMsg Tabs.Dev.Msg
-    | MobbersSettingsMsg Tabs.Mobbers.Msg
-    | TabsMsg Tabs.Tabs.Msg
+    = LinkClicked Browser.UrlRequest
+    | UrlChanged Url.Url
+    | LoginMsg Login.Msg
+    | MobMsg Mob.Main.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        TimePassed _ ->
-            Clock.timePassed model.mobClock model.dev
-                |> handleClockResult model
+    case ( model.pageModel, msg ) of
+        ( _, LinkClicked urlRequest ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Pages.pushUrl url model.session )
 
-        ClockMsg clockMsg ->
-            Clock.update model.timerSettings clockMsg
-                |> handleClockResult model
+                Browser.External href ->
+                    ( model, Nav.load href )
 
-        SoundMsg soundMsg ->
-            Sound.update model.sound soundMsg
+        ( _, UrlChanged url ) ->
+            let
+                ( session, pageModel ) =
+                    Pages.urlChanged url model.session model.userPreferences
+            in
+            ( { model | session = session, pageModel = pageModel }
+            , Cmd.none
+            )
+
+        ( Pages.LoginModel loginModel, LoginMsg loginMsg ) ->
+            Login.update loginModel loginMsg model.session.key
                 |> Tuple.mapBoth
-                    (\updated -> { model | sound = updated })
-                    (Cmd.map SoundMsg)
+                    (\it -> { model | pageModel = Pages.LoginModel it })
+                    (Cmd.map LoginMsg)
 
-        MobbersSettingsMsg mobberMsg ->
-            Tabs.Mobbers.update mobberMsg model.mobbers
-                |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersSettingsMsg)
-
-        TimerSettingsMsg timerMsg ->
-            Clock.Settings.update timerMsg model.timerSettings
+        ( Pages.MobModel mobModel, MobMsg mobMsg ) ->
+            Mob.Main.update mobMsg mobModel
                 |> Tuple.mapBoth
-                    (\it -> { model | timerSettings = it })
-                    (Cmd.map TimerSettingsMsg)
+                    (\it -> { model | pageModel = Pages.MobModel it })
+                    (Cmd.map MobMsg)
 
-        DevSettingsMsg devMsg ->
-            Tabs.Dev.update devMsg model.dev
-                |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevSettingsMsg)
-
-        TabsMsg tabsMsg ->
-            case tabsMsg of
-                Tabs.Tabs.Clicked tab ->
-                    ( { model | tab = tab }, Cmd.none )
-
-
-handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
-handleClockResult model clockResult =
-    let
-        soundResult =
-            Sound.handleClockEvents model.sound clockResult.event
-
-        mobbersResult =
-            Tabs.Mobbers.handleClockEvents model.mobbers clockResult.event
-    in
-    ( { model
-        | mobClock = clockResult.model
-        , sound = soundResult.model
-        , mobbers = mobbersResult.model
-      }
-    , Cmd.batch <|
-        [ soundResult.command |> Cmd.map SoundMsg
-        , clockResult.command |> Cmd.map ClockMsg
-        , mobbersResult.command |> Cmd.map MobbersSettingsMsg
-        ]
-    )
+        _ ->
+            ( model, Cmd.none )
 
 
 
@@ -147,9 +106,7 @@ handleClockResult model clockResult =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Time.every 1000 TimePassed
-        , Sound.subscriptions |> Sub.map SoundMsg
-        ]
+        [ Mob.Main.subscriptions |> Sub.map MobMsg ]
 
 
 
@@ -159,82 +116,25 @@ subscriptions _ =
 view : Model -> Browser.Document Msg
 view model =
     { title = pageTitle model
-    , body =
-        [ div
-            [ id "container" ]
-            [ header []
-                [ section []
-                    [ clockView model
-                    , Action.actionView
-                        { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
-                        { clock = ClockMsg, sound = SoundMsg }
-                    ]
-                ]
-            , Sound.view model.sound |> Html.map SoundMsg
-            , Tabs.Tabs.navView model.tab |> Html.map TabsMsg
-            , case model.tab.type_ of
-                Tabs.Tabs.Timer ->
-                    Clock.Settings.view model.timerSettings
-                        |> Html.map TimerSettingsMsg
-
-                Tabs.Tabs.Mobbers ->
-                    Tabs.Mobbers.view model.mobbers
-                        |> Html.map MobbersSettingsMsg
-
-                Tabs.Tabs.Sound ->
-                    Sound.settingsView model.sound
-                        |> Html.map SoundMsg
-
-                Tabs.Tabs.Dev ->
-                    Tabs.Dev.view model.dev
-                        |> Html.map DevSettingsMsg
-
-                Tabs.Tabs.Share ->
-                    Tabs.Share.view
-            ]
-        ]
+    , body = [ pageBody model ]
     }
 
 
+pageTitle : Model -> String
 pageTitle model =
-    Clock.humanReadableTimeLeft model.mobClock model.timerSettings
-        |> List.foldr (++) ""
-        |> (\it ->
-                if String.isEmpty it then
-                    ""
+    case model.pageModel of
+        Pages.LoginModel _ ->
+            Login.title
 
-                else
-                    it ++ " | "
-           )
-        |> (\it -> it ++ "Mob Time !")
+        Pages.MobModel mobModel ->
+            Mob.Main.pageTitle mobModel
 
 
+pageBody : Model -> Html Msg
+pageBody model =
+    case model.pageModel of
+        Pages.LoginModel loginModel ->
+            Login.view loginModel |> Html.map LoginMsg
 
--- CLOCK
-
-
-clockView : Model -> Html Msg
-clockView model =
-    let
-        totalWidth =
-            220
-
-        outerRadiant =
-            104
-
-        pomodoroCircle =
-            Circle.Circle
-                outerRadiant
-                (Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
-                (Circle.Stroke 10 "#999")
-
-        mobCircle =
-            Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
-    in
-    svg
-        [ Svg.width <| String.fromInt totalWidth
-        , Svg.height <| String.fromInt totalWidth
-        ]
-        (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
-            ++ Clock.view mobCircle model.mobClock
-        )
+        Pages.MobModel mobModel ->
+            Mob.Main.view mobModel |> Html.map MobMsg

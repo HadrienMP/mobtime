@@ -1,4 +1,4 @@
-module Lib.Ratio exposing (..)
+module Mob.Lib.Ratio exposing (..)
 
 type Ratio = Ratio Float
 

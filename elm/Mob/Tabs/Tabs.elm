@@ -1,7 +1,7 @@
-module Tabs.Tabs exposing (..)
+module Mob.Tabs.Tabs exposing (..)
 
-import Html exposing (Html, a, i, nav)
-import Html.Attributes exposing (class, classList)
+import Html exposing (Html, a, button, i, nav)
+import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onClick)
 
 type Msg
@@ -41,8 +41,8 @@ navView current =
     nav []
         (List.map
             (\tab ->
-                a
-                    [ onClick <| Clicked tab, classList [ activeClass current tab ] ]
+                button
+                    [ onClick <| Clicked tab, classList [ activeClass current tab ]]
                     [ i [ class <| "fas " ++ tab.icon ] [] ]
             )
             tabs

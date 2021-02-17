@@ -1,4 +1,4 @@
-module Clock.Events exposing (..)
+module Mob.Clock.Events exposing (..)
 
 
 type Event

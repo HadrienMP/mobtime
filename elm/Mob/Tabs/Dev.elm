@@ -1,9 +1,9 @@
-module Tabs.Dev exposing (..)
+module Mob.Tabs.Dev exposing (..)
 
 import Html exposing (Html, button, div, i, label, text)
 import Html.Attributes exposing (class, classList, for, id)
 import Html.Events exposing (onClick)
-import Lib.Duration as Duration exposing (Duration)
+import Mob.Lib.Duration as Duration exposing (Duration)
 
 
 type Speed
