@@ -1,8 +1,8 @@
 header {
   section {
     position: relative;
-    margin: 0   auto 10px;
-    padding: 50px 0 20px;
+    margin: 0 auto;
+    padding: 50px 0 0;
 
     &::before {
       content: "";
@@ -13,14 +13,14 @@ header {
       right: 0;
       bottom: 0;
       left: 0;
-      opacity: .2;
+      opacity: .15;
     }
 
     svg {
       margin: auto;
       display: block;
       transform: rotateZ(-90deg);
-      background: rgba(255,255,255,.7);
+      background: rgba(255, 255, 255, .7);
       border-radius: 100%;
 
       circle {
@@ -28,7 +28,7 @@ header {
       }
     }
 
-    button {
+    #action {
       position: absolute;
       top: 50px;
       left: 0;
@@ -55,14 +55,17 @@ header {
         i {
           display: block;
         }
+
         #time-left {
           display: none;
         }
       }
+
       &.on {
         i {
           display: none;
         }
+
         #time-left {
           display: block;
         }
@@ -71,6 +74,7 @@ header {
           #time-left {
             display: none;
           }
+
           i {
             display: block;
           }
@@ -94,14 +98,46 @@ header {
   }
 }
 
+
+#share-link {
+  cursor: pointer;
+
+  strong {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+  i {
+    font-size: 1.1em;
+  }
+}
+
+h2 {
+  text-align: center;
+
+  #share-link {
+    position: relative;
+    display: inline-block;
+    border-radius: 20px 20px 0 0;
+    border-bottom: 1px solid;
+    padding: 5px 20px;
+    margin-top: 20px;
+
+    i {
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+  }
+}
+
 // ===========================================
 // NAV
 // ===========================================
 
 nav {
   background: #666;
-  display: flex;
   margin-bottom: 20px;
+  display: flex;
 
   button {
     flex: 1 1;
@@ -110,11 +146,11 @@ nav {
     text-align: center;
     padding: 12px 0;
     text-shadow: 1px 1px 1px #666;
-    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
     color: white;
 
     &:first-child {
-      border-left: none;
+      border-left: 1px solid $border-color;
     }
   }
 }

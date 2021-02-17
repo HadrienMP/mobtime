@@ -156,9 +156,9 @@ view model url =
                 , Mob.Action.actionView
                     { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
                     { clock = ClockMsg, sound = SoundMsg }
+                , h2 [] [ Mob.Tabs.Share.shareButton url |> Html.map ShareMsg ]
                 ]
             ]
-        , h2 [] [ Mob.Tabs.Share.shareButton url |> Html.map ShareMsg ]
         , Mob.Tabs.Tabs.navView model.tab |> Html.map TabsMsg
         , case model.tab.type_ of
             Mob.Tabs.Tabs.Timer ->

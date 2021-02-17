@@ -59,6 +59,7 @@ button {
   color: white;
   padding: 0 20px;
   outline: none;
+  cursor: pointer;
 
   &:hover {
     background: $light-button-color;

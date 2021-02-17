@@ -31,6 +31,9 @@
 
     app.ports.commands.subscribe(command => {
         switch (command.name) {
+            case 'CopyInPasteBin':
+                navigator.clipboard.writeText(command.value);
+                break;
             case 'ChangeVolume':
                 window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
                 audio.volume = parseInt(command.value) / 100.0;

@@ -1,7 +1,7 @@
 module Mob.Tabs.Share exposing (..)
 
-import Html exposing (Html, a, button, div, i, strong, text)
-import Html.Attributes exposing (class, id)
+import Html exposing (Html, a, button, div, i, span, strong, text)
+import Html.Attributes exposing (class, id, title)
 import Html.Events exposing (onClick)
 import Interface.Commands
 import QRCode
@@ -42,9 +42,12 @@ shareButton url =
     button
         [ onClick <| PutLinkInPasteBin url
         , id "share-link"
+        , title "Copy this mob's link in your clipboard"
         ]
-        [ text "You are in the "
-        , strong [] [ text "Agicap" ]
-        , text " mob"
+        [ span []
+            [ text "You are in the "
+            , strong [] [ text "Agicap" ]
+            , text " mob"
+            ]
         , i [ id "share-button", class "fas fa-share-alt" ] []
         ]
