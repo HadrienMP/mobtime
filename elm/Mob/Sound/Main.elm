@@ -1,18 +1,14 @@
-port module Mob.Sound.Main exposing (..)
+module Mob.Sound.Main exposing (..)
 
+import Interface.Commands
+import Interface.Events
+import Json.Decode
 import Mob.Clock.Events
 import Html exposing (Html, audio)
 import Html.Attributes exposing (src)
-import Json.Encode
 import Random
 import Mob.Sound.Library as SoundLibrary
 import Mob.Sound.Settings
-
-
-port soundEnded : (String -> msg) -> Sub msg
-
-
-port soundCommands : Json.Encode.Value -> Cmd msg
 
 
 
@@ -31,12 +27,11 @@ type alias Model =
     }
 
 
--- TODO ports should maybe be more general (like a port type)
-init : Mob.Sound.Settings.StorePort -> Int -> Model
-init storePort volume =
+init : Int -> Model
+init volume =
     { state = NotPlaying
     , sound = SoundLibrary.default
-    , settings = Mob.Sound.Settings.init soundCommands storePort volume
+    , settings = Mob.Sound.Settings.init volume
     }
 
 
@@ -46,7 +41,7 @@ init storePort volume =
 
 type Msg
     = Picked SoundLibrary.Sound
-    | Ended String
+    | Ended Interface.Events.Event
     | Stop
     | SettingsMsg Mob.Sound.Settings.Msg
 
@@ -76,7 +71,7 @@ update model msg =
 
 subscriptions : Sub Msg
 subscriptions =
-    soundEnded Ended
+    Interface.Events.events Ended
 
 
 
@@ -130,17 +125,9 @@ pick model =
 
 play : Cmd msg
 play =
-    soundCommands <|
-        Json.Encode.object
-            [ ( "name", Json.Encode.string "play" )
-            , ( "data", Json.Encode.object [] )
-            ]
+    Interface.Commands.send Interface.Commands.SoundPlay
 
 
 stop : Cmd msg
 stop =
-    soundCommands <|
-        Json.Encode.object
-            [ ( "name", Json.Encode.string "stop" )
-            , ( "data", Json.Encode.object [] )
-            ]
+    Interface.Commands.send Interface.Commands.SoundStop

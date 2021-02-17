@@ -1,9 +1,7 @@
-port module Mob.Main exposing (..)
+module Mob.Main exposing (..)
 
-import Browser
-import Html exposing (Html, div, header, section)
+import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
-import Json.Encode
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
@@ -17,10 +15,8 @@ import Mob.Tabs.Tabs
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
+import Url
 import UserPreferences
-
-
-port storePort : Json.Encode.Value -> Cmd msg
 
 
 
@@ -46,7 +42,7 @@ init name userPreferences =
     , dev = Mob.Tabs.Dev.init
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
-    , sound = Sound.init storePort userPreferences.volume
+    , sound = Sound.init userPreferences.volume
     }
 
 
@@ -62,6 +58,7 @@ type Msg
     | DevSettingsMsg Mob.Tabs.Dev.Msg
     | MobbersSettingsMsg Mob.Tabs.Mobbers.Msg
     | TabsMsg Mob.Tabs.Tabs.Msg
+    | ShareMsg Mob.Tabs.Share.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,7 +80,9 @@ update msg model =
 
         MobbersSettingsMsg mobberMsg ->
             Mob.Tabs.Mobbers.update mobberMsg model.mobbers
-                |> Tuple.mapBoth (\it -> { model | mobbers = it }) (Cmd.map MobbersSettingsMsg)
+                |> Tuple.mapBoth
+                    (\it -> { model | mobbers = it })
+                    (Cmd.map MobbersSettingsMsg)
 
         TimerSettingsMsg timerMsg ->
             Mob.Clock.Settings.update timerMsg model.timerSettings
@@ -93,12 +92,20 @@ update msg model =
 
         DevSettingsMsg devMsg ->
             Mob.Tabs.Dev.update devMsg model.dev
-                |> Tuple.mapBoth (\dev -> { model | dev = dev }) (Cmd.map DevSettingsMsg)
+                |> Tuple.mapBoth
+                    (\dev -> { model | dev = dev })
+                    (Cmd.map DevSettingsMsg)
 
         TabsMsg tabsMsg ->
             case tabsMsg of
                 Mob.Tabs.Tabs.Clicked tab ->
                     ( { model | tab = tab }, Cmd.none )
+
+        ShareMsg shareMsg ->
+            ( model
+            , Mob.Tabs.Share.update shareMsg
+                |> Cmd.map ShareMsg
+            )
 
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
@@ -139,8 +146,8 @@ subscriptions =
 -- VIEW
 
 
-view : Model -> Html Msg
-view model =
+view : Model -> Url.Url -> Html Msg
+view model url =
     div
         [ id "mob", class "container" ]
         [ header []
@@ -152,6 +159,7 @@ view model =
                 ]
             ]
         , Sound.view model.sound |> Html.map SoundMsg
+        , h2 [] [ Mob.Tabs.Share.shareButton url |> Html.map ShareMsg ]
         , Mob.Tabs.Tabs.navView model.tab |> Html.map TabsMsg
         , case model.tab.type_ of
             Mob.Tabs.Tabs.Timer ->

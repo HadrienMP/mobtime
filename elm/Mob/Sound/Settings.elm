@@ -3,6 +3,7 @@ module Mob.Sound.Settings exposing (..)
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Interface.Commands
 import Json.Encode
 import Mob.Sound.Library as SoundLibrary
 import UserPreferences
@@ -13,17 +14,13 @@ type alias StorePort = (Json.Encode.Value -> Cmd Msg)
 type alias Model =
     { profile : SoundLibrary.Profile
     , volume : Int
-    , commandPort : CommandPort
-    , storePort : StorePort
     }
 
 
-init : CommandPort -> StorePort -> Int -> Model
-init commandPort storePort volume =
+init : Int -> Model
+init volume =
     { profile = SoundLibrary.ClassicWeird
     , volume = volume
-    , commandPort = commandPort
-    , storePort = storePort
     }
 
 
@@ -41,8 +38,8 @@ update msg model =
             in
             ( { model | volume = volume }
             , Cmd.batch
-                [ model.commandPort <| changeVolume volume
-                , model.storePort <| store volume
+                [ Interface.Commands.send <| Interface.Commands.ChangeVolume volume
+                , Interface.Commands.send <| Interface.Commands.StoreVolume volume
                 ]
             )
 

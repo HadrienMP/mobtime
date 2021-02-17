@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Interface.Commands
 import Json.Decode
 import Login
 import Mob.Main
@@ -15,7 +16,7 @@ import UserPreferences
 -- MAIN
 
 
-main : Program Json.Decode.Value Model Msg
+main : Program UserPreferences.Model Model Msg
 main =
     Browser.application
         { init = init
@@ -38,17 +39,13 @@ type alias Model =
     }
 
 
-init : Json.Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init rawUserPreferences url key =
-    let
-        userPreferences =
-            UserPreferences.decode rawUserPreferences
-    in
+init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init userPreferences url key =
     ( { session = Pages.Session key url
       , userPreferences = userPreferences
       , pageModel = Pages.pageOf url userPreferences
       }
-    , Cmd.none
+    , Interface.Commands.send <| Interface.Commands.ChangeVolume userPreferences.volume
     )
 
 
@@ -137,4 +134,4 @@ pageBody model =
             Login.view loginModel |> Html.map LoginMsg
 
         Pages.MobModel mobModel ->
-            Mob.Main.view mobModel |> Html.map MobMsg
+            Mob.Main.view mobModel model.session.url |> Html.map MobMsg

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.gstatic.com"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Fredericka+the+Great&family=Oswald&display=swap"
-          rel="stylesheet" />
+          rel="stylesheet"/>
     <script src="https://kit.fontawesome.com/36321d34e2.js" crossorigin="anonymous"></script>
     <title>tenpo kulupu</title>
     <link rel="stylesheet" href="/css/main.css">
@@ -25,27 +25,22 @@
         }
     )
 
-    app.ports.storePort.subscribe(userPreferences => {
-        window.localStorage.setItem("preferences", JSON.stringify(userPreferences));
-    });
-    app.ports.soundCommands.subscribe(soundCommandHandler);
-
-    function soundCommandHandler(command) {
+    app.ports.commands.subscribe(command => {
         let audio = document.getElementsByTagName("audio")[0];
-        audio.onended = () => app.ports.soundEnded.send("");
-
+        audio.onended = () => app.ports.events.send({name: 'SoundEnded', value: ""});
         switch (command.name) {
-            case "play":
-                audio.play();
+            case 'ChangeVolume':
+                window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
+                audio.volume = parseInt(command.value) / 100.0;
                 break;
-            case "stop":
+            case 'SoundPlay':
+                audio.play();
+                break
+            case 'SoundStop':
                 audio.pause();
                 break;
-            case "volume":
-                audio.volume = parseInt(command.data.volume) / 100.0;
-                break;
         }
-    }
+    });
 </script>
 </body>
 </html>
