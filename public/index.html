@@ -21,7 +21,7 @@
     let app = Elm.Main.init(
         {
             node: document.getElementById('elm'),
-            flags: JSON.parse(window.localStorage.getItem("preferences") || "")
+            flags: JSON.parse(window.localStorage.getItem("preferences"))
         }
     )
 

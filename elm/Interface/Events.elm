@@ -1,7 +1,7 @@
 port module Interface.Events exposing (..)
 
 
-port eventsPort : EventPort msg
+port events : EventPort msg
 
 
 type alias EventMessage msg =

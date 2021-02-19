@@ -17,7 +17,7 @@ import UserPreferences
 -- MAIN
 
 
-main : Program UserPreferences.Model Model Msg
+main : Program (Maybe UserPreferences.Model) Model Msg
 main =
     Browser.application
         { init = init
@@ -40,13 +40,16 @@ type alias Model =
     }
 
 
-init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init userPreferences url key =
+init : Maybe UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init maybePreference url key =
+    let
+        userPreference = Maybe.withDefault UserPreferences.default maybePreference
+    in
     ( { session = Pages.Session key url
-      , userPreferences = userPreferences
-      , pageModel = Pages.pageOf url userPreferences
+      , userPreferences = userPreference
+      , pageModel = Pages.pageOf url userPreference
       }
-    , Interface.Commands.send <| Interface.Commands.ChangeVolume userPreferences.volume
+    , Interface.Commands.send <| Interface.Commands.ChangeVolume userPreference.volume
     )
 
 
@@ -106,7 +109,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Mob.Main.subscriptions |> Sub.map MobMsg
-        , Interface.Events.eventsPort <| dispatch eventsMapping
+        , Interface.Events.events <| dispatch eventsMapping
         ]
 
 
