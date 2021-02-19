@@ -2,7 +2,7 @@ module Mob.Main exposing (..)
 
 import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
-import Interface.Events
+import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
@@ -146,12 +146,13 @@ subscriptions =
 -- EVENTS SUBSCRIPTIONS
 
 
-events : List (Interface.Events.EventMsg Msg)
-events =
-    [ Interface.Events.map SoundMsg Sound.events
-    , Interface.Events.map ShareMsg Mob.Tabs.Share.events
-    ]
-    |> List.foldr (++) []
+eventsMapping : EventsMapping Msg
+eventsMapping =
+    EventsMapping.batch
+        [ EventsMapping.map SoundMsg Sound.eventsMapping
+        , EventsMapping.map ShareMsg Mob.Tabs.Share.eventsMapping
+        ]
+
 
 
 -- VIEW

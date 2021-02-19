@@ -5,10 +5,9 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Interface.Commands
 import Interface.Events
-import Json.Decode
+import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
 import Login
 import Mob.Main
-import Mob.Sound.Main
 import Pages
 import Url
 import UserPreferences
@@ -107,16 +106,19 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Mob.Main.subscriptions |> Sub.map MobMsg
-        , Interface.Events.events <| eventToMsg <| Interface.Events.map MobMsg Mob.Main.events
+        , Interface.Events.eventsPort <| dispatch eventsMapping
         ]
 
 
-eventToMsg : List (Interface.Events.EventMsg Msg) -> Interface.Events.Event -> Msg
-eventToMsg map event =
-    List.filter (\( name, _ ) -> name == event.name) map
-        |> List.head
-        |> Maybe.map (\( _, msg ) -> msg event.value)
+dispatch : EventsMapping Msg -> Interface.Events.Event -> Msg
+dispatch mapping event =
+    EventsMapping.dispatch event mapping
         |> Maybe.withDefault (UnknownEvent event)
+
+
+eventsMapping : EventsMapping Msg
+eventsMapping =
+    EventsMapping.map MobMsg Mob.Main.eventsMapping
 
 
 

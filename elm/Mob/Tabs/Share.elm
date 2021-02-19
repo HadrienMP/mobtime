@@ -5,6 +5,7 @@ import Html.Attributes exposing (class, id, title)
 import Html.Events exposing (onClick)
 import Interface.Commands
 import Interface.Events
+import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
 import Process
 import QRCode
 import Svg.Attributes as Svg
@@ -61,9 +62,10 @@ update msg model =
 
 -- EVENTS SUBSCRIPTIONS
 
-events : List (Interface.Events.EventMsg Msg)
-events =
-    [ ( "Copied", (\_ -> DisplayCopied) ) ]
+eventsMapping : EventsMapping Msg
+eventsMapping =
+    [ ( Interface.Events.EventMessage "Copied" (\_ -> DisplayCopied) ) ]
+    |> EventsMapping.create
 
 
 

@@ -2,6 +2,7 @@ module Mob.Sound.Main exposing (..)
 
 import Interface.Commands
 import Interface.Events
+import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
 import Mob.Clock.Events
 import Html exposing (Html, audio)
@@ -69,9 +70,10 @@ update model msg =
 
 -- EVENTS SUBSCRIPTIONS
 
-events : List (Interface.Events.EventMsg Msg)
-events =
-    [ ( "SoundEnded", (\_ -> Ended) ) ]
+eventsMapping : EventsMapping Msg
+eventsMapping =
+    [ (Interface.Events.EventMessage "SoundEnded" (\_ -> Ended) ) ]
+    |> EventsMapping.create
 
 
 -- SETTINGS VIEW
