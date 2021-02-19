@@ -4,6 +4,7 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Interface.Commands
+import Interface.Events
 import Json.Decode
 import Login
 import Mob.Main
@@ -103,7 +104,8 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Mob.Main.subscriptions |> Sub.map MobMsg ]
+        [ Mob.Main.subscriptions |> Sub.map MobMsg
+        , Interface.Events.events Ended]
 
 
 

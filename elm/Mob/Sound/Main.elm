@@ -41,7 +41,7 @@ init volume =
 
 type Msg
     = Picked SoundLibrary.Sound
-    | Ended Interface.Events.Event
+    | Ended Interface.Events.InEvent
     | Stop
     | SettingsMsg Mob.Sound.Settings.Msg
 

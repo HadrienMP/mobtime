@@ -32,7 +32,9 @@
     app.ports.commands.subscribe(command => {
         switch (command.name) {
             case 'CopyInPasteBin':
-                navigator.clipboard.writeText(command.value);
+                navigator.clipboard
+                    .writeText(command.value)
+                    .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
                 break;
             case 'ChangeVolume':
                 window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));

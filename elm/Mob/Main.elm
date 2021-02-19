@@ -31,6 +31,7 @@ type alias Model =
     , mobbers : Mob.Tabs.Mobbers.Model
     , mobClock : Clock.Model
     , sound : Sound.Model
+    , share : Mob.Tabs.Share.Model
     }
 
 
@@ -43,6 +44,7 @@ init name userPreferences =
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
     , sound = Sound.init userPreferences.volume
+    , share = Mob.Tabs.Share.init
     }
 
 
@@ -102,10 +104,10 @@ update msg model =
                     ( { model | tab = tab }, Cmd.none )
 
         ShareMsg shareMsg ->
-            ( model
-            , Mob.Tabs.Share.update shareMsg
-                |> Cmd.map ShareMsg
-            )
+            Mob.Tabs.Share.update shareMsg model.share
+                |> Tuple.mapBoth
+                    (\it -> { model | share = it })
+                    (Cmd.map ShareMsg)
 
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
@@ -156,7 +158,7 @@ view model url =
                 , Mob.Action.actionView
                     { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
                     { clock = ClockMsg, sound = SoundMsg }
-                , h2 [] [ Mob.Tabs.Share.shareButton url |> Html.map ShareMsg ]
+                , h2 [] [ Mob.Tabs.Share.shareButton model.share url |> Html.map ShareMsg ]
                 ]
             ]
         , Mob.Tabs.Tabs.navView model.tab |> Html.map TabsMsg
@@ -178,7 +180,7 @@ view model url =
                     |> Html.map DevSettingsMsg
 
             Mob.Tabs.Tabs.Share ->
-                Mob.Tabs.Share.view url
+                Mob.Tabs.Share.view model.share url
                     |> Html.map ShareMsg
         ]
 

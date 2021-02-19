@@ -37,10 +37,7 @@ update msg model =
                 volume = String.toInt rawVolume|> Maybe.withDefault model.volume
             in
             ( { model | volume = volume }
-            , Cmd.batch
-                [ Interface.Commands.send <| Interface.Commands.ChangeVolume volume
-                , Interface.Commands.send <| Interface.Commands.StoreVolume volume
-                ]
+            , Interface.Commands.send <| Interface.Commands.ChangeVolume volume
             )
 
         SelectedSoundProfile profile ->
