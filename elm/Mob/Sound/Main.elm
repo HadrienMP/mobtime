@@ -41,7 +41,7 @@ init volume =
 
 type Msg
     = Picked SoundLibrary.Sound
-    | Ended Interface.Events.InEvent
+    | Ended
     | Stop
     | SettingsMsg Mob.Sound.Settings.Msg
 
@@ -54,7 +54,7 @@ update model msg =
             , Interface.Commands.send <| Interface.Commands.ChangeSound sound
             )
 
-        Ended _ ->
+        Ended ->
             ( { model | state = NotPlaying }, Cmd.none )
 
         Stop ->
@@ -67,14 +67,11 @@ update model msg =
                     (Cmd.map SettingsMsg)
 
 
+-- EVENTS SUBSCRIPTIONS
 
--- SUBSCRIPTIONS
-
-
-subscriptions : Sub Msg
-subscriptions =
-    Interface.Events.events Ended
-
+events : Interface.Events.EventMsg Msg
+events =
+    [ ( "SoundEnded", (\_ -> Ended) ) ]
 
 
 -- SETTINGS VIEW

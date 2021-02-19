@@ -3,17 +3,21 @@ port module Interface.Events exposing (..)
 
 port events : EventPort msg
 
+type alias EventMsg msg = List (Name, Value -> msg)
 
-type Event
-    = SoundEnded
-    | TextCopied
+type alias Name =
+    String
 
 
-type alias InEvent =
-    { name : String
-    , value : String
+type alias Value =
+    String
+
+
+type alias Event =
+    { name : Name
+    , value : Value
     }
 
 
 type alias EventPort msg =
-    (InEvent -> msg) -> Sub msg
+    (Event -> msg) -> Sub msg

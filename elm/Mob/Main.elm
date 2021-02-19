@@ -2,6 +2,7 @@ module Mob.Main exposing (..)
 
 import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
+import Interface.Events
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
@@ -138,10 +139,15 @@ handleClockResult model clockResult =
 
 subscriptions : Sub Msg
 subscriptions =
-    Sub.batch
-        [ Time.every 1000 TimePassed
-        , Sound.subscriptions |> Sub.map SoundMsg
-        ]
+    Time.every 1000 TimePassed
+
+
+-- EVENTS SUBSCRIPTIONS
+
+events : Interface.Events.EventMsg Msg
+events =
+    Sound.events
+    |> List.map (Tuple.mapSecond <| (<<) SoundMsg)
 
 
 

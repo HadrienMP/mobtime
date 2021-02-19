@@ -8,6 +8,7 @@ import Interface.Events
 import Json.Decode
 import Login
 import Mob.Main
+import Mob.Sound.Main
 import Pages
 import Url
 import UserPreferences
@@ -59,6 +60,7 @@ type Msg
     | UrlChanged Url.Url
     | LoginMsg Login.Msg
     | MobMsg Mob.Main.Msg
+    | UnknownEvent Interface.Events.Event
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -105,7 +107,20 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Mob.Main.subscriptions |> Sub.map MobMsg
-        , Interface.Events.events Ended]
+        , Interface.Events.events (eventToMsg eventsMap)
+        ]
+
+
+eventToMsg : Interface.Events.EventMsg Msg -> Interface.Events.Event -> Msg
+eventToMsg map event =
+    List.filter (\( name, _ ) -> name == event.name) map
+        |> List.head
+        |> Maybe.map (\(_, msg) -> msg event.value)
+        |> Maybe.withDefault (UnknownEvent event)
+
+eventsMap : Interface.Events.EventMsg Msg
+eventsMap =
+    List.map (Tuple.mapSecond <| (<<) MobMsg) Mob.Main.events
 
 
 

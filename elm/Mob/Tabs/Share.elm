@@ -58,11 +58,7 @@ update msg model =
         _ ->
             ( model, Cmd.none )
 
--- SUBSCRIPTION
 
-subscriptions : Sub Msg
-subscriptions =
-    Interface.Events.events Ended
 
 -- VIEW
 
