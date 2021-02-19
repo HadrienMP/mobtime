@@ -69,7 +69,7 @@ update model msg =
 
 -- EVENTS SUBSCRIPTIONS
 
-events : Interface.Events.EventMsg Msg
+events : List (Interface.Events.EventMsg Msg)
 events =
     [ ( "SoundEnded", (\_ -> Ended) ) ]
 

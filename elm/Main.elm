@@ -107,20 +107,16 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Mob.Main.subscriptions |> Sub.map MobMsg
-        , Interface.Events.events (eventToMsg eventsMap)
+        , Interface.Events.events <| eventToMsg <| Interface.Events.map MobMsg Mob.Main.events
         ]
 
 
-eventToMsg : Interface.Events.EventMsg Msg -> Interface.Events.Event -> Msg
+eventToMsg : List (Interface.Events.EventMsg Msg) -> Interface.Events.Event -> Msg
 eventToMsg map event =
     List.filter (\( name, _ ) -> name == event.name) map
         |> List.head
-        |> Maybe.map (\(_, msg) -> msg event.value)
+        |> Maybe.map (\( _, msg ) -> msg event.value)
         |> Maybe.withDefault (UnknownEvent event)
-
-eventsMap : Interface.Events.EventMsg Msg
-eventsMap =
-    List.map (Tuple.mapSecond <| (<<) MobMsg) Mob.Main.events
 
 
 

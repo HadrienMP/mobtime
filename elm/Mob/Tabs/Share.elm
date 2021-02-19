@@ -59,6 +59,13 @@ update msg model =
             ( model, Cmd.none )
 
 
+-- EVENTS SUBSCRIPTIONS
+
+events : List (Interface.Events.EventMsg Msg)
+events =
+    [ ( "Copied", (\_ -> DisplayCopied) ) ]
+
+
 
 -- VIEW
 

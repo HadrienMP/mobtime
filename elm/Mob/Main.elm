@@ -142,13 +142,16 @@ subscriptions =
     Time.every 1000 TimePassed
 
 
+
 -- EVENTS SUBSCRIPTIONS
 
-events : Interface.Events.EventMsg Msg
-events =
-    Sound.events
-    |> List.map (Tuple.mapSecond <| (<<) SoundMsg)
 
+events : List (Interface.Events.EventMsg Msg)
+events =
+    [ Interface.Events.map SoundMsg Sound.events
+    , Interface.Events.map ShareMsg Mob.Tabs.Share.events
+    ]
+    |> List.foldr (++) []
 
 
 -- VIEW
