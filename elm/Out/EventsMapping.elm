@@ -1,6 +1,6 @@
-module Interface.EventsMapping exposing (EventsMapping, batch, create, dispatch, map)
+module Out.EventsMapping exposing (EventsMapping, batch, create, dispatch, map)
 
-import Interface.Events exposing (Event, EventMessage)
+import Out.Events exposing (Event, EventMessage)
 
 
 type EventsMapping msg
@@ -27,12 +27,11 @@ batch eventsMappings =
         |> EventsMapping
 
 
-dispatch : Event -> EventsMapping msg -> Maybe msg
+dispatch : Event -> EventsMapping msg -> List msg
 dispatch event eventsMapping =
     open eventsMapping
         |> List.filter (\eventMessage -> eventMessage.name == event.name)
-        |> List.head
-        |> Maybe.map (\eventMessage -> eventMessage.messageFunction event.value )
+        |> List.map (\eventMessage -> eventMessage.messageFunction event.value )
 
 
 open : EventsMapping msg -> List (EventMessage msg)

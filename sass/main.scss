@@ -96,6 +96,46 @@ hr {
   background: #999;
 }
 
+#toasts {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  .toast {
+    margin: 10px;
+    border-radius: 5px;
+    display: flex;
+    position: relative;
+    cursor: pointer;
+
+    &.success {
+      border: 1px solid green;
+      background: #d5e5d5;
+
+      .level-icon {
+        background: green;
+      }
+    }
+
+    .content {
+      padding: 10px;
+      margin-left: 2em;
+    }
+
+    .level-icon {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      color: white;
+      padding: 10px;
+    }
+
+    .close {
+      padding: 10px 10px 0 0;
+    }
+  }
+}
+
 @import "login";
 @import "header";
 @import "tabs/timer";

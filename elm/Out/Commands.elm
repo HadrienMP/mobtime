@@ -1,4 +1,4 @@
-port module Interface.Commands exposing (..)
+port module Out.Commands exposing (..)
 
 
 port commands : OutCommand -> Cmd msg

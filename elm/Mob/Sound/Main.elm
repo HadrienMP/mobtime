@@ -1,8 +1,8 @@
 module Mob.Sound.Main exposing (..)
 
-import Interface.Commands
-import Interface.Events
-import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
+import Out.Commands
+import Out.Events
+import Out.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
 import Mob.Clock.Events
 import Html exposing (Html, audio)
@@ -52,7 +52,7 @@ update model msg =
     case msg of
         Picked sound ->
             ( { model | sound = sound }
-            , Interface.Commands.send <| Interface.Commands.ChangeSound sound
+            , Out.Commands.send <| Out.Commands.ChangeSound sound
             )
 
         Ended ->
@@ -72,7 +72,7 @@ update model msg =
 
 eventsMapping : EventsMapping Msg
 eventsMapping =
-    [ (Interface.Events.EventMessage "SoundEnded" (\_ -> Ended) ) ]
+    [ (Out.Events.EventMessage "SoundEnded" (\_ -> Ended) ) ]
     |> EventsMapping.create
 
 
@@ -117,9 +117,9 @@ pick model =
 
 play : Cmd msg
 play =
-    Interface.Commands.send Interface.Commands.SoundPlay
+    Out.Commands.send Out.Commands.SoundPlay
 
 
 stop : Cmd msg
 stop =
-    Interface.Commands.send Interface.Commands.SoundStop
+    Out.Commands.send Out.Commands.SoundStop

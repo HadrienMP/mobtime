@@ -3,11 +3,12 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Interface.Commands
-import Interface.Events
-import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
+import Lib.Toast
 import Login
 import Mob.Main
+import Out.Commands
+import Out.Events
+import Out.EventsMapping as EventsMapping exposing (EventsMapping)
 import Pages
 import Url
 import UserPreferences
@@ -37,19 +38,22 @@ type alias Model =
     { session : Pages.Session
     , userPreferences : UserPreferences.Model
     , pageModel : Pages.PageModel
+    , toasts : Lib.Toast.Toasts
     }
 
 
 init : Maybe UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init maybePreference url key =
     let
-        userPreference = Maybe.withDefault UserPreferences.default maybePreference
+        userPreference =
+            Maybe.withDefault UserPreferences.default maybePreference
     in
     ( { session = Pages.Session key url
       , userPreferences = userPreference
       , pageModel = Pages.pageOf url userPreference
+      , toasts = Lib.Toast.init
       }
-    , Interface.Commands.send <| Interface.Commands.ChangeVolume userPreference.volume
+    , Out.Commands.send <| Out.Commands.ChangeVolume userPreference.volume
     )
 
 
@@ -62,12 +66,31 @@ type Msg
     | UrlChanged Url.Url
     | LoginMsg Login.Msg
     | MobMsg Mob.Main.Msg
-    | UnknownEvent Interface.Events.Event
+    | Batch (List Msg)
+    | ToastMsg Lib.Toast.Msg
+
+
+batchUpdate : Msg -> Model -> List (Cmd Msg) -> ( Model, List (Cmd Msg) )
+batchUpdate msg model commandAcc =
+    case msg of
+        Batch (first :: other) ->
+            let
+                ( updated, command ) =
+                    update first model
+            in
+            batchUpdate (Batch other) updated (command :: commandAcc)
+
+        _ ->
+            ( model, commandAcc )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model.pageModel, msg ) of
+        ( _, Batch _ ) ->
+            batchUpdate msg model []
+                |> Tuple.mapSecond Cmd.batch
+
         ( _, LinkClicked urlRequest ) ->
             case urlRequest of
                 Browser.Internal url ->
@@ -97,6 +120,12 @@ update msg model =
                     (\it -> { model | pageModel = Pages.MobModel it })
                     (Cmd.map MobMsg)
 
+        ( _, ToastMsg toastMsg ) ->
+            Lib.Toast.update toastMsg model.toasts
+                |> Tuple.mapBoth
+                    (\it -> { model | toasts = it })
+                    (Cmd.map ToastMsg)
+
         _ ->
             ( model, Cmd.none )
 
@@ -109,19 +138,21 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Mob.Main.subscriptions |> Sub.map MobMsg
-        , Interface.Events.events <| dispatch eventsMapping
+        , Out.Events.events (dispatch eventsMapping)
         ]
 
 
-dispatch : EventsMapping Msg -> Interface.Events.Event -> Msg
+dispatch : EventsMapping Msg -> Out.Events.Event -> Msg
 dispatch mapping event =
-    EventsMapping.dispatch event mapping
-        |> Maybe.withDefault (UnknownEvent event)
+    Batch <| EventsMapping.dispatch event mapping
 
 
 eventsMapping : EventsMapping Msg
 eventsMapping =
-    EventsMapping.map MobMsg Mob.Main.eventsMapping
+    EventsMapping.batch
+        [ EventsMapping.map MobMsg Mob.Main.eventsMapping
+        , EventsMapping.map ToastMsg Lib.Toast.eventsMapping
+        ]
 
 
 
@@ -131,7 +162,10 @@ eventsMapping =
 view : Model -> Browser.Document Msg
 view model =
     { title = pageTitle model
-    , body = [ pageBody model ]
+    , body =
+        [ pageBody model
+        , Lib.Toast.view model.toasts |> Html.map ToastMsg
+        ]
     }
 
 

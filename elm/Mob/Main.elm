@@ -2,7 +2,7 @@ module Mob.Main exposing (..)
 
 import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
-import Interface.EventsMapping as EventsMapping exposing (EventsMapping)
+import Out.EventsMapping as EventsMapping exposing (EventsMapping)
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
@@ -32,7 +32,6 @@ type alias Model =
     , mobbers : Mob.Tabs.Mobbers.Model
     , mobClock : Clock.Model
     , sound : Sound.Model
-    , share : Mob.Tabs.Share.Model
     }
 
 
@@ -45,7 +44,6 @@ init name userPreferences =
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
     , sound = Sound.init userPreferences.volume
-    , share = Mob.Tabs.Share.init
     }
 
 
@@ -105,10 +103,7 @@ update msg model =
                     ( { model | tab = tab }, Cmd.none )
 
         ShareMsg shareMsg ->
-            Mob.Tabs.Share.update shareMsg model.share
-                |> Tuple.mapBoth
-                    (\it -> { model | share = it })
-                    (Cmd.map ShareMsg)
+            (model, Mob.Tabs.Share.update shareMsg |> Cmd.map ShareMsg)
 
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
@@ -148,10 +143,7 @@ subscriptions =
 
 eventsMapping : EventsMapping Msg
 eventsMapping =
-    EventsMapping.batch
-        [ EventsMapping.map SoundMsg Sound.eventsMapping
-        , EventsMapping.map ShareMsg Mob.Tabs.Share.eventsMapping
-        ]
+    EventsMapping.map SoundMsg Sound.eventsMapping
 
 
 
@@ -168,7 +160,7 @@ view model url =
                 , Mob.Action.actionView
                     { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
                     { clock = ClockMsg, sound = SoundMsg }
-                , h2 [] [ Mob.Tabs.Share.shareButton model.share url |> Html.map ShareMsg ]
+                , h2 [] [ Mob.Tabs.Share.shareButton model.name url |> Html.map ShareMsg ]
                 ]
             ]
         , Mob.Tabs.Tabs.navView model.tab |> Html.map TabsMsg
@@ -190,7 +182,7 @@ view model url =
                     |> Html.map DevSettingsMsg
 
             Mob.Tabs.Tabs.Share ->
-                Mob.Tabs.Share.view model.share url
+                Mob.Tabs.Share.view model.name url
                     |> Html.map ShareMsg
         ]
 

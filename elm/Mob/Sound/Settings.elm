@@ -3,7 +3,7 @@ module Mob.Sound.Settings exposing (..)
 import Html exposing (Html, button, div, i, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Interface.Commands
+import Out.Commands
 import Json.Encode
 import Mob.Sound.Library as SoundLibrary
 import UserPreferences
@@ -37,7 +37,7 @@ update msg model =
                 volume = String.toInt rawVolume|> Maybe.withDefault model.volume
             in
             ( { model | volume = volume }
-            , Interface.Commands.send <| Interface.Commands.ChangeVolume volume
+            , Out.Commands.send <| Out.Commands.ChangeVolume volume
             )
 
         SelectedSoundProfile profile ->

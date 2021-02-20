@@ -1,7 +1,6 @@
-port module Interface.Events exposing (..)
+port module Out.Events exposing (..)
 
-
-port events : EventPort msg
+port events : (Event -> msg) -> Sub msg
 
 
 type alias EventMessage msg =
@@ -22,7 +21,3 @@ type alias Event =
     { name : Name
     , value : Value
     }
-
-
-type alias EventPort msg =
-    (Event -> msg) -> Sub msg
