@@ -5,7 +5,6 @@ import Mob.Clock.Events exposing (Event(..))
 import Mob.Clock.Settings
 import Mob.Lib.Duration as Duration exposing (Duration)
 import Mob.Lib.Ratio as Ratio exposing (Ratio)
-import Mob.Tabs.Dev
 import Svg exposing (Svg)
 
 
@@ -19,8 +18,8 @@ start duration =
     On { timeLeft = duration, length = duration }
 
 
-timePassed : Model -> Mob.Tabs.Dev.Model -> UpdateResult
-timePassed model devSettings =
+timePassed : Model -> Mob.Clock.Settings.Model -> UpdateResult
+timePassed model settings =
     case model of
         Off ->
             { model = model
@@ -31,7 +30,7 @@ timePassed model devSettings =
         On on ->
             let
                 timeLeft =
-                    Duration.subtract on.timeLeft (Mob.Tabs.Dev.seconds devSettings)
+                    Duration.subtract on.timeLeft (Mob.Clock.Settings.seconds settings)
             in
             if Duration.toSeconds timeLeft <= 0 then
                 { model = Off

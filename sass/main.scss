@@ -107,6 +107,7 @@ hr {
     display: flex;
     position: relative;
     cursor: pointer;
+    box-shadow: 4px 4px 4px #c9c9c9;
 
     &.success {
       border: 1px solid green;

@@ -9,7 +9,6 @@ import Mob.Clock.Main as Clock
 import Mob.Clock.Settings
 import Mob.Lib.Ratio as Ratio exposing (Ratio)
 import Mob.Sound.Main as Sound
-import Mob.Tabs.Dev
 import Mob.Tabs.Mobbers
 import Mob.Tabs.Share
 import Mob.Tabs.Tabs
@@ -28,7 +27,6 @@ type alias Model =
     { name : String
     , tab : Mob.Tabs.Tabs.Tab
     , timerSettings : Mob.Clock.Settings.Model
-    , dev : Mob.Tabs.Dev.Model
     , mobbers : Mob.Tabs.Mobbers.Model
     , mobClock : Clock.Model
     , sound : Sound.Model
@@ -40,7 +38,6 @@ init name userPreferences =
     { name = name
     , tab = Mob.Tabs.Tabs.timerTab
     , timerSettings = Mob.Clock.Settings.init
-    , dev = Mob.Tabs.Dev.init
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
     , sound = Sound.init userPreferences.volume
@@ -56,7 +53,6 @@ type Msg
     | ClockMsg Clock.Msg
     | SoundMsg Sound.Msg
     | TimerSettingsMsg Mob.Clock.Settings.Msg
-    | DevSettingsMsg Mob.Tabs.Dev.Msg
     | MobbersSettingsMsg Mob.Tabs.Mobbers.Msg
     | TabsMsg Mob.Tabs.Tabs.Msg
     | ShareMsg Mob.Tabs.Share.Msg
@@ -66,7 +62,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TimePassed _ ->
-            Clock.timePassed model.mobClock model.dev
+            Clock.timePassed model.mobClock model.timerSettings
                 |> handleClockResult model
 
         ClockMsg clockMsg ->
@@ -90,12 +86,6 @@ update msg model =
                 |> Tuple.mapBoth
                     (\it -> { model | timerSettings = it })
                     (Cmd.map TimerSettingsMsg)
-
-        DevSettingsMsg devMsg ->
-            Mob.Tabs.Dev.update devMsg model.dev
-                |> Tuple.mapBoth
-                    (\dev -> { model | dev = dev })
-                    (Cmd.map DevSettingsMsg)
 
         TabsMsg tabsMsg ->
             case tabsMsg of
@@ -176,10 +166,6 @@ view model url =
             Mob.Tabs.Tabs.Sound ->
                 Sound.settingsView model.sound
                     |> Html.map SoundMsg
-
-            Mob.Tabs.Tabs.Dev ->
-                Mob.Tabs.Dev.view model.dev
-                    |> Html.map DevSettingsMsg
 
             Mob.Tabs.Tabs.Share ->
                 Mob.Tabs.Share.view model.name url

@@ -11,7 +11,6 @@ type TabType
     = Timer
     | Mobbers
     | Sound
-    | Dev
     | Share
 
 
@@ -32,7 +31,6 @@ tabs =
     , Tab Mobbers "fa-users"
     , Tab Sound "fa-volume-up"
     , Tab Share "fa-share-alt"
-    , Tab Dev "fa-code"
     ]
 
 
