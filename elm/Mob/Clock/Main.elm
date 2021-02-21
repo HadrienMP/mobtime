@@ -58,10 +58,6 @@ type alias UpdateResult =
     { model : Model, command : Cmd Msg, event : Maybe Event }
 
 
-
--- TODO HadrienMP length in start message
-
-
 update : Msg -> Model -> Duration -> UpdateResult
 update msg model length =
     case ( msg, model ) of
