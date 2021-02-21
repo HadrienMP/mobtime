@@ -2,16 +2,15 @@ module Mob.Main exposing (..)
 
 import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
-import Out.EventsMapping as EventsMapping exposing (EventsMapping)
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
 import Mob.Clock.Settings
-import Mob.Lib.Ratio as Ratio exposing (Ratio)
 import Mob.Sound.Main as Sound
 import Mob.Tabs.Mobbers
 import Mob.Tabs.Share
 import Mob.Tabs.Tabs
+import Out.EventsMapping as EventsMapping exposing (EventsMapping)
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Time
@@ -29,6 +28,7 @@ type alias Model =
     , timerSettings : Mob.Clock.Settings.Model
     , mobbers : Mob.Tabs.Mobbers.Model
     , mobClock : Clock.Model
+    , pomodoroClock : Clock.Model
     , sound : Sound.Model
     }
 
@@ -40,6 +40,7 @@ init name userPreferences =
     , timerSettings = Mob.Clock.Settings.init
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
+    , pomodoroClock = Clock.Off
     , sound = Sound.init userPreferences.volume
     }
 
@@ -63,11 +64,13 @@ update msg model =
     case msg of
         TimePassed _ ->
             Clock.timePassed model.mobClock model.timerSettings
-                |> handleClockResult model
+                |>handleClockResult model
+                |> Tuple.mapSecond Cmd.batch
 
         ClockMsg clockMsg ->
             Clock.update model.timerSettings clockMsg
                 |> handleClockResult model
+                |> Tuple.mapSecond Cmd.batch
 
         SoundMsg soundMsg ->
             Sound.update model.sound soundMsg
@@ -93,10 +96,10 @@ update msg model =
                     ( { model | tab = tab }, Cmd.none )
 
         ShareMsg shareMsg ->
-            (model, Mob.Tabs.Share.update shareMsg |> Cmd.map ShareMsg)
+            ( model, Mob.Tabs.Share.update shareMsg |> Cmd.map ShareMsg )
 
 
-handleClockResult : Model -> Clock.UpdateResult -> ( Model, Cmd Msg )
+handleClockResult : Model -> Clock.UpdateResult -> ( Model, List (Cmd Msg) )
 handleClockResult model clockResult =
     let
         soundResult =
@@ -107,14 +110,14 @@ handleClockResult model clockResult =
     in
     ( { model
         | mobClock = clockResult.model
+        , pomodoroClock = clockResult.model
         , sound = soundResult.model
         , mobbers = mobbersResult.model
       }
-    , Cmd.batch <|
-        [ soundResult.command |> Cmd.map SoundMsg
-        , clockResult.command |> Cmd.map ClockMsg
-        , mobbersResult.command |> Cmd.map MobbersSettingsMsg
-        ]
+    , [ soundResult.command |> Cmd.map SoundMsg
+      , clockResult.command |> Cmd.map ClockMsg
+      , mobbersResult.command |> Cmd.map MobbersSettingsMsg
+      ]
     )
 
 
@@ -212,6 +215,6 @@ clockView model =
         [ Svg.width <| String.fromInt totalWidth
         , Svg.height <| String.fromInt totalWidth
         ]
-        (Circle.drawWithoutInsideBorder pomodoroCircle Ratio.full
+        (Clock.view pomodoroCircle model.pomodoroClock
             ++ Clock.view mobCircle model.mobClock
         )

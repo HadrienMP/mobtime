@@ -3,8 +3,8 @@ module Mob.Clock.Main exposing (..)
 import Mob.Clock.Circle
 import Mob.Clock.Events exposing (Event(..))
 import Mob.Clock.Settings
-import Mob.Lib.Duration as Duration exposing (Duration)
-import Mob.Lib.Ratio as Ratio exposing (Ratio)
+import Lib.Duration as Duration exposing (Duration)
+import Lib.Ratio as Ratio exposing (Ratio)
 import Svg exposing (Svg)
 
 

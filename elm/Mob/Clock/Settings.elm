@@ -3,7 +3,7 @@ module Mob.Clock.Settings exposing (..)
 import Html exposing (Html, button, div, i, input, label, text)
 import Html.Attributes exposing (checked, class, classList, for, id, step, type_, value)
 import Html.Events exposing (onCheck, onClick, onInput)
-import Mob.Lib.Duration as Duration exposing (Duration)
+import Lib.Duration as Duration exposing (Duration)
 
 
 type Speed

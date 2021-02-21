@@ -1,10 +1,10 @@
 module Mob.Action exposing (..)
 
-import Mob.Clock.Main
-import Mob.Clock.Settings
 import Html exposing (Html, button, i, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
+import Mob.Clock.Main
+import Mob.Clock.Settings
 import Mob.Sound.Main
 
 

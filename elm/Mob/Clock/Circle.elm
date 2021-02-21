@@ -1,7 +1,7 @@
 module Mob.Clock.Circle exposing (Circle, Coordinates, Stroke, draw, drawWithoutInsideBorder, inside)
 
 import Html.Attributes as Html
-import Mob.Lib.Ratio as Ratio exposing (Ratio)
+import Lib.Ratio as Ratio exposing (Ratio)
 import Svg exposing (Svg)
 import Svg.Attributes as Svg
 
