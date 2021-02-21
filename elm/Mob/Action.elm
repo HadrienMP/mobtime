@@ -24,6 +24,8 @@ type alias Model =
 type alias Messages msg =
     { clock : Mob.Clock.Main.Msg -> msg
     , sound : Mob.Sound.Main.Msg -> msg
+    , pomodoro : Mob.Clock.Main.Msg -> msg
+    , batch : List msg -> msg
     }
 
 
@@ -43,7 +45,10 @@ actionMessage : Messages msg -> Action -> msg
 actionMessage messages action =
     case action of
         Start ->
-            Mob.Clock.Main.StartRequest |> messages.clock
+            messages.batch <|
+                [ Mob.Clock.Main.StartRequest |> messages.clock
+                , Mob.Clock.Main.StartRequest |> messages.pomodoro
+                ]
 
         Stop ->
             Mob.Clock.Main.StopRequest |> messages.clock

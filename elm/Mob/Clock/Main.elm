@@ -58,11 +58,11 @@ type alias UpdateResult =
     { model : Model, command : Cmd Msg, event : Maybe Event }
 
 
-update : Mob.Clock.Settings.Model -> Msg -> UpdateResult
-update settings msg =
+update : Duration -> Msg -> UpdateResult
+update length msg =
     case msg of
         StartRequest ->
-            { model = start settings.turnLength, command = Cmd.none, event = Just Started }
+            { model = start length, command = Cmd.none, event = Just Started }
 
         StopRequest ->
             { model = Off, command = Cmd.none, event = Nothing }

@@ -2,6 +2,7 @@ module Mob.Main exposing (..)
 
 import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
+import Lib.BatchMsg
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
@@ -51,26 +52,40 @@ init name userPreferences =
 
 type Msg
     = TimePassed Time.Posix
-    | ClockMsg Clock.Msg
+    | MainClockMsg Clock.Msg
+    | PomodoroClockMsg Clock.Msg
     | SoundMsg Sound.Msg
     | TimerSettingsMsg Mob.Clock.Settings.Msg
     | MobbersSettingsMsg Mob.Tabs.Mobbers.Msg
     | TabsMsg Mob.Tabs.Tabs.Msg
     | ShareMsg Mob.Tabs.Share.Msg
+    | Batch (List Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TimePassed _ ->
-            Clock.timePassed model.mobClock model.timerSettings
+            let
+                pomodoro = Clock.timePassed model.pomodoroClock model.timerSettings
+                (clock, cmd) = Clock.timePassed model.mobClock model.timerSettings
+                            |> handleClockResult model
+                            |> Tuple.mapSecond Cmd.batch
+            in
+            ({clock | pomodoroClock = pomodoro.model}, cmd)
+
+        MainClockMsg clockMsg ->
+            Clock.update model.timerSettings.turnLength clockMsg
                 |> handleClockResult model
                 |> Tuple.mapSecond Cmd.batch
 
-        ClockMsg clockMsg ->
-            Clock.update model.timerSettings clockMsg
-                |> handleClockResult model
-                |> Tuple.mapSecond Cmd.batch
+        PomodoroClockMsg clockMsg ->
+            Clock.update model.timerSettings.pomodoroLength clockMsg
+                |> (\result ->
+                        ( { model | pomodoroClock = result.model }
+                        , Cmd.map PomodoroClockMsg result.command
+                        )
+                   )
 
         SoundMsg soundMsg ->
             Sound.update model.sound soundMsg
@@ -98,6 +113,9 @@ update msg model =
         ShareMsg shareMsg ->
             ( model, Mob.Tabs.Share.update shareMsg |> Cmd.map ShareMsg )
 
+        Batch messages ->
+            Lib.BatchMsg.update messages model update
+
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, List (Cmd Msg) )
 handleClockResult model clockResult =
@@ -110,12 +128,11 @@ handleClockResult model clockResult =
     in
     ( { model
         | mobClock = clockResult.model
-        , pomodoroClock = clockResult.model
         , sound = soundResult.model
         , mobbers = mobbersResult.model
       }
     , [ soundResult.command |> Cmd.map SoundMsg
-      , clockResult.command |> Cmd.map ClockMsg
+      , clockResult.command |> Cmd.map MainClockMsg
       , mobbersResult.command |> Cmd.map MobbersSettingsMsg
       ]
     )
@@ -152,7 +169,11 @@ view model url =
                 [ clockView model
                 , Mob.Action.actionView
                     { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
-                    { clock = ClockMsg, sound = SoundMsg }
+                    { clock = MainClockMsg
+                    , sound = SoundMsg
+                    , pomodoro = PomodoroClockMsg
+                    , batch = Batch
+                    }
                 , h2 [] [ Mob.Tabs.Share.shareButton model.name url |> Html.map ShareMsg ]
                 ]
             ]

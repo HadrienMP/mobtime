@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Lib.BatchMsg
 import Lib.Toast
 import Login
 import Mob.Main
@@ -70,26 +71,11 @@ type Msg
     | ToastMsg Lib.Toast.Msg
 
 
-batchUpdate : Msg -> Model -> List (Cmd Msg) -> ( Model, List (Cmd Msg) )
-batchUpdate msg model commandAcc =
-    case msg of
-        Batch (first :: other) ->
-            let
-                ( updated, command ) =
-                    update first model
-            in
-            batchUpdate (Batch other) updated (command :: commandAcc)
-
-        _ ->
-            ( model, commandAcc )
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model.pageModel, msg ) of
-        ( _, Batch _ ) ->
-            batchUpdate msg model []
-                |> Tuple.mapSecond Cmd.batch
+        ( _, Batch messages ) ->
+            Lib.BatchMsg.update messages model update
 
         ( _, LinkClicked urlRequest ) ->
             case urlRequest of
