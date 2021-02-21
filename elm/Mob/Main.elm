@@ -64,7 +64,7 @@ update msg model =
     case msg of
         TimePassed _ ->
             Clock.timePassed model.mobClock model.timerSettings
-                |>handleClockResult model
+                |> handleClockResult model
                 |> Tuple.mapSecond Cmd.batch
 
         ClockMsg clockMsg ->

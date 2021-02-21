@@ -13,6 +13,7 @@ type Speed
 
 type alias Model =
     { turnLength : Duration
+    , pomodoroLength : Duration
     , displaySeconds : Bool
     , speed : Speed
     }
@@ -21,6 +22,7 @@ type alias Model =
 init : Model
 init =
     { turnLength = Duration.ofMinutes 8
+    , pomodoroLength = Duration.ofMinutes 25
     , displaySeconds = False
     , speed = Normal
     }
@@ -28,6 +30,7 @@ init =
 
 type Msg
     = TurnLengthChanged String
+    | PomodoroLengthChanged String
     | DisplaySecondsChanged Bool
     | SpeedChanged Speed
 
@@ -37,6 +40,11 @@ update msg model =
     case msg of
         TurnLengthChanged turnLength ->
             ( { model | turnLength = String.toInt turnLength |> Maybe.withDefault 8 |> Duration.ofMinutes }
+            , Cmd.none
+            )
+
+        PomodoroLengthChanged pomodoroLength ->
+            ( { model | pomodoroLength = String.toInt pomodoroLength |> Maybe.withDefault 25 |> Duration.ofMinutes }
             , Cmd.none
             )
 
@@ -73,14 +81,20 @@ view model =
     div [ id "timer", class "tab" ]
         [ div
             [ id "seconds-field", class "form-field" ]
-            [ label [ for "seconds" ] [ text "Display seconds" ]
-            , input
-                [ id "seconds"
-                , type_ "checkbox"
-                , onCheck DisplaySecondsChanged
-                , checked model.displaySeconds
-                ]
-                []
+            [ label [ for "seconds" ] [ text "Seconds" ]
+            , div
+                 [ class "toggles" ]
+                 [ button
+                     [ classList [ ( "active", not model.displaySeconds ) ]
+                     , onClick <| DisplaySecondsChanged False
+                     ]
+                     [ text "Hide" ]
+                 , button
+                     [ classList [ ( "active", model.displaySeconds ) ]
+                     , onClick <| DisplaySecondsChanged True
+                     ]
+                     [ text "Show" ]
+                 ]
             ]
         , div
             [ id "turn-length-field", class "form-field" ]
@@ -103,6 +117,28 @@ view model =
                 ]
                 []
             , i [ class "fas fa-hippo" ] []
+            ]
+        , div
+            [ id "length-field", class "form-field" ]
+            [ label
+                [ for "length" ]
+                [ text <|
+                    "Pomodoro : "
+                        ++ (String.fromInt <| Duration.toMinutes model.pomodoroLength)
+                        ++ " min"
+                ]
+            , i [ class "fas fa-battery-full" ] []
+            , input
+                [ id "length"
+                , type_ "range"
+                , step "1"
+                , onInput PomodoroLengthChanged
+                , Html.Attributes.min "15"
+                , Html.Attributes.max "45"
+                , value <| String.fromInt <| Duration.toMinutes model.pomodoroLength
+                ]
+                []
+            , i [ class "fas fa-battery-empty" ] []
             ]
         , div
             [ id "speed-field", class "form-field" ]
