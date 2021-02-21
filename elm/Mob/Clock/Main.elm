@@ -1,10 +1,10 @@
 module Mob.Clock.Main exposing (..)
 
+import Lib.Duration as Duration exposing (Duration)
+import Lib.Ratio as Ratio exposing (Ratio)
 import Mob.Clock.Circle
 import Mob.Clock.Events exposing (Event(..))
 import Mob.Clock.Settings
-import Lib.Duration as Duration exposing (Duration)
-import Lib.Ratio as Ratio exposing (Ratio)
 import Svg exposing (Svg)
 
 
@@ -58,14 +58,21 @@ type alias UpdateResult =
     { model : Model, command : Cmd Msg, event : Maybe Event }
 
 
-update : Duration -> Msg -> UpdateResult
-update length msg =
-    case msg of
-        StartRequest ->
+
+-- TODO HadrienMP length in start message
+
+
+update : Msg -> Model -> Duration -> UpdateResult
+update msg model length =
+    case ( msg, model ) of
+        ( StartRequest, Off ) ->
             { model = start length, command = Cmd.none, event = Just Started }
 
-        StopRequest ->
+        ( StopRequest, On _ ) ->
             { model = Off, command = Cmd.none, event = Nothing }
+
+        _ ->
+            { model = model, command = Cmd.none, event = Nothing }
 
 
 
@@ -87,6 +94,7 @@ ratio state =
 
         Off ->
             Ratio.full
+
 
 
 -- OTHER

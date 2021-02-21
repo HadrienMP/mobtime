@@ -75,12 +75,12 @@ update msg model =
             ({clock | pomodoroClock = pomodoro.model}, cmd)
 
         MainClockMsg clockMsg ->
-            Clock.update model.timerSettings.turnLength clockMsg
+            Clock.update clockMsg model.mobClock model.timerSettings.turnLength
                 |> handleClockResult model
                 |> Tuple.mapSecond Cmd.batch
 
         PomodoroClockMsg clockMsg ->
-            Clock.update model.timerSettings.pomodoroLength clockMsg
+            Clock.update clockMsg model.pomodoroClock model.timerSettings.pomodoroLength
                 |> (\result ->
                         ( { model | pomodoroClock = result.model }
                         , Cmd.map PomodoroClockMsg result.command

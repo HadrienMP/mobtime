@@ -36,7 +36,10 @@ actionView model messages =
         , class <| turnToString model
         , id "action"
         ]
-        [ span [ id "time-left" ] (Mob.Clock.Main.humanReadableTimeLeft model.clock model.clockSettings |> List.map (\it -> span [] [ text it ]))
+        [ span [ id "time-left" ]
+            (Mob.Clock.Main.humanReadableTimeLeft model.clock model.clockSettings
+                |> List.map (\it -> span [] [ text it ])
+            )
         , actionIcon <| actionOf model
         ]
 
