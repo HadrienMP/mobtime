@@ -7,6 +7,7 @@ import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
 import Mob.Clock.Settings
+import Mob.Pomodoro as Pomodoro
 import Mob.Sound.Main as Sound
 import Mob.Tabs.Mobbers
 import Mob.Tabs.Share
@@ -29,7 +30,7 @@ type alias Model =
     , timerSettings : Mob.Clock.Settings.Model
     , mobbers : Mob.Tabs.Mobbers.Model
     , mobClock : Clock.Model
-    , pomodoroClock : Clock.Model
+    , pomodoroClock : Pomodoro.Model
     , sound : Sound.Model
     }
 
@@ -41,7 +42,7 @@ init name userPreferences =
     , timerSettings = Mob.Clock.Settings.init
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
-    , pomodoroClock = Clock.Off
+    , pomodoroClock = Pomodoro.Ready
     , sound = Sound.init userPreferences.volume
     }
 
@@ -53,7 +54,7 @@ init name userPreferences =
 type Msg
     = TimePassed Time.Posix
     | MainClockMsg Clock.Msg
-    | PomodoroClockMsg Clock.Msg
+    | PomodoroClockMsg Pomodoro.Msg
     | SoundMsg Sound.Msg
     | TimerSettingsMsg Mob.Clock.Settings.Msg
     | MobbersSettingsMsg Mob.Tabs.Mobbers.Msg
@@ -67,12 +68,15 @@ update msg model =
     case msg of
         TimePassed _ ->
             let
-                pomodoro = Clock.timePassed model.pomodoroClock model.timerSettings
-                (clock, cmd) = Clock.timePassed model.mobClock model.timerSettings
-                            |> handleClockResult model
-                            |> Tuple.mapSecond Cmd.batch
+                pomodoro =
+                    Pomodoro.timePassed model.pomodoroClock model.timerSettings
+
+                ( clock, cmd ) =
+                    Clock.timePassed model.mobClock model.timerSettings
+                        |> handleClockResult model
+                        |> Tuple.mapSecond Cmd.batch
             in
-            ({clock | pomodoroClock = pomodoro.model}, cmd)
+            ( { clock | pomodoroClock = pomodoro }, cmd )
 
         MainClockMsg clockMsg ->
             Clock.update clockMsg model.mobClock model.timerSettings.turnLength
@@ -80,12 +84,10 @@ update msg model =
                 |> Tuple.mapSecond Cmd.batch
 
         PomodoroClockMsg clockMsg ->
-            Clock.update clockMsg model.pomodoroClock model.timerSettings.pomodoroLength
-                |> (\result ->
-                        ( { model | pomodoroClock = result.model }
-                        , Cmd.map PomodoroClockMsg result.command
-                        )
-                   )
+            Pomodoro.update clockMsg model.pomodoroClock model.timerSettings.pomodoroLength
+                |> Tuple.mapBoth
+                    (\it -> { model | pomodoroClock = it })
+                    (Cmd.map PomodoroClockMsg)
 
         SoundMsg soundMsg ->
             Sound.update model.sound soundMsg
@@ -168,7 +170,11 @@ view model url =
             [ section []
                 [ clockView model
                 , Mob.Action.actionView
-                    { clock = model.mobClock, sound = model.sound, clockSettings = model.timerSettings }
+                    { clock = model.mobClock
+                    , sound = model.sound
+                    , clockSettings = model.timerSettings
+                    , pomodoro = model.pomodoroClock
+                    }
                     { clock = MainClockMsg
                     , sound = SoundMsg
                     , pomodoro = PomodoroClockMsg
@@ -236,6 +242,8 @@ clockView model =
         [ Svg.width <| String.fromInt totalWidth
         , Svg.height <| String.fromInt totalWidth
         ]
-        (Clock.view pomodoroCircle model.pomodoroClock
+        ((Pomodoro.view pomodoroCircle model.pomodoroClock
+            |> List.map (Svg.map PomodoroClockMsg)
+         )
             ++ Clock.view mobCircle model.mobClock
         )

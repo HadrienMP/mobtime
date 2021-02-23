@@ -3,28 +3,31 @@ module Mob.Action exposing (..)
 import Html exposing (Html, button, i, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
-import Mob.Clock.Main
+import Mob.Clock.Main as Clock
 import Mob.Clock.Settings
-import Mob.Sound.Main
+import Mob.Pomodoro as Pomodoro
+import Mob.Sound.Main as Sound
 
 
 type Action
     = Start
     | Stop
     | StopSound
+    | StopBreak
 
 
 type alias Model =
-    { clock : Mob.Clock.Main.Model
-    , sound : Mob.Sound.Main.Model
+    { clock : Clock.Model
+    , sound : Sound.Model
+    , pomodoro : Pomodoro.Model
     , clockSettings : Mob.Clock.Settings.Model
     }
 
 
 type alias Messages msg =
-    { clock : Mob.Clock.Main.Msg -> msg
-    , sound : Mob.Sound.Main.Msg -> msg
-    , pomodoro : Mob.Clock.Main.Msg -> msg
+    { clock : Clock.Msg -> msg
+    , sound : Sound.Msg -> msg
+    , pomodoro : Pomodoro.Msg -> msg
     , batch : List msg -> msg
     }
 
@@ -37,7 +40,7 @@ actionView model messages =
         , id "action"
         ]
         [ span [ id "time-left" ]
-            (Mob.Clock.Main.humanReadableTimeLeft model.clock model.clockSettings
+            (Clock.humanReadableTimeLeft model.clock model.clockSettings
                 |> List.map (\it -> span [] [ text it ])
             )
         , actionIcon <| actionOf model
@@ -49,40 +52,50 @@ actionMessage messages action =
     case action of
         Start ->
             messages.batch <|
-                [ Mob.Clock.Main.StartRequest |> messages.clock
-                , Mob.Clock.Main.StartRequest |> messages.pomodoro
+                [ Clock.StartRequest |> messages.clock
+                , Pomodoro.Start |> messages.pomodoro
                 ]
 
         Stop ->
-            Mob.Clock.Main.StopRequest |> messages.clock
+            Clock.StopRequest |> messages.clock
 
         StopSound ->
-            Mob.Sound.Main.Stop |> messages.sound
+            Sound.Stop |> messages.sound
+
+        StopBreak ->
+            Pomodoro.BreakTaken |> messages.pomodoro
 
 
 turnToString : Model -> String
 turnToString model =
     case model.clock of
-        Mob.Clock.Main.On _ ->
+        Clock.On _ ->
             "on"
 
-        Mob.Clock.Main.Off ->
+        Clock.Off ->
             "off"
+
+
+
+-- TODO HadrienMP il faudrait un workflow commun, sinon il y a trop de risques d'erreur
 
 
 actionOf : Model -> Action
 actionOf model =
-    case ( model.clock, model.sound.state ) of
-        ( Mob.Clock.Main.On _, Mob.Sound.Main.NotPlaying ) ->
+    case ( model.clock, model.pomodoro, model.sound.state ) of
+        ( Clock.On _, _, Sound.NotPlaying ) ->
             Stop
 
-        ( Mob.Clock.Main.On _, Mob.Sound.Main.Playing ) ->
+        ( Clock.On _, _, Sound.Playing ) ->
             StopSound
 
-        ( Mob.Clock.Main.Off, Mob.Sound.Main.Playing ) ->
+        ( Clock.Off, _, Sound.Playing ) ->
             StopSound
 
-        ( Mob.Clock.Main.Off, Mob.Sound.Main.NotPlaying ) ->
+        ( Clock.Off, Pomodoro.OnABreak, Sound.NotPlaying ) ->
+            StopBreak
+
+        ( Clock.Off, _, Sound.NotPlaying ) ->
             Start
 
 
@@ -97,3 +110,6 @@ actionIcon action =
 
         StopSound ->
             i [ class "fas fa-volume-mute" ] []
+
+        StopBreak ->
+            i [ class "fas fa-coffee" ] []
