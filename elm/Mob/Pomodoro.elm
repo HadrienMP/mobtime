@@ -1,6 +1,7 @@
 module Mob.Pomodoro exposing (..)
 
 import Lib.Duration exposing (Duration)
+import Lib.Toast
 import Mob.Clock.Circle exposing (Circle)
 import Mob.Clock.Events
 import Mob.Clock.Main as Clock
@@ -25,7 +26,12 @@ type Msg
     | BreakTaken
 
 
-timePassed : Model -> ClockSettings.Model -> Model
+type alias TimePassedResult =
+    { model: Model
+    , toasts: Lib.Toast.Toasts
+    }
+
+timePassed : Model -> ClockSettings.Model -> TimePassedResult
 timePassed model settings =
     case model of
         Working clockModel ->
@@ -35,13 +41,13 @@ timePassed model settings =
             in
             case result.event of
                 Just Mob.Clock.Events.Finished ->
-                    OnABreak
+                    TimePassedResult OnABreak [Lib.Toast.Toast Lib.Toast.Info "Take a break !"]
 
                 _ ->
-                    Working result.model
+                    TimePassedResult (Working result.model) []
 
         _ ->
-            model
+            TimePassedResult model []
 
 
 update : Msg -> Model -> Duration -> ( Model, Cmd Msg )

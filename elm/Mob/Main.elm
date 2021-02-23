@@ -3,6 +3,7 @@ module Mob.Main exposing (..)
 import Html exposing (Html, div, h2, header, section)
 import Html.Attributes exposing (class, id)
 import Lib.BatchMsg
+import Lib.Toast
 import Mob.Action
 import Mob.Clock.Circle as Circle
 import Mob.Clock.Main as Clock
@@ -63,12 +64,19 @@ type Msg
     | Batch (List Msg)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+type alias UpdateResult =
+    { model : Model
+    , command : Cmd Msg
+    , toast : Lib.Toast.Toasts
+    }
+
+
+update : Msg -> Model -> UpdateResult
 update msg model =
     case msg of
         TimePassed _ ->
             let
-                pomodoro =
+                pomodoroResult =
                     Pomodoro.timePassed model.pomodoroClock model.timerSettings
 
                 ( clock, cmd ) =
@@ -76,47 +84,55 @@ update msg model =
                         |> handleClockResult model
                         |> Tuple.mapSecond Cmd.batch
             in
-            ( { clock | pomodoroClock = pomodoro }, cmd )
+            UpdateResult { clock | pomodoroClock = pomodoroResult.model } cmd pomodoroResult.toasts
 
         MainClockMsg clockMsg ->
             Clock.update clockMsg model.mobClock model.timerSettings.turnLength
                 |> handleClockResult model
                 |> Tuple.mapSecond Cmd.batch
+                |> (\( m, c ) -> UpdateResult m c [])
 
         PomodoroClockMsg clockMsg ->
             Pomodoro.update clockMsg model.pomodoroClock model.timerSettings.pomodoroLength
                 |> Tuple.mapBoth
                     (\it -> { model | pomodoroClock = it })
                     (Cmd.map PomodoroClockMsg)
+                |> (\( m, c ) -> UpdateResult m c [])
 
         SoundMsg soundMsg ->
             Sound.update model.sound soundMsg
                 |> Tuple.mapBoth
                     (\updated -> { model | sound = updated })
                     (Cmd.map SoundMsg)
+                |> (\( m, c ) -> UpdateResult m c [])
 
         MobbersSettingsMsg mobberMsg ->
             Mob.Tabs.Mobbers.update mobberMsg model.mobbers
                 |> Tuple.mapBoth
                     (\it -> { model | mobbers = it })
                     (Cmd.map MobbersSettingsMsg)
+                |> (\( m, c ) -> UpdateResult m c [])
 
         TimerSettingsMsg timerMsg ->
             Mob.Clock.Settings.update timerMsg model.timerSettings
                 |> Tuple.mapBoth
                     (\it -> { model | timerSettings = it })
                     (Cmd.map TimerSettingsMsg)
+                |> (\( m, c ) -> UpdateResult m c [])
 
         TabsMsg tabsMsg ->
             case tabsMsg of
                 Mob.Tabs.Tabs.Clicked tab ->
                     ( { model | tab = tab }, Cmd.none )
+                        |> (\( m, c ) -> UpdateResult m c [])
 
         ShareMsg shareMsg ->
             ( model, Mob.Tabs.Share.update shareMsg |> Cmd.map ShareMsg )
+                |> (\( m, c ) -> UpdateResult m c [])
 
         Batch messages ->
-            Lib.BatchMsg.update messages model update
+            Lib.BatchMsg.update messages model (\ms md -> update ms md |> (\r -> ( r.model, r.command )))
+                |> (\( m, c ) -> UpdateResult m c [])
 
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, List (Cmd Msg) )

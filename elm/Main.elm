@@ -101,10 +101,23 @@ update msg model =
                     (Cmd.map LoginMsg)
 
         ( Pages.MobModel mobModel, MobMsg mobMsg ) ->
-            Mob.Main.update mobMsg mobModel
-                |> Tuple.mapBoth
-                    (\it -> { model | pageModel = Pages.MobModel it })
-                    (Cmd.map MobMsg)
+            let
+                mobResult =
+                    Mob.Main.update mobMsg mobModel
+
+                mobCommand =
+                    Cmd.map MobMsg mobResult.command
+
+                ( toasts, commands ) =
+                    Lib.Toast.add mobResult.toast model.toasts
+                        |> Tuple.mapSecond (List.map (Cmd.map ToastMsg))
+            in
+            ( { model
+                | pageModel = Pages.MobModel mobResult.model
+                , toasts = toasts
+              }
+            , Cmd.batch <| mobCommand :: commands
+            )
 
         ( _, ToastMsg toastMsg ) ->
             Lib.Toast.update toastMsg model.toasts

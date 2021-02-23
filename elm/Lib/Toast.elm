@@ -47,18 +47,21 @@ update : Msg -> Toasts -> ( Toasts, Cmd Msg )
 update msg toasts =
     case msg of
         Add toast ->
-            if List.member toast toasts then
-                ( toasts, Cmd.none )
-
-            else
-                ( toast :: toasts
-                , Lib.Delay.after (Lib.Delay.Seconds 5) (Remove toast)
-                )
+            add [ toast ] toasts
+                |> Tuple.mapSecond Cmd.batch
 
         Remove toast ->
             ( List.filter (\t -> t /= toast) toasts
             , Cmd.none
             )
+
+
+add : Toasts -> Toasts -> ( Toasts, List (Cmd Msg) )
+add toAdd model =
+    toAdd
+        |> List.filter (\toast -> not (List.member toast model))
+        |> List.map (\toast -> ( toast, Lib.Delay.after (Lib.Delay.Seconds 10) (Remove toast) ))
+        |> List.foldr (\( toast, cmd ) ( ts, cs ) -> ( toast :: ts, cmd :: cs )) ( model, [] )
 
 
 

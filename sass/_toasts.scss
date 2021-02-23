@@ -1,0 +1,33 @@
+#toasts {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  .toast {
+    margin: 10px 10px 10px auto;
+    border-radius: 5px;
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,0,0,.6);
+    color: white;
+    align-items: center;
+    width: max-content;
+    padding: 15px;
+
+    &.success {
+      background: #35c135;
+    }
+    &.info {
+      background: #00a9eb;
+    }
+
+    .level-icon {
+      font-size: 1.5em;
+    }
+
+    .content {
+      padding: 0 15px;
+    }
+  }
+}
