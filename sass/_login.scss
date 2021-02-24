@@ -24,8 +24,22 @@
   button[type=submit] {
     width: 100%;
     padding: $padding-space;
+    background-image: repeating-linear-gradient(-45deg, #f8f8f8, #f8f8f8 20px, #efefef 20px, #efefef 40px);
+    border: 1px solid $dark-button-color;
+    color: black;
+    font-size: 1.1em;
+    font-weight: bold;
+
+    &:hover {
+      background: $dark-button-color;
+      color: white;
+    }
+
     i {
       margin-right: $margin-space;
+      font-size: .8em;
+      margin-top: -.2em;
+      vertical-align: middle;
     }
   }
 }
