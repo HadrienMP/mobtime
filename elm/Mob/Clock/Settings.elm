@@ -83,18 +83,18 @@ view model =
             [ id "seconds-field", class "form-field" ]
             [ label [ for "seconds" ] [ text "Seconds" ]
             , div
-                 [ class "toggles" ]
-                 [ button
-                     [ classList [ ( "active", not model.displaySeconds ) ]
-                     , onClick <| DisplaySecondsChanged False
-                     ]
-                     [ text "Hide" ]
-                 , button
-                     [ classList [ ( "active", model.displaySeconds ) ]
-                     , onClick <| DisplaySecondsChanged True
-                     ]
-                     [ text "Show" ]
-                 ]
+                [ class "toggles" ]
+                [ button
+                    [ classList [ ( "active", not model.displaySeconds ) ]
+                    , onClick <| DisplaySecondsChanged False
+                    ]
+                    [ text "Hide" ]
+                , button
+                    [ classList [ ( "active", model.displaySeconds ) ]
+                    , onClick <| DisplaySecondsChanged True
+                    ]
+                    [ text "Show" ]
+                ]
             ]
         , div
             [ id "turn-length-field", class "form-field" ]
@@ -105,18 +105,20 @@ view model =
                         ++ (String.fromInt <| Duration.toMinutes model.turnLength)
                         ++ " min"
                 ]
-            , i [ class "fas fa-dove" ] []
-            , input
-                [ id "turn-length"
-                , type_ "range"
-                , step "1"
-                , onInput TurnLengthChanged
-                , Html.Attributes.min "2"
-                , Html.Attributes.max "20"
-                , value <| String.fromInt <| Duration.toMinutes model.turnLength
+            , div [ class "field-input" ]
+                [ i [ class "fas fa-dove" ] []
+                , input
+                    [ id "turn-length"
+                    , type_ "range"
+                    , step "1"
+                    , onInput TurnLengthChanged
+                    , Html.Attributes.min "2"
+                    , Html.Attributes.max "20"
+                    , value <| String.fromInt <| Duration.toMinutes model.turnLength
+                    ]
+                    []
+                , i [ class "fas fa-hippo" ] []
                 ]
-                []
-            , i [ class "fas fa-hippo" ] []
             ]
         , div
             [ id "length-field", class "form-field" ]
@@ -127,18 +129,20 @@ view model =
                         ++ (String.fromInt <| Duration.toMinutes model.pomodoroLength)
                         ++ " min"
                 ]
-            , i [ class "fas fa-battery-full" ] []
-            , input
-                [ id "length"
-                , type_ "range"
-                , step "1"
-                , onInput PomodoroLengthChanged
-                , Html.Attributes.min "15"
-                , Html.Attributes.max "45"
-                , value <| String.fromInt <| Duration.toMinutes model.pomodoroLength
+            , div [ class "field-input" ]
+                [ i [ class "fas fa-battery-full" ] []
+                , input
+                    [ id "length"
+                    , type_ "range"
+                    , step "1"
+                    , onInput PomodoroLengthChanged
+                    , Html.Attributes.min "15"
+                    , Html.Attributes.max "45"
+                    , value <| String.fromInt <| Duration.toMinutes model.pomodoroLength
+                    ]
+                    []
+                , i [ class "fas fa-battery-empty" ] []
                 ]
-                []
-            , i [ class "fas fa-battery-empty" ] []
             ]
         , div
             [ id "speed-field", class "form-field" ]

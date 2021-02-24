@@ -1,10 +1,11 @@
 #toasts {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 10px;
+  left: 10px;
 
   .toast {
-    margin: 10px 10px 10px auto;
+    margin: 10px 0 10px auto;
     border-radius: 5px;
     display: flex;
     position: relative;
@@ -13,6 +14,7 @@
     color: white;
     align-items: center;
     width: max-content;
+    max-width: 100%;
     padding: 15px;
 
     &.success {
