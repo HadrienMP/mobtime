@@ -2,7 +2,7 @@ header {
   section {
     position: relative;
     margin: 0 auto;
-    padding: 50px 0 0;
+    padding: 50px 0 30px;
 
     &::before {
       content: "";
@@ -135,7 +135,7 @@ h2 {
 
 nav {
   background: #666;
-  margin-bottom: 20px;
+  margin: 0 0 10px;
   display: flex;
 
   button {

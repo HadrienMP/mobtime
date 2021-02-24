@@ -1,14 +1,15 @@
 module Mob.Tabs.Tabs exposing (..)
 
-import Html exposing (Html, a, button, i, nav)
-import Html.Attributes exposing (class, classList, href)
+import Html exposing (Html, button, i, nav)
+import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 
 type Msg
     = Clicked Tab
 
 type TabType
-    = Timer
+    = Home
+    | Timer
     | Mobbers
     | Sound
     | Share
@@ -20,14 +21,15 @@ type alias Tab =
     }
 
 
-timerTab : Tab
-timerTab =
-    Tab Timer "fa-clock"
+default : Tab
+default =
+    Tab Home "fa-home"
 
 
 tabs : List Tab
 tabs =
-    [ timerTab
+    [ default
+    , Tab Timer "fa-clock"
     , Tab Mobbers "fa-users"
     , Tab Sound "fa-volume-up"
     , Tab Share "fa-share-alt"

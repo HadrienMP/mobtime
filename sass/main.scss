@@ -37,12 +37,12 @@ h1 {
 }
 
 
-
 input {
   border: none;
   border-bottom: 1px solid;
   font-weight: bold;
   font-size: 1.1em;
+
   &:focus {
     outline: none;
   }
@@ -94,6 +94,49 @@ hr {
 
 .active {
   background: #999;
+}
+
+.tab {
+  #share-link {
+    display: flex;
+    padding: 0;
+    background: none;
+    color: black;
+    text-align: left;
+    font-size: 1em;
+    align-items: center;
+    width: 100%;
+
+    span {
+      flex: 1 1;
+    }
+
+    i {
+      flex: 0 0;
+    }
+  }
+}
+
+#home.tab {
+  a#git {
+    margin: 10px 0;
+    padding: 10px;
+    border-top: 1px solid $dark-button-color;
+    border-bottom: 1px solid $dark-button-color;
+    color: $dark-button-color;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+
+    &:hover {
+      background: $dark-button-color;
+      color: white;
+    }
+
+    i {
+      padding-right: 10px;
+    }
+  }
 }
 
 @import "toasts";

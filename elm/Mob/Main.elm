@@ -1,6 +1,6 @@
 module Mob.Main exposing (..)
 
-import Html exposing (Html, div, h2, header, section)
+import Html exposing (Html, div, header, section)
 import Html.Attributes exposing (class, id)
 import Lib.BatchMsg
 import Lib.Toast
@@ -10,6 +10,7 @@ import Mob.Clock.Main as Clock
 import Mob.Clock.Settings
 import Mob.Pomodoro as Pomodoro
 import Mob.Sound.Main as Sound
+import Mob.Tabs.Home
 import Mob.Tabs.Mobbers
 import Mob.Tabs.Share
 import Mob.Tabs.Tabs
@@ -39,7 +40,7 @@ type alias Model =
 init : String -> UserPreferences.Model -> Model
 init name userPreferences =
     { name = name
-    , tab = Mob.Tabs.Tabs.timerTab
+    , tab = Mob.Tabs.Tabs.default
     , timerSettings = Mob.Clock.Settings.init
     , mobbers = Mob.Tabs.Mobbers.init
     , mobClock = Clock.Off
@@ -62,6 +63,7 @@ type Msg
     | TabsMsg Mob.Tabs.Tabs.Msg
     | ShareMsg Mob.Tabs.Share.Msg
     | Batch (List Msg)
+    | HomeMsg Mob.Tabs.Home.Msg
 
 
 type alias UpdateResult =
@@ -134,6 +136,11 @@ update msg model =
             Lib.BatchMsg.update messages model (\ms md -> update ms md |> (\r -> ( r.model, r.command )))
                 |> (\( m, c ) -> UpdateResult m c [])
 
+        HomeMsg homeMsg ->
+            ( model, Mob.Tabs.Home.update homeMsg |> Cmd.map HomeMsg )
+                |> (\( m, c ) -> UpdateResult m c [])
+
+
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, List (Cmd Msg) )
 handleClockResult model clockResult =
@@ -196,7 +203,6 @@ view model url =
                     , pomodoro = PomodoroClockMsg
                     , batch = Batch
                     }
-                , h2 [] [ Mob.Tabs.Share.shareButton model.name url |> Html.map ShareMsg ]
                 ]
             ]
         , Mob.Tabs.Tabs.navView model.tab |> Html.map TabsMsg
@@ -216,6 +222,9 @@ view model url =
             Mob.Tabs.Tabs.Share ->
                 Mob.Tabs.Share.view model.name url
                     |> Html.map ShareMsg
+
+            Mob.Tabs.Tabs.Home ->
+                Mob.Tabs.Home.view model.name url |> Html.map HomeMsg
         ]
 
 

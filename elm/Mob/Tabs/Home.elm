@@ -1,16 +1,10 @@
-module Mob.Tabs.Share exposing (..)
+module Mob.Tabs.Home exposing (..)
 
-import Html exposing (Html, button, div, i, span, strong, text)
-import Html.Attributes exposing (class, id, title)
+import Html exposing (Html, a, button, div, i, span, strong, text)
+import Html.Attributes exposing (class, href, id, title)
 import Html.Events exposing (onClick)
 import Out.Commands
-import QRCode
-import Svg.Attributes as Svg
 import Url
-
-
-
--- UPDATE
 
 
 type Msg
@@ -26,22 +20,18 @@ update msg =
                 |> Out.Commands.send
 
 
-
--- VIEW
-
-
 view : String -> Url.Url -> Html Msg
-view mob url =
-    div [ id "share", class "tab" ]
-        [ shareButton mob url
-        , QRCode.fromString (Url.toString url)
-            |> Result.map
-                (QRCode.toSvg
-                    [ Svg.width "300px"
-                    , Svg.height "300px"
-                    ]
-                )
-            |> Result.withDefault (Html.text "Error while encoding to QRCode.")
+view mobName url =
+    div
+        [ id "home", class "tab" ]
+        [ shareButton mobName url
+        , a
+            [ href "https://github.com/HadrienMP/mob-time-elm"
+            , id "git"
+            ]
+            [ i [ class "fab fa-github" ] []
+            , text "Fork me on github!"
+            ]
         ]
 
 

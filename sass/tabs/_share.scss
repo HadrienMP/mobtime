@@ -1,25 +1,6 @@
 #share {
   text-align: center;
 
-  #share-link {
-    display: flex;
-    padding: 0;
-    background: none;
-    color: black;
-    text-align: left;
-    font-size: 1em;
-    align-items: center;
-    width: 100%;
-
-    span {
-      flex: 1 1;
-    }
-
-    i {
-      flex: 0 0;
-    }
-  }
-
   svg {
     margin: auto;
   }
