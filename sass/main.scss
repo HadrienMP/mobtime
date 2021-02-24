@@ -12,6 +12,7 @@ html {
   font-family: 'Oswald', sans-serif;
   font-size: 15pt;
   margin: 0;
+  line-height: 1em;
 }
 
 body {
@@ -21,6 +22,7 @@ body {
 body * {
   box-sizing: border-box;
   font-family: 'Oswald', sans-serif;
+  line-height: 1em;
 }
 
 .container {
@@ -29,8 +31,9 @@ body * {
 }
 
 h1 {
-  border-top: 2px solid $color;
-  border-bottom: 2px solid $color;
+  border-top: 4px solid $dark-button-color;
+  border-bottom: 4px solid $dark-button-color;
+  color: $dark-button-color;
   padding: 20px 0;
   font-size: 4.5em;
   text-align: center;
@@ -61,6 +64,7 @@ button {
   padding: 0 20px;
   outline: none;
   cursor: pointer;
+  font-size: .9em;
 
   &:hover {
     background: $light-button-color;
@@ -70,7 +74,7 @@ button {
 .form-field {
   display: flex;
   align-items: center;
-  margin: 20px 0;
+  margin: $margin-space 0;
 
   label {
     margin-right: 20px;
@@ -117,12 +121,34 @@ hr {
   }
 }
 
+footer {
+  a#git {
+    margin: $margin-space 0;
+    padding: $padding-space;
+    border-top: 1px solid $dark-button-color;
+    border-bottom: 1px solid $dark-button-color;
+    color: black;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+
+    &:hover {
+      background: $dark-button-color;
+      color: white;
+    }
+
+    i {
+      padding-right: 10px;
+    }
+  }
+}
+
 #home.tab {
 
   .mobber-roles {
     border-top: 1px solid $dark-button-color;
-    padding: 10px 0;
-    margin-top: 10px;
+    padding-top: $margin-space;
+    margin: $margin-space 0;
 
     .mobber-role {
       display: flex;
@@ -137,26 +163,6 @@ hr {
         font-weight: bold;
         font-size: 1.2em;
       }
-    }
-  }
-
-  a#git {
-    margin: 10px 0;
-    padding: 10px;
-    border-top: 1px solid $dark-button-color;
-    border-bottom: 1px solid $dark-button-color;
-    color: $dark-button-color;
-    text-decoration: none;
-    text-align: center;
-    display: block;
-
-    &:hover {
-      background: $dark-button-color;
-      color: white;
-    }
-
-    i {
-      padding-right: 10px;
     }
   }
 }

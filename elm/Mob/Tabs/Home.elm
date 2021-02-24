@@ -1,5 +1,6 @@
 module Mob.Tabs.Home exposing (..)
 
+import Footer
 import Html exposing (Html, a, button, dd, div, dl, dt, i, li, span, strong, text, ul)
 import Html.Attributes exposing (class, href, id, target, title)
 import Html.Events exposing (onClick)
@@ -27,7 +28,7 @@ view mobName url mobbers =
         [ id "home", class "tab" ]
         [ shareButton mobName url
         , roles mobbers
-        , gitButton
+        , Footer.view
         ]
 
 
@@ -72,16 +73,4 @@ roleView mobberRole =
     li [ class "mobber-role" ]
         [ span [ class "role" ] [ text mobberRole.role ]
         , span [ class "mobber" ] [ text mobberRole.name ]
-        ]
-
-
-gitButton : Html Msg
-gitButton =
-    a
-        [ href "https://github.com/HadrienMP/mob-time-elm"
-        , id "git"
-        , target "blank"
-        ]
-        [ i [ class "fab fa-github" ] []
-        , text "Fork me on github!"
         ]

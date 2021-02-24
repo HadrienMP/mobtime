@@ -3,6 +3,7 @@ module Login exposing (..)
 -- MODEL
 
 import Browser.Navigation as Nav
+import Footer
 import Html exposing (Html, button, div, form, h1, header, i, input, label, text)
 import Html.Attributes exposing (class, for, id, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
@@ -54,22 +55,27 @@ view model =
             [ h1 [] [ text "Mob Time" ]
             ]
         , form [ onSubmit JoinMob ]
-            [ label [ for "mob-name" ] []
-            , input
-                [ id "mob-name"
-                , type_ "text"
-                , onInput MobNameChanged
-                , placeholder "My Mob Name"
-                , required True
-                , Html.Attributes.min "4"
-                , Html.Attributes.max "50"
-                , value model.mobName
+            [ div [ class "form-field" ]
+                [ label
+                    [ for "mob-name" ]
+                    [ text "What's your mob?" ]
+                , input
+                    [ id "mob-name"
+                    , type_ "text"
+                    , onInput MobNameChanged
+                    , placeholder "Awesome"
+                    , required True
+                    , Html.Attributes.min "4"
+                    , Html.Attributes.max "50"
+                    , value model.mobName
+                    ]
+                    []
                 ]
-                []
             , button
                 [ type_ "submit" ]
-                [ text "Join"
-                , i [ class "fas fa-paper-plane" ] []
+                [ i [ class "fas fa-paper-plane" ] []
+                , text "Join"
                 ]
             ]
+        , Footer.view
         ]

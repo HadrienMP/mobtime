@@ -1,3 +1,5 @@
+@import "../theme";
+
 #timer {
   label {
     flex: 0 0 138px;
@@ -6,6 +8,7 @@
   .form-field {
     label {
       flex: 1 1;
+      margin-right: $margin-space;
       & + * {
         flex: 2 2;
       }
