@@ -118,6 +118,28 @@ hr {
 }
 
 #home.tab {
+
+  .mobber-roles {
+    border-top: 1px solid $dark-button-color;
+    padding: 10px 0;
+    margin-top: 10px;
+
+    .mobber-role {
+      display: flex;
+      align-items: center;
+
+      .role {
+        flex: 1 1;
+      }
+
+      .mobber {
+        flex: 2 2;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+    }
+  }
+
   a#git {
     margin: 10px 0;
     padding: 10px;

@@ -224,7 +224,7 @@ view model url =
                     |> Html.map ShareMsg
 
             Mob.Tabs.Tabs.Home ->
-                Mob.Tabs.Home.view model.name url |> Html.map HomeMsg
+                Mob.Tabs.Home.view model.name url model.mobbers |> Html.map HomeMsg
         ]
 
 

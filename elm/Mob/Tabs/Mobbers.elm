@@ -59,7 +59,7 @@ update msg model =
             )
 
         AddMobber ->
-            ( { model | newMobberName = "", mobbers = model.mobbers ++ [ model.newMobberName ] }
+            ( { model | newMobberName = "", mobbers = model.mobbers ++ [ capitalize model.newMobberName ] }
             , Cmd.none
             )
 
@@ -128,14 +128,14 @@ view model =
         , div [] (rotateButton model ++ shuffleButton model)
         , ul
             []
-            (assignRoles model.mobbers model.roles
+            (mobberRoles model
                 |> List.map
                     (\mobber ->
                         li []
                             [ p [] [ text mobber.role ]
                             , div
                                 []
-                                [ input [ type_ "text", value <| capitalize mobber.name ] []
+                                [ input [ type_ "text", value mobber.name ] []
                                 , button [ onClick <| DeleteMobber mobber.name ] [ i [ class "fas fa-times" ] [] ]
                                 ]
                             ]
@@ -168,10 +168,10 @@ capitalize string =
         ++ (String.dropLeft 1 string |> String.toLower)
 
 
-assignRoles : Mobbers -> Roles -> List MobberRole
-assignRoles mobbers roles =
-    List.indexedMap Tuple.pair mobbers
-        |> List.map (\( i, name ) -> { role = getRole i roles, name = name })
+mobberRoles : Model -> List MobberRole
+mobberRoles model =
+    List.indexedMap Tuple.pair model.mobbers
+        |> List.map (\( i, name ) -> { role = getRole i model.roles, name = name })
 
 
 getRole : Int -> Roles -> String
@@ -181,3 +181,7 @@ getRole index roles =
         |> List.map Tuple.second
         |> List.head
         |> Maybe.withDefault "Mobber"
+
+specificRole : MobberRole -> Bool
+specificRole mobberRole =
+    mobberRole.role /= "Mobber"

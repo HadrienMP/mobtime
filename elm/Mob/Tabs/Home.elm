@@ -1,8 +1,9 @@
 module Mob.Tabs.Home exposing (..)
 
-import Html exposing (Html, a, button, div, i, span, strong, text)
-import Html.Attributes exposing (class, href, id, title)
+import Html exposing (Html, a, button, dd, div, dl, dt, i, li, span, strong, text, ul)
+import Html.Attributes exposing (class, href, id, target, title)
 import Html.Events exposing (onClick)
+import Mob.Tabs.Mobbers as Mobbers
 import Out.Commands
 import Url
 
@@ -20,18 +21,13 @@ update msg =
                 |> Out.Commands.send
 
 
-view : String -> Url.Url -> Html Msg
-view mobName url =
+view : String -> Url.Url -> Mobbers.Model -> Html Msg
+view mobName url mobbers =
     div
         [ id "home", class "tab" ]
         [ shareButton mobName url
-        , a
-            [ href "https://github.com/HadrienMP/mob-time-elm"
-            , id "git"
-            ]
-            [ i [ class "fab fa-github" ] []
-            , text "Fork me on github!"
-            ]
+        , roles mobbers
+        , gitButton
         ]
 
 
@@ -53,4 +49,39 @@ shareText mob =
         [ text "You are in the "
         , strong [] [ text mob ]
         , text " mob"
+        ]
+
+
+roles : Mobbers.Model -> Html msg
+roles mobbers =
+    Mobbers.mobberRoles mobbers
+        |> List.filter Mobbers.specificRole
+        |> List.map roleView
+        |> (\list ->
+                case list of
+                    [] ->
+                        div [] []
+
+                    _ ->
+                        ul [ class "mobber-roles" ] list
+           )
+
+
+roleView : Mobbers.MobberRole -> Html msg
+roleView mobberRole =
+    li [ class "mobber-role" ]
+        [ span [ class "role" ] [ text mobberRole.role ]
+        , span [ class "mobber" ] [ text mobberRole.name ]
+        ]
+
+
+gitButton : Html Msg
+gitButton =
+    a
+        [ href "https://github.com/HadrienMP/mob-time-elm"
+        , id "git"
+        , target "blank"
+        ]
+        [ i [ class "fab fa-github" ] []
+        , text "Fork me on github!"
         ]
