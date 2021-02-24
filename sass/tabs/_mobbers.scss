@@ -13,9 +13,25 @@
     }
   }
 
+  .actions {
+    display: flex;
+    margin: 10px 0;
+
+    button {
+      flex: 1 1;
+      padding: 8px;
+      margin-left: 2px;
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+
   ul {
     li {
       margin: 20px 0;
+
       p {
         font-size: .8em;
         margin-bottom: 5px;

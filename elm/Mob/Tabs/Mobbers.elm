@@ -1,9 +1,9 @@
 module Mob.Tabs.Mobbers exposing (..)
 
-import Mob.Clock.Events
 import Html exposing (Html, button, div, form, i, input, li, p, text, ul)
 import Html.Attributes exposing (class, id, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Mob.Clock.Events
 import Random
 import Random.List
 
@@ -125,7 +125,7 @@ view model =
             [ input [ type_ "text", placeholder "Mobber name", onInput NewMobberNameChanged, value model.newMobberName ] []
             , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
             ]
-        , div [] (rotateButton model ++ shuffleButton model)
+        , div [ class "actions" ] (rotateButton model ++ shuffleButton model)
         , ul
             []
             (mobberRoles model
@@ -147,7 +147,12 @@ view model =
 rotateButton : Model -> List (Html Msg)
 rotateButton model =
     if List.length model.mobbers > 1 then
-        [ button [ onClick Rotate ] [ text "Rotate" ] ]
+        [ button
+            [ onClick Rotate ]
+            [ i [ class "fas fa-redo" ] []
+            , text " | Rotate"
+            ]
+        ]
 
     else
         []
@@ -156,7 +161,12 @@ rotateButton model =
 shuffleButton : Model -> List (Html Msg)
 shuffleButton model =
     if List.length model.mobbers > 2 then
-        [ button [ onClick Shuffle ] [ text "Shuffle" ] ]
+        [ button
+            [ onClick Shuffle ]
+            [ i [ class "fas fa-random" ] []
+            , text " | Shuffle"
+            ]
+        ]
 
     else
         []
@@ -181,6 +191,7 @@ getRole index roles =
         |> List.map Tuple.second
         |> List.head
         |> Maybe.withDefault "Mobber"
+
 
 specificRole : MobberRole -> Bool
 specificRole mobberRole =
