@@ -10,7 +10,7 @@ app.get('*', (req, res) => {
 })
 
 const https = require('https');
-https.createServer(require('https-local').options(), app).listen(3000, () => {
+https.createServer(require('https-local').options(), app).listen(port, () => {
     console.log(`Live at https://0.0.0.0:${port}`)
 })
 
