@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gem install compass --local
+          gem install --user-install compass
           compass compile
           elm --version
           npm install -g release-it
