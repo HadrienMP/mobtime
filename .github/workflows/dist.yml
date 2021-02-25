@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Install Elm
-        uses: jorelali/setup-elm@v2
-        with:
-          elm-version: 0.19.1
+#      - name: Install Elm
+#        uses: jorelali/setup-elm@v2
+#        with:
+#          elm-version: 0.19.1
 
       - name: Install Node
         uses: actions/setup-node@v1
