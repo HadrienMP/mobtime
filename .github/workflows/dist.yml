@@ -29,9 +29,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir bin
-          mv elm bin
+          mv elm bin/
           export PATH=${PWD}/bin:$PATH
           echo $PATH
-          which elm
           npm install -g release-it
           npm run release
