@@ -39,5 +39,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          elm --version
           npm install -g release-it
           npm run release
