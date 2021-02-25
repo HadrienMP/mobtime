@@ -29,10 +29,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir bin
-          mv elm bin/
-          export PATH=${PWD}/bin:$PATH
-          echo $PATH
-          ls -alsh bin
-          bin/elm
+          cd bin
+          curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
+          chmod +x elm
+          export PATH=${PWD}:$PATH
+          cd -
+          ls 0a
           npm install -g release-it
           npm run release
