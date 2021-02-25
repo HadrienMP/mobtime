@@ -4,7 +4,6 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "npm run prod:build-front",
 		"start": "npm run prod:server",
 		"prod:build-front": "./elm-make.sh",
 		"prod:server": "node server/app.js",
