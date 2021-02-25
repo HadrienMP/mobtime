@@ -24,7 +24,9 @@ jobs:
           git config user.name "HadrienMP"
           git config user.email "github@hadrienmp.fr"
 
-      - name : Install Elm
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir bin
           cd bin
@@ -33,11 +35,6 @@ jobs:
           chmod +x elm
           export PATH=${PWD}:$PATH
           cd -
-
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
           export PATH=/home/runner/.gem/ruby/2.5.0/bin:$PATH
           gem install --user-install compass
           compass compile
