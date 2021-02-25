@@ -24,9 +24,7 @@ jobs:
           git config user.name "HadrienMP"
           git config user.email "github@hadrienmp.fr"
 
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name : Install Elm
         run: |
           mkdir bin
           cd bin
@@ -35,6 +33,10 @@ jobs:
           chmod +x elm
           export PATH=${PWD}:$PATH
           cd -
-          ls 0a
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
           npm install -g release-it
           npm run release
