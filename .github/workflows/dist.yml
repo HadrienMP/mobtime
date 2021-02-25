@@ -33,6 +33,7 @@ jobs:
           chmod +x elm
           export PATH=${PWD}:$PATH
           cd -
+          elm --version
 
       - name: Release
         env:
