@@ -29,5 +29,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export PATH=${pwd}:$PATH
+          ls -alsh
           npm install -g release-it
           npm run release
