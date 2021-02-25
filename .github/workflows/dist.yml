@@ -38,6 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          export PATH=/home/runner/.gem/ruby/2.5.0/bin:$PATH
           gem install --user-install compass
           compass compile
           elm --version
