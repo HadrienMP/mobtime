@@ -32,6 +32,7 @@ jobs:
           mv elm bin/
           export PATH=${PWD}/bin:$PATH
           echo $PATH
-          ./bin/elm
+          ll bin
+          bin/elm
           npm install -g release-it
           npm run release
