@@ -37,6 +37,5 @@ jobs:
           cd -
           echo $PATH
           elm --version
-          elm --version
           npm install -g release-it
           npm run release

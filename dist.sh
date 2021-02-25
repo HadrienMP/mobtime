@@ -1,2 +1,3 @@
 ./elm-make.sh
-zip -r dist.zip ./public/*
+mkdir dist
+zip -r dist/dist.zip ./public/*
