@@ -1,4 +1,4 @@
 ./elm-make.sh
 cd public || exit
-mkdir dist
+mkdir ../dist
 zip -r ../dist/dist.zip ./*
