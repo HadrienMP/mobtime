@@ -14,6 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install Elm
+        uses: jorelali/setup-elm@v2
+        with:
+          elm-version: 0.19.1
+
       - name: Install Node
         uses: actions/setup-node@v1
         with:
@@ -28,13 +33,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir bin
-          cd bin
-          curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
-          gunzip elm.gz
-          chmod +x elm
-          export PATH=${PWD}:$PATH
-          cd -
           export PATH=/home/runner/.gem/ruby/2.5.0/bin:$PATH
           gem install --user-install compass
           compass compile
