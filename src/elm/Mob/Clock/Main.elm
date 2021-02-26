@@ -6,16 +6,17 @@ import Mob.Clock.Circle
 import Mob.Clock.Events exposing (Event(..))
 import Mob.Clock.Settings
 import Svg exposing (Svg)
+import Time
 
 
 type Model
     = Off
-    | On { timeLeft : Duration, length : Duration }
+    | On { timeLeft : Duration, length : Duration, start: Time.Posix }
 
 
 start : Duration -> Model
 start duration =
-    On { timeLeft = duration, length = duration }
+    On { timeLeft = duration, length = duration, start = Time.millisToPosix 0 }
 
 
 timePassed : Model -> Mob.Clock.Settings.Model -> UpdateResult
