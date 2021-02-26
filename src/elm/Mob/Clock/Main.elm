@@ -6,6 +6,7 @@ import Mob.Clock.Circle
 import Mob.Clock.Events exposing (Event(..))
 import Mob.Clock.Settings
 import Svg exposing (Svg)
+import Task
 import Time
 
 
@@ -14,13 +15,13 @@ type Model
     | On { timeLeft : Duration, length : Duration, start: Time.Posix }
 
 
-start : Duration -> Model
-start duration =
-    On { timeLeft = duration, length = duration, start = Time.millisToPosix 0 }
+start : Time.Posix -> Duration -> Model
+start now duration =
+    On { timeLeft = duration, length = duration, start = now }
 
 
-timePassed : Model -> Mob.Clock.Settings.Model -> UpdateResult
-timePassed model settings =
+timePassed : Time.Posix -> Model -> UpdateResult
+timePassed now model =
     case model of
         Off ->
             { model = model
@@ -31,7 +32,7 @@ timePassed model settings =
         On on ->
             let
                 timeLeft =
-                    Duration.subtract on.timeLeft (Mob.Clock.Settings.seconds settings)
+                    Duration.subtract on.length (Duration.between on.start now)
             in
             if Duration.toSeconds timeLeft <= 0 then
                 { model = Off
@@ -53,6 +54,7 @@ timePassed model settings =
 type Msg
     = StartRequest
     | StopRequest
+    | StartWithTime Time.Posix
 
 
 type alias UpdateResult =
@@ -63,10 +65,13 @@ update : Msg -> Model -> Duration -> UpdateResult
 update msg model length =
     case ( msg, model ) of
         ( StartRequest, Off ) ->
-            { model = start length, command = Cmd.none, event = Just Started }
+            { model = model, command = Task.perform StartWithTime Time.now, event = Nothing }
 
         ( StopRequest, On _ ) ->
             { model = Off, command = Cmd.none, event = Nothing }
+
+        (StartWithTime now, Off) ->
+            { model = start now length, command = Cmd.none, event = Just Started }
 
         _ ->
             { model = model, command = Cmd.none, event = Nothing }

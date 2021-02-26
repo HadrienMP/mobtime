@@ -76,13 +76,13 @@ type alias UpdateResult =
 update : Msg -> Model -> UpdateResult
 update msg model =
     case msg of
-        TimePassed _ ->
+        TimePassed now ->
             let
                 pomodoroResult =
-                    Pomodoro.timePassed model.pomodoroClock model.timerSettings
+                    Pomodoro.timePassed now model.pomodoroClock
 
                 ( clock, cmd ) =
-                    Clock.timePassed model.mobClock model.timerSettings
+                    Clock.timePassed now model.mobClock
                         |> handleClockResult model
                         |> Tuple.mapSecond Cmd.batch
             in

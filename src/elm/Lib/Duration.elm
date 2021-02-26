@@ -1,8 +1,18 @@
 module Lib.Duration exposing (..)
 
+import Time
+
 
 type Duration
     = Duration Int
+
+
+between : Time.Posix -> Time.Posix -> Duration
+between a b =
+    ( a, b )
+        |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
+        |> (\( a2, b2 ) -> (b2 - a2) // 1000)
+        |> ofSeconds
 
 
 div : Duration -> Duration -> Float

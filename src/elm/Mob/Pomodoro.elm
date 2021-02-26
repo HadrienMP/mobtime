@@ -7,6 +7,8 @@ import Mob.Clock.Events
 import Mob.Clock.Main as Clock
 import Mob.Clock.Settings as ClockSettings
 import Svg exposing (Svg)
+import Task
+import Time
 
 
 type Model
@@ -22,6 +24,7 @@ init =
 
 type Msg
     = Start
+    | StartWithTime Time.Posix
     | Stop
     | BreakTaken
 
@@ -31,13 +34,13 @@ type alias TimePassedResult =
     , toasts: Lib.Toast.Toasts
     }
 
-timePassed : Model -> ClockSettings.Model -> TimePassedResult
-timePassed model settings =
+timePassed : Time.Posix -> Model -> TimePassedResult
+timePassed now model =
     case model of
         Working clockModel ->
             let
                 result =
-                    Clock.timePassed clockModel settings
+                    Clock.timePassed now clockModel
             in
             case result.event of
                 Just Mob.Clock.Events.Finished ->
@@ -54,7 +57,10 @@ update : Msg -> Model -> Duration -> ( Model, Cmd Msg )
 update msg model duration =
     case ( msg, model ) of
         ( Start, Ready ) ->
-            ( Working <| Clock.start duration, Cmd.none )
+            ( model, Task.perform StartWithTime Time.now )
+
+        ( StartWithTime now, Ready ) ->
+            ( Working <| Clock.start now duration, Cmd.none )
 
         ( Stop, Working _ ) ->
             ( OnABreak, Cmd.none )
