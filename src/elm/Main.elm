@@ -54,7 +54,7 @@ init maybePreference url key =
       , pageModel = Pages.pageOf url userPreference
       , toasts = Lib.Toast.init
       }
-    , Out.Commands.send <| Out.Commands.ChangeVolume userPreference.volume
+    , Cmd.none
     )
 
 
@@ -87,11 +87,12 @@ update msg model =
 
         ( _, UrlChanged url ) ->
             let
-                ( session, pageModel ) =
+                ( session, pageModel, pageCommand ) =
                     Pages.urlChanged url model.session model.userPreferences
+
             in
             ( { model | session = session, pageModel = pageModel }
-            , Cmd.none
+            , pageCommand
             )
 
         ( Pages.LoginModel loginModel, LoginMsg loginMsg ) ->

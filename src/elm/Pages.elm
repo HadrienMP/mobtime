@@ -1,6 +1,7 @@
 module Pages exposing (..)
 
 import Browser.Navigation as Nav
+import Lib.Toast
 import Login
 import Mob.Main
 import Url
@@ -16,7 +17,6 @@ type Page
     = Login
     | Mob String
 
-
 type alias Session =
     { key : Nav.Key
     , url : Url.Url
@@ -28,9 +28,12 @@ pushUrl url session =
     Nav.pushUrl session.key (Url.toString url)
 
 
-urlChanged : Url.Url -> Session -> UserPreferences.Model -> (Session, PageModel)
+urlChanged : Url.Url -> Session -> UserPreferences.Model -> (Session, PageModel, Cmd msg)
 urlChanged url session userPreferences =
-    ({ session | url = url }, pageOf url userPreferences)
+    let
+        model = pageOf url userPreferences
+    in
+    ({ session | url = url }, model, Cmd.none)
 
 
 pageOf : Url.Url -> UserPreferences.Model -> PageModel
@@ -40,11 +43,15 @@ pageOf url userPreferences=
         |> (\page ->
             case page of
                 Login ->
-                    LoginModel Login.init
+                    Login.init
+                    |> Tuple.first
+                    |> LoginModel
 
 
                 Mob name ->
-                    MobModel <| Mob.Main.init name userPreferences
+                    Mob.Main.init name userPreferences
+                    |> Tuple.first
+                    |> MobModel
         )
 
 

@@ -7,6 +7,7 @@ import Footer
 import Html exposing (Html, button, div, form, h1, header, i, input, label, text)
 import Html.Attributes exposing (class, for, id, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
+import Out.Commands
 
 
 type alias Model =
@@ -14,9 +15,11 @@ type alias Model =
     }
 
 
-init : Model
+init : (Model, Cmd Msg)
 init =
-    { mobName = "" }
+    ( { mobName = "" }
+    , Cmd.none
+    )
 
 
 
@@ -35,7 +38,9 @@ update model msg navKey =
             ( { model | mobName = name }, Cmd.none )
 
         JoinMob ->
-            ( model, Nav.pushUrl navKey <| "/mob/" ++ model.mobName )
+            ( model
+            , Nav.pushUrl navKey <| "/mob/" ++ model.mobName
+            )
 
 
 

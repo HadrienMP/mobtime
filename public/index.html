@@ -15,7 +15,7 @@
 <body>
 
 <pre id="elm"></pre>
-
+<script src="/socket.io/socket.io.js"></script>
 <script src="/js/main.js"></script>
 <script>
     let app = Elm.Main.init(
@@ -25,12 +25,21 @@
         }
     )
 
+    const socket = io();
+    socket.on('message', app.ports.events.send);
+
     const audio = document.createElement("audio")
     document.body.appendChild(audio);
     audio.onended = () => app.ports.events.send({name: 'SoundEnded', value: ""});
 
     app.ports.commands.subscribe(command => {
         switch (command.name) {
+            case 'JoinMob':
+                socket.emit('join', command.value);
+                break;
+            case 'Message':
+                socket.emit('message', command.value);
+                break;
             case 'CopyInPasteBin':
                 navigator.clipboard
                     .writeText(command.value)

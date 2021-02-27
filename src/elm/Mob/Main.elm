@@ -14,6 +14,7 @@ import Mob.Tabs.Home
 import Mob.Tabs.Mobbers
 import Mob.Tabs.Share
 import Mob.Tabs.Tabs
+import Out.Commands
 import Out.EventsMapping as EventsMapping exposing (EventsMapping)
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
@@ -37,16 +38,18 @@ type alias Model =
     }
 
 
-init : String -> UserPreferences.Model -> Model
+init : String -> UserPreferences.Model -> ( Model, Cmd Msg )
 init name userPreferences =
-    { name = name
-    , tab = Mob.Tabs.Tabs.default
-    , timerSettings = Mob.Clock.Settings.init
-    , mobbers = Mob.Tabs.Mobbers.init
-    , mobClock = Clock.Off
-    , pomodoroClock = Pomodoro.Ready
-    , sound = Sound.init userPreferences.volume
-    }
+    ( { name = name
+      , tab = Mob.Tabs.Tabs.default
+      , timerSettings = Mob.Clock.Settings.init
+      , mobbers = Mob.Tabs.Mobbers.init
+      , mobClock = Clock.Off
+      , pomodoroClock = Pomodoro.Ready
+      , sound = Sound.init userPreferences.volume
+      }
+    , Out.Commands.send <| Out.Commands.JoinMob name
+    )
 
 
 
@@ -139,7 +142,6 @@ update msg model =
         HomeMsg homeMsg ->
             ( model, Mob.Tabs.Home.update homeMsg |> Cmd.map HomeMsg )
                 |> (\( m, c ) -> UpdateResult m c [])
-
 
 
 handleClockResult : Model -> Clock.UpdateResult -> ( Model, List (Cmd Msg) )

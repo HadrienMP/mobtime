@@ -5,6 +5,7 @@ import Lib.Ratio as Ratio exposing (Ratio)
 import Mob.Clock.Circle
 import Mob.Clock.Events exposing (Event(..))
 import Mob.Clock.Settings
+import Out.Commands
 import Svg exposing (Svg)
 import Task
 import Time
@@ -71,7 +72,10 @@ update msg model length =
             { model = Off, command = Cmd.none, event = Nothing }
 
         (StartWithTime now, Off) ->
-            { model = start now length, command = Cmd.none, event = Just Started }
+            { model = start now length
+            , command = Out.Commands.send <| Out.Commands.StartTurn now length
+            , event = Just Started
+            }
 
         _ ->
             { model = model, command = Cmd.none, event = Nothing }
