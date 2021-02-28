@@ -11,7 +11,10 @@ io.on('connection', (socket) => {
         console.log(`Someone joined the ${room} room`);
         return socket.join(room);
     });
-    socket.on('message', (room, message) => socket.to(room).emit('message', message));
+    socket.on('message', (room, message) => {
+        console.log(`${room}: ${JSON.stringify(message)}`)
+        return socket.to(room).emit('message', message);
+    });
     socket.on('disconnect', () => console.log('user disconnected'));
 });
 

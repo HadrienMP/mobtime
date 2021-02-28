@@ -32,13 +32,15 @@
     document.body.appendChild(audio);
     audio.onended = () => app.ports.events.send({name: 'SoundEnded', value: ""});
 
+    let room = '';
     app.ports.commands.subscribe(command => {
         switch (command.name) {
             case 'JoinMob':
-                socket.emit('join', command.value);
+                room = command.value;
+                socket.emit('join', room);
                 break;
             case 'Message':
-                socket.emit('message', command.value);
+                socket.emit('message', room, command.value);
                 break;
             case 'CopyInPasteBin':
                 navigator.clipboard

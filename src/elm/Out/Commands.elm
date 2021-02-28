@@ -51,8 +51,13 @@ send command =
                 OutCommand "JoinMob" <| Json.Encode.string mobName
 
             StartTurn now length ->
-                OutCommand "StartTurn" <|
+                OutCommand "Message" <|
                     Json.Encode.object
-                        [ ( "now", Json.Encode.int <| Time.posixToMillis now )
-                        , ( "length", Json.Encode.int <| Duration.toSeconds length )
+                        [ ( "name", Json.Encode.string "StartTurn" )
+                        , ( "data"
+                          , Json.Encode.object
+                                [ ( "now", Json.Encode.int <| Time.posixToMillis now )
+                                , ( "length", Json.Encode.int <| Duration.toSeconds length )
+                                ]
+                          )
                         ]
