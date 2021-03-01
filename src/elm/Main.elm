@@ -1,22 +1,28 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Lib.BatchMsg
-import Lib.Toast
-import Out.Events
-import Out.EventsMapping as EventsMapping exposing (EventsMapping)
-import Pages
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
+import Json.Decode
+import Json.Encode
+import Task
+import Time
 import Url
-import UserPreferences
+
+
+port sendEvent : Json.Encode.Value -> Cmd msg
+
+
+port receiveEvent : (Json.Encode.Value -> msg) -> Sub msg
 
 
 
 -- MAIN
 
 
-main : Program (Maybe UserPreferences.Model) Model Msg
+main : Program () Model Msg
 main =
     Browser.application
         { init = init
@@ -32,25 +38,53 @@ main =
 -- MODEL
 
 
+type Event
+    = StartedAt Time.Posix
+    | Stopped
+
+
+decodeEvent : Json.Decode.Value -> Result Json.Decode.Error Event
+decodeEvent value =
+    Json.Decode.field "name" Json.Decode.string
+        |> Json.Decode.andThen
+            (\a ->
+                case a of
+                    "StartedAt" ->
+                        Json.Decode.field "start" Json.Decode.int
+                            |> Json.Decode.map
+                                (\ms -> StartedAt <| Time.millisToPosix ms)
+
+                    _ ->
+                        Json.Decode.fail <| "I don't know this event " ++ a
+            )
+        |> (\decoder -> Json.Decode.decodeValue decoder value)
+
+
+encodeEvent : Event -> Json.Encode.Value
+encodeEvent event =
+    Json.Encode.object <|
+        case event of
+            StartedAt now ->
+                [ ( "name", Json.Encode.string "StartedAt" )
+                , ( "start", Json.Encode.int <| Time.posixToMillis now )
+                ]
+
+            Stopped ->
+                [ ( "name", Json.Encode.string "Stopped" ) ]
+
+
 type alias Model =
-    { session : Pages.Session
-    , toasts : Lib.Toast.Toasts
+    { history : List Event
+    , now : Time.Posix
     }
 
 
-init : Maybe UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init maybePreference url key =
-    let
-        userPreference =
-            Maybe.withDefault UserPreferences.default maybePreference
-
-        ( session, command ) =
-            Pages.init key url userPreference
-    in
-    ( { session = session
-      , toasts = Lib.Toast.init
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init _ _ _ =
+    ( { history = []
+      , now = Time.millisToPosix 0
       }
-    , command |> Cmd.map PageMsg
+    , Task.perform TimePassed Time.now
     )
 
 
@@ -61,51 +95,38 @@ init maybePreference url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | PageMsg Pages.Msg
-    | Batch (List Msg)
-    | ToastMsg Lib.Toast.Msg
+    | SendEvent Event
+    | ReceiveEvent (Result Json.Decode.Error Event)
+    | TimePassed Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Batch messages ->
-            Lib.BatchMsg.update messages model update
+        LinkClicked _ ->
+            ( model, Cmd.none )
 
-        LinkClicked urlRequest ->
-            case urlRequest of
-                Browser.Internal url ->
-                    ( model, Pages.pushUrl url model.session )
+        UrlChanged _ ->
+            ( model, Cmd.none )
 
-                Browser.External href ->
-                    ( model, Nav.load href )
-
-        UrlChanged url ->
-            Pages.urlChanged url model.session
-                |> Tuple.mapBoth
-                    (\session -> { model | session = session })
-                    (Cmd.map PageMsg)
-
-        PageMsg pageMsg ->
-            let
-                ( session, command, toasts ) =
-                    Pages.update pageMsg model.session
-
-                ( allToasts, commands ) =
-                    Lib.Toast.add toasts model.toasts
-            in
-            ( { model
-                | session = session
-                , toasts = allToasts
-              }
-            , Cmd.batch <| (command |> Cmd.map PageMsg) :: (commands |> List.map (Cmd.map ToastMsg))
+        SendEvent event ->
+            ( model
+            , sendEvent <| encodeEvent event
             )
 
-        ToastMsg toastMsg ->
-            Lib.Toast.update toastMsg model.toasts
-                |> Tuple.mapBoth
-                    (\it -> { model | toasts = it })
-                    (Cmd.map ToastMsg)
+        ReceiveEvent result ->
+            case result of
+                Ok event ->
+                    ( { model | history = event :: model.history }
+                    , Cmd.none
+                    )
+                Err _ ->
+                    ( model, Cmd.none )
+
+        TimePassed now ->
+            ( { model | now = now }
+            , Cmd.none
+            )
 
 
 
@@ -115,21 +136,11 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Pages.subscriptions |> Sub.map PageMsg
-        , Out.Events.events (dispatch eventsMapping)
-        ]
-
-
-dispatch : EventsMapping Msg -> Out.Events.Event -> Msg
-dispatch mapping event =
-    Batch <| EventsMapping.dispatch event mapping
-
-
-eventsMapping : EventsMapping Msg
-eventsMapping =
-    EventsMapping.batch
-        [ EventsMapping.map PageMsg Pages.eventsMapping
-        , EventsMapping.map ToastMsg Lib.Toast.eventsMapping
+        [ Time.every 1000 TimePassed
+        , receiveEvent
+            (\json ->
+                ReceiveEvent <| decodeEvent json
+            )
         ]
 
 
@@ -139,9 +150,54 @@ eventsMapping =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = Pages.pageTitle model.session
+    let
+        toto =
+            blah model.now <| List.head model.history
+    in
+    { title = "Mob Time"
     , body =
-        [ Pages.pageBody model.session |> Html.map PageMsg
-        , Lib.Toast.view model.toasts |> Html.map ToastMsg
+        [ header []
+            [ section []
+                [ button
+                    [ id "action"
+                    , class toto.class
+                    , onClick toto.message
+                    ]
+                    [ i [ class <| "fas " ++ toto.icon ] []
+                    , span [ id "time-left" ] [ text toto.text ]
+                    ]
+                ]
+            ]
         ]
     }
+
+
+type alias Toto =
+    { icon : String
+    , message : Msg
+    , text : String
+    , class : String
+    }
+
+
+blah : Time.Posix -> Maybe Event -> Toto
+blah now maybeEvent =
+    case maybeEvent of
+        Just (StartedAt start) ->
+            { icon = "fa-square"
+            , message = SendEvent Stopped
+            , class = "on"
+            , text =
+                ( now, start )
+                    |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
+                    |> (\( a, b ) -> b + (2 * 60 * 1000) - a)
+                    |> (\a -> a // 1000)
+                    |> (\a -> String.fromInt a ++ " s")
+            }
+
+        _ ->
+            { icon = "fa-play"
+            , message = SendEvent <| StartedAt now
+            , class = "off"
+            , text = ""
+            }

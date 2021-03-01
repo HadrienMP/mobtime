@@ -15,53 +15,22 @@
 <body>
 
 <pre id="elm"></pre>
-<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <script src="/js/main.js"></script>
 <script>
-    let app = Elm.Main.init(
+    const gun = Gun();
+
+    const app = Elm.Main.init(
         {
             node: document.getElementById('elm'),
-            flags: JSON.parse(window.localStorage.getItem("preferences"))
         }
     )
 
-    const socket = io();
-    socket.on('message', app.ports.events.send);
-
-    const audio = document.createElement("audio")
-    document.body.appendChild(audio);
-    audio.onended = () => app.ports.events.send({name: 'SoundEnded', value: ""});
-
-    let room = '';
-    app.ports.commands.subscribe(command => {
-        switch (command.name) {
-            case 'JoinMob':
-                room = command.value;
-                socket.emit('join', room);
-                break;
-            case 'Message':
-                socket.emit('message', room, command.value);
-                break;
-            case 'CopyInPasteBin':
-                navigator.clipboard
-                    .writeText(command.value)
-                    .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
-                break;
-            case 'ChangeVolume':
-                window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
-                audio.volume = parseInt(command.value) / 100.0;
-                break;
-            case 'ChangeSound':
-                audio.src = "/sound/" + command.value;
-                break;
-            case 'SoundPlay':
-                audio.play();
-                break;
-            case 'SoundStop':
-                audio.pause();
-                break;
-        }
+    app.ports.sendEvent.subscribe(event => {
+        gun.get("mobtime").put(event);
     });
+
+    gun.get("mobtime").on((key, data) => app.ports.receiveEvent.send(data))
 </script>
 </body>
 </html>
