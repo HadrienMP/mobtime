@@ -2,6 +2,7 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Events
 import Html exposing (..)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
@@ -39,47 +40,6 @@ main =
 
 -- MODEL
 
-
-type Event
-    = Started { start: Time.Posix, alarm: Sound.Library.Sound }
-    | Stopped
-
-
-decodeEvent : Json.Decode.Value -> Result Json.Decode.Error Event
-decodeEvent value =
-    Json.Decode.field "name" Json.Decode.string
-        |> Json.Decode.andThen
-            (\a ->
-                case a of
-                    "Started" ->
-                        Json.Decode.map2 (\start alarm -> Started {start = start, alarm = alarm})
-                        (Json.Decode.field "start" Json.Decode.int
-                            |> Json.Decode.map Time.millisToPosix)
-                        (Json.Decode.field "alarm" Json.Decode.string)
-
-                    "Stopped" ->
-                        Json.Decode.succeed Stopped
-
-                    _ ->
-                        Json.Decode.fail <| "I don't know this event " ++ a
-            )
-        |> (\decoder -> Json.Decode.decodeValue decoder value)
-
-
-encodeEvent : Event -> Json.Encode.Value
-encodeEvent event =
-    Json.Encode.object <|
-        case event of
-            Started started ->
-                [ ( "name", Json.Encode.string "Started" )
-                , ( "start", Json.Encode.int <| Time.posixToMillis started.start )
-                , ( "alarm", Json.Encode.string started.alarm )
-                ]
-
-            Stopped ->
-                [ ( "name", Json.Encode.string "Stopped" ) ]
-
-
 type State
     = Off
     | On { start : Time.Posix }
@@ -107,8 +67,8 @@ init _ _ _ =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | SendEvent Event
-    | ReceiveEvent (Result Json.Decode.Error Event)
+    | SendEvent Events.Event
+    | ReceiveEvent (Result Json.Decode.Error Events.Event)
     | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
@@ -125,7 +85,7 @@ update msg model =
 
         SendEvent event ->
             ( model
-            , sendEvent <| encodeEvent event
+            , sendEvent <| Events.toJson event
             )
 
         ReceiveEvent result ->
@@ -148,17 +108,17 @@ update msg model =
 
         StartWithAlarm sound ->
             ( model
-            , sendEvent <| encodeEvent <| Started {start = model.now, alarm = sound}
+            , sendEvent <| Events.toJson <| Events.Started { start = model.now, alarm = sound }
             )
 
 
-apply : Event -> State -> State
+apply : Events.Event -> State -> State
 apply event state =
     case ( event, state ) of
-        ( Started start, Off ) ->
+        ( Events.Started start, Off ) ->
             On { start = start.start }
 
-        ( Stopped, On _ ) ->
+        ( Events.Stopped, On _ ) ->
             Off
 
         _ ->
@@ -175,7 +135,7 @@ subscriptions _ =
         [ Time.every 1000 TimePassed
         , receiveEvent
             (\json ->
-                ReceiveEvent <| decodeEvent json
+                ReceiveEvent <| Events.fromJson json
             )
         ]
 
@@ -217,11 +177,11 @@ type alias Toto =
 
 
 blah : Time.Posix -> State -> Toto
-blah now maybeEvent =
-    case maybeEvent of
+blah now state =
+    case state of
         On on ->
             { icon = "fa-square"
-            , message = SendEvent Stopped
+            , message = SendEvent Events.Stopped
             , class = "on"
             , text =
                 ( now, on.start )
