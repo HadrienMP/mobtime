@@ -108,15 +108,15 @@ update msg model =
 
         StartWithAlarm sound ->
             ( model
-            , sendEvent <| Events.toJson <| Events.Started { start = model.now, alarm = sound }
+            , sendEvent <| Events.toJson <| Events.Started { time = model.now, alarm = sound }
             )
 
 
 apply : Events.Event -> State -> State
 apply event state =
     case ( event, state ) of
-        ( Events.Started start, Off ) ->
-            On { start = start.start }
+        ( Events.Started started, Off ) ->
+            On { start = started.time }
 
         ( Events.Stopped, On _ ) ->
             Off

@@ -7,7 +7,7 @@ import Time
 
 
 type Event
-    = Started { start : Time.Posix, alarm : Sound.Library.Sound }
+    = Started { time : Time.Posix, alarm : Sound.Library.Sound }
     | Stopped
 
 
@@ -42,8 +42,8 @@ decoderFromName eventName =
 startedDecoder : Json.Decode.Decoder Event
 startedDecoder =
     Json.Decode.map2
-        (\start alarm -> Started { start = start, alarm = alarm })
-        (Json.Decode.field "start" timeDecoder)
+        (\start alarm -> Started { time = start, alarm = alarm })
+        (Json.Decode.field "time" timeDecoder)
         (Json.Decode.field "alarm" Json.Decode.string)
 
 
@@ -62,7 +62,7 @@ toJson event =
         case event of
             Started started ->
                 [ ( "name", Json.Encode.string "Started" )
-                , ( "start", Json.Encode.int <| Time.posixToMillis started.start )
+                , ( "time", Json.Encode.int <| Time.posixToMillis started.time )
                 , ( "alarm", Json.Encode.string started.alarm )
                 ]
 
