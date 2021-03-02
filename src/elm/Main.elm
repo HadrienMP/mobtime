@@ -7,6 +7,8 @@ import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Json.Decode
 import Json.Encode
+import Random
+import Sound.Library
 import Task
 import Time
 import Url
@@ -39,7 +41,7 @@ main =
 
 
 type Event
-    = StartedAt Time.Posix
+    = Started { start: Time.Posix, alarm: Sound.Library.Sound }
     | Stopped
 
 
@@ -49,10 +51,14 @@ decodeEvent value =
         |> Json.Decode.andThen
             (\a ->
                 case a of
-                    "StartedAt" ->
-                        Json.Decode.field "start" Json.Decode.int
-                            |> Json.Decode.map
-                                (\ms -> StartedAt <| Time.millisToPosix ms)
+                    "Started" ->
+                        Json.Decode.map2 (\start alarm -> Started {start = start, alarm = alarm})
+                        (Json.Decode.field "start" Json.Decode.int
+                            |> Json.Decode.map Time.millisToPosix)
+                        (Json.Decode.field "alarm" Json.Decode.string)
+
+                    "Stopped" ->
+                        Json.Decode.succeed Stopped
 
                     _ ->
                         Json.Decode.fail <| "I don't know this event " ++ a
@@ -64,24 +70,30 @@ encodeEvent : Event -> Json.Encode.Value
 encodeEvent event =
     Json.Encode.object <|
         case event of
-            StartedAt now ->
-                [ ( "name", Json.Encode.string "StartedAt" )
-                , ( "start", Json.Encode.int <| Time.posixToMillis now )
+            Started started ->
+                [ ( "name", Json.Encode.string "Started" )
+                , ( "start", Json.Encode.int <| Time.posixToMillis started.start )
+                , ( "alarm", Json.Encode.string started.alarm )
                 ]
 
             Stopped ->
                 [ ( "name", Json.Encode.string "Stopped" ) ]
 
 
+type State
+    = Off
+    | On { start : Time.Posix }
+
+
 type alias Model =
-    { history : List Event
+    { state : State
     , now : Time.Posix
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { history = []
+    ( { state = Off
       , now = Time.millisToPosix 0
       }
     , Task.perform TimePassed Time.now
@@ -98,6 +110,8 @@ type Msg
     | SendEvent Event
     | ReceiveEvent (Result Json.Decode.Error Event)
     | TimePassed Time.Posix
+    | Start
+    | StartWithAlarm Sound.Library.Sound
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -117,9 +131,10 @@ update msg model =
         ReceiveEvent result ->
             case result of
                 Ok event ->
-                    ( { model | history = event :: model.history }
+                    ( { model | state = apply event model.state }
                     , Cmd.none
                     )
+
                 Err _ ->
                     ( model, Cmd.none )
 
@@ -127,6 +142,27 @@ update msg model =
             ( { model | now = now }
             , Cmd.none
             )
+
+        Start ->
+            ( model, Random.generate StartWithAlarm <| Sound.Library.pick Sound.Library.ClassicWeird )
+
+        StartWithAlarm sound ->
+            ( model
+            , sendEvent <| encodeEvent <| Started {start = model.now, alarm = sound}
+            )
+
+
+apply : Event -> State -> State
+apply event state =
+    case ( event, state ) of
+        ( Started start, Off ) ->
+            On { start = start.start }
+
+        ( Stopped, On _ ) ->
+            Off
+
+        _ ->
+            state
 
 
 
@@ -152,7 +188,7 @@ view : Model -> Browser.Document Msg
 view model =
     let
         toto =
-            blah model.now <| List.head model.history
+            blah model.now model.state
     in
     { title = "Mob Time"
     , body =
@@ -180,15 +216,15 @@ type alias Toto =
     }
 
 
-blah : Time.Posix -> Maybe Event -> Toto
+blah : Time.Posix -> State -> Toto
 blah now maybeEvent =
     case maybeEvent of
-        Just (StartedAt start) ->
+        On on ->
             { icon = "fa-square"
             , message = SendEvent Stopped
             , class = "on"
             , text =
-                ( now, start )
+                ( now, on.start )
                     |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
                     |> (\( a, b ) -> b + (2 * 60 * 1000) - a)
                     |> (\a -> a // 1000)
@@ -197,7 +233,7 @@ blah now maybeEvent =
 
         _ ->
             { icon = "fa-play"
-            , message = SendEvent <| StartedAt now
+            , message = Start
             , class = "off"
             , text = ""
             }

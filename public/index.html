@@ -18,19 +18,22 @@
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <script src="/js/main.js"></script>
 <script>
-    const gun = Gun();
 
-    const app = Elm.Main.init(
-        {
-            node: document.getElementById('elm'),
-        }
-    )
+    const app = Elm.Main.init({ node: document.getElementById('elm'), });
 
+    // -----------------------------------------
+    // GUN JS
+    // -----------------------------------------
+    const gun = Gun(['https://gunjs-hadrienmp.herokuapp.com/gun']);
+    let events = gun.get("events");
     app.ports.sendEvent.subscribe(event => {
-        gun.get("mobtime").put(event);
+        events.set(event);
     });
-
-    gun.get("mobtime").on((key, data) => app.ports.receiveEvent.send(data))
+    events.map().on((data, id) => {
+        console.log(data, id);
+        return app.ports.receiveEvent.send(data);
+    });
+    // -----------------------------------------
 </script>
 </body>
 </html>
