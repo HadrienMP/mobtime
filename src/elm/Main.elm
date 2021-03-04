@@ -2,13 +2,16 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Events
+import Duration
 import Html exposing (..)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Json.Decode
 import Json.Encode
+import Out.Commands
+import Out.Events
 import Random
+import SharedEvents
 import Sound.Library
 import Task
 import Time
@@ -40,20 +43,28 @@ main =
 
 -- MODEL
 
-type State
+
+type SharedState
     = Off
-    | On { start : Time.Posix }
+    | On { end : Time.Posix }
+
+
+type AlarmState
+    = AlarmOn
+    | AlarmOff
 
 
 type alias Model =
-    { state : State
+    { sharedState : SharedState
+    , alarmState : AlarmState
     , now : Time.Posix
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { state = Off
+    ( { sharedState = Off
+      , alarmState = AlarmOff
       , now = Time.millisToPosix 0
       }
     , Task.perform TimePassed Time.now
@@ -67,11 +78,14 @@ init _ _ _ =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | SendEvent Events.Event
-    | ReceiveEvent (Result Json.Decode.Error Events.Event)
+    | ShareEvent SharedEvents.Event
+    | ReceivedEvent (Result Json.Decode.Error SharedEvents.Event)
     | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
+    | StopSound
+    | AlarmEnded
+    | UnknownEvent
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,46 +97,74 @@ update msg model =
         UrlChanged _ ->
             ( model, Cmd.none )
 
-        SendEvent event ->
+        ShareEvent event ->
             ( model
-            , sendEvent <| Events.toJson event
+            , sendEvent <| SharedEvents.toJson event
             )
 
-        ReceiveEvent result ->
-            case result of
-                Ok event ->
-                    ( { model | state = apply event model.state }
-                    , Cmd.none
-                    )
-
-                Err _ ->
-                    ( model, Cmd.none )
+        ReceivedEvent eventResult ->
+            eventResult
+                |> Result.map (applyTo model.sharedState)
+                |> Result.withDefault ( model.sharedState, Cmd.none )
+                |> Tuple.mapFirst (\it -> { model | sharedState = it })
 
         TimePassed now ->
-            ( { model | now = now }
-            , Cmd.none
-            )
+            case model.sharedState of
+                Off ->
+                    ( { model | now = now }, Cmd.none )
+
+                On on ->
+                    let
+                        timeLeft =
+                            Duration.between now on.end
+                    in
+                    if Duration.toSeconds timeLeft == 0 then
+                        ( { model
+                            | now = now
+                            , alarmState = AlarmOn
+                          }
+                        , Out.Commands.send Out.Commands.SoundAlarm
+                        )
+
+                    else
+                        ( { model | now = now }, Cmd.none )
 
         Start ->
             ( model, Random.generate StartWithAlarm <| Sound.Library.pick Sound.Library.ClassicWeird )
 
         StartWithAlarm sound ->
             ( model
-            , sendEvent <| Events.toJson <| Events.Started { time = model.now, alarm = sound }
+            , sendEvent <| SharedEvents.toJson <| SharedEvents.Started { time = model.now, alarm = sound }
             )
 
+        StopSound ->
+            ( { model | alarmState = AlarmOff }
+            , Out.Commands.send Out.Commands.StopAlarm
+            )
 
-apply : Events.Event -> State -> State
-apply event state =
+        AlarmEnded ->
+            ( { model | alarmState = AlarmOff }
+            , Cmd.none
+            )
+
+        UnknownEvent ->
+            (model, Cmd.none)
+
+
+
+applyTo : SharedState -> SharedEvents.Event -> ( SharedState, Cmd Msg )
+applyTo state event =
     case ( event, state ) of
-        ( Events.Started started, Off ) ->
-            On { start = started.time }
+        ( SharedEvents.Started started, Off ) ->
+            ( On { end = (Time.posixToMillis started.time) + (1 * 60 * 1000 // 3) |> Time.millisToPosix }
+            , Out.Commands.send <| Out.Commands.SetAlarm started.alarm
+            )
 
-        ( Events.Stopped, On _ ) ->
-            Off
+        ( SharedEvents.Stopped, On _ ) ->
+            ( Off, Cmd.none )
 
         _ ->
-            state
+            ( state, Cmd.none )
 
 
 
@@ -132,12 +174,18 @@ apply event state =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Time.every 1000 TimePassed
-        , receiveEvent
-            (\json ->
-                ReceiveEvent <| Events.fromJson json
-            )
+        [ Time.every 500 TimePassed
+        , receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
+        , Out.Events.events toMsg
         ]
+
+toMsg : Out.Events.Event -> Msg
+toMsg event =
+    case event.name of
+        "AlarmEnded" ->
+            AlarmEnded
+        _ ->
+            UnknownEvent
 
 
 
@@ -148,7 +196,7 @@ view : Model -> Browser.Document Msg
 view model =
     let
         toto =
-            blah model.now model.state
+            blah model
     in
     { title = "Mob Time"
     , body =
@@ -176,24 +224,31 @@ type alias Toto =
     }
 
 
-blah : Time.Posix -> State -> Toto
-blah now state =
-    case state of
-        On on ->
-            { icon = "fa-square"
-            , message = SendEvent Events.Stopped
-            , class = "on"
-            , text =
-                ( now, on.start )
-                    |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
-                    |> (\( a, b ) -> b + (2 * 60 * 1000) - a)
-                    |> (\a -> a // 1000)
-                    |> (\a -> String.fromInt a ++ " s")
-            }
-
-        _ ->
-            { icon = "fa-play"
-            , message = Start
-            , class = "off"
+blah : Model -> Toto
+blah model =
+    case model.alarmState of
+        AlarmOn ->
+            { icon = "fa-volume-mute"
+            , message = StopSound
+            , class = ""
             , text = ""
             }
+
+        AlarmOff ->
+            case model.sharedState of
+                On on ->
+                    { icon = "fa-square"
+                    , message = ShareEvent SharedEvents.Stopped
+                    , class = "on"
+                    , text =
+                        Duration.between model.now on.end
+                            |> Duration.toSeconds
+                            |> (\a -> String.fromInt a ++ " s")
+                    }
+
+                Off ->
+                    { icon = "fa-play"
+                    , message = Start
+                    , class = ""
+                    , text = ""
+                    }

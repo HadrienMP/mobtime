@@ -1,4 +1,4 @@
-module Events exposing (..)
+module SharedEvents exposing (..)
 
 import Json.Decode
 import Json.Encode

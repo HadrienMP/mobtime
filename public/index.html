@@ -19,7 +19,31 @@
 <script src="/js/main.js"></script>
 <script>
 
-    const app = Elm.Main.init({ node: document.getElementById('elm'), });
+    const app = Elm.Main.init({node: document.getElementById('elm'),});
+
+    let alarm = document.createElement("audio");
+    document.body.appendChild(alarm);
+
+    // -----------------------------------------
+    // IO
+    // -----------------------------------------
+    app.ports.commands.subscribe(command => {
+        switch (command.name) {
+            case "SoundAlarm":
+                alarm.play();
+                break;
+            case "SetAlarm":
+                alarm.src = "/sound/" + command.value;
+                break;
+            case "StopAlarm":
+                alarm.pause();
+                alarm.src = '';
+                break;
+        }
+    });
+    alarm.addEventListener("ended", () => {
+        app.ports.events.send({name: "AlarmEnded", value: ""});
+    });
 
     // -----------------------------------------
     // GUN JS

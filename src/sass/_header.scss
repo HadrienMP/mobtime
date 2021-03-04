@@ -52,16 +52,6 @@ header {
         background: none;
       }
 
-      &.off {
-        i {
-          display: block;
-        }
-
-        #time-left {
-          display: none;
-        }
-      }
-
       &.on {
         i {
           display: none;
@@ -83,11 +73,12 @@ header {
       }
 
       i {
-        display: none;
+        display: block;
         font-size: 5em;
       }
 
       #time-left {
+        display: none;
         font-size: 2.4em;
         line-height: 1em;
 
