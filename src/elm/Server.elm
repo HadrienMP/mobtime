@@ -1,7 +1,5 @@
 module Server exposing (..)
 
-import Set exposing (Set)
-
 
 main : Program () Model Msg
 main =

@@ -3,7 +3,9 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
+const Elm = require('./elm-server').Elm;
 
+Elm.Server.init();
 
 io.on('connection', (socket) => {
     console.log('a user connected');
