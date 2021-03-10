@@ -5,16 +5,19 @@ const io = require('socket.io')(http);
 const path = require('path');
 const Elm = require('./elm-server').Elm;
 
-Elm.Server.init();
+const elmApp = Elm.Server.init();
 
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('join', room => {
-        return socket.join(room);
+        console.log(room)
+        socket.join(room);
+
     });
     socket.on('message', (room, message) => {
-        console.log(`${room}: ${JSON.stringify(message)}`)
-        return socket.to(room).emit('message', message);
+        elmApp.ports.receiveEvent.send(message);
+        console.log(room, message)
+        return io.in(room).emit('message', message);
     });
     socket.on('disconnect', () => console.log('user disconnected'));
 });

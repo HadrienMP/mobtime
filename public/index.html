@@ -16,8 +16,7 @@
 
 <pre id="elm"></pre>
 <script src="/js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun/lib/open.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script>
 
     const app = Elm.Main.init({node: document.getElementById('elm'),});
@@ -47,24 +46,21 @@
     });
 
     // -----------------------------------------
-    // GUN JS
+    // Socket IO
     // -----------------------------------------
-    const gun = Gun(['https://gunjs-hadrienmp.herokuapp.com/gun']);
 
-    // Events
-    let events = gun.get("events");
-    let lastEvent = gun.get("lastEvent");
-    app.ports.sendEvent.subscribe(event => {
-        events.set(event);
+    const socket = io();
+    socket.on('connect', () => {
+        console.log("connected")
+        setTimeout(() => socket.emit('join', 'mob'), 500);
     });
-    events.map()
-        .on((data, id) => {
-            lastEvent.set(id);
-            gun.get(data['_']['#']).open(it => {
-                console.log('new', it);
-                app.ports.receiveEvent.send(it);
-            });
-        });
+    app.ports.sendEvent.subscribe(event => {
+        socket.emit('message', 'mob', event);
+    });
+    socket.on('message', data => {
+        console.log(data);
+        return app.ports.receiveEvent.send(data);
+    });
     // -----------------------------------------
 </script>
 </body>
