@@ -1,4 +1,4 @@
-port module Out.Commands exposing (..)
+port module Js.Commands exposing (..)
 
 import Json.Encode
 import Sound.Library

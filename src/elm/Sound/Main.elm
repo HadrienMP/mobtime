@@ -1,9 +1,9 @@
 module Mob.Sound.Main exposing (..)
 
 import Html exposing (Html)
-import Out.Commands
-import Out.Events
-import Out.EventsMapping as EventsMapping exposing (EventsMapping)
+import Js.Commands
+import Js.Events
+import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Random
 import Sound.Library as SoundLibrary
 
@@ -55,7 +55,7 @@ update model msg =
 
 eventsMapping : EventsMapping Msg
 eventsMapping =
-    [ Out.Events.EventMessage "SoundEnded" (\_ -> Ended) ]
+    [ Js.Events.EventMessage "SoundEnded" (\_ -> Ended) ]
         |> EventsMapping.create
 
 
@@ -101,9 +101,9 @@ pick model =
 
 play : Cmd msg
 play =
-    Out.Commands.send Out.Commands.SoundAlarm
+    Js.Commands.send Js.Commands.SoundAlarm
 
 
 stop : Cmd msg
 stop =
-    Out.Commands.send Out.Commands.SoundStop
+    Js.Commands.send Js.Commands.SoundStop

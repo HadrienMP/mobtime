@@ -15,8 +15,9 @@
 <body>
 
 <pre id="elm"></pre>
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <script src="/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/lib/open.js"></script>
 <script>
 
     const app = Elm.Main.init({node: document.getElementById('elm'),});
@@ -49,14 +50,21 @@
     // GUN JS
     // -----------------------------------------
     const gun = Gun(['https://gunjs-hadrienmp.herokuapp.com/gun']);
+
+    // Events
     let events = gun.get("events");
+    let lastEvent = gun.get("lastEvent");
     app.ports.sendEvent.subscribe(event => {
         events.set(event);
     });
-    events.map().on((data, id) => {
-        console.log(data, id);
-        return app.ports.receiveEvent.send(data);
-    });
+    events.map()
+        .on((data, id) => {
+            lastEvent.set(id);
+            gun.get(data['_']['#']).open(it => {
+                console.log('new', it);
+                app.ports.receiveEvent.send(it);
+            });
+        });
     // -----------------------------------------
 </script>
 </body>

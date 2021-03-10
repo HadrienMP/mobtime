@@ -2,6 +2,7 @@ module SharedEvents exposing (..)
 
 import Json.Decode
 import Json.Encode
+import Mobbers exposing (Mobber)
 import Sound.Library
 import Time
 
@@ -9,6 +10,8 @@ import Time
 type Event
     = Started { time : Time.Posix, alarm : Sound.Library.Sound }
     | Stopped
+    | AddedMobber Mobber
+    | DeletedMobber Mobber
 
 
 
@@ -34,6 +37,12 @@ decoderFromName eventName =
 
         "Stopped" ->
             Json.Decode.succeed Stopped
+
+        "AddedMobber" ->
+            Json.Decode.map AddedMobber (Json.Decode.field "mobber" Mobbers.jsonDecoder)
+
+        "DeletedMobber" ->
+            Json.Decode.map DeletedMobber (Json.Decode.field "mobber" Mobbers.jsonDecoder)
 
         _ ->
             Json.Decode.fail <| "I don't know this event " ++ eventName
@@ -68,3 +77,13 @@ toJson event =
 
             Stopped ->
                 [ ( "name", Json.Encode.string "Stopped" ) ]
+
+            AddedMobber mobber ->
+                [ ( "name", Json.Encode.string "AddedMobber" )
+                , ( "mobber", Mobbers.toJson mobber )
+                ]
+
+            DeletedMobber mobber ->
+                [ ( "name", Json.Encode.string "DeletedMobber" )
+                , ( "mobber", Mobbers.toJson mobber )
+                ]

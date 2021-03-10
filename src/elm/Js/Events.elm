@@ -1,4 +1,4 @@
-port module Out.Events exposing (..)
+port module Js.Events exposing (..)
 
 port events : (Event -> msg) -> Sub msg
 

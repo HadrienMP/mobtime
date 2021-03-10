@@ -1,6 +1,6 @@
-module Out.EventsMapping exposing (EventsMapping, batch, create, dispatch, map)
+module Js.EventsMapping exposing (EventsMapping, batch, create, dispatch, map)
 
-import Out.Events exposing (Event, EventMessage)
+import Js.Events exposing (Event, EventMessage)
 
 
 type EventsMapping msg

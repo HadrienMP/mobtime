@@ -4,12 +4,13 @@ import Browser
 import Browser.Navigation as Nav
 import Duration
 import Html exposing (..)
-import Html.Attributes exposing (class, id)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, id, type_, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
+import Js.Commands
+import Js.Events
 import Json.Decode
 import Json.Encode
-import Out.Commands
-import Out.Events
+import Mobbers exposing (Mobber, Mobbers)
 import Random
 import SharedEvents
 import Sound.Library
@@ -44,9 +45,15 @@ main =
 -- MODEL
 
 
-type SharedState
+type ClockState
     = Off
     | On { end : Time.Posix }
+
+
+type alias SharedState =
+    { clock : ClockState
+    , mobbers : Mobbers
+    }
 
 
 type AlarmState
@@ -57,14 +64,19 @@ type AlarmState
 type alias Model =
     { sharedState : SharedState
     , alarmState : AlarmState
+    , mobberName : String
     , now : Time.Posix
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { sharedState = Off
+    ( { sharedState =
+            { clock = Off
+            , mobbers = []
+            }
       , alarmState = AlarmOff
+      , mobberName = ""
       , now = Time.millisToPosix 0
       }
     , Task.perform TimePassed Time.now
@@ -86,6 +98,8 @@ type Msg
     | StopSound
     | AlarmEnded
     | UnknownEvent
+    | MobberNameChanged String
+    | AddMobber
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,7 +123,7 @@ update msg model =
                 |> Tuple.mapFirst (\it -> { model | sharedState = it })
 
         TimePassed now ->
-            case model.sharedState of
+            case model.sharedState.clock of
                 Off ->
                     ( { model | now = now }, Cmd.none )
 
@@ -123,7 +137,7 @@ update msg model =
                             | now = now
                             , alarmState = AlarmOn
                           }
-                        , Out.Commands.send Out.Commands.SoundAlarm
+                        , Js.Commands.send Js.Commands.SoundAlarm
                         )
 
                     else
@@ -139,7 +153,7 @@ update msg model =
 
         StopSound ->
             ( { model | alarmState = AlarmOff }
-            , Out.Commands.send Out.Commands.StopAlarm
+            , Js.Commands.send Js.Commands.StopAlarm
             )
 
         AlarmEnded ->
@@ -148,20 +162,43 @@ update msg model =
             )
 
         UnknownEvent ->
-            (model, Cmd.none)
+            ( model, Cmd.none )
 
+        MobberNameChanged name ->
+            ( { model | mobberName = name }
+            , Cmd.none
+            )
+
+        AddMobber ->
+            ( { model | mobberName = "" }
+            , Mobbers.create model.mobberName model.sharedState.mobbers
+                |> SharedEvents.AddedMobber
+                |> SharedEvents.toJson
+                |> sendEvent
+            )
 
 
 applyTo : SharedState -> SharedEvents.Event -> ( SharedState, Cmd Msg )
 applyTo state event =
-    case ( event, state ) of
+    case ( event, state.clock ) of
         ( SharedEvents.Started started, Off ) ->
-            ( On { end = (Time.posixToMillis started.time) + (1 * 60 * 1000 // 3) |> Time.millisToPosix }
-            , Out.Commands.send <| Out.Commands.SetAlarm started.alarm
+            ( { state | clock = On { end = Time.posixToMillis started.time + (10 * 1000) |> Time.millisToPosix } }
+            , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
             )
 
         ( SharedEvents.Stopped, On _ ) ->
-            ( Off, Cmd.none )
+            ( { state
+                | clock = Off
+                , mobbers = Mobbers.rotate state.mobbers
+              }
+            , Cmd.none
+            )
+
+        ( SharedEvents.AddedMobber mobber, _ ) ->
+            ( { state | mobbers = mobber :: state.mobbers }, Cmd.none )
+
+        ( SharedEvents.DeletedMobber mobber, _ ) ->
+            ( { state | mobbers = List.filter (\m -> m /= mobber) state.mobbers }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )
@@ -176,14 +213,16 @@ subscriptions _ =
     Sub.batch
         [ Time.every 500 TimePassed
         , receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
-        , Out.Events.events toMsg
+        , Js.Events.events toMsg
         ]
 
-toMsg : Out.Events.Event -> Msg
+
+toMsg : Js.Events.Event -> Msg
 toMsg event =
     case event.name of
         "AlarmEnded" ->
             AlarmEnded
+
         _ ->
             UnknownEvent
 
@@ -212,8 +251,27 @@ view model =
                     ]
                 ]
             ]
+        , div
+            [ id "mobbers", class "tab" ]
+            [ form
+                [ onSubmit AddMobber ]
+                [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
+                , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
+                ]
+            , ul [] (List.map mobberView model.sharedState.mobbers)
+            ]
         ]
     }
+
+
+mobberView : Mobber -> Html Msg
+mobberView mobber =
+    li []
+        [ span [] [ text mobber.name ]
+        , button
+            [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
+            [ i [ class "fas fa-times" ] [] ]
+        ]
 
 
 type alias Toto =
@@ -235,7 +293,7 @@ blah model =
             }
 
         AlarmOff ->
-            case model.sharedState of
+            case model.sharedState.clock of
                 On on ->
                     { icon = "fa-square"
                     , message = ShareEvent SharedEvents.Stopped

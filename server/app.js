@@ -8,7 +8,6 @@ const path = require('path');
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('join', room => {
-        console.log(`Someone joined the ${room} room`);
         return socket.join(room);
     });
     socket.on('message', (room, message) => {
