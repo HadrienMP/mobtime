@@ -6,3 +6,4 @@ public/js/main.js
 public/css/main.css
 .sass-cache
 .idea
+server/elm-server.js

@@ -11,14 +11,20 @@ main =
         , subscriptions = subscriptions
         }
 
-type alias Event = String
-
 type Msg
-    = Received Event
+    = Received
 
 
-type alias Model = { history : Set Event }
+type alias Model = { }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    ({history = Set.empty}, Cmd.none)
+    ({}, Cmd.none)
+
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+    (model, Cmd.none)
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
