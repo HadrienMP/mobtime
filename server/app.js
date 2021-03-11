@@ -6,21 +6,25 @@ const path = require('path');
 const Elm = require('./elm-server').Elm;
 
 const elmApp = Elm.Server.init();
+const history = {}
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
     socket.on('join', room => {
-        console.log(room)
         socket.join(room);
-
+        socket.emit('history', history[room] ? history[room] : []);
     });
     socket.on('message', (room, message) => {
-        elmApp.ports.receiveEvent.send(message);
-        console.log(room, message)
-        return io.in(room).emit('message', message);
+        historize(room, message);
+        io.in(room).emit('message', message);
     });
     socket.on('disconnect', () => console.log('user disconnected'));
 });
+
+function historize(room, message) {
+    let roomHistory = history[room] || [];
+    roomHistory.push(message)
+    history[room] = roomHistory;
+}
 
 app.use(express.static(path.join(path.dirname(__dirname), 'public')));
 

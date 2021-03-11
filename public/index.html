@@ -61,6 +61,7 @@
         console.log(data);
         return app.ports.receiveEvent.send(data);
     });
+    socket.on('history', app.ports.receiveHistory.send);
     // -----------------------------------------
 </script>
 </body>

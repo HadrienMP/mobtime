@@ -25,6 +25,9 @@ port sendEvent : Json.Encode.Value -> Cmd msg
 port receiveEvent : (Json.Encode.Value -> msg) -> Sub msg
 
 
+port receiveHistory : (List Json.Encode.Value -> msg) -> Sub msg
+
+
 
 -- MAIN
 
@@ -92,6 +95,7 @@ type Msg
     | UrlChanged Url.Url
     | ShareEvent SharedEvents.Event
     | ReceivedEvent (Result Json.Decode.Error SharedEvents.Event)
+    | ReceivedHistory (List (Result Json.Decode.Error SharedEvents.Event))
     | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
@@ -121,6 +125,11 @@ update msg model =
                 |> Result.map (applyTo model.sharedState)
                 |> Result.withDefault ( model.sharedState, Cmd.none )
                 |> Tuple.mapFirst (\it -> { model | sharedState = it })
+
+        ReceivedHistory eventsResults ->
+            ( { model | sharedState = evolveMany model.sharedState eventsResults }
+            , Cmd.none
+            )
 
         TimePassed now ->
             case model.sharedState.clock of
@@ -178,6 +187,26 @@ update msg model =
             )
 
 
+evolveMany : SharedState -> List (Result Json.Decode.Error SharedEvents.Event) -> SharedState
+evolveMany sharedState events =
+    case uncons events of
+        ( Nothing, _ ) ->
+            sharedState
+
+        ( Just (Err _), tail ) ->
+            evolveMany sharedState tail
+
+        ( Just (Ok head), tail ) ->
+            evolveMany (applyTo sharedState head |> Tuple.first) tail
+
+
+uncons : List a -> ( Maybe a, List a )
+uncons list =
+    ( list, list )
+        |> Tuple.mapBoth List.head List.tail
+        |> Tuple.mapSecond (Maybe.withDefault [])
+
+
 applyTo : SharedState -> SharedEvents.Event -> ( SharedState, Cmd Msg )
 applyTo state event =
     case ( event, state.clock ) of
@@ -213,6 +242,7 @@ subscriptions _ =
     Sub.batch
         [ Time.every 500 TimePassed
         , receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
+        , receiveHistory <| List.map SharedEvents.fromJson >> ReceivedHistory
         , Js.Events.events toMsg
         ]
 
