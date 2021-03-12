@@ -22,7 +22,7 @@ io.on('connection', (socket) => {
 
 function historize(room, message) {
     let roomHistory = history[room] || [];
-    roomHistory.push(message)
+    roomHistory.push(message);
     history[room] = roomHistory;
 }
 

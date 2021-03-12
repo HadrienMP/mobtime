@@ -93,9 +93,11 @@ init _ _ _ =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+
     | ShareEvent SharedEvents.Event
     | ReceivedEvent (Result Json.Decode.Error SharedEvents.Event)
     | ReceivedHistory (List (Result Json.Decode.Error SharedEvents.Event))
+
     | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
