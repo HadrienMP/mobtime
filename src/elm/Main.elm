@@ -15,6 +15,7 @@ import Mobbers exposing (Mobber, Mobbers)
 import Random
 import SharedEvents
 import Sound.Library
+import Svg exposing (svg)
 import Task
 import Time
 import Url
@@ -219,7 +220,7 @@ applyTo state event =
             )
 
         ( SharedEvents.AddedMobber mobber, _ ) ->
-            ( { state | mobbers = state.mobbers ++ [mobber] }, Cmd.none )
+            ( { state | mobbers = state.mobbers ++ [ mobber ] }, Cmd.none )
 
         ( SharedEvents.DeletedMobber mobber, _ ) ->
             ( { state | mobbers = List.filter (\m -> m /= mobber) state.mobbers }, Cmd.none )
@@ -264,26 +265,32 @@ view model =
     in
     { title = "Mob Time"
     , body =
-        [ header []
-            [ section []
-                [ button
-                    [ id "action"
-                    , class toto.class
-                    , onClick toto.message
-                    ]
-                    [ i [ class <| "fas " ++ toto.icon ] []
-                    , span [ id "time-left" ] [ text toto.text ]
+        [ div [ class "container" ]
+            [ header []
+                [ section []
+                    [ svg [] []
+                    , button
+                        [ id "action"
+                        , class toto.class
+                        , onClick toto.message
+                        ]
+                        [ i [ class <| "fas " ++ toto.icon ] []
+                        , span [ id "time-left" ] [ text toto.text ]
+                        ]
                     ]
                 ]
-            ]
-        , div
-            [ id "mobbers", class "tab" ]
-            [ form
-                [ onSubmit AddMobber ]
-                [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
-                , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
+            , nav []
+                [ button [] [ i [ class "fas fa-people" ] [] ]
                 ]
-            , ul [] (List.map mobberView model.sharedState.mobbers)
+            , div
+                [ id "mobbers", class "tab" ]
+                [ form
+                    [ id "add", onSubmit AddMobber ]
+                    [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
+                    , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
+                    ]
+                , ul [] (List.map mobberView model.sharedState.mobbers)
+                ]
             ]
         ]
     }
@@ -292,10 +299,14 @@ view model =
 mobberView : Mobber -> Html Msg
 mobberView mobber =
     li []
-        [ span [] [ text mobber.name ]
-        , button
-            [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
-            [ i [ class "fas fa-times" ] [] ]
+        [ p [] [ text "Mobber" ]
+        , div
+            []
+            [ input [ type_ "text", value mobber.name ] []
+            , button
+                [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
+                [ i [ class "fas fa-times" ] [] ]
+            ]
         ]
 
 

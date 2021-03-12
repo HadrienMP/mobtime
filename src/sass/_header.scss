@@ -23,6 +23,8 @@ header {
       transform: rotateZ(-90deg);
       background: rgba(255, 255, 255, .7);
       border-radius: 100%;
+      height: 220px;
+      width: 220px;
 
       circle {
         transition: stroke-dashoffset 1s linear;
