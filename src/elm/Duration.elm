@@ -6,6 +6,9 @@ import Time
 type Duration
     = Duration Int
 
+secondsBetween : Time.Posix -> Time.Posix -> Int
+secondsBetween a b =
+    toSeconds <| between a b
 
 between : Time.Posix -> Time.Posix -> Duration
 between a b =

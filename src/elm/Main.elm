@@ -10,6 +10,7 @@ import Js.Commands
 import Js.Events
 import Json.Decode
 import Json.Encode
+import Lib.ListExtras exposing (rotate, uncons)
 import Mobbers exposing (Mobber, Mobbers)
 import Random
 import SharedEvents
@@ -93,11 +94,9 @@ init _ _ _ =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-
     | ShareEvent SharedEvents.Event
     | ReceivedEvent (Result Json.Decode.Error SharedEvents.Event)
     | ReceivedHistory (List (Result Json.Decode.Error SharedEvents.Event))
-
     | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
@@ -134,25 +133,16 @@ update msg model =
             )
 
         TimePassed now ->
-            case model.sharedState.clock of
-                Off ->
-                    ( { model | now = now }, Cmd.none )
+            if hasTurnEnded now model.sharedState.clock then
+                ( { model
+                    | now = now
+                    , alarmState = AlarmOn
+                  }
+                , Js.Commands.send Js.Commands.SoundAlarm
+                )
 
-                On on ->
-                    let
-                        timeLeft =
-                            Duration.between now on.end
-                    in
-                    if Duration.toSeconds timeLeft == 0 then
-                        ( { model
-                            | now = now
-                            , alarmState = AlarmOn
-                          }
-                        , Js.Commands.send Js.Commands.SoundAlarm
-                        )
-
-                    else
-                        ( { model | now = now }, Cmd.none )
+            else
+                ( { model | now = now }, Cmd.none )
 
         Start ->
             ( model, Random.generate StartWithAlarm <| Sound.Library.pick Sound.Library.ClassicWeird )
@@ -182,11 +172,21 @@ update msg model =
 
         AddMobber ->
             ( { model | mobberName = "" }
-            , Mobbers.create model.mobberName model.sharedState.mobbers
+            , Mobbers.create model.mobberName
                 |> SharedEvents.AddedMobber
                 |> SharedEvents.toJson
                 |> sendEvent
             )
+
+
+hasTurnEnded : Time.Posix -> ClockState -> Bool
+hasTurnEnded now clockState =
+    case clockState of
+        Off ->
+            False
+
+        On on ->
+            Duration.secondsBetween now on.end == 0
 
 
 evolveMany : SharedState -> List (Result Json.Decode.Error SharedEvents.Event) -> SharedState
@@ -202,13 +202,6 @@ evolveMany sharedState events =
             evolveMany (applyTo sharedState head |> Tuple.first) tail
 
 
-uncons : List a -> ( Maybe a, List a )
-uncons list =
-    ( list, list )
-        |> Tuple.mapBoth List.head List.tail
-        |> Tuple.mapSecond (Maybe.withDefault [])
-
-
 applyTo : SharedState -> SharedEvents.Event -> ( SharedState, Cmd Msg )
 applyTo state event =
     case ( event, state.clock ) of
@@ -220,13 +213,13 @@ applyTo state event =
         ( SharedEvents.Stopped, On _ ) ->
             ( { state
                 | clock = Off
-                , mobbers = Mobbers.rotate state.mobbers
+                , mobbers = rotate state.mobbers
               }
             , Cmd.none
             )
 
         ( SharedEvents.AddedMobber mobber, _ ) ->
-            ( { state | mobbers = mobber :: state.mobbers }, Cmd.none )
+            ( { state | mobbers = state.mobbers ++ [mobber] }, Cmd.none )
 
         ( SharedEvents.DeletedMobber mobber, _ ) ->
             ( { state | mobbers = List.filter (\m -> m /= mobber) state.mobbers }, Cmd.none )
