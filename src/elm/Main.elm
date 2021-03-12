@@ -10,7 +10,7 @@ import Js.Events
 import Json.Decode
 import Json.Encode
 import Lib.Duration as Duration
-import Lib.ListExtras exposing (rotate, uncons)
+import Lib.ListExtras exposing (assign, rotate, uncons)
 import Mobbers exposing (Mobber, Mobbers)
 import Random
 import SharedEvents
@@ -289,25 +289,35 @@ view model =
                     [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
                     , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
                     ]
-                , ul [] (List.map mobberView model.sharedState.mobbers)
+                , ul []
+                    (model.sharedState.mobbers
+                        |> assign [ "Driver", "Navigator" ]
+                        |> List.map mobberView
+                        |> List.filter ((/=) Nothing)
+                        |> List.map (Maybe.withDefault (li [] []))
+                    )
                 ]
             ]
         ]
     }
 
 
-mobberView : Mobber -> Html Msg
-mobberView mobber =
-    li []
-        [ p [] [ text "Mobber" ]
-        , div
-            []
-            [ input [ type_ "text", value mobber.name ] []
-            , button
-                [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
-                [ i [ class "fas fa-times" ] [] ]
-            ]
-        ]
+mobberView : ( Maybe String, Maybe Mobber ) -> Maybe (Html Msg)
+mobberView ( role, maybeMobber ) =
+    Maybe.map
+        (\mobber ->
+            li []
+                [ p [] [ text <| Maybe.withDefault "Mobber" role ]
+                , div
+                    []
+                    [ input [ type_ "text", value mobber.name ] []
+                    , button
+                        [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
+                        [ i [ class "fas fa-times" ] [] ]
+                    ]
+                ]
+        )
+        maybeMobber
 
 
 type alias Toto =
