@@ -3,9 +3,7 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
-const Elm = require('./elm-server').Elm;
 
-const elmApp = Elm.Server.init();
 const history = {}
 
 io.on('connection', (socket) => {

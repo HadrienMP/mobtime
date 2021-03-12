@@ -1,4 +1,4 @@
-module Duration exposing (..)
+module Lib.Duration exposing (..)
 
 import Time
 

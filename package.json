@@ -5,10 +5,11 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "node server/app.js",
+
 		"dev:all": "concurrently --kill-others \"npm run dev:build-front\" \"npm run dev:server\"",
-		"dev:build-back": "elm-live src/elm/Server.elm --dir=./server --no-server -- --output=./server/elm-server.js --debug",
 		"dev:build-front": "elm-live src/elm/Main.elm --dir=./public/js --no-server -- --output=./public/js/main.js --debug",
 		"dev:server": "nodemon server/app.js",
+
 		"release": "./dist.sh && git status && release-it --minor --ci",
 		"test": "npx elm-test --watch \"./src/elm/**/*Spec.elm\""
 	},

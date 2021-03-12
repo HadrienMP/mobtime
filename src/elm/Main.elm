@@ -2,7 +2,6 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Duration
 import Html exposing (..)
 import Html.Attributes exposing (class, id, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -10,6 +9,7 @@ import Js.Commands
 import Js.Events
 import Json.Decode
 import Json.Encode
+import Lib.Duration as Duration
 import Lib.ListExtras exposing (rotate, uncons)
 import Mobbers exposing (Mobber, Mobbers)
 import Random
