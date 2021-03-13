@@ -260,8 +260,8 @@ toMsg event =
 view : Model -> Browser.Document Msg
 view model =
     let
-        toto =
-            blah model
+        action =
+            detectAction model
     in
     { title = "Mob Time"
     , body =
@@ -271,16 +271,16 @@ view model =
                     [ svg [] []
                     , button
                         [ id "action"
-                        , class toto.class
-                        , onClick toto.message
+                        , class action.class
+                        , onClick action.message
                         ]
-                        [ i [ class <| "fas " ++ toto.icon ] []
-                        , span [ id "time-left" ] [ text toto.text ]
+                        [ i [ class <| "fas " ++ action.icon ] []
+                        , span [ id "time-left" ] [ text action.text ]
                         ]
                     ]
                 ]
             , nav []
-                [ button [] [ i [ class "fas fa-people" ] [] ]
+                [ button [] [ i [ class "fas fa-users" ] [] ]
                 ]
             , div
                 [ id "mobbers", class "tab" ]
@@ -304,23 +304,23 @@ view model =
 
 mobberView : ( Maybe String, Maybe Mobber ) -> Maybe (Html Msg)
 mobberView ( role, maybeMobber ) =
-    Maybe.map
-        (\mobber ->
-            li []
-                [ p [] [ text <| Maybe.withDefault "Mobber" role ]
-                , div
-                    []
-                    [ input [ type_ "text", value mobber.name ] []
-                    , button
-                        [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
-                        [ i [ class "fas fa-times" ] [] ]
+    maybeMobber
+        |> Maybe.map
+            (\mobber ->
+                li []
+                    [ p [] [ text <| Maybe.withDefault "Mobber" role ]
+                    , div
+                        []
+                        [ input [ type_ "text", value mobber.name ] []
+                        , button
+                            [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
+                            [ i [ class "fas fa-times" ] [] ]
+                        ]
                     ]
-                ]
-        )
-        maybeMobber
+            )
 
 
-type alias Toto =
+type alias ActionDescription =
     { icon : String
     , message : Msg
     , text : String
@@ -328,8 +328,8 @@ type alias Toto =
     }
 
 
-blah : Model -> Toto
-blah model =
+detectAction : Model -> ActionDescription
+detectAction model =
     case model.alarmState of
         AlarmOn ->
             { icon = "fa-volume-mute"
