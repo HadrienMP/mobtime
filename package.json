@@ -10,7 +10,7 @@
 		"dev:build-front": "elm-live src/elm/Main.elm --dir=./public/js --no-server -- --output=./public/js/main.js --debug",
 		"dev:server": "nodemon server/app.js",
 
-		"release": "./dist.sh && git status && release-it --minor --ci",
+		"release": "./dist.sh && git status && release-it --ci",
 		"test": "npx elm-test --watch \"./src/elm/**/*Spec.elm\""
 	},
 	"keywords": [],
