@@ -135,16 +135,17 @@ update msg model =
             )
 
         TimePassed now ->
+            let
+                timeUpdated = { model | now = now }
+            in
+
             if hasTurnEnded now model.sharedState.clock then
-                ( { model
-                    | now = now
-                    , alarmState = AlarmOn
-                  }
+                ( { timeUpdated | alarmState = AlarmOn }
                 , Js.Commands.send Js.Commands.SoundAlarm
                 )
 
             else
-                ( { model | now = now }, Cmd.none )
+                ( timeUpdated, Cmd.none )
 
         Start ->
             ( model, Random.generate StartWithAlarm <| Sound.Library.pick Sound.Library.ClassicWeird )
