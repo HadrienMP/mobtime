@@ -1,4 +1,3 @@
-
 $width: 433px;
 $light-bg-color: #ffffff;
 $dark-bg-color: #c9c9c9;
@@ -11,3 +10,15 @@ $border-shade: 250;
 $border-color: rgba($border-shade, $border-shade, $border-shade, .6);
 $margin-space: 1em;
 $padding-space: .5em;
+
+@mixin icon($size, $icon-color) {
+  .icon {
+    svg {
+      width: $size;
+      height: $size;
+      * {
+        fill: $icon-color;
+      }
+    }
+  }
+}

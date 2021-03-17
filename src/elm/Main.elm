@@ -10,12 +10,13 @@ import Js.Events
 import Json.Decode
 import Json.Encode
 import Lib.Duration as Duration
+import Lib.Icons as Icons
 import Lib.ListExtras exposing (assign, rotate, uncons)
 import Mobbers exposing (Mobber, Mobbers)
 import Random
 import SharedEvents
 import Sound.Library
-import Svg exposing (svg)
+import Svg exposing (Svg, svg)
 import Task
 import Time
 import Url
@@ -268,26 +269,26 @@ view model =
         [ div [ class "container" ]
             [ header []
                 [ section []
-                    [ svg [] []
+                    [ svg [ id "circles" ] []
                     , button
                         [ id "action"
                         , class action.class
                         , onClick action.message
                         ]
-                        [ i [ class <| "fas " ++ action.icon ] []
+                        [ action.icon
                         , span [ id "time-left" ] [ text action.text ]
                         ]
                     ]
                 ]
             , nav []
-                [ button [] [ i [ class "fas fa-users" ] [] ]
+                [ button [] [ Icons.people ]
                 ]
             , div
                 [ id "mobbers", class "tab" ]
                 [ form
                     [ id "add", onSubmit AddMobber ]
                     [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
-                    , button [ type_ "submit" ] [ i [ class "fas fa-plus" ] [] ]
+                    , button [ type_ "submit" ] [ Icons.plus ]
                     ]
                 , ul []
                     (model.sharedState.mobbers
@@ -314,14 +315,14 @@ mobberView ( role, maybeMobber ) =
                         [ input [ type_ "text", value mobber.name ] []
                         , button
                             [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
-                            [ i [ class "fas fa-times" ] [] ]
+                            [ i [ class "las la-times" ] [] ]
                         ]
                     ]
             )
 
 
 type alias ActionDescription =
-    { icon : String
+    { icon : Svg Msg
     , message : Msg
     , text : String
     , class : String
@@ -332,7 +333,7 @@ detectAction : Model -> ActionDescription
 detectAction model =
     case model.alarmState of
         AlarmOn ->
-            { icon = "fa-volume-mute"
+            { icon = Icons.mute
             , message = StopSound
             , class = ""
             , text = ""
@@ -341,7 +342,7 @@ detectAction model =
         AlarmOff ->
             case model.sharedState.clock of
                 On on ->
-                    { icon = "fa-square"
+                    { icon = Icons.stop
                     , message = ShareEvent SharedEvents.Stopped
                     , class = "on"
                     , text =
@@ -351,7 +352,7 @@ detectAction model =
                     }
 
                 Off ->
-                    { icon = "fa-play"
+                    { icon = Icons.play
                     , message = Start
                     , class = ""
                     , text = ""

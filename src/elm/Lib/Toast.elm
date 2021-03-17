@@ -93,7 +93,7 @@ viewToast toast =
         ]
         [ icon toast.level
         , span [ class "content" ] [ text toast.content ]
-        , i [ class "close fas fa-times close" ] []
+        , i [ class "close las la-times close" ] []
         ]
 
 
@@ -117,13 +117,13 @@ icon : Level -> Html msg
 icon level =
     case level of
         Info ->
-            i [ class "level-icon fas fa-info-circle" ] []
+            i [ class "level-icon las la-info-circle" ] []
 
         Error ->
-            i [ class "level-icon fas fa-minus-circle" ] []
+            i [ class "level-icon las la-minus-circle" ] []
 
         Warning ->
-            i [ class "level-icon fas fa-exclamation-circle" ] []
+            i [ class "level-icon las la-exclamation-circle" ] []
 
         Success ->
-            i [ class "level-icon fas fa-check-circle" ] []
+            i [ class "level-icon las la-check-circle" ] []

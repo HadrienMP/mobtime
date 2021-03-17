@@ -17,7 +17,7 @@ header {
       opacity: .15;
     }
 
-    svg {
+    svg#circles {
       margin: auto;
       display: block;
       transform: rotateZ(-90deg);
@@ -41,6 +41,7 @@ header {
       width: 220px;
       height: 220px;
       margin: auto;
+      padding: 0;
 
       cursor: pointer;
       color: $dark-button-color;
@@ -50,12 +51,14 @@ header {
       border-radius: 100%;
       font-weight: bold;
 
+      @include icon(120px, $dark-button-color);
+
       &:hover {
         background: none;
       }
 
       &.on {
-        i {
+        .icon {
           display: none;
         }
 
@@ -68,15 +71,15 @@ header {
             display: none;
           }
 
-          i {
+          .icon {
             display: block;
           }
         }
       }
 
-      i {
+      .icon {
         display: block;
-        font-size: 5em;
+        margin: auto;
       }
 
       #time-left {
@@ -138,10 +141,12 @@ nav {
     display: inline-block;
     font-size: 1.2em;
     text-align: center;
-    padding: 12px 0;
+    padding: 4px 0;
     text-shadow: 1px 1px 1px #666;
     border-right: 1px solid $border-color;
     color: white;
+
+    @include icon(1.4em, white);
 
     &:first-child {
       border-left: 1px solid $border-color;

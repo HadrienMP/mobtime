@@ -1,3 +1,5 @@
+@import "../theme";
+
 #mobbers {
 
   #add {
@@ -10,6 +12,8 @@
 
     button {
       flex: 0 0;
+
+      @include icon(1.1em, white);
     }
   }
 
