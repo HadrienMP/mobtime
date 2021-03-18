@@ -53,13 +53,7 @@ main =
 
 type ClockState
     = Off
-    | On { end : Time.Posix }
-
-
-type alias SharedState =
-    { clock : ClockState
-    , mobbers : Mobbers
-    }
+    | On { end : Time.Posix, ended : Bool }
 
 
 type AlarmState
@@ -68,7 +62,8 @@ type AlarmState
 
 
 type alias Model =
-    { sharedState : SharedState
+    { clock : ClockState
+    , mobbers : Mobbers
     , alarmState : AlarmState
     , mobberName : String
     , now : Time.Posix
@@ -77,10 +72,8 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { sharedState =
-            { clock = Off
-            , mobbers = []
-            }
+    ( { clock = Off
+      , mobbers = []
       , alarmState = AlarmOff
       , mobberName = ""
       , now = Time.millisToPosix 0
@@ -125,22 +118,24 @@ update msg model =
 
         ReceivedEvent eventResult ->
             eventResult
-                |> Result.map (applyTo model.sharedState)
-                |> Result.withDefault ( model.sharedState, Cmd.none )
-                |> Tuple.mapFirst (\it -> { model | sharedState = it })
+                |> Result.map (applyTo model)
+                |> Result.withDefault ( model, Cmd.none )
 
         ReceivedHistory eventsResults ->
-            ( { model | sharedState = evolveMany model.sharedState eventsResults }
+            ( evolveMany model eventsResults
             , Cmd.none
             )
 
         TimePassed now ->
             let
-                timeUpdated = { model | now = now }
+                timeUpdated =
+                    { model | now = now }
             in
-
-            if hasTurnEnded now model.sharedState.clock then
-                ( { timeUpdated | alarmState = AlarmOn }
+            if hasTurnEnded timeUpdated then
+                ( { timeUpdated
+                    | alarmState = AlarmOn
+                    , clock = end timeUpdated.clock
+                  }
                 , Js.Commands.send Js.Commands.SoundAlarm
                 )
 
@@ -182,34 +177,49 @@ update msg model =
             )
 
 
-hasTurnEnded : Time.Posix -> ClockState -> Bool
-hasTurnEnded now clockState =
-    case clockState of
-        Off ->
+hasTurnEnded : Model -> Bool
+hasTurnEnded model =
+    case model.clock of
+        On on ->
+            not on.ended && Duration.secondsBetween model.now on.end == 0
+
+        _ ->
             False
 
+end : ClockState -> ClockState
+end clockState =
+    case clockState of
         On on ->
-            Duration.secondsBetween now on.end == 0
+            On { on | ended = True }
+
+        Off ->
+            clockState
 
 
-evolveMany : SharedState -> List (Result Json.Decode.Error SharedEvents.Event) -> SharedState
-evolveMany sharedState events =
+evolveMany : Model -> List (Result Json.Decode.Error SharedEvents.Event) -> Model
+evolveMany model events =
     case uncons events of
         ( Nothing, _ ) ->
-            sharedState
+            model
 
         ( Just (Err _), tail ) ->
-            evolveMany sharedState tail
+            evolveMany model tail
 
         ( Just (Ok head), tail ) ->
-            evolveMany (applyTo sharedState head |> Tuple.first) tail
+            evolveMany (applyTo model head |> Tuple.first) tail
 
 
-applyTo : SharedState -> SharedEvents.Event -> ( SharedState, Cmd Msg )
+applyTo : Model -> SharedEvents.Event -> ( Model, Cmd Msg )
 applyTo state event =
     case ( event, state.clock ) of
         ( SharedEvents.Started started, Off ) ->
-            ( { state | clock = On { end = Time.posixToMillis started.time + (10 * 1000) |> Time.millisToPosix } }
+            ( { state
+                | clock =
+                    On
+                        { end = Time.posixToMillis started.time + (10 * 1000) |> Time.millisToPosix
+                        , ended = False
+                        }
+              }
             , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
             )
 
@@ -292,7 +302,7 @@ view model =
                     , button [ type_ "submit" ] [ Icons.plus ]
                     ]
                 , ul []
-                    (model.sharedState.mobbers
+                    (model.mobbers
                         |> assign [ "Driver", "Navigator" ]
                         |> List.map mobberView
                         |> List.filter ((/=) Nothing)
@@ -341,7 +351,14 @@ detectAction model =
             }
 
         AlarmOff ->
-            case model.sharedState.clock of
+            case model.clock of
+                Off ->
+                    { icon = Icons.play
+                    , message = Start
+                    , class = ""
+                    , text = ""
+                    }
+
                 On on ->
                     { icon = Icons.stop
                     , message = ShareEvent SharedEvents.Stopped
@@ -350,11 +367,4 @@ detectAction model =
                         Duration.between model.now on.end
                             |> Duration.toSeconds
                             |> (\a -> String.fromInt a ++ " s")
-                    }
-
-                Off ->
-                    { icon = Icons.play
-                    , message = Start
-                    , class = ""
-                    , text = ""
                     }
