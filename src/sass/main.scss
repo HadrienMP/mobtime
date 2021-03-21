@@ -62,13 +62,47 @@ button {
   border: none;
   background: $dark-button-color;
   color: white;
-  padding: 0 20px;
   outline: none;
   cursor: pointer;
   font-size: .9em;
+  @include icon(1.3em, white);
+  display: inline-flex;
+  align-items: center;
+  padding: $padding-space;
 
   &:hover {
     background: $light-button-color;
+  }
+
+  &[disabled] {
+    opacity: .6;
+    cursor: auto;
+    &:hover {
+      background: $dark-button-color;
+    }
+  }
+}
+
+.labelled-icon-button {
+  .icon {
+    padding-right: .4em;
+    margin-right: .4em;
+    border-right: 1px solid white;
+  }
+}
+
+.button-row {
+  display: flex;
+  margin: $margin-space 0;
+
+  button {
+    flex: auto;
+    justify-content: center;
+    margin-left: .2em;
+
+    &:first-child {
+      margin-left: 0;
+    }
   }
 }
 

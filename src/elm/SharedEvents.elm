@@ -2,7 +2,7 @@ module SharedEvents exposing (..)
 
 import Json.Decode
 import Json.Encode
-import Mobbers exposing (Mobber)
+import Mobbers exposing (Mobber, Mobbers)
 import Sound.Library
 import Time
 
@@ -12,6 +12,8 @@ type Event
     | Stopped
     | AddedMobber Mobber
     | DeletedMobber Mobber
+    | RotatedMobbers
+    | ShuffledMobbers Mobbers
 
 
 
@@ -43,6 +45,12 @@ decoderFromName eventName =
 
         "DeletedMobber" ->
             Json.Decode.map DeletedMobber (Json.Decode.field "mobber" Mobbers.jsonDecoder)
+
+        "ShuffledMobbers" ->
+            Json.Decode.map ShuffledMobbers (Json.Decode.field "mobbers" (Json.Decode.list Mobbers.jsonDecoder))
+
+        "RotatedMobbers" ->
+            Json.Decode.succeed RotatedMobbers
 
         _ ->
             Json.Decode.fail <| "I don't know this event " ++ eventName
@@ -87,3 +95,13 @@ toJson event =
                 [ ( "name", Json.Encode.string "DeletedMobber" )
                 , ( "mobber", Mobbers.toJson mobber )
                 ]
+
+            ShuffledMobbers mobbers ->
+                [ ( "name", Json.Encode.string "ShuffledMobbers" )
+                , ( "mobbers", Json.Encode.list Mobbers.toJson mobbers )
+                ]
+
+            RotatedMobbers ->
+                [ ( "name", Json.Encode.string "RotatedMobbers" ) ]
+
+

@@ -6,6 +6,14 @@ import Ionicon
 import Ionicon.Android
 import Svg exposing (Svg)
 
+rotate : Svg msg
+rotate =
+    display Ionicon.refresh
+
+shuffle : Svg msg
+shuffle =
+    display Ionicon.shuffle
+
 plus : Svg msg
 plus =
     display Ionicon.plus

@@ -3,7 +3,7 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (class, id, type_, value)
+import Html.Attributes exposing (class, disabled, hidden, id, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Js.Commands
 import Js.Events
@@ -14,6 +14,7 @@ import Lib.Icons as Icons
 import Lib.ListExtras exposing (assign, rotate, uncons)
 import Mobbers exposing (Mobber, Mobbers)
 import Random
+import Random.List
 import SharedEvents
 import Sound.Library
 import Svg exposing (Svg, svg)
@@ -100,6 +101,7 @@ type Msg
     | UnknownEvent
     | MobberNameChanged String
     | AddMobber
+    | ShuffleMobbers
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -176,6 +178,9 @@ update msg model =
                 |> sendEvent
             )
 
+        ShuffleMobbers ->
+            ( model, Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Random.List.shuffle model.mobbers )
+
 
 hasTurnEnded : Model -> Bool
 hasTurnEnded model =
@@ -185,6 +190,7 @@ hasTurnEnded model =
 
         _ ->
             False
+
 
 end : ClockState -> ClockState
 end clockState =
@@ -236,6 +242,12 @@ applyTo state event =
 
         ( SharedEvents.DeletedMobber mobber, _ ) ->
             ( { state | mobbers = List.filter (\m -> m /= mobber) state.mobbers }, Cmd.none )
+
+        ( SharedEvents.RotatedMobbers, _ ) ->
+            ( { state | mobbers = rotate state.mobbers }, Cmd.none )
+
+        ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
+            ( { state | mobbers = mobbers }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )
@@ -300,6 +312,24 @@ view model =
                     [ id "add", onSubmit AddMobber ]
                     [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
                     , button [ type_ "submit" ] [ Icons.plus ]
+                    ]
+                , div [ class "button-row" ]
+                    [ button
+                        [ class "labelled-icon-button"
+                        , disabled (List.length model.mobbers < 2)
+                        , onClick <| ShareEvent <| SharedEvents.RotatedMobbers
+                        ]
+                        [ Icons.rotate
+                        , text "Rotate"
+                        ]
+                    , button
+                        [ class "labelled-icon-button"
+                        , disabled (List.length model.mobbers < 3)
+                        , onClick ShuffleMobbers
+                        ]
+                        [ Icons.shuffle
+                        , text "Shuffle"
+                        ]
                     ]
                 , ul []
                     (model.mobbers

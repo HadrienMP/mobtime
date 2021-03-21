@@ -139,9 +139,9 @@ nav {
   button {
     flex: 1 1;
     display: inline-block;
-    font-size: 1.2em;
+    font-size: 1.4em;
     text-align: center;
-    padding: 4px 0;
+    padding: $padding-space 0;
     text-shadow: 1px 1px 1px #666;
     border-right: 1px solid $border-color;
     color: white;
