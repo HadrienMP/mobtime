@@ -247,7 +247,7 @@ applyTo state event =
             ( { state | mobbers = rotate state.mobbers }, Cmd.none )
 
         ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
-            ( { state | mobbers = mobbers }, Cmd.none )
+            ( { state | mobbers = mobbers ++ (List.filter (\el -> not <| List.member el mobbers) state.mobbers) }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )
