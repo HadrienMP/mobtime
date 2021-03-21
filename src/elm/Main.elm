@@ -356,7 +356,7 @@ mobberView ( role, maybeMobber ) =
                         [ input [ type_ "text", value mobber.name ] []
                         , button
                             [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
-                            [ i [ class "las la-times" ] [] ]
+                            [ Icons.delete ]
                         ]
                     ]
             )

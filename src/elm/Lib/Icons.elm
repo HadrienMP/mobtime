@@ -6,6 +6,10 @@ import Ionicon
 import Ionicon.Android
 import Svg exposing (Svg)
 
+delete : Svg msg
+delete =
+    display Ionicon.close
+
 rotate : Svg msg
 rotate =
     display Ionicon.refresh
