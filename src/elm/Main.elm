@@ -2,22 +2,25 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Circle
 import Html exposing (..)
-import Html.Attributes exposing (class, disabled, hidden, id, type_, value)
+import Html.Attributes exposing (class, disabled, id, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Js.Commands
 import Js.Events
 import Json.Decode
 import Json.Encode
-import Lib.Duration as Duration
+import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons as Icons
 import Lib.ListExtras exposing (assign, rotate, uncons)
+import Lib.Ratio
 import Mobbers exposing (Mobber, Mobbers)
 import Random
 import Random.List
 import SharedEvents
 import Sound.Library
 import Svg exposing (Svg, svg)
+import Svg.Attributes as Svg
 import Task
 import Time
 import Url
@@ -54,7 +57,7 @@ main =
 
 type ClockState
     = Off
-    | On { end : Time.Posix, ended : Bool }
+    | On { end : Time.Posix, length : Duration, ended : Bool }
 
 
 type AlarmState
@@ -149,7 +152,9 @@ update msg model =
 
         StartWithAlarm sound ->
             ( model
-            , sendEvent <| SharedEvents.toJson <| SharedEvents.Started { time = model.now, alarm = sound }
+            , sendEvent <|
+                SharedEvents.toJson <|
+                    SharedEvents.Started { time = model.now, alarm = sound, length = Duration.ofSeconds 10 }
             )
 
         StopSound ->
@@ -223,6 +228,7 @@ applyTo state event =
                 | clock =
                     On
                         { end = Time.posixToMillis started.time + (10 * 1000) |> Time.millisToPosix
+                        , length = started.length
                         , ended = False
                         }
               }
@@ -247,7 +253,7 @@ applyTo state event =
             ( { state | mobbers = rotate state.mobbers }, Cmd.none )
 
         ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
-            ( { state | mobbers = mobbers ++ (List.filter (\el -> not <| List.member el mobbers) state.mobbers) }, Cmd.none )
+            ( { state | mobbers = mobbers ++ List.filter (\el -> not <| List.member el mobbers) state.mobbers }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )
@@ -286,13 +292,35 @@ view model =
     let
         action =
             detectAction model
+
+        totalWidth =
+            220
+
+        outerRadiant =
+            104
+
+        pomodoroCircle =
+            Circle.Circle
+                outerRadiant
+                (Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
+                (Circle.Stroke 10 "#999")
+
+        mobCircle =
+            Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
     in
     { title = "Mob Time"
     , body =
         [ div [ class "container" ]
             [ header []
                 [ section []
-                    [ svg [ id "circles" ] []
+                    [ svg
+                        [ id "circles"
+                        , Svg.width <| String.fromInt totalWidth
+                        , Svg.height <| String.fromInt totalWidth
+                        ]
+                      <|
+                        Circle.draw pomodoroCircle Lib.Ratio.full
+                            ++ Circle.draw mobCircle (clockRatio model)
                     , button
                         [ id "action"
                         , class action.class
@@ -342,6 +370,18 @@ view model =
             ]
         ]
     }
+
+
+clockRatio : Model -> Lib.Ratio.Ratio
+clockRatio model =
+    case model.clock of
+        Off ->
+            Lib.Ratio.full
+
+        On on ->
+            Duration.div (Duration.between model.now on.end) on.length
+                |> ((-) 1)
+                |> Lib.Ratio.from
 
 
 mobberView : ( Maybe String, Maybe Mobber ) -> Maybe (Html Msg)

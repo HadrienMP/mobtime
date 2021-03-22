@@ -1,10 +1,21 @@
 module Lib.Duration exposing (..)
 
+import Json.Decode
+import Json.Encode
 import Time
 
 
 type Duration
     = Duration Int
+
+toJson : Duration -> Json.Encode.Value
+toJson duration =
+    Json.Encode.int <| toMillis duration
+
+jsonDecoder : Json.Decode.Decoder Duration
+jsonDecoder =
+    Json.Decode.int
+    |> Json.Decode.map ofMillis
 
 secondsBetween : Time.Posix -> Time.Posix -> Int
 secondsBetween a b =

@@ -2,13 +2,14 @@ module SharedEvents exposing (..)
 
 import Json.Decode
 import Json.Encode
+import Lib.Duration exposing (Duration)
 import Mobbers exposing (Mobber, Mobbers)
 import Sound.Library
 import Time
 
 
 type Event
-    = Started { time : Time.Posix, alarm : Sound.Library.Sound }
+    = Started { time : Time.Posix, alarm : Sound.Library.Sound, length : Duration }
     | Stopped
     | AddedMobber Mobber
     | DeletedMobber Mobber
@@ -58,10 +59,11 @@ decoderFromName eventName =
 
 startedDecoder : Json.Decode.Decoder Event
 startedDecoder =
-    Json.Decode.map2
-        (\start alarm -> Started { time = start, alarm = alarm })
+    Json.Decode.map3
+        (\start alarm length -> Started { time = start, alarm = alarm, length = length })
         (Json.Decode.field "time" timeDecoder)
         (Json.Decode.field "alarm" Json.Decode.string)
+        (Json.Decode.field "length" Lib.Duration.jsonDecoder)
 
 
 timeDecoder : Json.Decode.Decoder Time.Posix
@@ -81,6 +83,7 @@ toJson event =
                 [ ( "name", Json.Encode.string "Started" )
                 , ( "time", Json.Encode.int <| Time.posixToMillis started.time )
                 , ( "alarm", Json.Encode.string started.alarm )
+                , ( "length", Lib.Duration.toJson started.length )
                 ]
 
             Stopped ->
