@@ -6,6 +6,22 @@ import Ionicon
 import Ionicon.Android
 import Svg exposing (Svg)
 
+sound : Svg msg
+sound =
+    display Ionicon.musicNote
+
+share : Svg msg
+share =
+    display Ionicon.Android.shareAlt
+
+clock : Svg msg
+clock =
+    display Ionicon.Android.alarmClock
+
+home : Svg msg
+home =
+    display Ionicon.home
+
 delete : Svg msg
 delete =
     display Ionicon.close
@@ -36,7 +52,7 @@ mute =
 
 people : Svg msg
 people =
-    display Ionicon.Android.people
+    display Ionicon.personStalker
 
 display : (Int -> RGBA -> Svg msg) -> Svg msg
 display icon =

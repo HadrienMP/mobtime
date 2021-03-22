@@ -140,12 +140,12 @@ nav {
     flex: 1 1;
     display: inline-block;
     text-align: center;
-    padding: .1em 0;
+    padding: .5em 0;
     text-shadow: 1px 1px 1px #666;
     border-right: 1px solid $border-color;
     color: white;
 
-    @include icon(2.5em, white);
+    @include icon(2.1em, white);
 
     &:first-child {
       border-left: 1px solid $border-color;

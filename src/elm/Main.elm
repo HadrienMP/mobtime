@@ -332,7 +332,11 @@ view model =
                     ]
                 ]
             , nav []
-                [ button [] [ Icons.people ]
+                [ button [] [ Icons.home ]
+                , button [] [ Icons.clock ]
+                , button [] [ Icons.people ]
+                , button [] [ Icons.sound ]
+                , button [] [ Icons.share ]
                 ]
             , div
                 [ id "mobbers", class "tab" ]
