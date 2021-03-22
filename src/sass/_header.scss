@@ -4,7 +4,7 @@ header {
   section {
     position: relative;
     margin: 0 auto;
-    padding: 50px 0 30px;
+    padding: 40px 0;
 
     &::before {
       content: "";
@@ -33,7 +33,7 @@ header {
 
     #action {
       position: absolute;
-      top: 50px;
+      top: 40px;
       left: 0;
       right: 0;
       display: block;
