@@ -33,6 +33,7 @@
                 break;
             case "SetAlarm":
                 alarm.src = "/sound/" + command.value;
+                alarm.load();
                 break;
             case "StopAlarm":
                 alarm.pause();
