@@ -139,14 +139,13 @@ nav {
   button {
     flex: 1 1;
     display: inline-block;
-    font-size: 1.4em;
     text-align: center;
-    padding: $padding-space 0;
+    padding: .1em 0;
     text-shadow: 1px 1px 1px #666;
     border-right: 1px solid $border-color;
     color: white;
 
-    @include icon(1.4em, white);
+    @include icon(2.5em, white);
 
     &:first-child {
       border-left: 1px solid $border-color;

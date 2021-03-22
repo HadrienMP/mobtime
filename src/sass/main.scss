@@ -17,7 +17,9 @@ html {
 
 body {
   color: $color;
-  margin-top: $margin-space;
+  @media (min-width: $width) {
+    margin-top: $margin-space;
+  }
 }
 
 body * {
