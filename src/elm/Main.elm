@@ -3,20 +3,21 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
+import Clock.Model exposing (ClockState(..))
 import Html exposing (..)
-import Html.Attributes exposing (class, disabled, id, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Json.Decode
 import Json.Encode
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons as Icons
-import Lib.ListExtras exposing (assign, rotate, uncons)
+import Lib.ListExtras exposing (rotate, uncons)
 import Lib.Ratio
-import Mobbers exposing (Mobber, Mobbers)
+import Mobbers.Model exposing (Mobbers)
+import Mobbers.Settings
 import Random
-import Random.List
 import SharedEvents
 import Sound.Library
 import Svg exposing (Svg, svg)
@@ -24,9 +25,6 @@ import Svg.Attributes as Svg
 import Task
 import Time
 import Url
-
-
-port sendEvent : Json.Encode.Value -> Cmd msg
 
 
 port receiveEvent : (Json.Encode.Value -> msg) -> Sub msg
@@ -55,11 +53,6 @@ main =
 -- MODEL
 
 
-type ClockState
-    = Off
-    | On { end : Time.Posix, length : Duration, ended : Bool }
-
-
 type AlarmState
     = AlarmOn
     | AlarmOff
@@ -68,8 +61,8 @@ type AlarmState
 type alias Model =
     { clock : ClockState
     , mobbers : Mobbers
+    , mobbersSettings : Mobbers.Settings.Model
     , alarmState : AlarmState
-    , mobberName : String
     , now : Time.Posix
     }
 
@@ -78,8 +71,8 @@ init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
     ( { clock = Off
       , mobbers = []
+      , mobbersSettings = Mobbers.Settings.init
       , alarmState = AlarmOff
-      , mobberName = ""
       , now = Time.millisToPosix 0
       }
     , Task.perform TimePassed Time.now
@@ -102,9 +95,7 @@ type Msg
     | StopSound
     | AlarmEnded
     | UnknownEvent
-    | MobberNameChanged String
-    | AddMobber
-    | ShuffleMobbers
+    | GotMobbersSettingsMsg Mobbers.Settings.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -118,7 +109,7 @@ update msg model =
 
         ShareEvent event ->
             ( model
-            , sendEvent <| SharedEvents.toJson event
+            , SharedEvents.sendEvent <| SharedEvents.toJson event
             )
 
         ReceivedEvent eventResult ->
@@ -152,7 +143,7 @@ update msg model =
 
         StartWithAlarm sound ->
             ( model
-            , sendEvent <|
+            , SharedEvents.sendEvent <|
                 SharedEvents.toJson <|
                     SharedEvents.Started { time = model.now, alarm = sound, length = Duration.ofSeconds 10 }
             )
@@ -170,21 +161,11 @@ update msg model =
         UnknownEvent ->
             ( model, Cmd.none )
 
-        MobberNameChanged name ->
-            ( { model | mobberName = name }
-            , Cmd.none
-            )
-
-        AddMobber ->
-            ( { model | mobberName = "" }
-            , Mobbers.create model.mobberName
-                |> SharedEvents.AddedMobber
-                |> SharedEvents.toJson
-                |> sendEvent
-            )
-
-        ShuffleMobbers ->
-            ( model, Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Random.List.shuffle model.mobbers )
+        GotMobbersSettingsMsg subMsg ->
+            Mobbers.Settings.update subMsg model.mobbers model.mobbersSettings
+                |> Tuple.mapBoth
+                    (\it -> { model | mobbersSettings = it })
+                    (Cmd.map GotMobbersSettingsMsg)
 
 
 hasTurnEnded : Model -> Bool
@@ -338,39 +319,8 @@ view model =
                 , button [] [ Icons.sound ]
                 , button [] [ Icons.share ]
                 ]
-            , div
-                [ id "mobbers", class "tab" ]
-                [ form
-                    [ id "add", onSubmit AddMobber ]
-                    [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
-                    , button [ type_ "submit" ] [ Icons.plus ]
-                    ]
-                , div [ class "button-row" ]
-                    [ button
-                        [ class "labelled-icon-button"
-                        , disabled (List.length model.mobbers < 2)
-                        , onClick <| ShareEvent <| SharedEvents.RotatedMobbers
-                        ]
-                        [ Icons.rotate
-                        , text "Rotate"
-                        ]
-                    , button
-                        [ class "labelled-icon-button"
-                        , disabled (List.length model.mobbers < 3)
-                        , onClick ShuffleMobbers
-                        ]
-                        [ Icons.shuffle
-                        , text "Shuffle"
-                        ]
-                    ]
-                , ul []
-                    (model.mobbers
-                        |> assign [ "Driver", "Navigator" ]
-                        |> List.map mobberView
-                        |> List.filter ((/=) Nothing)
-                        |> List.map (Maybe.withDefault (li [] []))
-                    )
-                ]
+            , Mobbers.Settings.view model.mobbers model.mobbersSettings
+                |> Html.map GotMobbersSettingsMsg
             ]
         ]
     }
@@ -384,26 +334,8 @@ clockRatio model =
 
         On on ->
             Duration.div (Duration.between model.now on.end) on.length
-                |> ((-) 1)
+                |> (-) 1
                 |> Lib.Ratio.from
-
-
-mobberView : ( Maybe String, Maybe Mobber ) -> Maybe (Html Msg)
-mobberView ( role, maybeMobber ) =
-    maybeMobber
-        |> Maybe.map
-            (\mobber ->
-                li []
-                    [ p [] [ text <| Maybe.withDefault "Mobber" role ]
-                    , div
-                        []
-                        [ input [ type_ "text", value mobber.name ] []
-                        , button
-                            [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
-                            [ Icons.delete ]
-                        ]
-                    ]
-            )
 
 
 type alias ActionDescription =

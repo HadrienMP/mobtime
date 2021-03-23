@@ -1,4 +1,4 @@
-module Mobbers exposing (..)
+module Mobbers.Model exposing (..)
 
 import Json.Decode
 import Json.Encode
@@ -16,6 +16,7 @@ type alias Mobbers =
 create : String -> Mobber
 create name =
     Mobber name
+
 
 
 -- JSON

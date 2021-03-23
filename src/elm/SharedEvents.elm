@@ -1,11 +1,14 @@
-module SharedEvents exposing (..)
+port module SharedEvents exposing (..)
 
 import Json.Decode
 import Json.Encode
 import Lib.Duration exposing (Duration)
-import Mobbers exposing (Mobber, Mobbers)
+import Mobbers.Model as Mobbers exposing (Mobber, Mobbers)
 import Sound.Library
 import Time
+
+
+port sendEvent : Json.Encode.Value -> Cmd msg
 
 
 type Event
@@ -106,5 +109,3 @@ toJson event =
 
             RotatedMobbers ->
                 [ ( "name", Json.Encode.string "RotatedMobbers" ) ]
-
-
