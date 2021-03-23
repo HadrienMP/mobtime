@@ -13,11 +13,10 @@ import Json.Decode
 import Json.Encode
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons as Icons
-import Lib.ListExtras exposing (rotate, uncons)
 import Lib.Ratio
-import Mobbers.Model exposing (Mobbers)
 import Mobbers.Settings
 import Random
+import Shared
 import SharedEvents
 import Sound.Library
 import Svg exposing (Svg, svg)
@@ -54,8 +53,7 @@ main =
 
 
 type alias Model =
-    { clock : ClockState
-    , mobbers : Mobbers
+    { shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
     , alarmPlaying : Bool
     , now : Time.Posix
@@ -64,8 +62,7 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { clock = Off
-      , mobbers = []
+    ( { shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
       , alarmPlaying = False
       , now = Time.millisToPosix 0
@@ -109,23 +106,24 @@ update msg model =
 
         ReceivedEvent eventResult ->
             eventResult
-                |> Result.map (applyTo model)
-                |> Result.withDefault ( model, Cmd.none )
+                |> Result.map (Shared.applyTo model.shared)
+                |> Result.withDefault ( Shared.init, Cmd.none )
+                |> Tuple.mapFirst (\shared -> { model | shared = shared })
 
         ReceivedHistory eventsResults ->
-            ( evolveMany model eventsResults
+            ( { model | shared = Shared.evolveMany model.shared eventsResults }
             , Cmd.none
             )
 
         TimePassed now ->
             let
-                ( clock, command ) =
-                    Clock.Model.timePassed now model.clock
+                ( shared, command ) =
+                    Shared.timePassed now model.shared
             in
             ( { model
-                | alarmPlaying = Clock.Model.clockEnded clock
+                | alarmPlaying = Clock.Model.clockEnded shared.clock
                 , now = now
-                , clock = clock
+                , shared = shared
               }
             , command
             )
@@ -154,62 +152,13 @@ update msg model =
             ( model, Cmd.none )
 
         GotMobbersSettingsMsg subMsg ->
-            Mobbers.Settings.update subMsg model.mobbers model.mobbersSettings
+            Mobbers.Settings.update subMsg model.shared.mobbers model.mobbersSettings
                 |> Tuple.mapBoth
                     (\it -> { model | mobbersSettings = it })
                     (Cmd.map GotMobbersSettingsMsg)
 
 
-evolveMany : Model -> List (Result Json.Decode.Error SharedEvents.Event) -> Model
-evolveMany model events =
-    case uncons events of
-        ( Nothing, _ ) ->
-            model
 
-        ( Just (Err _), tail ) ->
-            evolveMany model tail
-
-        ( Just (Ok head), tail ) ->
-            evolveMany (applyTo model head |> Tuple.first) tail
-
-
-applyTo : Model -> SharedEvents.Event -> ( Model, Cmd Msg )
-applyTo state event =
-    case ( event, state.clock ) of
-        ( SharedEvents.Started started, Off ) ->
-            ( { state
-                | clock =
-                    On
-                        { end = Time.posixToMillis started.time + (10 * 1000) |> Time.millisToPosix
-                        , length = started.length
-                        , ended = False
-                        }
-              }
-            , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
-            )
-
-        ( SharedEvents.Stopped, On _ ) ->
-            ( { state
-                | clock = Off
-                , mobbers = rotate state.mobbers
-              }
-            , Cmd.none
-            )
-
-        ( SharedEvents.AddedMobber mobber, _ ) ->
-            ( { state | mobbers = state.mobbers ++ [ mobber ] }, Cmd.none )
-
-        ( SharedEvents.DeletedMobber mobber, _ ) ->
-            ( { state | mobbers = List.filter (\m -> m /= mobber) state.mobbers }, Cmd.none )
-
-        ( SharedEvents.RotatedMobbers, _ ) ->
-            ( { state | mobbers = rotate state.mobbers }, Cmd.none )
-
-        ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
-            ( { state | mobbers = mobbers ++ List.filter (\el -> not <| List.member el mobbers) state.mobbers }, Cmd.none )
-
-        _ ->
-            ( state, Cmd.none )
 
 
 
@@ -273,7 +222,7 @@ view model =
                         ]
                       <|
                         Circle.draw pomodoroCircle Lib.Ratio.full
-                            ++ Circle.draw mobCircle (clockRatio model)
+                            ++ Circle.draw mobCircle (Clock.Model.clockRatio model.now model.shared.clock)
                     , button
                         [ id "action"
                         , class action.class
@@ -291,23 +240,11 @@ view model =
                 , button [] [ Icons.sound ]
                 , button [] [ Icons.share ]
                 ]
-            , Mobbers.Settings.view model.mobbers model.mobbersSettings
+            , Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
                 |> Html.map GotMobbersSettingsMsg
             ]
         ]
     }
-
-
-clockRatio : Model -> Lib.Ratio.Ratio
-clockRatio model =
-    case model.clock of
-        Off ->
-            Lib.Ratio.full
-
-        On on ->
-            Duration.div (Duration.between model.now on.end) on.length
-                |> (-) 1
-                |> Lib.Ratio.from
 
 
 type alias ActionDescription =
@@ -328,7 +265,7 @@ detectAction model =
         }
 
     else
-        case model.clock of
+        case model.shared.clock of
             Off ->
                 { icon = Icons.play
                 , message = Start

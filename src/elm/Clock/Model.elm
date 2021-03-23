@@ -2,6 +2,7 @@ module Clock.Model exposing (..)
 
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
+import Lib.Ratio
 import Time
 
 
@@ -43,3 +44,15 @@ clockEnded clockState =
 
         Off ->
             False
+
+
+clockRatio : Time.Posix -> ClockState -> Lib.Ratio.Ratio
+clockRatio now model =
+    case model of
+        Off ->
+            Lib.Ratio.full
+
+        On on ->
+            Duration.div (Duration.between now on.end) on.length
+                |> (-) 1
+                |> Lib.Ratio.from
