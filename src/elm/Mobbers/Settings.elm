@@ -1,7 +1,7 @@
 module Mobbers.Settings exposing (..)
 
 import Html exposing (Html, button, div, form, input, li, p, text, ul)
-import Html.Attributes exposing (class, disabled, id, type_, value)
+import Html.Attributes exposing (class, disabled, id, placeholder, required, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons as Icons
 import Lib.ListExtras exposing (assign)
@@ -69,7 +69,13 @@ view mobbers model =
         [ id "mobbers", class "tab" ]
         [ form
             [ id "add", onSubmit AddMobber ]
-            [ input [ type_ "text", onInput MobberNameChanged, value model.mobberName ] []
+            [ input
+                [ type_ "text"
+                , Html.Attributes.minlength 1
+                , placeholder "Mobber to be added"
+                , onInput MobberNameChanged
+                , value model.mobberName ]
+                []
             , button [ type_ "submit" ] [ Icons.plus ]
             ]
         , div [ class "button-row" ]

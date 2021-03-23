@@ -53,16 +53,11 @@ main =
 -- MODEL
 
 
-type AlarmState
-    = AlarmOn
-    | AlarmOff
-
-
 type alias Model =
     { clock : ClockState
     , mobbers : Mobbers
     , mobbersSettings : Mobbers.Settings.Model
-    , alarmState : AlarmState
+    , alarmPlaying : Bool
     , now : Time.Posix
     }
 
@@ -72,7 +67,7 @@ init _ _ _ =
     ( { clock = Off
       , mobbers = []
       , mobbersSettings = Mobbers.Settings.init
-      , alarmState = AlarmOff
+      , alarmPlaying = False
       , now = Time.millisToPosix 0
       }
     , Task.perform TimePassed Time.now
@@ -124,19 +119,16 @@ update msg model =
 
         TimePassed now ->
             let
-                timeUpdated =
-                    { model | now = now }
+                ( clock, command ) =
+                    Clock.Model.timePassed now model.clock
             in
-            if hasTurnEnded timeUpdated then
-                ( { timeUpdated
-                    | alarmState = AlarmOn
-                    , clock = end timeUpdated.clock
-                  }
-                , Js.Commands.send Js.Commands.SoundAlarm
-                )
-
-            else
-                ( timeUpdated, Cmd.none )
+            ( { model
+                | alarmPlaying = Clock.Model.clockEnded clock
+                , now = now
+                , clock = clock
+              }
+            , command
+            )
 
         Start ->
             ( model, Random.generate StartWithAlarm <| Sound.Library.pick Sound.Library.ClassicWeird )
@@ -149,12 +141,12 @@ update msg model =
             )
 
         StopSound ->
-            ( { model | alarmState = AlarmOff }
+            ( { model | alarmPlaying = False }
             , Js.Commands.send Js.Commands.StopAlarm
             )
 
         AlarmEnded ->
-            ( { model | alarmState = AlarmOff }
+            ( { model | alarmPlaying = False }
             , Cmd.none
             )
 
@@ -166,26 +158,6 @@ update msg model =
                 |> Tuple.mapBoth
                     (\it -> { model | mobbersSettings = it })
                     (Cmd.map GotMobbersSettingsMsg)
-
-
-hasTurnEnded : Model -> Bool
-hasTurnEnded model =
-    case model.clock of
-        On on ->
-            not on.ended && Duration.secondsBetween model.now on.end == 0
-
-        _ ->
-            False
-
-
-end : ClockState -> ClockState
-end clockState =
-    case clockState of
-        On on ->
-            On { on | ended = True }
-
-        Off ->
-            clockState
 
 
 evolveMany : Model -> List (Result Json.Decode.Error SharedEvents.Event) -> Model
@@ -348,29 +320,28 @@ type alias ActionDescription =
 
 detectAction : Model -> ActionDescription
 detectAction model =
-    case model.alarmState of
-        AlarmOn ->
-            { icon = Icons.mute
-            , message = StopSound
-            , class = ""
-            , text = ""
-            }
+    if model.alarmPlaying then
+        { icon = Icons.mute
+        , message = StopSound
+        , class = ""
+        , text = ""
+        }
 
-        AlarmOff ->
-            case model.clock of
-                Off ->
-                    { icon = Icons.play
-                    , message = Start
-                    , class = ""
-                    , text = ""
-                    }
+    else
+        case model.clock of
+            Off ->
+                { icon = Icons.play
+                , message = Start
+                , class = ""
+                , text = ""
+                }
 
-                On on ->
-                    { icon = Icons.stop
-                    , message = ShareEvent SharedEvents.Stopped
-                    , class = "on"
-                    , text =
-                        Duration.between model.now on.end
-                            |> Duration.toSeconds
-                            |> (\a -> String.fromInt a ++ " s")
-                    }
+            On on ->
+                { icon = Icons.stop
+                , message = ShareEvent SharedEvents.Stopped
+                , class = "on"
+                , text =
+                    Duration.between model.now on.end
+                        |> Duration.toSeconds
+                        |> (\a -> String.fromInt a ++ " s")
+                }
