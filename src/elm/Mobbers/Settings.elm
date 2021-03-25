@@ -1,10 +1,13 @@
 module Mobbers.Settings exposing (..)
 
+import Field
+import Field.String
 import Html exposing (Html, button, div, form, input, li, p, text, ul)
-import Html.Attributes exposing (class, disabled, id, placeholder, required, type_, value)
+import Html.Attributes as Attributes exposing (class, disabled, id, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons as Icons
 import Lib.ListExtras exposing (assign)
+import Lib.Toaster exposing (Level(..), Toasts, Toast)
 import Mobbers.Model exposing (Mobber, Mobbers)
 import Random
 import Random.List
@@ -12,12 +15,12 @@ import SharedEvents
 
 
 type alias Model =
-    { mobberName : String }
+    { mobberName : Field.String.Field }
 
 
 init : Model
 init =
-    { mobberName = "" }
+    { mobberName = Field.init "" }
 
 
 
@@ -30,33 +33,55 @@ type Msg
     | ShuffleMobbers
     | ShareEvent SharedEvents.Event
 
+type alias UpdateResult =
+    { updated : Model
+    , command : Cmd Msg
+    , toasts : Toasts
+    }
 
-update : Msg -> Mobbers -> Model -> ( Model, Cmd Msg )
+update : Msg -> Mobbers -> Model -> UpdateResult
 update msg mobbers model =
     case msg of
         MobberNameChanged name ->
-            ( { model | mobberName = name }
-            , Cmd.none
-            )
+            { updated = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
+            , command = Cmd.none
+            , toasts = []
+            }
 
         AddMobber ->
-            ( { model | mobberName = "" }
-            , Mobbers.Model.create model.mobberName
-                |> SharedEvents.AddedMobber
-                |> SharedEvents.toJson
-                |> SharedEvents.sendEvent
-            )
+            let
+                name = model.mobberName |> Field.String.notEmpty
+            in
+            case Field.toResult name of
+                Ok valid ->
+                    { updated = { model | mobberName = Field.init "" }
+                    , command = Mobbers.Model.create valid
+                        |> SharedEvents.AddedMobber
+                        |> SharedEvents.toJson
+                        |> SharedEvents.sendEvent
+                    , toasts = []
+                    }
+
+                Err _ ->
+                    { updated = { model | mobberName = name }
+                    , command = Cmd.none
+                    , toasts = [Toast Error "The mobber name cannot be empty"]
+                    }
 
         ShuffleMobbers ->
-            ( model, Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Random.List.shuffle mobbers )
+            { updated = model
+            , command = Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Random.List.shuffle mobbers
+            , toasts = []
+            }
 
         ShareEvent event ->
             -- TODO duplicated code
-            ( model
-            , event
+            { updated = model
+            , command = event
                 |> SharedEvents.toJson
                 |> SharedEvents.sendEvent
-            )
+            , toasts = []
+            }
 
 
 
@@ -69,13 +94,7 @@ view mobbers model =
         [ id "mobbers", class "tab" ]
         [ form
             [ id "add", onSubmit AddMobber ]
-            [ input
-                [ type_ "text"
-                , Html.Attributes.minlength 1
-                , placeholder "Mobber to be added"
-                , onInput MobberNameChanged
-                , value model.mobberName ]
-                []
+            [ Field.view (textFieldConfig "Mobber to be added" MobberNameChanged) model.mobberName
             , button [ type_ "submit" ] [ Icons.plus ]
             ]
         , div [ class "button-row" ]
@@ -104,6 +123,32 @@ view mobbers model =
                 |> List.map (Maybe.withDefault (li [] []))
             )
         ]
+
+
+textFieldConfig : String -> (String -> msg) -> Field.String.ViewConfig msg
+textFieldConfig title toMsg =
+    { valid =
+        \meta value ->
+            div [ class "form-field" ]
+                [ textInput title toMsg value meta ]
+    , invalid =
+        \meta value _ ->
+            div [ class "form-field" ]
+                [ textInput title toMsg value meta
+                ]
+    }
+
+
+textInput : String -> (String -> msg) -> String -> { a | disabled : Bool } -> Html msg
+textInput title toMsg value meta =
+    input
+        [ onInput toMsg
+        , type_ "text"
+        , placeholder title
+        , Attributes.value value
+        , disabled meta.disabled
+        ]
+        []
 
 
 mobberView : ( Maybe String, Maybe Mobber ) -> Maybe (Html Msg)

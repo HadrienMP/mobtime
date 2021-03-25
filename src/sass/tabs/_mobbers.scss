@@ -4,10 +4,17 @@
 
   #add {
     display: flex;
+    align-items: end;
 
-    input {
+    .form-field {
       flex: 1 1;
       width: 50%;
+      margin: 0;
+      position: relative;
+
+      input {
+        width: 100%;
+      }
     }
 
     button {

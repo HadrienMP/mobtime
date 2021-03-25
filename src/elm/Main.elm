@@ -14,6 +14,7 @@ import Json.Encode
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons as Icons
 import Lib.Ratio
+import Lib.Toaster exposing (Toasts)
 import Mobbers.Settings
 import Random
 import Shared
@@ -52,11 +53,18 @@ main =
 -- MODEL
 
 
+type AlarmState
+    = Playing
+    | Stopped
+    | Standby
+
+
 type alias Model =
     { shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
-    , alarmPlaying : Bool
+    , alarm : AlarmState
     , now : Time.Posix
+    , toasts : Toasts
     }
 
 
@@ -64,8 +72,9 @@ init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
     ( { shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
-      , alarmPlaying = False
+      , alarm = Standby
       , now = Time.millisToPosix 0
+      , toasts = []
       }
     , Task.perform TimePassed Time.now
     )
@@ -88,6 +97,7 @@ type Msg
     | AlarmEnded
     | UnknownEvent
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
+    | GotToastMsg Lib.Toaster.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -121,7 +131,22 @@ update msg model =
                     Shared.timePassed now model.shared
             in
             ( { model
-                | alarmPlaying = Clock.Model.clockEnded shared.clock
+                | alarm =
+                    if Clock.Model.clockEnded shared.clock then
+                        case model.alarm of
+                            Standby ->
+                                Playing
+
+                            _ ->
+                                model.alarm
+
+                    else
+                        case model.alarm of
+                            Stopped ->
+                                Standby
+
+                            _ ->
+                                model.alarm
                 , now = now
                 , shared = shared
               }
@@ -139,12 +164,12 @@ update msg model =
             )
 
         StopSound ->
-            ( { model | alarmPlaying = False }
+            ( { model | alarm = Stopped }
             , Js.Commands.send Js.Commands.StopAlarm
             )
 
         AlarmEnded ->
-            ( { model | alarmPlaying = False }
+            ( { model | alarm = Stopped }
             , Cmd.none
             )
 
@@ -152,13 +177,27 @@ update msg model =
             ( model, Cmd.none )
 
         GotMobbersSettingsMsg subMsg ->
-            Mobbers.Settings.update subMsg model.shared.mobbers model.mobbersSettings
+            let
+                mobbersResult =
+                    Mobbers.Settings.update subMsg model.shared.mobbers model.mobbersSettings
+
+                ( toasts, commands ) =
+                    Lib.Toaster.add mobbersResult.toasts model.toasts
+            in
+            ( { model
+                | mobbersSettings = mobbersResult.updated
+                , toasts = toasts
+              }
+            , Cmd.batch <|
+                Cmd.map GotMobbersSettingsMsg mobbersResult.command
+                    :: List.map (Cmd.map GotToastMsg) commands
+            )
+
+        GotToastMsg subMsg ->
+            Lib.Toaster.update subMsg model.toasts
                 |> Tuple.mapBoth
-                    (\it -> { model | mobbersSettings = it })
-                    (Cmd.map GotMobbersSettingsMsg)
-
-
-
+                    (\toasts -> { model | toasts = toasts })
+                    (Cmd.map GotToastMsg)
 
 
 
@@ -242,6 +281,7 @@ view model =
                 ]
             , Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
                 |> Html.map GotMobbersSettingsMsg
+            , Lib.Toaster.view model.toasts |> Html.map GotToastMsg
             ]
         ]
     }
@@ -257,28 +297,29 @@ type alias ActionDescription =
 
 detectAction : Model -> ActionDescription
 detectAction model =
-    if model.alarmPlaying then
-        { icon = Icons.mute
-        , message = StopSound
-        , class = ""
-        , text = ""
-        }
+    case model.alarm of
+        Playing ->
+            { icon = Icons.mute
+            , message = StopSound
+            , class = ""
+            , text = ""
+            }
 
-    else
-        case model.shared.clock of
-            Off ->
-                { icon = Icons.play
-                , message = Start
-                , class = ""
-                , text = ""
-                }
+        _ ->
+            case model.shared.clock of
+                Off ->
+                    { icon = Icons.play
+                    , message = Start
+                    , class = ""
+                    , text = ""
+                    }
 
-            On on ->
-                { icon = Icons.stop
-                , message = ShareEvent SharedEvents.Stopped
-                , class = "on"
-                , text =
-                    Duration.between model.now on.end
-                        |> Duration.toSeconds
-                        |> (\a -> String.fromInt a ++ " s")
-                }
+                On on ->
+                    { icon = Icons.stop
+                    , message = ShareEvent SharedEvents.Stopped
+                    , class = "on"
+                    , text =
+                        Duration.between model.now on.end
+                            |> Duration.toSeconds
+                            |> (\a -> String.fromInt a ++ " s")
+                    }

@@ -8,6 +8,11 @@ import Time
 type Duration
     = Duration Int
 
+minus : Duration -> Duration -> Duration
+minus a b =
+    (toMillis a) - (toMillis b)
+    |> ofMillis
+
 toJson : Duration -> Json.Encode.Value
 toJson duration =
     Json.Encode.int <| toMillis duration

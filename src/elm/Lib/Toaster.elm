@@ -1,11 +1,10 @@
-module Lib.Toast exposing (..)
+module Lib.Toaster exposing (..)
 
-import Html exposing (Html, button, div, i, section, span, text)
+import Html exposing (Html, div, i, section, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Lib.Delay
-import Out.Events as Events
-import Out.EventsMapping as EventsMapping exposing (EventsMapping)
+import Lib.Icons
 
 
 
@@ -65,16 +64,6 @@ add toAdd model =
 
 
 
--- EVENTS SUBSCRIPTIONS
-
-
-eventsMapping : EventsMapping Msg
-eventsMapping =
-    [ Events.EventMessage "Copied" (\_ -> Add <| Toast Success "The text has been copied to your clipboard!") ]
-        |> EventsMapping.create
-
-
-
 -- VIEW
 
 
@@ -117,13 +106,13 @@ icon : Level -> Html msg
 icon level =
     case level of
         Info ->
-            i [ class "level-icon las la-info-circle" ] []
+            Lib.Icons.info
 
         Error ->
-            i [ class "level-icon las la-minus-circle" ] []
+            Lib.Icons.error
 
         Warning ->
-            i [ class "level-icon las la-exclamation-circle" ] []
+            Lib.Icons.warning
 
         Success ->
-            i [ class "level-icon las la-check-circle" ] []
+            Lib.Icons.success

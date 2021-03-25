@@ -6,6 +6,22 @@ import Ionicon
 import Ionicon.Android
 import Svg exposing (Svg)
 
+info : Svg msg
+info =
+    display Ionicon.informationCircled
+
+error : Svg msg
+error =
+    display Ionicon.closeCircled
+
+warning : Svg msg
+warning =
+    display Ionicon.alertCircled
+
+success : Svg msg
+success =
+    display Ionicon.checkmarkCircled
+
 sound : Svg msg
 sound =
     display Ionicon.musicNote

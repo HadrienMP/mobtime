@@ -53,6 +53,6 @@ clockRatio now model =
             Lib.Ratio.full
 
         On on ->
-            Duration.div (Duration.between now on.end) on.length
+            Duration.div (Duration.minus (Duration.between now on.end) (Duration.ofSeconds 1)) on.length
                 |> (-) 1
                 |> Lib.Ratio.from
