@@ -39,6 +39,11 @@
                 alarm.pause();
                 alarm.src = '';
                 break;
+            case 'CopyInPasteBin':
+                navigator.clipboard
+                    .writeText(command.value)
+                    .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
+                break;
         }
     });
     alarm.addEventListener("ended", () => {

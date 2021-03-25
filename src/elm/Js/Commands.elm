@@ -11,6 +11,7 @@ type Command
     = SoundAlarm
     | SetAlarm Sound.Library.Sound
     | StopAlarm
+    | CopyInPasteBin String
 
 
 type alias OutCommand =
@@ -23,6 +24,9 @@ send : Command -> Cmd msg
 send command =
     commands <|
         case command of
+            CopyInPasteBin toCopy ->
+                OutCommand "CopyInPasteBin" <| Json.Encode.string toCopy
+
             SoundAlarm ->
                 OutCommand "SoundAlarm" Json.Encode.null
 
@@ -31,5 +35,3 @@ send command =
 
             StopAlarm ->
                 OutCommand "StopAlarm" Json.Encode.null
-
-

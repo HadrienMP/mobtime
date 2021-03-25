@@ -3,8 +3,10 @@ module Lib.Toaster exposing (..)
 import Html exposing (Html, div, i, section, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
+import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
 import Lib.Icons
+import Js.Events
 
 
 
@@ -61,6 +63,16 @@ add toAdd model =
         |> List.filter (\toast -> not (List.member toast model))
         |> List.map (\toast -> ( toast, Lib.Delay.after (Lib.Delay.Seconds 10) (Remove toast) ))
         |> List.foldr (\( toast, cmd ) ( ts, cs ) -> ( toast :: ts, cmd :: cs )) ( model, [] )
+
+
+
+-- EVENTS SUBSCRIPTIONS
+
+
+eventsMapping : EventsMapping Msg
+eventsMapping =
+    [ Js.Events.EventMessage "Copied" (\_ -> Add <| Toast Success "The text has been copied to your clipboard!") ]
+        |> EventsMapping.create
 
 
 

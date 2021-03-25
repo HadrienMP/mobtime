@@ -5,16 +5,19 @@ import Browser.Navigation as Nav
 import Circle
 import Clock.Model exposing (ClockState(..))
 import Html exposing (..)
-import Html.Attributes exposing (class, id)
+import Html.Attributes exposing (class, classList, id)
 import Html.Events exposing (onClick)
 import Js.Commands
 import Js.Events
+import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
 import Json.Encode
+import Lib.BatchMsg
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons as Icons
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
+import Mob.Tabs.Home
 import Mobbers.Settings
 import Random
 import Shared
@@ -59,22 +62,36 @@ type AlarmState
     | Standby
 
 
+type Tab
+    = Main
+    | Mobbers
+    | Clock
+    | Sound
+    | Share
+
+
 type alias Model =
-    { shared : Shared.State
+    { key : Nav.Key
+    , url : Url.Url
+    , shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
     , alarm : AlarmState
     , now : Time.Posix
     , toasts : Toasts
+    , tab : Tab
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ _ _ =
-    ( { shared = Shared.init
+init _ url key =
+    ( { key = key
+      , url = url
+      , shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
       , alarm = Standby
       , now = Time.millisToPosix 0
       , toasts = []
+      , tab = Main
       }
     , Task.perform TimePassed Time.now
     )
@@ -96,8 +113,11 @@ type Msg
     | StopSound
     | AlarmEnded
     | UnknownEvent
+    | GotMainTabMsg Mob.Tabs.Home.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
+    | SwitchTab Tab
+    | Batch (List Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -176,6 +196,9 @@ update msg model =
         UnknownEvent ->
             ( model, Cmd.none )
 
+        GotMainTabMsg subMsg ->
+            ( model, Mob.Tabs.Home.update subMsg |> Cmd.map GotMainTabMsg )
+
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
@@ -199,6 +222,12 @@ update msg model =
                     (\toasts -> { model | toasts = toasts })
                     (Cmd.map GotToastMsg)
 
+        SwitchTab tab ->
+            ( { model | tab = tab }, Cmd.none )
+
+        Batch messages ->
+            Lib.BatchMsg.update messages model update
+
 
 
 -- SUBSCRIPTIONS
@@ -221,7 +250,10 @@ toMsg event =
             AlarmEnded
 
         _ ->
-            UnknownEvent
+            Lib.Toaster.eventsMapping
+            |> EventsMapping.map GotToastMsg
+            |> EventsMapping.dispatch event
+            |> Batch
 
 
 
@@ -273,14 +305,29 @@ view model =
                     ]
                 ]
             , nav []
-                [ button [] [ Icons.home ]
-                , button [] [ Icons.clock ]
-                , button [] [ Icons.people ]
-                , button [] [ Icons.sound ]
-                , button [] [ Icons.share ]
+                [ button [ onClick <| SwitchTab Main, classList [ ( "active", model.tab == Main ) ] ] [ Icons.home ]
+                , button [ onClick <| SwitchTab Clock, classList [ ( "active", model.tab == Clock ) ] ] [ Icons.clock ]
+                , button [ onClick <| SwitchTab Mobbers, classList [ ( "active", model.tab == Mobbers ) ] ] [ Icons.people ]
+                , button [ onClick <| SwitchTab Sound, classList [ ( "active", model.tab == Sound ) ] ] [ Icons.sound ]
+                , button [ onClick <| SwitchTab Share, classList [ ( "active", model.tab == Share ) ] ] [ Icons.share ]
                 ]
-            , Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
-                |> Html.map GotMobbersSettingsMsg
+            , case model.tab of
+                Main ->
+                    Mob.Tabs.Home.view "Awesome" model.url model.shared.mobbers
+                        |> Html.map GotMainTabMsg
+
+                Clock ->
+                    div [] []
+
+                Mobbers ->
+                    Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
+                        |> Html.map GotMobbersSettingsMsg
+
+                Sound ->
+                    div [] []
+
+                Share ->
+                    div [] []
             , Lib.Toaster.view model.toasts |> Html.map GotToastMsg
             ]
         ]

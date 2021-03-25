@@ -4,7 +4,12 @@ import Html exposing (i)
 import Html.Attributes exposing (class)
 import Ionicon
 import Ionicon.Android
+import Ionicon.Social
 import Svg exposing (Svg)
+
+github : Svg msg
+github =
+    display Ionicon.Social.github
 
 info : Svg msg
 info =

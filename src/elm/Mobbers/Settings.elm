@@ -116,14 +116,16 @@ view mobbers model =
                 ]
             ]
         , ul []
-            (mobbers
-                |> assign [ "Driver", "Navigator" ]
+            (assignRoles mobbers
                 |> List.map mobberView
                 |> List.filter ((/=) Nothing)
                 |> List.map (Maybe.withDefault (li [] []))
             )
         ]
 
+assignRoles : Mobbers -> List ( Maybe String, Maybe Mobber )
+assignRoles mobbers =
+    assign [ "Driver", "Navigator" ] mobbers
 
 textFieldConfig : String -> (String -> msg) -> Field.String.ViewConfig msg
 textFieldConfig title toMsg =

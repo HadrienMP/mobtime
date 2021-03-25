@@ -59,6 +59,8 @@ a, button {
   cursor: pointer;
 }
 
+@include icon(1.2em, black);
+
 button {
   border-radius: 0;
   border: none;
@@ -147,6 +149,7 @@ hr {
     font-size: 1em;
     align-items: center;
     width: 100%;
+    @include icon(1.4em, black);
 
     span {
       flex: 1 1;
@@ -172,10 +175,12 @@ footer {
     &:hover {
       background: $dark-button-color;
       color: white;
+      @include icon(1.2em, white);
     }
 
     i {
       padding-right: 10px;
+      vertical-align: sub;
     }
   }
 }
