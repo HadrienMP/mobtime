@@ -6,6 +6,7 @@ import Html.Attributes exposing (class, id, title)
 import Html.Events exposing (onClick)
 import Js.Commands
 import Lib.Icons
+import Mob.Tabs.Share
 import Mobbers.Model exposing (Mobber, Mobbers)
 import Mobbers.Settings
 import Url
@@ -28,30 +29,9 @@ view : String -> Url.Url -> Mobbers -> Html Msg
 view mobName url mobbers =
     div
         [ id "home", class "tab" ]
-        [ shareButton mobName url
+        [ Mob.Tabs.Share.shareButton mobName <| PutLinkInPasteBin url
         , roles mobbers
         , Footer.view
-        ]
-
-
-shareButton : String -> Url.Url -> Html Msg
-shareButton mob url =
-    button
-        [ onClick <| PutLinkInPasteBin url
-        , id "share-link"
-        , title "Copy this mob's link in your clipboard"
-        ]
-        [ shareText mob
-        , Lib.Icons.share
-        ]
-
-
-shareText : String -> Html Msg
-shareText mob =
-    span []
-        [ text "You are in the "
-        , strong [] [ text mob ]
-        , text " mob"
         ]
 
 

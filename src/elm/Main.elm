@@ -18,6 +18,7 @@ import Lib.Icons as Icons
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
 import Mob.Tabs.Home
+import Mob.Tabs.Share
 import Mobbers.Settings
 import Random
 import Shared
@@ -114,6 +115,7 @@ type Msg
     | AlarmEnded
     | UnknownEvent
     | GotMainTabMsg Mob.Tabs.Home.Msg
+    | GotShareTabMsg Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
     | SwitchTab Tab
@@ -228,6 +230,10 @@ update msg model =
         Batch messages ->
             Lib.BatchMsg.update messages model update
 
+        GotShareTabMsg subMsg ->
+            ( model, Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
+
+
 
 
 -- SUBSCRIPTIONS
@@ -327,7 +333,8 @@ view model =
                     div [] []
 
                 Share ->
-                    div [] []
+                    Mob.Tabs.Share.view "Awesome" model.url
+                        |> Html.map GotShareTabMsg
             , Lib.Toaster.view model.toasts |> Html.map GotToastMsg
             ]
         ]
