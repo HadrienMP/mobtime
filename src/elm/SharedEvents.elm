@@ -19,6 +19,7 @@ type Event
     | RotatedMobbers
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
+    | SelectedMusicProfile Sound.Library.Profile
 
 
 
@@ -55,10 +56,19 @@ decoderFromName eventName =
             Json.Decode.map ShuffledMobbers (Json.Decode.field "mobbers" (Json.Decode.list Mobbers.jsonDecoder))
 
         "TurnLengthChanged" ->
-            Json.Decode.map TurnLengthChanged (Json.Decode.field "seconds" (Json.Decode.map (Lib.Duration.ofSeconds) Json.Decode.int))
+            Json.Decode.int
+                |> Json.Decode.map (Lib.Duration.ofSeconds)
+                |> Json.Decode.field "seconds"
+                |> Json.Decode.map TurnLengthChanged
 
         "RotatedMobbers" ->
             Json.Decode.succeed RotatedMobbers
+
+        "SelectedMusicProfile" ->
+            Json.Decode.string
+                |> Json.Decode.map (Sound.Library.profileFromString)
+                |> Json.Decode.field "profile"
+                |> Json.Decode.map SelectedMusicProfile
 
         _ ->
             Json.Decode.fail <| "I don't know this event " ++ eventName
@@ -118,3 +128,9 @@ toJson event =
                 [ ( "name", Json.Encode.string "TurnLengthChanged" )
                 , ( "seconds", Json.Encode.int <| Lib.Duration.toSeconds duration )
                 ]
+
+            SelectedMusicProfile profile ->
+                [ ( "name", Json.Encode.string "SelectedMusicProfile" )
+                , ( "profile", Json.Encode.string <| Sound.Library.profileToString profile )
+                ]
+

@@ -37,16 +37,18 @@ input[type="range"] {
     button {
       flex: 1 0;
       width: 130px;
-      background: none;
       text-align: center;
       padding: 0;
-      color: black;
       vertical-align: top;
       display: block;
       margin-left: $margin-space;
 
       &:first-child {
         margin-left: 0;
+      }
+
+      p {
+        padding: $padding-space;
       }
 
       img {

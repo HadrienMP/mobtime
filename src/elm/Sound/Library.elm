@@ -1,4 +1,4 @@
-module Sound.Library exposing (Profile(..), Sound, default, pick)
+module Sound.Library exposing (Profile(..), Sound, default, pick, profileFromString, profileToString)
 
 import Random
 
@@ -12,6 +12,27 @@ type Profile
     | Riot
 
 
+profileToString : Profile -> String
+profileToString profile =
+    case profile of
+        ClassicWeird ->
+            "ClassicWeird"
+
+        Riot ->
+            "Riot"
+
+
+profileFromString : String -> Profile
+profileFromString string =
+    case string of
+        "Riot" ->
+            Riot
+        _ ->
+            ClassicWeird
+
+
+
+
 default : Sound
 default =
     "classic-weird/celebration.mp3"
@@ -20,7 +41,7 @@ default =
 pick : Profile -> Random.Generator Sound
 pick profile =
     soundsOf profile
-    |> (\(d, list) -> Random.uniform d list)
+        |> (\( d, list ) -> Random.uniform d list)
 
 
 soundsOf : Profile -> ( Sound, List Sound )

@@ -7,13 +7,15 @@ import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (rotate, uncons)
 import Mobbers.Model exposing (Mobbers)
 import SharedEvents
+import Sound.Library
 import Time
 
 
 type alias State =
     { clock : ClockState
-    , turnLength: Duration
+    , turnLength : Duration
     , mobbers : Mobbers
+    , soundProfile : Sound.Library.Profile
     }
 
 
@@ -22,6 +24,7 @@ init =
     { clock = Off
     , turnLength = Lib.Duration.ofMinutes 8
     , mobbers = []
+    , soundProfile = Sound.Library.ClassicWeird
     }
 
 
@@ -35,6 +38,7 @@ timePassed now state =
     , command
     )
 
+
 evolveMany : State -> List (Result Json.Decode.Error SharedEvents.Event) -> State
 evolveMany model events =
     case uncons events of
@@ -45,17 +49,17 @@ evolveMany model events =
             evolveMany model tail
 
         ( Just (Ok head), tail ) ->
-            evolveMany (applyTo model head |> Tuple.first) tail
+            evolveMany (evolve model head |> Tuple.first) tail
 
 
-applyTo : State -> SharedEvents.Event -> ( State, Cmd msg )
-applyTo state event =
+evolve : State -> SharedEvents.Event -> ( State, Cmd msg )
+evolve state event =
     case ( event, state.clock ) of
         ( SharedEvents.Started started, Off ) ->
             ( { state
                 | clock =
                     On
-                        { end = Time.posixToMillis started.time + (Lib.Duration.toMillis started.length) |> Time.millisToPosix
+                        { end = Time.posixToMillis started.time + Lib.Duration.toMillis started.length |> Time.millisToPosix
                         , length = started.length
                         , ended = False
                         }
@@ -83,8 +87,11 @@ applyTo state event =
         ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
             ( { state | mobbers = mobbers ++ List.filter (\el -> not <| List.member el mobbers) state.mobbers }, Cmd.none )
 
-        (SharedEvents.TurnLengthChanged turnLength, _) ->
+        ( SharedEvents.TurnLengthChanged turnLength, _ ) ->
             ( { state | turnLength = turnLength }, Cmd.none )
+
+        ( SharedEvents.SelectedMusicProfile profile, _ ) ->
+            ( { state | soundProfile = profile }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )

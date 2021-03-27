@@ -146,7 +146,7 @@ update msg model =
 
         ReceivedEvent eventResult ->
             eventResult
-                |> Result.map (Shared.applyTo model.shared)
+                |> Result.map (Shared.evolve model.shared)
                 |> Result.withDefault ( Shared.init, Cmd.none )
                 |> Tuple.mapFirst (\shared -> { model | shared = shared })
 
@@ -184,7 +184,7 @@ update msg model =
             )
 
         Start ->
-            ( model, Random.generate StartWithAlarm <| Sound.Library.pick model.soundSettings.profile )
+            ( model, Random.generate StartWithAlarm <| Sound.Library.pick model.shared.soundProfile )
 
         StartWithAlarm sound ->
             ( model
@@ -351,7 +351,7 @@ view model =
                         |> Html.map GotMobbersSettingsMsg
 
                 Sound ->
-                    Sound.Settings.view model.soundSettings
+                    Sound.Settings.view model.soundSettings model.shared.soundProfile
                         |> Html.map GotSoundSettingsMsg
 
                 Share ->
