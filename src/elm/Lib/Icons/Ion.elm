@@ -1,11 +1,13 @@
-module Lib.Icons exposing (..)
+module Lib.Icons.Ion exposing (..)
 
 import Html exposing (i)
 import Html.Attributes exposing (class)
 import Ionicon
 import Ionicon.Android
 import Ionicon.Social
+import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
+
 
 github : Svg msg
 github =
@@ -78,10 +80,3 @@ people =
 display : (Int -> RGBA -> Svg msg) -> Svg msg
 display icon =
     i [ class "icon" ] [ icon 32 (RGBA 0 0 0 0) ]
-
-type alias RGBA =
-    { red : Float
-    , green : Float
-    , blue : Float
-    , alpha : Float
-    }

@@ -5,7 +5,7 @@ import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
-import Lib.Icons
+import Lib.Icons.Ion
 import Js.Events
 
 
@@ -118,13 +118,13 @@ icon : Level -> Html msg
 icon level =
     case level of
         Info ->
-            Lib.Icons.info
+            Lib.Icons.Ion.info
 
         Error ->
-            Lib.Icons.error
+            Lib.Icons.Ion.error
 
         Warning ->
-            Lib.Icons.warning
+            Lib.Icons.Ion.warning
 
         Success ->
-            Lib.Icons.success
+            Lib.Icons.Ion.success

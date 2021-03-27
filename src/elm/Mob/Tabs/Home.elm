@@ -1,11 +1,9 @@
 module Mob.Tabs.Home exposing (..)
 
 import Footer
-import Html exposing (Html, button, div, i, li, span, strong, text, ul)
-import Html.Attributes exposing (class, id, title)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, li, span, text, ul)
+import Html.Attributes exposing (class, id)
 import Js.Commands
-import Lib.Icons
 import Mob.Tabs.Share
 import Mobbers.Model exposing (Mobber, Mobbers)
 import Mobbers.Settings

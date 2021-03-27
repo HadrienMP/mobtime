@@ -2,35 +2,42 @@ module Lib.Duration exposing (..)
 
 import Json.Decode
 import Json.Encode
+import Lib.ListExtras exposing (uncons)
 import Time
 
 
 type Duration
     = Duration Int
 
+
 minus : Duration -> Duration -> Duration
 minus a b =
-    (toMillis a) - (toMillis b)
-    |> ofMillis
+    toMillis a
+        - toMillis b
+        |> ofMillis
+
 
 toJson : Duration -> Json.Encode.Value
 toJson duration =
     Json.Encode.int <| toMillis duration
 
+
 jsonDecoder : Json.Decode.Decoder Duration
 jsonDecoder =
     Json.Decode.int
-    |> Json.Decode.map ofMillis
+        |> Json.Decode.map ofMillis
+
 
 secondsBetween : Time.Posix -> Time.Posix -> Int
 secondsBetween a b =
     toSeconds <| between a b
 
+
 between : Time.Posix -> Time.Posix -> Duration
 between a b =
     ( a, b )
         |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
-        |> (\( a2, b2 ) -> (b2 - a2))
+        |> (\( a2, b2 ) -> b2 - a2)
         |> ofMillis
 
 
@@ -52,6 +59,7 @@ toSeconds duration =
         Duration s ->
             s // 1000
 
+
 toMillis : Duration -> Int
 toMillis duration =
     case duration of
@@ -61,9 +69,8 @@ toMillis duration =
 
 toMinutes : Duration -> Int
 toMinutes duration =
-    case duration of
-        Duration s ->
-            s // 60
+    toSeconds duration // 60
+
 
 ofMillis : Int -> Duration
 ofMillis int =
@@ -92,44 +99,60 @@ toShortString duration =
     case duration of
         Duration seconds ->
             if seconds < 60 then
-                [ String.fromInt seconds ++ " s" ]
+                [ overtimeSign duration ++ String.fromInt seconds ++ " s" ]
 
             else
                 toFloat seconds
                     / 60.0
                     |> ceiling
                     |> String.fromInt
-                    |> (\minutes -> [ minutes ++ " min" ])
+                    |> (\minutes -> [ overtimeSign duration ++ minutes ++ " min" ])
+
+
+overtimeSign : Duration -> String
+overtimeSign duration =
+    if toMillis duration < 0 then
+        "+"
+
+    else
+        ""
 
 
 toLongString : Duration -> List String
 toLongString duration =
-    case duration of
-        Duration seconds ->
-            let
-                floatMinutes =
-                    toFloat seconds / 60.0
+    let
+        seconds =
+            toSeconds duration
+                |> abs
 
-                intMinutes =
-                    floor floatMinutes
+        floatMinutes =
+            toFloat seconds / 60.0
 
-                secondsLeft =
-                    seconds - (floor floatMinutes * 60)
+        intMinutes =
+            floor floatMinutes
 
-                minutesText =
-                    if intMinutes /= 0 then
-                        String.fromInt intMinutes ++ " min "
+        secondsLeft =
+            seconds - (floor floatMinutes * 60)
 
-                    else
-                        ""
+        minutesText =
+            if intMinutes /= 0 then
+                [ String.fromInt intMinutes ++ " min " ]
 
-                secondsText =
-                    if secondsLeft /= 0 then
-                        String.fromInt secondsLeft ++ " " ++ "s"
+            else
+                []
 
-                    else
-                        ""
-            in
-            [ minutesText
-            , secondsText
-            ]
+        secondsText =
+            if secondsLeft /= 0 then
+                [ String.fromInt secondsLeft ++ " " ++ "s" ]
+
+            else
+                []
+
+        a =
+            minutesText
+                ++ secondsText
+                |> List.filter (not << String.isEmpty)
+
+        (first, second) = uncons a |> Tuple.mapFirst (Maybe.withDefault "" >> (++) (overtimeSign duration))
+    in
+    [first] ++ second

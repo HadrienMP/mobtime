@@ -5,7 +5,7 @@ import Field.String
 import Html exposing (Html, button, div, form, input, li, p, text, ul)
 import Html.Attributes as Attributes exposing (class, disabled, id, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Lib.Icons as Icons
+import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
 import Lib.Toaster exposing (Level(..), Toasts, Toast)
 import Mobbers.Model exposing (Mobber, Mobbers)

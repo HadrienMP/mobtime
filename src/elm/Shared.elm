@@ -3,6 +3,7 @@ module Shared exposing (..)
 import Clock.Model exposing (ClockState(..))
 import Js.Commands
 import Json.Decode
+import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (rotate, uncons)
 import Mobbers.Model exposing (Mobbers)
 import SharedEvents
@@ -11,6 +12,7 @@ import Time
 
 type alias State =
     { clock : ClockState
+    , turnLength: Duration
     , mobbers : Mobbers
     }
 
@@ -18,6 +20,7 @@ type alias State =
 init : State
 init =
     { clock = Off
+    , turnLength = Lib.Duration.ofMinutes 8
     , mobbers = []
     }
 
@@ -52,7 +55,7 @@ applyTo state event =
             ( { state
                 | clock =
                     On
-                        { end = Time.posixToMillis started.time + (10 * 1000) |> Time.millisToPosix
+                        { end = Time.posixToMillis started.time + (Lib.Duration.toMillis started.length) |> Time.millisToPosix
                         , length = started.length
                         , ended = False
                         }
@@ -79,6 +82,9 @@ applyTo state event =
 
         ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
             ( { state | mobbers = mobbers ++ List.filter (\el -> not <| List.member el mobbers) state.mobbers }, Cmd.none )
+
+        (SharedEvents.TurnLengthChanged turnLength, _) ->
+            ( { state | turnLength = turnLength }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )

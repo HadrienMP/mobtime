@@ -4,6 +4,7 @@ import Browser
 import Browser.Navigation as Nav
 import Circle
 import Clock.Model exposing (ClockState(..))
+import Clock.Settings
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, id)
 import Html.Events exposing (onClick)
@@ -14,7 +15,7 @@ import Json.Decode
 import Json.Encode
 import Lib.BatchMsg
 import Lib.Duration as Duration exposing (Duration)
-import Lib.Icons as Icons
+import Lib.Icons.Ion
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
 import Mob.Tabs.Home
@@ -182,7 +183,7 @@ update msg model =
             ( model
             , SharedEvents.sendEvent <|
                 SharedEvents.toJson <|
-                    SharedEvents.Started { time = model.now, alarm = sound, length = Duration.ofSeconds 10 }
+                    SharedEvents.Started { time = model.now, alarm = sound, length = model.shared.turnLength }
             )
 
         StopSound ->
@@ -235,7 +236,6 @@ update msg model =
 
 
 
-
 -- SUBSCRIPTIONS
 
 
@@ -257,9 +257,9 @@ toMsg event =
 
         _ ->
             Lib.Toaster.eventsMapping
-            |> EventsMapping.map GotToastMsg
-            |> EventsMapping.dispatch event
-            |> Batch
+                |> EventsMapping.map GotToastMsg
+                |> EventsMapping.dispatch event
+                |> Batch
 
 
 
@@ -306,16 +306,16 @@ view model =
                         , onClick action.message
                         ]
                         [ action.icon
-                        , span [ id "time-left" ] [ text action.text ]
+                        , span [ id "time-left" ] (action.text |> List.map (\a -> span [] [ text a ]))
                         ]
                     ]
                 ]
             , nav []
-                [ button [ onClick <| SwitchTab Main, classList [ ( "active", model.tab == Main ) ] ] [ Icons.home ]
-                , button [ onClick <| SwitchTab Clock, classList [ ( "active", model.tab == Clock ) ] ] [ Icons.clock ]
-                , button [ onClick <| SwitchTab Mobbers, classList [ ( "active", model.tab == Mobbers ) ] ] [ Icons.people ]
-                , button [ onClick <| SwitchTab Sound, classList [ ( "active", model.tab == Sound ) ] ] [ Icons.sound ]
-                , button [ onClick <| SwitchTab Share, classList [ ( "active", model.tab == Share ) ] ] [ Icons.share ]
+                [ button [ onClick <| SwitchTab Main, classList [ ( "active", model.tab == Main ) ] ] [ Lib.Icons.Ion.home ]
+                , button [ onClick <| SwitchTab Clock, classList [ ( "active", model.tab == Clock ) ] ] [ Lib.Icons.Ion.clock ]
+                , button [ onClick <| SwitchTab Mobbers, classList [ ( "active", model.tab == Mobbers ) ] ] [ Lib.Icons.Ion.people ]
+                , button [ onClick <| SwitchTab Sound, classList [ ( "active", model.tab == Sound ) ] ] [ Lib.Icons.Ion.sound ]
+                , button [ onClick <| SwitchTab Share, classList [ ( "active", model.tab == Share ) ] ] [ Lib.Icons.Ion.share ]
                 ]
             , case model.tab of
                 Main ->
@@ -323,7 +323,7 @@ view model =
                         |> Html.map GotMainTabMsg
 
                 Clock ->
-                    div [] []
+                    Clock.Settings.view model.shared.turnLength ShareEvent
 
                 Mobbers ->
                     Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
@@ -344,7 +344,7 @@ view model =
 type alias ActionDescription =
     { icon : Svg Msg
     , message : Msg
-    , text : String
+    , text : List String
     , class : String
     }
 
@@ -353,27 +353,26 @@ detectAction : Model -> ActionDescription
 detectAction model =
     case model.alarm of
         Playing ->
-            { icon = Icons.mute
+            { icon = Lib.Icons.Ion.mute
             , message = StopSound
             , class = ""
-            , text = ""
+            , text = []
             }
 
         _ ->
             case model.shared.clock of
                 Off ->
-                    { icon = Icons.play
+                    { icon = Lib.Icons.Ion.play
                     , message = Start
                     , class = ""
-                    , text = ""
+                    , text = []
                     }
 
                 On on ->
-                    { icon = Icons.stop
+                    { icon = Lib.Icons.Ion.stop
                     , message = ShareEvent SharedEvents.Stopped
                     , class = "on"
                     , text =
                         Duration.between model.now on.end
-                            |> Duration.toSeconds
-                            |> (\a -> String.fromInt a ++ " s")
+                            |> Duration.toLongString
                     }

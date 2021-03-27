@@ -4,7 +4,7 @@ import Html exposing (Html, button, div, i, span, strong, text)
 import Html.Attributes exposing (class, id, title)
 import Html.Events exposing (onClick)
 import Js.Commands
-import Lib.Icons
+import Lib.Icons.Ion
 import QRCode
 import Svg.Attributes as Svg
 import Url
@@ -54,7 +54,7 @@ shareButton mob shareMsg =
         , title "Copy this mob's link in your clipboard"
         ]
         [ shareText mob
-        , Lib.Icons.share
+        , Lib.Icons.Ion.share
         ]
 
 

@@ -1,8 +1,8 @@
 module Footer exposing (..)
 
-import Html exposing (Html, a, footer, i, text)
-import Html.Attributes exposing (class, href, id, target)
-import Lib.Icons
+import Html exposing (Html, a, footer, text)
+import Html.Attributes exposing (href, id, target)
+import Lib.Icons.Ion
 
 
 view : Html msg
@@ -14,7 +14,7 @@ view =
             , id "git"
             , target "blank"
             ]
-            [ Lib.Icons.github
+            [ Lib.Icons.Ion.github
             , text "Fork me on github!"
             ]
         ]

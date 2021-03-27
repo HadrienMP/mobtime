@@ -18,6 +18,7 @@ type Event
     | DeletedMobber Mobber
     | RotatedMobbers
     | ShuffledMobbers Mobbers
+    | TurnLengthChanged Duration
 
 
 
@@ -52,6 +53,9 @@ decoderFromName eventName =
 
         "ShuffledMobbers" ->
             Json.Decode.map ShuffledMobbers (Json.Decode.field "mobbers" (Json.Decode.list Mobbers.jsonDecoder))
+
+        "TurnLengthChanged" ->
+            Json.Decode.map TurnLengthChanged (Json.Decode.field "seconds" (Json.Decode.map (Lib.Duration.ofSeconds) Json.Decode.int))
 
         "RotatedMobbers" ->
             Json.Decode.succeed RotatedMobbers
@@ -109,3 +113,8 @@ toJson event =
 
             RotatedMobbers ->
                 [ ( "name", Json.Encode.string "RotatedMobbers" ) ]
+
+            TurnLengthChanged duration ->
+                [ ( "name", Json.Encode.string "TurnLengthChanged" )
+                , ( "seconds", Json.Encode.int <| Lib.Duration.toSeconds duration )
+                ]
