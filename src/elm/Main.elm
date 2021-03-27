@@ -77,6 +77,7 @@ type alias Model =
     , url : Url.Url
     , shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
+    , clockSettings : Clock.Settings.Model
     , alarm : AlarmState
     , now : Time.Posix
     , toasts : Toasts
@@ -90,6 +91,7 @@ init _ url key =
       , url = url
       , shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
+      , clockSettings = Clock.Settings.init
       , alarm = Standby
       , now = Time.millisToPosix 0
       , toasts = []
@@ -116,6 +118,7 @@ type Msg
     | AlarmEnded
     | UnknownEvent
     | GotMainTabMsg Mob.Tabs.Home.Msg
+    | GotClockSettingsMsg Clock.Settings.Msg
     | GotShareTabMsg Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
@@ -234,6 +237,12 @@ update msg model =
         GotShareTabMsg subMsg ->
             ( model, Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
 
+        GotClockSettingsMsg subMsg ->
+            Clock.Settings.update subMsg model.clockSettings
+                |> Tuple.mapBoth
+                    (\a -> { model | clockSettings = a })
+                    (Cmd.map GotClockSettingsMsg)
+
 
 
 -- SUBSCRIPTIONS
@@ -323,7 +332,8 @@ view model =
                         |> Html.map GotMainTabMsg
 
                 Clock ->
-                    Clock.Settings.view model.shared.turnLength ShareEvent
+                    Clock.Settings.view model.shared.turnLength model.clockSettings
+                        |> Html.map GotClockSettingsMsg
 
                 Mobbers ->
                     Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
@@ -374,5 +384,10 @@ detectAction model =
                     , class = "on"
                     , text =
                         Duration.between model.now on.end
-                            |> Duration.toLongString
+                            |> (if model.clockSettings.displaySeconds then
+                                    Duration.toLongString
+
+                                else
+                                    Duration.toShortString
+                               )
                     }

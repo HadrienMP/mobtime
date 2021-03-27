@@ -1,16 +1,61 @@
 module Clock.Settings exposing (..)
 
-import Html exposing (Html, div, input, label, text)
-import Html.Attributes exposing (class, for, id, step, type_, value)
-import Html.Events exposing (onInput)
+import Html exposing (Html, button, div, input, label, text)
+import Html.Attributes exposing (class, classList, for, id, step, type_, value)
+import Html.Events exposing (onClick, onInput)
+import Js.Events
 import Lib.Duration as Duration
 import Lib.Icons.Animals
 import SharedEvents
 
-view : Duration.Duration -> (SharedEvents.Event -> msg) -> Html msg
-view turnLength shareEvent =
+
+type alias Model =
+    { displaySeconds : Bool }
+
+
+init : Model
+init =
+    { displaySeconds = False }
+
+
+type Msg
+    = DisplaySecondsChanged Bool
+    | ShareEvent SharedEvents.Event
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        DisplaySecondsChanged bool ->
+            ( { model | displaySeconds = bool }, Cmd.none )
+
+        ShareEvent event ->
+            ( model
+            , SharedEvents.toJson event |> SharedEvents.sendEvent
+            )
+
+
+view : Duration.Duration -> Model -> Html Msg
+view turnLength model =
     div [ id "timer", class "tab" ]
         [ div
+            [ id "seconds-field", class "form-field" ]
+            [ label [ for "seconds" ] [ text "Seconds" ]
+            , div
+                [ class "toggles" ]
+                [ button
+                    [ classList [ ( "active", not model.displaySeconds ) ]
+                    , onClick <| DisplaySecondsChanged False
+                    ]
+                    [ text "Hide" ]
+                , button
+                    [ classList [ ( "active", model.displaySeconds ) ]
+                    , onClick <| DisplaySecondsChanged True
+                    ]
+                    [ text "Show" ]
+                ]
+            ]
+        , div
             [ id "turn-length-field", class "form-field" ]
             [ label
                 [ for "turn-length" ]
@@ -30,7 +75,7 @@ view turnLength shareEvent =
                             >> Maybe.withDefault 8
                             >> Duration.ofMinutes
                             >> SharedEvents.TurnLengthChanged
-                            >> shareEvent
+                            >> ShareEvent
                     , Html.Attributes.min "2"
                     , Html.Attributes.max "20"
                     , value <| String.fromInt <| Duration.toMinutes turnLength

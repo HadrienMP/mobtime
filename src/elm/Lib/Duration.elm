@@ -96,17 +96,19 @@ subtract a b =
 
 toShortString : Duration -> List String
 toShortString duration =
-    case duration of
-        Duration seconds ->
-            if seconds < 60 then
-                [ overtimeSign duration ++ String.fromInt seconds ++ " s" ]
+    let
+        seconds =
+            toSeconds duration |> abs
+    in
+    if seconds < 60 then
+        [ overtimeSign duration ++ String.fromInt seconds ++ " s" ]
 
-            else
-                toFloat seconds
-                    / 60.0
-                    |> ceiling
-                    |> String.fromInt
-                    |> (\minutes -> [ overtimeSign duration ++ minutes ++ " min" ])
+    else
+        toFloat seconds
+            / 60.0
+            |> ceiling
+            |> String.fromInt
+            |> (\minutes -> [ overtimeSign duration ++ minutes ++ " min" ])
 
 
 overtimeSign : Duration -> String
@@ -153,6 +155,7 @@ toLongString duration =
                 ++ secondsText
                 |> List.filter (not << String.isEmpty)
 
-        (first, second) = uncons a |> Tuple.mapFirst (Maybe.withDefault "" >> (++) (overtimeSign duration))
+        ( first, second ) =
+            uncons a |> Tuple.mapFirst (Maybe.withDefault "" >> (++) (overtimeSign duration))
     in
-    [first] ++ second
+    [ first ] ++ second
