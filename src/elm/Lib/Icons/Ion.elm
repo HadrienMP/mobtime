@@ -9,6 +9,14 @@ import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
 
 
+volumeLow : Svg msg
+volumeLow =
+    display Ionicon.volumeLow
+
+volumeHigh : Svg msg
+volumeHigh =
+    display Ionicon.volumeHigh
+
 github : Svg msg
 github =
     display Ionicon.Social.github

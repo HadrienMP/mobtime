@@ -44,6 +44,10 @@
                     .writeText(command.value)
                     .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
                 break;
+            case 'ChangeVolume':
+                // window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
+                alarm.volume = parseInt(command.value) / 100.0;
+                break;
         }
     });
     alarm.addEventListener("ended", () => {

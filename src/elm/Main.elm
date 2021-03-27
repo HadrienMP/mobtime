@@ -25,6 +25,7 @@ import Random
 import Shared
 import SharedEvents
 import Sound.Library
+import Sound.Settings
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Task
@@ -78,6 +79,7 @@ type alias Model =
     , shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
     , clockSettings : Clock.Settings.Model
+    , soundSettings : Sound.Settings.Model
     , alarm : AlarmState
     , now : Time.Posix
     , toasts : Toasts
@@ -92,6 +94,7 @@ init _ url key =
       , shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
       , clockSettings = Clock.Settings.init
+      , soundSettings = Sound.Settings.init 50
       , alarm = Standby
       , now = Time.millisToPosix 0
       , toasts = []
@@ -121,6 +124,7 @@ type Msg
     | GotClockSettingsMsg Clock.Settings.Msg
     | GotShareTabMsg Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
+    | GotSoundSettingsMsg Sound.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
     | SwitchTab Tab
     | Batch (List Msg)
@@ -180,7 +184,7 @@ update msg model =
             )
 
         Start ->
-            ( model, Random.generate StartWithAlarm <| Sound.Library.pick Sound.Library.ClassicWeird )
+            ( model, Random.generate StartWithAlarm <| Sound.Library.pick model.soundSettings.profile )
 
         StartWithAlarm sound ->
             ( model
@@ -242,6 +246,13 @@ update msg model =
                 |> Tuple.mapBoth
                     (\a -> { model | clockSettings = a })
                     (Cmd.map GotClockSettingsMsg)
+
+        GotSoundSettingsMsg subMsg->
+            Sound.Settings.update subMsg model.soundSettings
+                |> Tuple.mapBoth
+                    (\a -> { model | soundSettings = a })
+                    (Cmd.map GotSoundSettingsMsg)
+
 
 
 
@@ -340,7 +351,8 @@ view model =
                         |> Html.map GotMobbersSettingsMsg
 
                 Sound ->
-                    div [] []
+                    Sound.Settings.view model.soundSettings
+                        |> Html.map GotSoundSettingsMsg
 
                 Share ->
                     Mob.Tabs.Share.view "Awesome" model.url

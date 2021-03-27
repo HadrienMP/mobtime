@@ -32,26 +32,31 @@ input[type="range"] {
   #sound-cards {
     display: flex;
     align-items: start;
+    padding: $margin-space 0;
 
     button {
       flex: 1 0;
       width: 130px;
       background: none;
       text-align: center;
-      padding: 20px;
+      padding: 0;
       color: black;
       vertical-align: top;
+      display: block;
+      margin-left: $margin-space;
 
-      i {
-        font-size: 2em;
-        padding: 30px;
-        background: $dark-button-color;
-        color: white;
+      &:first-child {
+        margin-left: 0;
       }
 
-      &.active {
-        i {
-          background: $light-button-color;
+      img {
+        width: 100%;
+        opacity: .6;
+      }
+
+      &.active, &:hover {
+        img {
+          opacity: 1;
         }
       }
     }

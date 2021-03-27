@@ -12,6 +12,7 @@ type Command
     | SetAlarm Sound.Library.Sound
     | StopAlarm
     | CopyInPasteBin String
+    | ChangeVolume Int
 
 
 type alias OutCommand =
@@ -35,3 +36,6 @@ send command =
 
             StopAlarm ->
                 OutCommand "StopAlarm" Json.Encode.null
+
+            ChangeVolume volume ->
+                OutCommand "ChangeVolume" <| Json.Encode.string <| String.fromInt volume
