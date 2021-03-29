@@ -18,7 +18,10 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
-    const app = Elm.Main.init({node: document.getElementById('elm'),});
+    const app = Elm.Main.init({
+        node: document.getElementById('elm'),
+        flags: JSON.parse(window.localStorage.getItem("preferences"))
+    });
 
     let alarm = document.createElement("audio");
     document.body.appendChild(alarm);
@@ -45,7 +48,7 @@
                     .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
                 break;
             case 'ChangeVolume':
-                // window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
+                window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
                 alarm.volume = parseInt(command.value) / 100.0;
                 break;
         }

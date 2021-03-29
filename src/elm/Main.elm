@@ -31,6 +31,7 @@ import Svg.Attributes as Svg
 import Task
 import Time
 import Url
+import UserPreferences
 
 
 port receiveEvent : (Json.Encode.Value -> msg) -> Sub msg
@@ -43,7 +44,7 @@ port receiveHistory : (List Json.Encode.Value -> msg) -> Sub msg
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program UserPreferences.Model Model Msg
 main =
     Browser.application
         { init = init
@@ -87,20 +88,23 @@ type alias Model =
     }
 
 
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url key =
+init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init preferences url key =
     ( { key = key
       , url = url
       , shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
       , clockSettings = Clock.Settings.init
-      , soundSettings = Sound.Settings.init 50
+      , soundSettings = Sound.Settings.init preferences.volume
       , alarm = Standby
       , now = Time.millisToPosix 0
       , toasts = []
       , tab = Main
       }
-    , Task.perform TimePassed Time.now
+    , Cmd.batch
+        [ Task.perform TimePassed Time.now
+        , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
+        ]
     )
 
 
@@ -247,12 +251,11 @@ update msg model =
                     (\a -> { model | clockSettings = a })
                     (Cmd.map GotClockSettingsMsg)
 
-        GotSoundSettingsMsg subMsg->
+        GotSoundSettingsMsg subMsg ->
             Sound.Settings.update subMsg model.soundSettings
                 |> Tuple.mapBoth
                     (\a -> { model | soundSettings = a })
                     (Cmd.map GotSoundSettingsMsg)
-
 
 
 
