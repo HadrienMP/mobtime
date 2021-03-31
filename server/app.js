@@ -33,10 +33,10 @@ console.log(path.join(path.dirname(__dirname), 'public'));
 ls(publicDirPath);
 app.use(express.static(publicDirPath))
     .get('/', (req, res) => {
-        res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
+        res.sendFile(path.join(publicDirPath, "index.html"))
     })
     .get('/mob/*', (req, res) => {
-        res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
+        res.sendFile(path.join(publicDirPath, "index.html"))
     })
     .listen(port, () => {
         console.log(`Live at http://0.0.0.0:${port}`)
