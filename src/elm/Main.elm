@@ -3,7 +3,7 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Circle
-import Clock.Model exposing (ClockState(..))
+import Clock.Clock exposing (ClockState(..))
 import Clock.Settings
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, id)
@@ -166,7 +166,7 @@ update msg model =
             in
             ( { model
                 | alarm =
-                    if Clock.Model.clockEnded shared.clock then
+                    if Clock.Clock.clockEnded shared.clock then
                         case model.alarm of
                             Standby ->
                                 Playing
@@ -322,7 +322,7 @@ view model =
                         ]
                       <|
                         Circle.draw pomodoroCircle Lib.Ratio.full
-                            ++ Circle.draw mobCircle (Clock.Model.clockRatio model.now model.shared.clock)
+                            ++ Circle.draw mobCircle (Clock.Clock.ratio model.now model.shared.clock)
                     , button
                         [ id "action"
                         , class action.class

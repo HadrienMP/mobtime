@@ -1,6 +1,5 @@
-module Clock.Model exposing (..)
+module Clock.Clock exposing (..)
 
-import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio
 import Time
@@ -12,23 +11,28 @@ type alias OnModel =
 
 type ClockState
     = Off
-    | On { end : Time.Posix, length : Duration, ended : Bool }
+    | On OnModel
 
 
-timePassed : Time.Posix -> ClockState -> ( ClockState, Cmd msg )
+type Event
+    = Ended
+    | Continued
+
+
+timePassed : Time.Posix -> ClockState -> ( ClockState, Event )
 timePassed now clockState =
     case clockState of
         On on ->
             if ended on now then
                 ( On { on | ended = True }
-                , Js.Commands.send Js.Commands.SoundAlarm
+                , Ended
                 )
 
             else
-                ( clockState, Cmd.none )
+                ( clockState, Continued )
 
         Off ->
-            ( clockState, Cmd.none )
+            ( clockState, Continued )
 
 
 ended : OnModel -> Time.Posix -> Bool
@@ -46,8 +50,8 @@ clockEnded clockState =
             False
 
 
-clockRatio : Time.Posix -> ClockState -> Lib.Ratio.Ratio
-clockRatio now model =
+ratio : Time.Posix -> ClockState -> Lib.Ratio.Ratio
+ratio now model =
     case model of
         Off ->
             Lib.Ratio.full

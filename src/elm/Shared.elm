@@ -1,6 +1,7 @@
 module Shared exposing (..)
 
-import Clock.Model exposing (ClockState(..))
+import Clock.Clock exposing (ClockState(..))
+import Clock.TurnClock
 import Js.Commands
 import Json.Decode
 import Lib.Duration exposing (Duration)
@@ -32,7 +33,7 @@ timePassed : Time.Posix -> State -> ( State, Cmd msg )
 timePassed now state =
     let
         ( clock, command ) =
-            Clock.Model.timePassed now state.clock
+            Clock.TurnClock.timePassed now state.clock
     in
     ( { state | clock = clock }
     , command
