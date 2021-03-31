@@ -201,6 +201,7 @@ update msg model =
                 , alarm = sound
                 , length = Duration.div model.shared.turnLength <| if model.dev then 20 else 1
                 }
+                |> SharedEvents.Clock
                 |> SharedEvents.toJson
                 |> SharedEvents.sendEvent
             )
@@ -425,7 +426,7 @@ detectAction model =
 
                 On on ->
                     { icon = Lib.Icons.Ion.stop
-                    , message = ShareEvent SharedEvents.Stopped
+                    , message = ShareEvent <| SharedEvents.Clock SharedEvents.Stopped
                     , class = "on"
                     , text =
                         Duration.between model.now on.end

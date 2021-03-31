@@ -12,9 +12,13 @@ import Time
 port sendEvent : Json.Encode.Value -> Cmd msg
 
 
-type Event
+type ClockEvent
     = Started { time : Time.Posix, alarm : Sound.Library.Sound, length : Duration }
     | Stopped
+
+
+type Event
+    = Clock ClockEvent
     | AddedMobber Mobber
     | DeletedMobber Mobber
     | RotatedMobbers
@@ -45,7 +49,7 @@ decoderFromName eventName =
             startedDecoder
 
         "Stopped" ->
-            Json.Decode.succeed Stopped
+            Json.Decode.succeed <| Clock Stopped
 
         "AddedMobber" ->
             Json.Decode.map AddedMobber (Json.Decode.field "mobber" Mobber.jsonDecoder)
@@ -58,7 +62,7 @@ decoderFromName eventName =
 
         "TurnLengthChanged" ->
             Json.Decode.int
-                |> Json.Decode.map (Lib.Duration.ofSeconds)
+                |> Json.Decode.map Lib.Duration.ofSeconds
                 |> Json.Decode.field "seconds"
                 |> Json.Decode.map TurnLengthChanged
 
@@ -67,7 +71,7 @@ decoderFromName eventName =
 
         "SelectedMusicProfile" ->
             Json.Decode.string
-                |> Json.Decode.map (Sound.Library.profileFromString)
+                |> Json.Decode.map Sound.Library.profileFromString
                 |> Json.Decode.field "profile"
                 |> Json.Decode.map SelectedMusicProfile
 
@@ -78,7 +82,7 @@ decoderFromName eventName =
 startedDecoder : Json.Decode.Decoder Event
 startedDecoder =
     Json.Decode.map3
-        (\start alarm length -> Started { time = start, alarm = alarm, length = length })
+        (\start alarm length -> Clock <| Started { time = start, alarm = alarm, length = length })
         (Json.Decode.field "time" timeDecoder)
         (Json.Decode.field "alarm" Json.Decode.string)
         (Json.Decode.field "length" Lib.Duration.jsonDecoder)
@@ -97,15 +101,8 @@ toJson : Event -> Json.Encode.Value
 toJson event =
     Json.Encode.object <|
         case event of
-            Started started ->
-                [ ( "name", Json.Encode.string "Started" )
-                , ( "time", Json.Encode.int <| Time.posixToMillis started.time )
-                , ( "alarm", Json.Encode.string started.alarm )
-                , ( "length", Lib.Duration.toJson started.length )
-                ]
-
-            Stopped ->
-                [ ( "name", Json.Encode.string "Stopped" ) ]
+            Clock clockEvent ->
+                clockEventToJson clockEvent
 
             AddedMobber mobber ->
                 [ ( "name", Json.Encode.string "AddedMobber" )
@@ -135,3 +132,16 @@ toJson event =
                 , ( "profile", Json.Encode.string <| Sound.Library.profileToString profile )
                 ]
 
+
+clockEventToJson : ClockEvent -> List ( String, Json.Encode.Value )
+clockEventToJson clockEvent =
+    case clockEvent of
+        Started started ->
+            [ ( "name", Json.Encode.string "Started" )
+            , ( "time", Json.Encode.int <| Time.posixToMillis started.time )
+            , ( "alarm", Json.Encode.string started.alarm )
+            , ( "length", Lib.Duration.toJson started.length )
+            ]
+
+        Stopped ->
+            [ ( "name", Json.Encode.string "Stopped" ) ]

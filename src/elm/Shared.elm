@@ -55,6 +55,31 @@ evolveMany model events =
 
 evolve : State -> SharedEvents.Event -> ( State, Cmd msg )
 evolve state event =
+    case event of
+        SharedEvents.Clock clockEvent ->
+            evolveClock clockEvent state
+
+        SharedEvents.AddedMobber mobber ->
+            ( { state | mobbers = Mobbers.add mobber state.mobbers }, Cmd.none )
+
+        SharedEvents.DeletedMobber mobber ->
+            ( { state | mobbers = Mobbers.delete mobber state.mobbers }, Cmd.none )
+
+        SharedEvents.RotatedMobbers ->
+            ( { state | mobbers = Mobbers.rotate state.mobbers }, Cmd.none )
+
+        SharedEvents.ShuffledMobbers mobbers ->
+            ( { state | mobbers = Mobbers.merge mobbers state.mobbers }, Cmd.none )
+
+        SharedEvents.TurnLengthChanged turnLength ->
+            ( { state | turnLength = turnLength }, Cmd.none )
+
+        SharedEvents.SelectedMusicProfile profile ->
+            ( { state | soundProfile = profile }, Cmd.none )
+
+
+evolveClock : SharedEvents.ClockEvent -> State -> ( State, Cmd msg )
+evolveClock event state =
     case ( event, state.clock ) of
         ( SharedEvents.Started started, Off ) ->
             ( { state
@@ -75,24 +100,6 @@ evolve state event =
               }
             , Cmd.none
             )
-
-        ( SharedEvents.AddedMobber mobber, _ ) ->
-            ( { state | mobbers = Mobbers.add mobber state.mobbers  }, Cmd.none )
-
-        ( SharedEvents.DeletedMobber mobber, _ ) ->
-            ( { state | mobbers = Mobbers.delete mobber state.mobbers }, Cmd.none )
-
-        ( SharedEvents.RotatedMobbers, _ ) ->
-            ( { state | mobbers = Mobbers.rotate state.mobbers }, Cmd.none )
-
-        ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
-            ( { state | mobbers = Mobbers.merge mobbers state.mobbers }, Cmd.none )
-
-        ( SharedEvents.TurnLengthChanged turnLength, _ ) ->
-            ( { state | turnLength = turnLength }, Cmd.none )
-
-        ( SharedEvents.SelectedMusicProfile profile, _ ) ->
-            ( { state | soundProfile = profile }, Cmd.none )
 
         _ ->
             ( state, Cmd.none )
