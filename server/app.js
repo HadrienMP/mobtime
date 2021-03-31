@@ -25,12 +25,12 @@ function historize(room, message) {
 }
 
 let publicDirPath = path.join(__dirname + "/../", 'public');
-app.use(express.static(publicDirPath))
-    .get('/', (req, res) => {
-        res.sendFile(path.join(publicDirPath, "index.html"))
-    })
+app.use(express.static(publicDirPath));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(publicDirPath, "index.html"))
+})
 
 const port = process.env.PORT || 3000
 server.listen(port, () => {
-        console.log(`Live at http://0.0.0.0:${port}`)
-    });
+    console.log(`Live at http://0.0.0.0:${port}`)
+});

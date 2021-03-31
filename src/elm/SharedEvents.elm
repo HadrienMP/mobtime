@@ -3,7 +3,8 @@ port module SharedEvents exposing (..)
 import Json.Decode
 import Json.Encode
 import Lib.Duration exposing (Duration)
-import Mobbers.Model as Mobbers exposing (Mobber, Mobbers)
+import Mobbers.Mobber as Mobber exposing (Mobber)
+import Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Sound.Library
 import Time
 
@@ -47,13 +48,13 @@ decoderFromName eventName =
             Json.Decode.succeed Stopped
 
         "AddedMobber" ->
-            Json.Decode.map AddedMobber (Json.Decode.field "mobber" Mobbers.jsonDecoder)
+            Json.Decode.map AddedMobber (Json.Decode.field "mobber" Mobber.jsonDecoder)
 
         "DeletedMobber" ->
-            Json.Decode.map DeletedMobber (Json.Decode.field "mobber" Mobbers.jsonDecoder)
+            Json.Decode.map DeletedMobber (Json.Decode.field "mobber" Mobber.jsonDecoder)
 
         "ShuffledMobbers" ->
-            Json.Decode.map ShuffledMobbers (Json.Decode.field "mobbers" (Json.Decode.list Mobbers.jsonDecoder))
+            Json.Decode.map ShuffledMobbers (Json.Decode.field "mobbers" Mobbers.decoder)
 
         "TurnLengthChanged" ->
             Json.Decode.int
@@ -108,17 +109,17 @@ toJson event =
 
             AddedMobber mobber ->
                 [ ( "name", Json.Encode.string "AddedMobber" )
-                , ( "mobber", Mobbers.toJson mobber )
+                , ( "mobber", Mobber.toJson mobber )
                 ]
 
             DeletedMobber mobber ->
                 [ ( "name", Json.Encode.string "DeletedMobber" )
-                , ( "mobber", Mobbers.toJson mobber )
+                , ( "mobber", Mobber.toJson mobber )
                 ]
 
             ShuffledMobbers mobbers ->
                 [ ( "name", Json.Encode.string "ShuffledMobbers" )
-                , ( "mobbers", Json.Encode.list Mobbers.toJson mobbers )
+                , ( "mobbers", Mobbers.toJson mobbers )
                 ]
 
             RotatedMobbers ->

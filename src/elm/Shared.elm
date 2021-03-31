@@ -5,7 +5,7 @@ import Js.Commands
 import Json.Decode
 import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (rotate, uncons)
-import Mobbers.Model exposing (Mobbers)
+import Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import SharedEvents
 import Sound.Library
 import Time
@@ -23,7 +23,7 @@ init : State
 init =
     { clock = Off
     , turnLength = Lib.Duration.ofMinutes 8
-    , mobbers = []
+    , mobbers = Mobbers.empty
     , soundProfile = Sound.Library.ClassicWeird
     }
 
@@ -70,22 +70,22 @@ evolve state event =
         ( SharedEvents.Stopped, On _ ) ->
             ( { state
                 | clock = Off
-                , mobbers = rotate state.mobbers
+                , mobbers = Mobbers.rotate state.mobbers
               }
             , Cmd.none
             )
 
         ( SharedEvents.AddedMobber mobber, _ ) ->
-            ( { state | mobbers = state.mobbers ++ [ mobber ] }, Cmd.none )
+            ( { state | mobbers = Mobbers.add mobber state.mobbers  }, Cmd.none )
 
         ( SharedEvents.DeletedMobber mobber, _ ) ->
-            ( { state | mobbers = List.filter (\m -> m /= mobber) state.mobbers }, Cmd.none )
+            ( { state | mobbers = Mobbers.delete mobber state.mobbers }, Cmd.none )
 
         ( SharedEvents.RotatedMobbers, _ ) ->
-            ( { state | mobbers = rotate state.mobbers }, Cmd.none )
+            ( { state | mobbers = Mobbers.rotate state.mobbers }, Cmd.none )
 
         ( SharedEvents.ShuffledMobbers mobbers, _ ) ->
-            ( { state | mobbers = mobbers ++ List.filter (\el -> not <| List.member el mobbers) state.mobbers }, Cmd.none )
+            ( { state | mobbers = Mobbers.merge mobbers state.mobbers }, Cmd.none )
 
         ( SharedEvents.TurnLengthChanged turnLength, _ ) ->
             ( { state | turnLength = turnLength }, Cmd.none )

@@ -7,11 +7,13 @@ import Html.Attributes as Attributes exposing (class, disabled, id, placeholder,
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
-import Lib.Toaster exposing (Level(..), Toasts, Toast)
-import Mobbers.Model exposing (Mobber, Mobbers)
+import Lib.Toaster exposing (Level(..), Toast, Toasts)
+import Mobbers.Mobbers as Mobbers exposing (Mobbers)
+import Mobbers.Mobber exposing (Mobber)
 import Random
 import Random.List
 import SharedEvents
+import Uuid
 
 
 type alias Model =
@@ -28,10 +30,12 @@ init =
 
 
 type Msg
-    = MobberNameChanged String
-    | AddMobber
-    | ShuffleMobbers
+    = NameChanged String
+    | StartAdding
+    | Add Mobber
+    | Shuffle
     | ShareEvent SharedEvents.Event
+
 
 type alias UpdateResult =
     { updated : Model
@@ -39,47 +43,58 @@ type alias UpdateResult =
     , toasts : Toasts
     }
 
+
 update : Msg -> Mobbers -> Model -> UpdateResult
 update msg mobbers model =
     case msg of
-        MobberNameChanged name ->
+        NameChanged name ->
             { updated = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
             , command = Cmd.none
             , toasts = []
             }
 
-        AddMobber ->
+        StartAdding ->
             let
-                name = model.mobberName |> Field.String.notEmpty
+                name =
+                    model.mobberName |> Field.String.notEmpty
             in
             case Field.toResult name of
-                Ok valid ->
+                Ok validMobberName ->
                     { updated = { model | mobberName = Field.init "" }
-                    , command = Mobbers.Model.create valid
-                        |> SharedEvents.AddedMobber
-                        |> SharedEvents.toJson
-                        |> SharedEvents.sendEvent
+                    , command =
+                        Random.generate (\id -> Add <| Mobber id validMobberName) Uuid.uuidGenerator
                     , toasts = []
                     }
 
                 Err _ ->
                     { updated = { model | mobberName = name }
                     , command = Cmd.none
-                    , toasts = [Toast Error "The mobber name cannot be empty"]
+                    , toasts = [ Toast Error "The mobber name cannot be empty" ]
                     }
 
-        ShuffleMobbers ->
+        Add mobber ->
             { updated = model
-            , command = Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Random.List.shuffle mobbers
+            , command =
+                mobber
+                    |> SharedEvents.AddedMobber
+                    |> SharedEvents.toJson
+                    |> SharedEvents.sendEvent
+            , toasts = []
+            }
+
+        Shuffle ->
+            { updated = model
+            , command = Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Mobbers.shuffle mobbers
             , toasts = []
             }
 
         ShareEvent event ->
             -- TODO duplicated code
             { updated = model
-            , command = event
-                |> SharedEvents.toJson
-                |> SharedEvents.sendEvent
+            , command =
+                event
+                    |> SharedEvents.toJson
+                    |> SharedEvents.sendEvent
             , toasts = []
             }
 
@@ -93,14 +108,14 @@ view mobbers model =
     div
         [ id "mobbers", class "tab" ]
         [ form
-            [ id "add", onSubmit AddMobber ]
-            [ Field.view (textFieldConfig "Mobber to be added" MobberNameChanged) model.mobberName
+            [ id "add", onSubmit StartAdding ]
+            [ Field.view (textFieldConfig "Mobber to be added" NameChanged) model.mobberName
             , button [ type_ "submit" ] [ Icons.plus ]
             ]
         , div [ class "button-row" ]
             [ button
                 [ class "labelled-icon-button"
-                , disabled (List.length mobbers < 2)
+                , disabled (not <| Mobbers.rotatable mobbers)
                 , onClick <| ShareEvent <| SharedEvents.RotatedMobbers
                 ]
                 [ Icons.rotate
@@ -108,8 +123,8 @@ view mobbers model =
                 ]
             , button
                 [ class "labelled-icon-button"
-                , disabled (List.length mobbers < 3)
-                , onClick ShuffleMobbers
+                , disabled (not <| Mobbers.shufflable mobbers)
+                , onClick Shuffle
                 ]
                 [ Icons.shuffle
                 , text "Shuffle"
@@ -123,9 +138,11 @@ view mobbers model =
             )
         ]
 
+
 assignRoles : Mobbers -> List ( Maybe String, Maybe Mobber )
 assignRoles mobbers =
-    assign [ "Driver", "Navigator" ] mobbers
+    assign [ "Driver", "Navigator" ] <| Mobbers.toList mobbers
+
 
 textFieldConfig : String -> (String -> msg) -> Field.String.ViewConfig msg
 textFieldConfig title toMsg =
