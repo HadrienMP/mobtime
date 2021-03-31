@@ -32,7 +32,10 @@ console.log(publicDirPath);
 console.log(path.join(path.dirname(__dirname), 'public'));
 ls(publicDirPath);
 app.use(express.static(publicDirPath))
-    .get('*', (req, res) => {
+    .get('/', (req, res) => {
+        res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
+    })
+    .get('/mob/*', (req, res) => {
         res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
     })
     .listen(port, () => {
