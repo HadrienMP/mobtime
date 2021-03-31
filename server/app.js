@@ -3,6 +3,7 @@ const app = require('express')();
 // const http = require('http').Server(app);
 // const io = require('socket.io')(http);
 const path = require('path');
+const fs = require('fs');
 
 const history = {}
 
@@ -29,6 +30,7 @@ const port = process.env.PORT || 3000
 let publicDirPath = path.join(__dirname + "/../", 'public');
 console.log(publicDirPath);
 console.log(path.join(path.dirname(__dirname), 'public'));
+ls(publicDirPath);
 app.use(express.static(publicDirPath))
     .get('*', (req, res) => {
         res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
@@ -36,4 +38,20 @@ app.use(express.static(publicDirPath))
     .listen(port, () => {
         console.log(`Live at http://0.0.0.0:${port}`)
     });
+
+function ls(dir) {
+    // list all files in the directory
+    try {
+        const files = fs.readdirSync(dir);
+
+        // files object contains all files names
+        // log them on console
+        files.forEach(file => {
+            console.log(file);
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 
