@@ -24,15 +24,13 @@ function historize(room, message) {
     history[room] = roomHistory;
 }
 
-app.use(express.static(path.join(path.dirname(__dirname), 'public')));
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
-})
-
 const port = process.env.PORT || 3000
 
-http.listen(port, () => {
-    console.log(`Live at http://0.0.0.0:${port}`)
-})
+app.use(express.static(path.join(path.dirname(__dirname), 'public')))
+    .get('*', (req, res) => {
+        res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
+    })
+    .listen(port, () => {
+        console.log(`Live at http://0.0.0.0:${port}`)
+    });
 
