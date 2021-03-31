@@ -26,7 +26,7 @@ function historize(room, message) {
 
 const port = process.env.PORT || 3000
 
-app.use(express.static(path.join(path.dirname(__dirname), 'public')))
+app.use(express.static(path.join(__dirname + "../", 'public')))
     .get('*', (req, res) => {
         res.sendFile(path.join(path.dirname(__dirname), 'public', "index.html"))
     })
