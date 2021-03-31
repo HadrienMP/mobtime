@@ -29,11 +29,8 @@ app.use(express.static(publicDirPath))
     .get('/', (req, res) => {
         res.sendFile(path.join(publicDirPath, "index.html"))
     })
-    .get('/mob/*', (req, res) => {
-        res.sendFile(path.join(publicDirPath, "index.html"))
-    })
 
-const port = process.env.PORT || "3000"
+const port = process.env.PORT || 3000
 server.listen(port, () => {
         console.log(`Live at http://0.0.0.0:${port}`)
     });
