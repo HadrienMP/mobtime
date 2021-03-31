@@ -74,7 +74,14 @@
         return app.ports.receiveEvent.send(data);
     });
     socket.on('history', app.ports.receiveHistory.send);
+
     // -----------------------------------------
+    // Keyboard
+    // -----------------------------------------
+
+    document.addEventListener('keyup', function (ev) {
+        console.log(ev.key, ev.altKey, ev.ctrlKey, ev.shiftKey);
+    })
 </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ import Clock.TurnClock
 import Js.Commands
 import Json.Decode
 import Lib.Duration exposing (Duration)
-import Lib.ListExtras exposing (rotate, uncons)
+import Lib.ListExtras exposing (uncons)
 import Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import SharedEvents
 import Sound.Library

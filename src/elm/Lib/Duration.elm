@@ -40,9 +40,13 @@ between a b =
         |> (\( a2, b2 ) -> b2 - a2)
         |> ofMillis
 
-
-div : Duration -> Duration -> Float
+div : Duration -> Int -> Duration
 div numerator denominator =
+    ofMillis <| toMillis numerator // denominator
+
+
+ratio : Duration -> Duration -> Float
+ratio numerator denominator =
     let
         numeratorSeconds =
             toSeconds numerator |> toFloat

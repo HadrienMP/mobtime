@@ -1,6 +1,7 @@
 port module Main exposing (..)
 
 import Browser
+import Browser.Events exposing (onKeyPress, onKeyUp)
 import Browser.Navigation as Nav
 import Circle
 import Clock.Clock exposing (ClockState(..))
@@ -85,6 +86,7 @@ type alias Model =
     , now : Time.Posix
     , toasts : Toasts
     , tab : Tab
+    , dev : Bool
     }
 
 
@@ -100,6 +102,7 @@ init preferences url key =
       , now = Time.millisToPosix 0
       , toasts = []
       , tab = Main
+      , dev = False
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -132,6 +135,7 @@ type Msg
     | GotToastMsg Lib.Toaster.Msg
     | SwitchTab Tab
     | Batch (List Msg)
+    | KeyPressed Keystroke
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -192,9 +196,13 @@ update msg model =
 
         StartWithAlarm sound ->
             ( model
-            , SharedEvents.sendEvent <|
-                SharedEvents.toJson <|
-                    SharedEvents.Started { time = model.now, alarm = sound, length = model.shared.turnLength }
+            , SharedEvents.Started
+                { time = model.now
+                , alarm = sound
+                , length = Duration.div model.shared.turnLength <| if model.dev then 20 else 1
+                }
+                |> SharedEvents.toJson
+                |> SharedEvents.sendEvent
             )
 
         StopSound ->
@@ -257,9 +265,24 @@ update msg model =
                     (\a -> { model | soundSettings = a })
                     (Cmd.map GotSoundSettingsMsg)
 
+        KeyPressed stroke ->
+            ( { model
+                | dev = xor model.dev <| stroke == Keystroke "D" True True True
+              }
+            , Cmd.none
+            )
+
 
 
 -- SUBSCRIPTIONS
+
+
+type alias Keystroke =
+    { key : String
+    , ctrl : Bool
+    , alt : Bool
+    , shift : Bool
+    }
 
 
 subscriptions : Model -> Sub Msg
@@ -269,6 +292,13 @@ subscriptions _ =
         , receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
         , receiveHistory <| List.map SharedEvents.fromJson >> ReceivedHistory
         , Js.Events.events toMsg
+        , onKeyUp <|
+            Json.Decode.map KeyPressed <|
+                Json.Decode.map4 Keystroke
+                    (Json.Decode.field "key" Json.Decode.string)
+                    (Json.Decode.field "ctrlKey" Json.Decode.bool)
+                    (Json.Decode.field "altKey" Json.Decode.bool)
+                    (Json.Decode.field "shiftKey" Json.Decode.bool)
         ]
 
 
