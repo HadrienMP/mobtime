@@ -119,8 +119,8 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | ShareEvent SharedEvents.Event
-    | ReceivedEvent (Result Json.Decode.Error SharedEvents.Event)
-    | ReceivedHistory (List (Result Json.Decode.Error SharedEvents.Event))
+    | ReceivedEvent SharedEvents.Event
+    | ReceivedHistory (List SharedEvents.Event)
     | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
@@ -152,11 +152,23 @@ update msg model =
             , SharedEvents.sendEvent <| SharedEvents.toJson event
             )
 
-        ReceivedEvent eventResult ->
-            eventResult
-                |> Result.map (Shared.evolve model.shared)
-                |> Result.withDefault ( Shared.init, Cmd.none )
-                |> Tuple.mapFirst (\shared -> { model | shared = shared })
+        ReceivedEvent event ->
+            event
+                |> Shared.evolve model.shared
+                |> Tuple.mapFirst
+                    (\shared ->
+                        { model
+                            | shared = shared
+                            , alarm =
+                                -- Handle alarm (command) as separate from the evolve method ?
+                                case event of
+                                    SharedEvents.Clock (SharedEvents.Started _) ->
+                                        Stopped
+
+                                    _ ->
+                                        model.alarm
+                        }
+                    )
 
         ReceivedHistory eventsResults ->
             ( { model | shared = Shared.evolveMany model.shared eventsResults }
@@ -165,30 +177,26 @@ update msg model =
 
         TimePassed now ->
             let
-                ( shared, command ) =
+                timePassedResult =
                     Shared.timePassed now model.shared
             in
             ( { model
                 | alarm =
-                    if Clock.Clock.clockEnded shared.clock then
-                        case model.alarm of
-                            Standby ->
-                                Playing
+                    case timePassedResult.turnEvent of
+                        Clock.Clock.Ended ->
+                            Playing
 
-                            _ ->
-                                model.alarm
-
-                    else
-                        case model.alarm of
-                            Stopped ->
-                                Standby
-
-                            _ ->
-                                model.alarm
+                        Clock.Clock.Continued ->
+                            model.alarm
                 , now = now
-                , shared = shared
+                , shared = timePassedResult.updated
               }
-            , command
+            , case timePassedResult.turnEvent of
+                Clock.Clock.Ended ->
+                    Js.Commands.send Js.Commands.SoundAlarm
+
+                Clock.Clock.Continued ->
+                    Cmd.none
             )
 
         Start ->
@@ -199,7 +207,13 @@ update msg model =
             , SharedEvents.Started
                 { time = model.now
                 , alarm = sound
-                , length = Duration.div model.shared.turnLength <| if model.dev then 20 else 1
+                , length =
+                    Duration.div model.shared.turnLength <|
+                        if model.dev then
+                            20
+
+                        else
+                            1
                 }
                 |> SharedEvents.Clock
                 |> SharedEvents.toJson

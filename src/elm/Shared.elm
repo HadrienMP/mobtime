@@ -1,6 +1,6 @@
 module Shared exposing (..)
 
-import Clock.Clock exposing (ClockState(..))
+import Clock.Clock as Clock exposing (ClockState(..))
 import Clock.TurnClock
 import Js.Commands
 import Json.Decode
@@ -29,27 +29,30 @@ init =
     }
 
 
-timePassed : Time.Posix -> State -> ( State, Cmd msg )
+type alias TimePassedResult =
+    { updated : State
+    , turnEvent : Clock.Event
+    }
+
+
+timePassed : Time.Posix -> State -> TimePassedResult
 timePassed now state =
     let
-        ( clock, command ) =
-            Clock.TurnClock.timePassed now state.clock
+        ( clock, event ) =
+            Clock.timePassed now state.clock
     in
-    ( { state | clock = clock }
-    , command
-    )
+    { updated = { state | clock = clock }
+    , turnEvent = event
+    }
 
 
-evolveMany : State -> List (Result Json.Decode.Error SharedEvents.Event) -> State
+evolveMany : State -> List SharedEvents.Event -> State
 evolveMany model events =
     case uncons events of
         ( Nothing, _ ) ->
             model
 
-        ( Just (Err _), tail ) ->
-            evolveMany model tail
-
-        ( Just (Ok head), tail ) ->
+        ( Just head, tail ) ->
             evolveMany (evolve model head |> Tuple.first) tail
 
 
@@ -76,6 +79,9 @@ evolve state event =
 
         SharedEvents.SelectedMusicProfile profile ->
             ( { state | soundProfile = profile }, Cmd.none )
+
+        SharedEvents.Unknown _ ->
+            ( state, Cmd.none )
 
 
 evolveClock : SharedEvents.ClockEvent -> State -> ( State, Cmd msg )

@@ -25,15 +25,17 @@ type Event
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
     | SelectedMusicProfile Sound.Library.Profile
+    | Unknown Json.Decode.Value
 
 
 
 -- DECODING
 
 
-fromJson : Json.Decode.Value -> Result Json.Decode.Error Event
+fromJson : Json.Decode.Value -> Event
 fromJson value =
     Json.Decode.decodeValue eventDecoder value
+        |> Result.withDefault (Unknown value)
 
 
 eventDecoder : Json.Decode.Decoder Event
@@ -130,6 +132,11 @@ toJson event =
             SelectedMusicProfile profile ->
                 [ ( "name", Json.Encode.string "SelectedMusicProfile" )
                 , ( "profile", Json.Encode.string <| Sound.Library.profileToString profile )
+                ]
+
+            Unknown value ->
+                [ ( "name", Json.Encode.string "Unknown" )
+                , ( "event", value )
                 ]
 
 
