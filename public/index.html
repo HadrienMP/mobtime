@@ -33,6 +33,7 @@
         switch (command.name) {
             case "SoundAlarm":
                 alarm.play();
+                alarm.muted = false;
                 break;
             case "SetAlarm":
                 alarm.src = "/sound/" + command.value;
