@@ -1,10 +1,10 @@
-module Mob.Tabs.Home exposing (..)
+module Pages.Mob.Tabs.Home exposing (..)
 
 import Footer
 import Html exposing (Html, div, li, span, text, ul)
 import Html.Attributes exposing (class, id)
 import Js.Commands
-import Mob.Tabs.Share
+import Pages.Mob.Tabs.Share
 import Mobbers.Mobber exposing (Mobber)
 import Mobbers.Mobbers exposing (Mobbers)
 import Mobbers.Settings
@@ -28,7 +28,7 @@ view : String -> Url.Url -> Mobbers -> Html Msg
 view mobName url mobbers =
     div
         [ id "home", class "tab" ]
-        [ Mob.Tabs.Share.shareButton mobName <| PutLinkInPasteBin url
+        [ Pages.Mob.Tabs.Share.shareButton mobName <| PutLinkInPasteBin url
         , roles mobbers
         , Footer.view
         ]

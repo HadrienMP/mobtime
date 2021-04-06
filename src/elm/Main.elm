@@ -19,8 +19,8 @@ import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons.Ion
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
-import Mob.Tabs.Home
-import Mob.Tabs.Share
+import Pages.Mob.Tabs.Home
+import Pages.Mob.Tabs.Share
 import Mobbers.Settings
 import Random
 import Shared
@@ -127,9 +127,9 @@ type Msg
     | StopSound
     | AlarmEnded
     | UnknownEvent
-    | GotMainTabMsg Mob.Tabs.Home.Msg
+    | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Clock.Settings.Msg
-    | GotShareTabMsg Mob.Tabs.Share.Msg
+    | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
     | GotSoundSettingsMsg Sound.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
@@ -234,7 +234,7 @@ update msg model =
             ( model, Cmd.none )
 
         GotMainTabMsg subMsg ->
-            ( model, Mob.Tabs.Home.update subMsg |> Cmd.map GotMainTabMsg )
+            ( model, Pages.Mob.Tabs.Home.update subMsg |> Cmd.map GotMainTabMsg )
 
         GotMobbersSettingsMsg subMsg ->
             let
@@ -266,7 +266,7 @@ update msg model =
             Lib.BatchMsg.update messages model update
 
         GotShareTabMsg subMsg ->
-            ( model, Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
+            ( model, Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
 
         GotClockSettingsMsg subMsg ->
             Clock.Settings.update subMsg model.clockSettings
@@ -387,7 +387,7 @@ view model =
                 ]
             , case model.tab of
                 Main ->
-                    Mob.Tabs.Home.view "Awesome" model.url model.shared.mobbers
+                    Pages.Mob.Tabs.Home.view "Awesome" model.url model.shared.mobbers
                         |> Html.map GotMainTabMsg
 
                 Clock ->
@@ -403,7 +403,7 @@ view model =
                         |> Html.map GotSoundSettingsMsg
 
                 Share ->
-                    Mob.Tabs.Share.view "Awesome" model.url
+                    Pages.Mob.Tabs.Share.view "Awesome" model.url
                         |> Html.map GotShareTabMsg
             , Lib.Toaster.view model.toasts |> Html.map GotToastMsg
             ]
