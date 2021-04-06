@@ -1,4 +1,4 @@
-port module SharedEvents exposing (..)
+port module Peers.Events exposing (..)
 
 import Json.Decode
 import Json.Encode

@@ -22,8 +22,8 @@ import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Share
 import Pages.Mob.Mobbers.Settings
 import Random
-import Shared
-import SharedEvents
+import Peers.State
+import Peers.Events
 import Pages.Mob.Sound.Library
 import Pages.Mob.Sound.Settings
 import Svg exposing (Svg, svg)
@@ -58,7 +58,7 @@ type Tab
 
 
 type alias Model =
-    { shared : Shared.State
+    { shared : Peers.State.State
     , mobbersSettings : Pages.Mob.Mobbers.Settings.Model
     , clockSettings : Pages.Mob.Clocks.Settings.Model
     , soundSettings : Pages.Mob.Sound.Settings.Model
@@ -72,7 +72,7 @@ type alias Model =
 
 init : UserPreferences.Model -> ( Model, Cmd Msg )
 init preferences =
-    ( { shared = Shared.init
+    ( { shared = Peers.State.init
       , mobbersSettings = Pages.Mob.Mobbers.Settings.init
       , clockSettings = Pages.Mob.Clocks.Settings.init
       , soundSettings = Pages.Mob.Sound.Settings.init preferences.volume
@@ -93,9 +93,9 @@ init preferences =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | ShareEvent SharedEvents.Event
-    | ReceivedEvent SharedEvents.Event
-    | ReceivedHistory (List SharedEvents.Event)
+    | ShareEvent Peers.Events.Event
+    | ReceivedEvent Peers.Events.Event
+    | ReceivedHistory (List Peers.Events.Event)
     | Start
     | StartWithAlarm Pages.Mob.Sound.Library.Sound
     | StopSound
@@ -116,7 +116,7 @@ timePassed : Time.Posix -> Model -> (Model, Cmd Msg)
 timePassed now model =
     let
         timePassedResult =
-            Shared.timePassed now model.shared
+            Peers.State.timePassed now model.shared
     in
     ( { model
         | alarm =
@@ -149,12 +149,12 @@ update msg model =
 
         ShareEvent event ->
             ( model
-            , SharedEvents.sendEvent <| SharedEvents.toJson event
+            , Peers.Events.sendEvent <| Peers.Events.toJson event
             )
 
         ReceivedEvent event ->
             event
-                |> Shared.evolve model.shared
+                |> Peers.State.evolve model.shared
                 |> Tuple.mapFirst
                     (\shared ->
                         { model
@@ -162,7 +162,7 @@ update msg model =
                             , alarm =
                                 -- Handle alarm (command) as separate from the evolve method ?
                                 case event of
-                                    SharedEvents.Clock (SharedEvents.Started _) ->
+                                    Peers.Events.Clock (Peers.Events.Started _) ->
                                         Stopped
 
                                     _ ->
@@ -171,7 +171,7 @@ update msg model =
                     )
 
         ReceivedHistory eventsResults ->
-            ( { model | shared = Shared.evolveMany model.shared eventsResults }
+            ( { model | shared = Peers.State.evolveMany model.shared eventsResults }
             , Cmd.none
             )
 
@@ -180,7 +180,7 @@ update msg model =
 
         StartWithAlarm sound ->
             ( model
-            , SharedEvents.Started
+            , Peers.Events.Started
                 { time = model.now
                 , alarm = sound
                 , length =
@@ -191,9 +191,9 @@ update msg model =
                         else
                             1
                 }
-                |> SharedEvents.Clock
-                |> SharedEvents.toJson
-                |> SharedEvents.sendEvent
+                |> Peers.Events.Clock
+                |> Peers.Events.toJson
+                |> Peers.Events.sendEvent
             )
 
         StopSound ->
@@ -279,8 +279,8 @@ type alias Keystroke =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
-        , receiveHistory <| List.map SharedEvents.fromJson >> ReceivedHistory
+        [ receiveEvent <| Peers.Events.fromJson >> ReceivedEvent
+        , receiveHistory <| List.map Peers.Events.fromJson >> ReceivedHistory
         , Js.Events.events toMsg
         , onKeyUp <|
             Json.Decode.map KeyPressed <|
@@ -415,7 +415,7 @@ detectAction model =
 
                 On on ->
                     { icon = Lib.Icons.Ion.stop
-                    , message = ShareEvent <| SharedEvents.Clock SharedEvents.Stopped
+                    , message = ShareEvent <| Peers.Events.Clock Peers.Events.Stopped
                     , class = "on"
                     , text =
                         Duration.between model.now on.end

@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
 import Lib.Icons.Ion
-import SharedEvents
+import Peers.Events
 import Pages.Mob.Sound.Library as SoundLibrary
 
 
@@ -29,7 +29,7 @@ init volume =
 
 type Msg
     = VolumeChanged String
-    | ShareEvent SharedEvents.Event
+    | ShareEvent Peers.Events.Event
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -47,8 +47,8 @@ update msg model =
         ShareEvent event ->
             ( model
             , event
-                |> SharedEvents.toJson
-                |> SharedEvents.sendEvent
+                |> Peers.Events.toJson
+                |> Peers.Events.sendEvent
             )
 
 
@@ -78,7 +78,7 @@ view model profile =
                     [ classList [ ( "active", profile == SoundLibrary.ClassicWeird ) ]
                     , onClick
                         (SoundLibrary.ClassicWeird
-                            |> SharedEvents.SelectedMusicProfile
+                            |> Peers.Events.SelectedMusicProfile
                             |> ShareEvent
                         )
                     ]
@@ -89,7 +89,7 @@ view model profile =
                     [ classList [ ( "active", profile == SoundLibrary.Riot ) ]
                     , onClick
                         (SoundLibrary.Riot
-                            |> SharedEvents.SelectedMusicProfile
+                            |> Peers.Events.SelectedMusicProfile
                             |> ShareEvent
                         )
                     ]

@@ -1,11 +1,11 @@
-module Shared exposing (..)
+module Peers.State exposing (..)
 
 import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Js.Commands
 import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
-import SharedEvents
+import Peers.Events
 import Pages.Mob.Sound.Library
 import Time
 
@@ -44,7 +44,7 @@ timePassed now state =
     }
 
 
-evolveMany : State -> List SharedEvents.Event -> State
+evolveMany : State -> List Peers.Events.Event -> State
 evolveMany model events =
     case uncons events of
         ( Nothing, _ ) ->
@@ -54,38 +54,38 @@ evolveMany model events =
             evolveMany (evolve model head |> Tuple.first) tail
 
 
-evolve : State -> SharedEvents.Event -> ( State, Cmd msg )
+evolve : State -> Peers.Events.Event -> ( State, Cmd msg )
 evolve state event =
     case event of
-        SharedEvents.Clock clockEvent ->
+        Peers.Events.Clock clockEvent ->
             evolveClock clockEvent state
 
-        SharedEvents.AddedMobber mobber ->
+        Peers.Events.AddedMobber mobber ->
             ( { state | mobbers = Mobbers.add mobber state.mobbers }, Cmd.none )
 
-        SharedEvents.DeletedMobber mobber ->
+        Peers.Events.DeletedMobber mobber ->
             ( { state | mobbers = Mobbers.delete mobber state.mobbers }, Cmd.none )
 
-        SharedEvents.RotatedMobbers ->
+        Peers.Events.RotatedMobbers ->
             ( { state | mobbers = Mobbers.rotate state.mobbers }, Cmd.none )
 
-        SharedEvents.ShuffledMobbers mobbers ->
+        Peers.Events.ShuffledMobbers mobbers ->
             ( { state | mobbers = Mobbers.merge mobbers state.mobbers }, Cmd.none )
 
-        SharedEvents.TurnLengthChanged turnLength ->
+        Peers.Events.TurnLengthChanged turnLength ->
             ( { state | turnLength = turnLength }, Cmd.none )
 
-        SharedEvents.SelectedMusicProfile profile ->
+        Peers.Events.SelectedMusicProfile profile ->
             ( { state | soundProfile = profile }, Cmd.none )
 
-        SharedEvents.Unknown _ ->
+        Peers.Events.Unknown _ ->
             ( state, Cmd.none )
 
 
-evolveClock : SharedEvents.ClockEvent -> State -> ( State, Cmd msg )
+evolveClock : Peers.Events.ClockEvent -> State -> ( State, Cmd msg )
 evolveClock event state =
     case ( event, state.clock ) of
-        ( SharedEvents.Started started, Off ) ->
+        ( Peers.Events.Started started, Off ) ->
             ( { state
                 | clock =
                     On
@@ -97,7 +97,7 @@ evolveClock event state =
             , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
             )
 
-        ( SharedEvents.Stopped, On _ ) ->
+        ( Peers.Events.Stopped, On _ ) ->
             ( { state
                 | clock = Off
                 , mobbers = Mobbers.rotate state.mobbers

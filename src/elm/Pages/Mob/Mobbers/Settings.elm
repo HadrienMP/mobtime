@@ -12,7 +12,7 @@ import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Mobbers.Mobber exposing (Mobber)
 import Random
 import Random.List
-import SharedEvents
+import Peers.Events
 import Uuid
 
 
@@ -34,7 +34,7 @@ type Msg
     | StartAdding
     | Add Mobber
     | Shuffle
-    | ShareEvent SharedEvents.Event
+    | ShareEvent Peers.Events.Event
 
 
 type alias UpdateResult =
@@ -76,15 +76,15 @@ update msg mobbers model =
             { updated = model
             , command =
                 mobber
-                    |> SharedEvents.AddedMobber
-                    |> SharedEvents.toJson
-                    |> SharedEvents.sendEvent
+                    |> Peers.Events.AddedMobber
+                    |> Peers.Events.toJson
+                    |> Peers.Events.sendEvent
             , toasts = []
             }
 
         Shuffle ->
             { updated = model
-            , command = Random.generate (ShareEvent << SharedEvents.ShuffledMobbers) <| Mobbers.shuffle mobbers
+            , command = Random.generate (ShareEvent << Peers.Events.ShuffledMobbers) <| Mobbers.shuffle mobbers
             , toasts = []
             }
 
@@ -93,8 +93,8 @@ update msg mobbers model =
             { updated = model
             , command =
                 event
-                    |> SharedEvents.toJson
-                    |> SharedEvents.sendEvent
+                    |> Peers.Events.toJson
+                    |> Peers.Events.sendEvent
             , toasts = []
             }
 
@@ -116,7 +116,7 @@ view mobbers model =
             [ button
                 [ class "labelled-icon-button"
                 , disabled (not <| Mobbers.rotatable mobbers)
-                , onClick <| ShareEvent <| SharedEvents.RotatedMobbers
+                , onClick <| ShareEvent <| Peers.Events.RotatedMobbers
                 ]
                 [ Icons.rotate
                 , text "Rotate"
@@ -181,7 +181,7 @@ mobberView ( role, maybeMobber ) =
                         []
                         [ input [ type_ "text", value mobber.name ] []
                         , button
-                            [ onClick <| ShareEvent <| SharedEvents.DeletedMobber mobber ]
+                            [ onClick <| ShareEvent <| Peers.Events.DeletedMobber mobber ]
                             [ Icons.delete ]
                         ]
                     ]

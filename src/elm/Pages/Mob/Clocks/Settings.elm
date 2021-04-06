@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Js.Events
 import Lib.Duration as Duration
 import Lib.Icons.Animals
-import SharedEvents
+import Peers.Events
 
 
 type alias Model =
@@ -20,7 +20,7 @@ init =
 
 type Msg
     = DisplaySecondsChanged Bool
-    | ShareEvent SharedEvents.Event
+    | ShareEvent Peers.Events.Event
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -31,7 +31,7 @@ update msg model =
 
         ShareEvent event ->
             ( model
-            , SharedEvents.toJson event |> SharedEvents.sendEvent
+            , Peers.Events.toJson event |> Peers.Events.sendEvent
             )
 
 
@@ -74,7 +74,7 @@ view turnLength model =
                         String.toInt
                             >> Maybe.withDefault 8
                             >> Duration.ofMinutes
-                            >> SharedEvents.TurnLengthChanged
+                            >> Peers.Events.TurnLengthChanged
                             >> ShareEvent
                     , Html.Attributes.min "2"
                     , Html.Attributes.max "20"
