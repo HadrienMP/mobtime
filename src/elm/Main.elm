@@ -355,7 +355,7 @@ view model =
         mobCircle =
             Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
     in
-    { title = "Mob Time"
+    { title = timeLeftTitle action ++ "Mob Time"
     , body =
         [ div [ class "container" ]
             [ header []
@@ -451,3 +451,9 @@ detectAction model =
                                     Duration.toShortString
                                )
                     }
+
+timeLeftTitle : ActionDescription -> String
+timeLeftTitle action =
+    case action.text of
+        [] -> ""
+        _ -> String.join " " action.text ++ " | "
