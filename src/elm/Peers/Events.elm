@@ -9,6 +9,12 @@ import Pages.Mob.Sound.Library
 import Time
 
 
+port receiveOne : (Json.Encode.Value -> msg) -> Sub msg
+
+
+port receiveHistory : (List Json.Encode.Value -> msg) -> Sub msg
+
+
 port sendEvent : Json.Encode.Value -> Cmd msg
 
 

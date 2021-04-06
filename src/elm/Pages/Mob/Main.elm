@@ -1,4 +1,4 @@
-port module Pages.Mob.Main exposing (..)
+module Pages.Mob.Main exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
@@ -34,14 +34,9 @@ import Url
 import UserPreferences
 
 
-port receiveEvent : (Json.Encode.Value -> msg) -> Sub msg
-
-
-port receiveHistory : (List Json.Encode.Value -> msg) -> Sub msg
-
-
 -- MODEL
 
+type alias MobName = String
 
 type AlarmState
     = Playing
@@ -58,7 +53,8 @@ type Tab
 
 
 type alias Model =
-    { shared : Peers.State.State
+    { name : MobName
+    , shared : Peers.State.State
     , mobbersSettings : Pages.Mob.Mobbers.Settings.Model
     , clockSettings : Pages.Mob.Clocks.Settings.Model
     , soundSettings : Pages.Mob.Sound.Settings.Model
@@ -70,9 +66,10 @@ type alias Model =
     }
 
 
-init : UserPreferences.Model -> ( Model, Cmd Msg )
-init preferences =
-    ( { shared = Peers.State.init
+init : MobName -> UserPreferences.Model -> ( Model, Cmd Msg )
+init name preferences =
+    ( { name = name
+      , shared = Peers.State.init
       , mobbersSettings = Pages.Mob.Mobbers.Settings.init
       , clockSettings = Pages.Mob.Clocks.Settings.init
       , soundSettings = Pages.Mob.Sound.Settings.init preferences.volume
@@ -276,11 +273,11 @@ type alias Keystroke =
     }
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions : Sub Msg
+subscriptions =
     Sub.batch
-        [ receiveEvent <| Peers.Events.fromJson >> ReceivedEvent
-        , receiveHistory <| List.map Peers.Events.fromJson >> ReceivedHistory
+        [ Peers.Events.receiveOne <| Peers.Events.fromJson >> ReceivedEvent
+        , Peers.Events.receiveHistory <| List.map Peers.Events.fromJson >> ReceivedHistory
         , Js.Events.events toMsg
         , onKeyUp <|
             Json.Decode.map KeyPressed <|
@@ -362,7 +359,7 @@ view model url =
                 ]
             , case model.tab of
                 Main ->
-                    Pages.Mob.Tabs.Home.view "Awesome" url model.shared.mobbers
+                    Pages.Mob.Tabs.Home.view model.name url model.shared.mobbers
                         |> Html.map GotMainTabMsg
 
                 Clock ->
@@ -378,7 +375,7 @@ view model url =
                         |> Html.map GotSoundSettingsMsg
 
                 Share ->
-                    Pages.Mob.Tabs.Share.view "Awesome" url
+                    Pages.Mob.Tabs.Share.view model.name url
                         |> Html.map GotShareTabMsg
             , Lib.Toaster.view model.toasts |> Html.map GotToastMsg
             ]

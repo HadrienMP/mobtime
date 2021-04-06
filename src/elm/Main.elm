@@ -42,7 +42,7 @@ init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init preferences url key =
     let
         ( mob, mobCommand ) =
-            Pages.Mob.Main.init preferences
+            Pages.Mob.Main.init "Awesome" preferences
     in
     ( { key = key
       , url = url
@@ -93,10 +93,9 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
-        [ Pages.Mob.Main.subscriptions model.mob
-            |> Sub.map GotMobMsg
+        [ Pages.Mob.Main.subscriptions |> Sub.map GotMobMsg
         , Time.every 500 TimePassed
         ]
 
