@@ -1,4 +1,4 @@
-module Sound.Settings exposing (..)
+module Pages.Mob.Sound.Settings exposing (..)
 
 import Html exposing (Html, button, div, img, input, label, p, text)
 import Html.Attributes exposing (alt, class, classList, for, id, src, step, type_, value)
@@ -7,7 +7,7 @@ import Js.Commands
 import Json.Encode
 import Lib.Icons.Ion
 import SharedEvents
-import Sound.Library as SoundLibrary
+import Pages.Mob.Sound.Library as SoundLibrary
 
 
 type alias CommandPort =

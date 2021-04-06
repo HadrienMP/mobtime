@@ -6,7 +6,7 @@ import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
 import Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import SharedEvents
-import Sound.Library
+import Pages.Mob.Sound.Library
 import Time
 
 
@@ -14,7 +14,7 @@ type alias State =
     { clock : ClockState
     , turnLength : Duration
     , mobbers : Mobbers
-    , soundProfile : Sound.Library.Profile
+    , soundProfile : Pages.Mob.Sound.Library.Profile
     }
 
 
@@ -23,7 +23,7 @@ init =
     { clock = Off
     , turnLength = Lib.Duration.ofMinutes 8
     , mobbers = Mobbers.empty
-    , soundProfile = Sound.Library.ClassicWeird
+    , soundProfile = Pages.Mob.Sound.Library.ClassicWeird
     }
 
 

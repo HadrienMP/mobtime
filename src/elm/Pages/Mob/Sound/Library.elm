@@ -1,4 +1,4 @@
-module Sound.Library exposing (Profile(..), Sound, default, pick, profileFromString, profileToString)
+module Pages.Mob.Sound.Library exposing (Profile(..), Sound, default, pick, profileFromString, profileToString)
 
 import Random
 

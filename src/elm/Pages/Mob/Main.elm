@@ -24,8 +24,8 @@ import Mobbers.Settings
 import Random
 import Shared
 import SharedEvents
-import Sound.Library
-import Sound.Settings
+import Pages.Mob.Sound.Library
+import Pages.Mob.Sound.Settings
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
 import Task
@@ -61,7 +61,7 @@ type alias Model =
     { shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
     , clockSettings : Pages.Mob.Clocks.Settings.Model
-    , soundSettings : Sound.Settings.Model
+    , soundSettings : Pages.Mob.Sound.Settings.Model
     , alarm : AlarmState
     , now : Time.Posix
     , toasts : Toasts
@@ -75,7 +75,7 @@ init preferences =
     ( { shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
       , clockSettings = Pages.Mob.Clocks.Settings.init
-      , soundSettings = Sound.Settings.init preferences.volume
+      , soundSettings = Pages.Mob.Sound.Settings.init preferences.volume
       , alarm = Standby
       , now = Time.millisToPosix 0
       , toasts = []
@@ -97,7 +97,7 @@ type Msg
     | ReceivedEvent SharedEvents.Event
     | ReceivedHistory (List SharedEvents.Event)
     | Start
-    | StartWithAlarm Sound.Library.Sound
+    | StartWithAlarm Pages.Mob.Sound.Library.Sound
     | StopSound
     | AlarmEnded
     | UnknownEvent
@@ -105,7 +105,7 @@ type Msg
     | GotClockSettingsMsg Pages.Mob.Clocks.Settings.Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
-    | GotSoundSettingsMsg Sound.Settings.Msg
+    | GotSoundSettingsMsg Pages.Mob.Sound.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
     | SwitchTab Tab
     | Batch (List Msg)
@@ -176,7 +176,7 @@ update msg model =
             )
 
         Start ->
-            ( model, Random.generate StartWithAlarm <| Sound.Library.pick model.shared.soundProfile )
+            ( model, Random.generate StartWithAlarm <| Pages.Mob.Sound.Library.pick model.shared.soundProfile )
 
         StartWithAlarm sound ->
             ( model
@@ -251,7 +251,7 @@ update msg model =
                     (Cmd.map GotClockSettingsMsg)
 
         GotSoundSettingsMsg subMsg ->
-            Sound.Settings.update subMsg model.soundSettings
+            Pages.Mob.Sound.Settings.update subMsg model.soundSettings
                 |> Tuple.mapBoth
                     (\a -> { model | soundSettings = a })
                     (Cmd.map GotSoundSettingsMsg)
@@ -374,7 +374,7 @@ view model url =
                         |> Html.map GotMobbersSettingsMsg
 
                 Sound ->
-                    Sound.Settings.view model.soundSettings model.shared.soundProfile
+                    Pages.Mob.Sound.Settings.view model.soundSettings model.shared.soundProfile
                         |> Html.map GotSoundSettingsMsg
 
                 Share ->
