@@ -1,4 +1,4 @@
-module Mobbers.Settings exposing (..)
+module Pages.Mob.Mobbers.Settings exposing (..)
 
 import Field
 import Field.String
@@ -8,8 +8,8 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
 import Lib.Toaster exposing (Level(..), Toast, Toasts)
-import Mobbers.Mobbers as Mobbers exposing (Mobbers)
-import Mobbers.Mobber exposing (Mobber)
+import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
+import Pages.Mob.Mobbers.Mobber exposing (Mobber)
 import Random
 import Random.List
 import SharedEvents

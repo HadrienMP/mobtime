@@ -3,8 +3,8 @@ port module SharedEvents exposing (..)
 import Json.Decode
 import Json.Encode
 import Lib.Duration exposing (Duration)
-import Mobbers.Mobber as Mobber exposing (Mobber)
-import Mobbers.Mobbers as Mobbers exposing (Mobbers)
+import Pages.Mob.Mobbers.Mobber as Mobber exposing (Mobber)
+import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Sound.Library
 import Time
 

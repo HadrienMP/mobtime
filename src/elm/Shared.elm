@@ -4,7 +4,7 @@ import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Js.Commands
 import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
-import Mobbers.Mobbers as Mobbers exposing (Mobbers)
+import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import SharedEvents
 import Pages.Mob.Sound.Library
 import Time

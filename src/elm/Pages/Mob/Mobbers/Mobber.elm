@@ -1,4 +1,4 @@
-module Mobbers.Mobber exposing (..)
+module Pages.Mob.Mobbers.Mobber exposing (..)
 
 import Dict exposing (Dict)
 import Json.Decode

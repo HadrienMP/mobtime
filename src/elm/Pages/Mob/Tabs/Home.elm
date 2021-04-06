@@ -5,9 +5,9 @@ import Html exposing (Html, div, li, span, text, ul)
 import Html.Attributes exposing (class, id)
 import Js.Commands
 import Pages.Mob.Tabs.Share
-import Mobbers.Mobber exposing (Mobber)
-import Mobbers.Mobbers exposing (Mobbers)
-import Mobbers.Settings
+import Pages.Mob.Mobbers.Mobber exposing (Mobber)
+import Pages.Mob.Mobbers.Mobbers exposing (Mobbers)
+import Pages.Mob.Mobbers.Settings
 import Url
 
 
@@ -36,7 +36,7 @@ view mobName url mobbers =
 
 roles : Mobbers -> Html msg
 roles mobbers =
-    Mobbers.Settings.assignRoles mobbers
+    Pages.Mob.Mobbers.Settings.assignRoles mobbers
         |> List.filter (\(_, mobber) -> mobber /= Nothing)
         |> List.take 2
         |> List.map roleView

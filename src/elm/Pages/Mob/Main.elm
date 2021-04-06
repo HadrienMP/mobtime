@@ -2,7 +2,7 @@ port module Pages.Mob.Main exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
-import Circle
+import Lib.Circle
 import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
 import Html exposing (..)
@@ -20,7 +20,7 @@ import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Share
-import Mobbers.Settings
+import Pages.Mob.Mobbers.Settings
 import Random
 import Shared
 import SharedEvents
@@ -59,7 +59,7 @@ type Tab
 
 type alias Model =
     { shared : Shared.State
-    , mobbersSettings : Mobbers.Settings.Model
+    , mobbersSettings : Pages.Mob.Mobbers.Settings.Model
     , clockSettings : Pages.Mob.Clocks.Settings.Model
     , soundSettings : Pages.Mob.Sound.Settings.Model
     , alarm : AlarmState
@@ -73,7 +73,7 @@ type alias Model =
 init : UserPreferences.Model -> ( Model, Cmd Msg )
 init preferences =
     ( { shared = Shared.init
-      , mobbersSettings = Mobbers.Settings.init
+      , mobbersSettings = Pages.Mob.Mobbers.Settings.init
       , clockSettings = Pages.Mob.Clocks.Settings.init
       , soundSettings = Pages.Mob.Sound.Settings.init preferences.volume
       , alarm = Standby
@@ -104,7 +104,7 @@ type Msg
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Clocks.Settings.Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
-    | GotMobbersSettingsMsg Mobbers.Settings.Msg
+    | GotMobbersSettingsMsg Pages.Mob.Mobbers.Settings.Msg
     | GotSoundSettingsMsg Pages.Mob.Sound.Settings.Msg
     | GotToastMsg Lib.Toaster.Msg
     | SwitchTab Tab
@@ -215,7 +215,7 @@ update msg model =
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
-                    Mobbers.Settings.update subMsg model.shared.mobbers model.mobbersSettings
+                    Pages.Mob.Mobbers.Settings.update subMsg model.shared.mobbers model.mobbersSettings
 
                 ( toasts, commands ) =
                     Lib.Toaster.add mobbersResult.toasts model.toasts
@@ -322,13 +322,13 @@ view model url =
             104
 
         pomodoroCircle =
-            Circle.Circle
+            Lib.Circle.Circle
                 outerRadiant
-                (Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
-                (Circle.Stroke 10 "#999")
+                (Lib.Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
+                (Lib.Circle.Stroke 10 "#999")
 
         mobCircle =
-            Circle.inside pomodoroCircle <| Circle.Stroke 18 "#666"
+            Lib.Circle.inside pomodoroCircle <| Lib.Circle.Stroke 18 "#666"
     in
     { title = timeLeftTitle action ++ "Mob Time"
     , body =
@@ -341,8 +341,8 @@ view model url =
                         , Svg.height <| String.fromInt totalWidth
                         ]
                       <|
-                        Circle.draw pomodoroCircle Lib.Ratio.full
-                            ++ Circle.draw mobCircle (Pages.Mob.Clocks.Clock.ratio model.now model.shared.clock)
+                        Lib.Circle.draw pomodoroCircle Lib.Ratio.full
+                            ++ Lib.Circle.draw mobCircle (Pages.Mob.Clocks.Clock.ratio model.now model.shared.clock)
                     , button
                         [ id "action"
                         , class action.class
@@ -370,7 +370,7 @@ view model url =
                         |> Html.map GotClockSettingsMsg
 
                 Mobbers ->
-                    Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
+                    Pages.Mob.Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
                         |> Html.map GotMobbersSettingsMsg
 
                 Sound ->
