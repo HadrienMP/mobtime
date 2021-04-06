@@ -3,8 +3,8 @@ port module Pages.Mob.Main exposing (..)
 import Browser
 import Browser.Events exposing (onKeyUp)
 import Circle
-import Clock.Clock exposing (ClockState(..))
-import Clock.Settings
+import Pages.Mob.Clocks.Clock exposing (ClockState(..))
+import Pages.Mob.Clocks.Settings
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, id)
 import Html.Events exposing (onClick)
@@ -60,7 +60,7 @@ type Tab
 type alias Model =
     { shared : Shared.State
     , mobbersSettings : Mobbers.Settings.Model
-    , clockSettings : Clock.Settings.Model
+    , clockSettings : Pages.Mob.Clocks.Settings.Model
     , soundSettings : Sound.Settings.Model
     , alarm : AlarmState
     , now : Time.Posix
@@ -74,7 +74,7 @@ init : UserPreferences.Model -> ( Model, Cmd Msg )
 init preferences =
     ( { shared = Shared.init
       , mobbersSettings = Mobbers.Settings.init
-      , clockSettings = Clock.Settings.init
+      , clockSettings = Pages.Mob.Clocks.Settings.init
       , soundSettings = Sound.Settings.init preferences.volume
       , alarm = Standby
       , now = Time.millisToPosix 0
@@ -82,10 +82,7 @@ init preferences =
       , tab = Main
       , dev = False
       }
-    , Cmd.batch
-        [ Task.perform TimePassed Time.now
-        , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
-        ]
+    , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
     )
 
 
@@ -99,14 +96,13 @@ type Msg
     | ShareEvent SharedEvents.Event
     | ReceivedEvent SharedEvents.Event
     | ReceivedHistory (List SharedEvents.Event)
-    | TimePassed Time.Posix
     | Start
     | StartWithAlarm Sound.Library.Sound
     | StopSound
     | AlarmEnded
     | UnknownEvent
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
-    | GotClockSettingsMsg Clock.Settings.Msg
+    | GotClockSettingsMsg Pages.Mob.Clocks.Settings.Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Mobbers.Settings.Msg
     | GotSoundSettingsMsg Sound.Settings.Msg
@@ -114,6 +110,32 @@ type Msg
     | SwitchTab Tab
     | Batch (List Msg)
     | KeyPressed Keystroke
+
+
+timePassed : Time.Posix -> Model -> (Model, Cmd Msg)
+timePassed now model =
+    let
+        timePassedResult =
+            Shared.timePassed now model.shared
+    in
+    ( { model
+        | alarm =
+            case timePassedResult.turnEvent of
+                Pages.Mob.Clocks.Clock.Ended ->
+                    Playing
+
+                Pages.Mob.Clocks.Clock.Continued ->
+                    model.alarm
+        , now = now
+        , shared = timePassedResult.updated
+      }
+    , case timePassedResult.turnEvent of
+        Pages.Mob.Clocks.Clock.Ended ->
+            Js.Commands.send Js.Commands.SoundAlarm
+
+        Pages.Mob.Clocks.Clock.Continued ->
+            Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -151,30 +173,6 @@ update msg model =
         ReceivedHistory eventsResults ->
             ( { model | shared = Shared.evolveMany model.shared eventsResults }
             , Cmd.none
-            )
-
-        TimePassed now ->
-            let
-                timePassedResult =
-                    Shared.timePassed now model.shared
-            in
-            ( { model
-                | alarm =
-                    case timePassedResult.turnEvent of
-                        Clock.Clock.Ended ->
-                            Playing
-
-                        Clock.Clock.Continued ->
-                            model.alarm
-                , now = now
-                , shared = timePassedResult.updated
-              }
-            , case timePassedResult.turnEvent of
-                Clock.Clock.Ended ->
-                    Js.Commands.send Js.Commands.SoundAlarm
-
-                Clock.Clock.Continued ->
-                    Cmd.none
             )
 
         Start ->
@@ -247,7 +245,7 @@ update msg model =
             ( model, Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
 
         GotClockSettingsMsg subMsg ->
-            Clock.Settings.update subMsg model.clockSettings
+            Pages.Mob.Clocks.Settings.update subMsg model.clockSettings
                 |> Tuple.mapBoth
                     (\a -> { model | clockSettings = a })
                     (Cmd.map GotClockSettingsMsg)
@@ -281,8 +279,7 @@ type alias Keystroke =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Time.every 500 TimePassed
-        , receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
+        [ receiveEvent <| SharedEvents.fromJson >> ReceivedEvent
         , receiveHistory <| List.map SharedEvents.fromJson >> ReceivedHistory
         , Js.Events.events toMsg
         , onKeyUp <|
@@ -345,7 +342,7 @@ view model url =
                         ]
                       <|
                         Circle.draw pomodoroCircle Lib.Ratio.full
-                            ++ Circle.draw mobCircle (Clock.Clock.ratio model.now model.shared.clock)
+                            ++ Circle.draw mobCircle (Pages.Mob.Clocks.Clock.ratio model.now model.shared.clock)
                     , button
                         [ id "action"
                         , class action.class
@@ -369,7 +366,7 @@ view model url =
                         |> Html.map GotMainTabMsg
 
                 Clock ->
-                    Clock.Settings.view model.shared.turnLength model.clockSettings
+                    Pages.Mob.Clocks.Settings.view model.shared.turnLength model.clockSettings
                         |> Html.map GotClockSettingsMsg
 
                 Mobbers ->

@@ -1,9 +1,7 @@
 module Shared exposing (..)
 
-import Clock.Clock as Clock exposing (ClockState(..))
-import Clock.TurnClock
+import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Js.Commands
-import Json.Decode
 import Lib.Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
 import Mobbers.Mobbers as Mobbers exposing (Mobbers)
@@ -31,7 +29,7 @@ init =
 
 type alias TimePassedResult =
     { updated : State
-    , turnEvent : Clock.Event
+    , turnEvent : Pages.Mob.Clocks.Clock.Event
     }
 
 
@@ -39,7 +37,7 @@ timePassed : Time.Posix -> State -> TimePassedResult
 timePassed now state =
     let
         ( clock, event ) =
-            Clock.timePassed now state.clock
+            Pages.Mob.Clocks.Clock.timePassed now state.clock
     in
     { updated = { state | clock = clock }
     , turnEvent = event

@@ -3,9 +3,13 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Lib.ListExtras
 import Pages.Mob.Main
+import Task
+import Time
 import Url
 import UserPreferences
+
 
 
 -- MAIN
@@ -36,15 +40,19 @@ type alias Model =
 
 init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init preferences url key =
-    Pages.Mob.Main.init preferences
-        |> Tuple.mapBoth
-            (\mob ->
-                { key = key
-                , url = url
-                , mob = mob
-                }
-            )
-            (Cmd.map GotMobMsg)
+    let
+        ( mob, mobCommand ) =
+            Pages.Mob.Main.init preferences
+    in
+    ( { key = key
+      , url = url
+      , mob = mob
+      }
+    , Cmd.batch
+        [ Task.perform TimePassed Time.now
+        , Cmd.map GotMobMsg mobCommand
+        ]
+    )
 
 
 
@@ -55,6 +63,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | GotMobMsg Pages.Mob.Main.Msg
+    | TimePassed Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -72,6 +81,12 @@ update msg model =
                     (\mob -> { model | mob = mob })
                     (Cmd.map GotMobMsg)
 
+        TimePassed now ->
+            Pages.Mob.Main.timePassed now model.mob
+                |> Tuple.mapBoth
+                    (\mob -> { model | mob = mob })
+                    (Cmd.map GotMobMsg)
+
 
 
 -- SUBSCRIPTIONS
@@ -79,8 +94,11 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Pages.Mob.Main.subscriptions model.mob
-        |> Sub.map GotMobMsg
+    Sub.batch
+        [ Pages.Mob.Main.subscriptions model.mob
+            |> Sub.map GotMobMsg
+        , Time.every 500 TimePassed
+        ]
 
 
 

@@ -1,5 +1,9 @@
 module Lib.ListExtras exposing (..)
 
+from : a -> List a
+from a =
+    [a]
+
 rotate : List a -> List a
 rotate list =
     uncons list

@@ -1,4 +1,4 @@
-module Clock.Settings exposing (..)
+module Pages.Mob.Clocks.Settings exposing (..)
 
 import Html exposing (Html, button, div, input, label, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
