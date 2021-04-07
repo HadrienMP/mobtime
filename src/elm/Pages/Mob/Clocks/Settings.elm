@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Js.Events
 import Lib.Duration as Duration
 import Lib.Icons.Animals
+import Pages.Mob.Name exposing (MobName)
 import Peers.Events
 
 
@@ -23,15 +24,18 @@ type Msg
     | ShareEvent Peers.Events.Event
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Model -> MobName -> ( Model, Cmd Msg )
+update msg model mob =
     case msg of
         DisplaySecondsChanged bool ->
             ( { model | displaySeconds = bool }, Cmd.none )
 
         ShareEvent event ->
             ( model
-            , Peers.Events.toJson event |> Peers.Events.sendEvent
+            , event
+                |> Peers.Events.MobEvent mob
+                |> Peers.Events.mobEventToJson
+                |> Peers.Events.sendEvent
             )
 
 

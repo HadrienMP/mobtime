@@ -15,11 +15,9 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
+init : (Model, Cmd msg)
 init =
-    ( { mobName = "" }
-    , Cmd.none
-    )
+    ({ mobName = "" }, Cmd.none)
 
 
 

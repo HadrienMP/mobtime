@@ -2,9 +2,11 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (..)
-import Lib.ListExtras
+import Js.Commands
+import Lib.DocumentExtras
+import Pages.Login
 import Pages.Mob.Main
+import Pages.Routing
 import Task
 import Time
 import Url
@@ -31,28 +33,53 @@ main =
 -- MODEL
 
 
+type PageModel
+    = LoginModel Pages.Login.Model
+    | MobModel Pages.Mob.Main.Model
+
+
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
-    , mob : Pages.Mob.Main.Model
+    , page : PageModel
+    , preferences : UserPreferences.Model
     }
 
 
 init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init preferences url key =
-    let
-        ( mob, mobCommand ) =
-            Pages.Mob.Main.init "Awesome" preferences
-    in
-    ( { key = key
-      , url = url
-      , mob = mob
-      }
-    , Cmd.batch
-        [ Task.perform TimePassed Time.now
-        , Cmd.map GotMobMsg mobCommand
-        ]
-    )
+    loadPage url preferences
+        |> Tuple.mapBoth
+            (\page ->
+                { key = key
+                , url = url
+                , page = page
+                , preferences = preferences
+                }
+            )
+            (\command ->
+                Cmd.batch
+                    [ Task.perform TimePassed Time.now
+                    , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
+                    , command
+                    ]
+            )
+
+
+loadPage : Url.Url -> UserPreferences.Model -> ( PageModel, Cmd Msg )
+loadPage url preferences =
+    case Pages.Routing.toPage url of
+        Pages.Routing.Login ->
+            Pages.Login.init
+                |> Tuple.mapBoth
+                    LoginModel
+                    (Cmd.map GotLoginMsg)
+
+        Pages.Routing.Mob mobName ->
+            Pages.Mob.Main.init mobName preferences
+                |> Tuple.mapBoth
+                    MobModel
+                    (Cmd.map GotMobMsg)
 
 
 
@@ -62,30 +89,46 @@ init preferences url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | GotMobMsg Pages.Mob.Main.Msg
     | TimePassed Time.Posix
+    | GotMobMsg Pages.Mob.Main.Msg
+    | GotLoginMsg Pages.Login.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        LinkClicked _ ->
-            ( model, Cmd.none )
+    case ( msg, model.page ) of
+        ( LinkClicked urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
-        UrlChanged _ ->
-            ( model, Cmd.none )
+                Browser.External href ->
+                    ( model, Nav.load href )
 
-        GotMobMsg sub ->
-            Pages.Mob.Main.update sub model.mob
+        ( UrlChanged url, _ ) ->
+            loadPage url model.preferences
+                |> Tuple.mapFirst (\page -> { model | page = page })
+
+        ( GotLoginMsg subMsg, LoginModel subModel ) ->
+            Pages.Login.update subModel subMsg model.key
                 |> Tuple.mapBoth
-                    (\mob -> { model | mob = mob })
+                    (\mob -> { model | page = LoginModel mob })
+                    (Cmd.map GotLoginMsg)
+
+        ( GotMobMsg subMsg, MobModel subModel ) ->
+            Pages.Mob.Main.update subMsg subModel
+                |> Tuple.mapBoth
+                    (\mob -> { model | page = MobModel mob })
                     (Cmd.map GotMobMsg)
 
-        TimePassed now ->
-            Pages.Mob.Main.timePassed now model.mob
+        ( TimePassed now, MobModel subModel ) ->
+            Pages.Mob.Main.timePassed now subModel
                 |> Tuple.mapBoth
-                    (\mob -> { model | mob = mob })
+                    (\mob -> { model | page = MobModel mob })
                     (Cmd.map GotMobMsg)
+
+        _ ->
+            ( model, Cmd.none )
 
 
 
@@ -106,12 +149,11 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    let
-        mobDocument =
-            Pages.Mob.Main.view model.mob model.url
-    in
-    { title = mobDocument.title
-    , body =
-        mobDocument.body
-            |> List.map (Html.map GotMobMsg)
-    }
+    case model.page of
+        LoginModel sub ->
+            Pages.Login.view sub
+                |> Lib.DocumentExtras.map GotLoginMsg
+
+        MobModel sub ->
+            Pages.Mob.Main.view sub model.url
+                |> Lib.DocumentExtras.map GotMobMsg

@@ -13,6 +13,7 @@ type Command
     | StopAlarm
     | CopyInPasteBin String
     | ChangeVolume Int
+    | Join String
 
 
 type alias OutCommand =
@@ -39,3 +40,7 @@ send command =
 
             ChangeVolume volume ->
                 OutCommand "ChangeVolume" <| Json.Encode.string <| String.fromInt volume
+
+            Join mobName ->
+                OutCommand "Join" <| Json.Encode.string mobName
+

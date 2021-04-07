@@ -8,6 +8,7 @@ const history = {}
 
 io.on('connection', (socket) => {
     socket.on('join', room => {
+        console.log(`Someone joined ${room}`)
         socket.join(room);
         socket.emit('history', history[room] ? history[room] : []);
     });
@@ -27,6 +28,8 @@ function historize(room, message) {
 let publicDirPath = path.join(__dirname + "/../", 'public');
 app.use(express.static(publicDirPath));
 app.get('/', (req, res) => {
+    res.sendFile(path.join(publicDirPath, "index.html"))
+}).get('/mob/*', (req, res) => {
     res.sendFile(path.join(publicDirPath, "index.html"))
 })
 

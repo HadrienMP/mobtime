@@ -10,6 +10,7 @@ import Lib.ListExtras exposing (assign)
 import Lib.Toaster exposing (Level(..), Toast, Toasts)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Mobbers.Mobber exposing (Mobber)
+import Pages.Mob.Name exposing (MobName)
 import Random
 import Random.List
 import Peers.Events
@@ -44,8 +45,8 @@ type alias UpdateResult =
     }
 
 
-update : Msg -> Mobbers -> Model -> UpdateResult
-update msg mobbers model =
+update : Msg -> Mobbers -> MobName -> Model -> UpdateResult
+update msg mobbers mob model =
     case msg of
         NameChanged name ->
             { updated = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
@@ -77,7 +78,8 @@ update msg mobbers model =
             , command =
                 mobber
                     |> Peers.Events.AddedMobber
-                    |> Peers.Events.toJson
+                    |> Peers.Events.MobEvent mob
+                    |> Peers.Events.mobEventToJson
                     |> Peers.Events.sendEvent
             , toasts = []
             }
@@ -93,7 +95,8 @@ update msg mobbers model =
             { updated = model
             , command =
                 event
-                    |> Peers.Events.toJson
+                    |> Peers.Events.MobEvent mob
+                    |> Peers.Events.mobEventToJson
                     |> Peers.Events.sendEvent
             , toasts = []
             }

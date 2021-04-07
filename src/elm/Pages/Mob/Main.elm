@@ -2,9 +2,6 @@ module Pages.Mob.Main exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
-import Lib.Circle
-import Pages.Mob.Clocks.Clock exposing (ClockState(..))
-import Pages.Mob.Clocks.Settings
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, id)
 import Html.Events exposing (onClick)
@@ -12,31 +9,33 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
-import Json.Encode
 import Lib.BatchMsg
+import Lib.Circle
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons.Ion
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
-import Pages.Mob.Tabs.Home
-import Pages.Mob.Tabs.Share
+import Pages.Mob.Clocks.Clock exposing (ClockState(..))
+import Pages.Mob.Clocks.Settings
 import Pages.Mob.Mobbers.Settings
-import Random
-import Peers.State
-import Peers.Events
+import Pages.Mob.Name exposing (MobName)
 import Pages.Mob.Sound.Library
 import Pages.Mob.Sound.Settings
+import Pages.Mob.Tabs.Home
+import Pages.Mob.Tabs.Share
+import Peers.Events
+import Peers.State
+import Random
 import Svg exposing (Svg, svg)
 import Svg.Attributes as Svg
-import Task
 import Time
 import Url
 import UserPreferences
 
 
+
 -- MODEL
 
-type alias MobName = String
 
 type AlarmState
     = Playing
@@ -79,7 +78,7 @@ init name preferences =
       , tab = Main
       , dev = False
       }
-    , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
+    , Js.Commands.send <| Js.Commands.Join name
     )
 
 
@@ -90,7 +89,7 @@ init name preferences =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | ShareEvent Peers.Events.Event
+    | ShareEvent Peers.Events.MobEvent
     | ReceivedEvent Peers.Events.Event
     | ReceivedHistory (List Peers.Events.Event)
     | Start
@@ -109,7 +108,7 @@ type Msg
     | KeyPressed Keystroke
 
 
-timePassed : Time.Posix -> Model -> (Model, Cmd Msg)
+timePassed : Time.Posix -> Model -> ( Model, Cmd Msg )
 timePassed now model =
     let
         timePassedResult =
@@ -146,7 +145,7 @@ update msg model =
 
         ShareEvent event ->
             ( model
-            , Peers.Events.sendEvent <| Peers.Events.toJson event
+            , Peers.Events.sendEvent <| Peers.Events.mobEventToJson event
             )
 
         ReceivedEvent event ->
@@ -189,7 +188,8 @@ update msg model =
                             1
                 }
                 |> Peers.Events.Clock
-                |> Peers.Events.toJson
+                |> Peers.Events.MobEvent model.name
+                |> Peers.Events.mobEventToJson
                 |> Peers.Events.sendEvent
             )
 
@@ -212,7 +212,7 @@ update msg model =
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
-                    Pages.Mob.Mobbers.Settings.update subMsg model.shared.mobbers model.mobbersSettings
+                    Pages.Mob.Mobbers.Settings.update subMsg model.shared.mobbers model.name model.mobbersSettings
 
                 ( toasts, commands ) =
                     Lib.Toaster.add mobbersResult.toasts model.toasts
@@ -242,7 +242,7 @@ update msg model =
             ( model, Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
 
         GotClockSettingsMsg subMsg ->
-            Pages.Mob.Clocks.Settings.update subMsg model.clockSettings
+            Pages.Mob.Clocks.Settings.update subMsg model.clockSettings model.name
                 |> Tuple.mapBoth
                     (\a -> { model | clockSettings = a })
                     (Cmd.map GotClockSettingsMsg)
@@ -371,7 +371,7 @@ view model url =
                         |> Html.map GotMobbersSettingsMsg
 
                 Sound ->
-                    Pages.Mob.Sound.Settings.view model.soundSettings model.shared.soundProfile
+                    Pages.Mob.Sound.Settings.view model.soundSettings model.name model.shared.soundProfile
                         |> Html.map GotSoundSettingsMsg
 
                 Share ->
@@ -412,7 +412,9 @@ detectAction model =
 
                 On on ->
                     { icon = Lib.Icons.Ion.stop
-                    , message = ShareEvent <| Peers.Events.Clock Peers.Events.Stopped
+                    , message = Peers.Events.Clock Peers.Events.Stopped
+                        |> Peers.Events.MobEvent model.name
+                        |> ShareEvent
                     , class = "on"
                     , text =
                         Duration.between model.now on.end
@@ -424,8 +426,12 @@ detectAction model =
                                )
                     }
 
+
 timeLeftTitle : ActionDescription -> String
 timeLeftTitle action =
     case action.text of
-        [] -> ""
-        _ -> String.join " " action.text ++ " | "
+        [] ->
+            ""
+
+        _ ->
+            String.join " " action.text ++ " | "

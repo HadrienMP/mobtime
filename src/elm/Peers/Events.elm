@@ -23,6 +23,12 @@ type ClockEvent
     | Stopped
 
 
+type alias MobEvent =
+    { mob : String
+    , content : Event
+    }
+
+
 type Event
     = Clock ClockEvent
     | AddedMobber Mobber
@@ -47,11 +53,11 @@ fromJson value =
 eventDecoder : Json.Decode.Decoder Event
 eventDecoder =
     Json.Decode.field "name" Json.Decode.string
-        |> Json.Decode.andThen decoderFromName
+        |> Json.Decode.andThen eventFromNameDecoder
 
 
-decoderFromName : String -> Json.Decode.Decoder Event
-decoderFromName eventName =
+eventFromNameDecoder : String -> Json.Decode.Decoder Event
+eventFromNameDecoder eventName =
     case eventName of
         "Started" ->
             startedDecoder
@@ -105,45 +111,51 @@ timeDecoder =
 -- ENCODING
 
 
-toJson : Event -> Json.Encode.Value
-toJson event =
-    Json.Encode.object <|
-        case event of
-            Clock clockEvent ->
-                clockEventToJson clockEvent
+mobEventToJson : MobEvent -> Json.Encode.Value
+mobEventToJson event =
+    eventToJson event.content
+        |> (::) ( "mob", Json.Encode.string event.mob )
+        |> Json.Encode.object
 
-            AddedMobber mobber ->
-                [ ( "name", Json.Encode.string "AddedMobber" )
-                , ( "mobber", Mobber.toJson mobber )
-                ]
 
-            DeletedMobber mobber ->
-                [ ( "name", Json.Encode.string "DeletedMobber" )
-                , ( "mobber", Mobber.toJson mobber )
-                ]
+eventToJson : Event -> List ( String, Json.Encode.Value )
+eventToJson event =
+    case event of
+        Clock clockEvent ->
+            clockEventToJson clockEvent
 
-            ShuffledMobbers mobbers ->
-                [ ( "name", Json.Encode.string "ShuffledMobbers" )
-                , ( "mobbers", Mobbers.toJson mobbers )
-                ]
+        AddedMobber mobber ->
+            [ ( "name", Json.Encode.string "AddedMobber" )
+            , ( "mobber", Mobber.toJson mobber )
+            ]
 
-            RotatedMobbers ->
-                [ ( "name", Json.Encode.string "RotatedMobbers" ) ]
+        DeletedMobber mobber ->
+            [ ( "name", Json.Encode.string "DeletedMobber" )
+            , ( "mobber", Mobber.toJson mobber )
+            ]
 
-            TurnLengthChanged duration ->
-                [ ( "name", Json.Encode.string "TurnLengthChanged" )
-                , ( "seconds", Json.Encode.int <| Lib.Duration.toSeconds duration )
-                ]
+        ShuffledMobbers mobbers ->
+            [ ( "name", Json.Encode.string "ShuffledMobbers" )
+            , ( "mobbers", Mobbers.toJson mobbers )
+            ]
 
-            SelectedMusicProfile profile ->
-                [ ( "name", Json.Encode.string "SelectedMusicProfile" )
-                , ( "profile", Json.Encode.string <| Pages.Mob.Sound.Library.profileToString profile )
-                ]
+        RotatedMobbers ->
+            [ ( "name", Json.Encode.string "RotatedMobbers" ) ]
 
-            Unknown value ->
-                [ ( "name", Json.Encode.string "Unknown" )
-                , ( "event", value )
-                ]
+        TurnLengthChanged duration ->
+            [ ( "name", Json.Encode.string "TurnLengthChanged" )
+            , ( "seconds", Json.Encode.int <| Lib.Duration.toSeconds duration )
+            ]
+
+        SelectedMusicProfile profile ->
+            [ ( "name", Json.Encode.string "SelectedMusicProfile" )
+            , ( "profile", Json.Encode.string <| Pages.Mob.Sound.Library.profileToString profile )
+            ]
+
+        Unknown value ->
+            [ ( "name", Json.Encode.string "Unknown" )
+            , ( "event", value )
+            ]
 
 
 clockEventToJson : ClockEvent -> List ( String, Json.Encode.Value )

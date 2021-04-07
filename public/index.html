@@ -28,10 +28,27 @@
     document.body.appendChild(alarm);
 
     // -----------------------------------------
+    // Socket IO
+    // -----------------------------------------
+
+    const socket = io();
+    app.ports.sendEvent.subscribe(event => {
+        socket.emit('message', event.mob, event);
+    });
+    socket.on('message', data => {
+        console.log(data);
+        return app.ports.receiveOne.send(data);
+    });
+    socket.on('history', app.ports.receiveHistory.send);
+
+    // -----------------------------------------
     // IO
     // -----------------------------------------
     app.ports.commands.subscribe(command => {
         switch (command.name) {
+            case "Join":
+                socket.emit('join', command.value);
+                break;
             case "SoundAlarm":
                 alarm.muted = false;
                 alarm.play();
@@ -58,32 +75,6 @@
     alarm.addEventListener("ended", () => {
         app.ports.events.send({name: "AlarmEnded", value: ""});
     });
-
-    // -----------------------------------------
-    // Socket IO
-    // -----------------------------------------
-
-    const socket = io();
-    socket.on('connect', () => {
-        console.log("connected")
-        setTimeout(() => socket.emit('join', 'mob'), 500);
-    });
-    app.ports.sendEvent.subscribe(event => {
-        socket.emit('message', 'mob', event);
-    });
-    socket.on('message', data => {
-        console.log(data);
-        return app.ports.receiveEvent.send(data);
-    });
-    socket.on('history', app.ports.receiveHistory.send);
-
-    // -----------------------------------------
-    // Keyboard
-    // -----------------------------------------
-
-    document.addEventListener('keyup', function (ev) {
-        console.log(ev.key, ev.altKey, ev.ctrlKey, ev.shiftKey);
-    })
 </script>
 </body>
 </html>
