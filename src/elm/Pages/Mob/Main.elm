@@ -9,12 +9,12 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
-import Lib.BatchMsg
 import Lib.Circle
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons.Ion
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
+import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
 import Pages.Mob.Mobbers.Settings
@@ -59,7 +59,6 @@ type alias Model =
     , soundSettings : Pages.Mob.Sound.Settings.Model
     , alarm : AlarmState
     , now : Time.Posix
-    , toasts : Toasts
     , tab : Tab
     , dev : Bool
     }
@@ -74,7 +73,6 @@ init name preferences =
       , soundSettings = Pages.Mob.Sound.Settings.init preferences.volume
       , alarm = Standby
       , now = Time.millisToPosix 0
-      , toasts = []
       , tab = Main
       , dev = False
       }
@@ -87,9 +85,7 @@ init name preferences =
 
 
 type Msg
-    = LinkClicked Browser.UrlRequest
-    | UrlChanged Url.Url
-    | ShareEvent Peers.Events.MobEvent
+    = ShareEvent Peers.Events.MobEvent
     | ReceivedEvent Peers.Events.Event
     | ReceivedHistory (List Peers.Events.Event)
     | Start
@@ -102,9 +98,7 @@ type Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Pages.Mob.Mobbers.Settings.Msg
     | GotSoundSettingsMsg Pages.Mob.Sound.Settings.Msg
-    | GotToastMsg Lib.Toaster.Msg
     | SwitchTab Tab
-    | Batch (List Msg)
     | KeyPressed Keystroke
 
 
@@ -134,131 +128,146 @@ timePassed now model =
     )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> UpdateResult Model Msg
 update msg model =
     case msg of
-        LinkClicked _ ->
-            ( model, Cmd.none )
-
-        UrlChanged _ ->
-            ( model, Cmd.none )
-
         ShareEvent event ->
-            ( model
-            , Peers.Events.sendEvent <| Peers.Events.mobEventToJson event
-            )
+            { model = model
+            , command = Peers.Events.sendEvent <| Peers.Events.mobEventToJson event
+            , toasts = []
+            }
 
         ReceivedEvent event ->
-            event
-                |> Peers.State.evolve model.shared
-                |> Tuple.mapFirst
-                    (\shared ->
-                        { model
-                            | shared = shared
-                            , alarm =
-                                -- Handle alarm (command) as separate from the evolve method ?
-                                case event of
-                                    Peers.Events.Clock (Peers.Events.Started _) ->
-                                        Stopped
+            let
+                ( shared, command ) =
+                    Peers.State.evolve model.shared event
+            in
+            { model =
+                { model
+                    | shared = shared
+                    , alarm =
+                        -- Handle alarm (command) as separate from the evolve method ?
+                        case event of
+                            Peers.Events.Clock (Peers.Events.Started _) ->
+                                Stopped
 
-                                    _ ->
-                                        model.alarm
-                        }
-                    )
+                            _ ->
+                                model.alarm
+                }
+            , command = command
+            , toasts = []
+            }
 
         ReceivedHistory eventsResults ->
-            ( { model | shared = Peers.State.evolveMany model.shared eventsResults }
-            , Cmd.none
-            )
+            { model = { model | shared = Peers.State.evolveMany model.shared eventsResults }
+            , command = Cmd.none
+            , toasts = []
+            }
 
         Start ->
-            ( model, Random.generate StartWithAlarm <| Pages.Mob.Sound.Library.pick model.shared.soundProfile )
+            { model = model
+            , command = Random.generate StartWithAlarm <| Pages.Mob.Sound.Library.pick model.shared.soundProfile
+            , toasts = []
+            }
 
         StartWithAlarm sound ->
-            ( model
-            , Peers.Events.Started
-                { time = model.now
-                , alarm = sound
-                , length =
-                    Duration.div model.shared.turnLength <|
-                        if model.dev then
-                            20
+            { model = model
+            , command =
+                Peers.Events.Started
+                    { time = model.now
+                    , alarm = sound
+                    , length =
+                        Duration.div model.shared.turnLength <|
+                            if model.dev then
+                                20
 
-                        else
-                            1
-                }
-                |> Peers.Events.Clock
-                |> Peers.Events.MobEvent model.name
-                |> Peers.Events.mobEventToJson
-                |> Peers.Events.sendEvent
-            )
+                            else
+                                1
+                    }
+                    |> Peers.Events.Clock
+                    |> Peers.Events.MobEvent model.name
+                    |> Peers.Events.mobEventToJson
+                    |> Peers.Events.sendEvent
+            , toasts = []
+            }
 
         StopSound ->
-            ( { model | alarm = Stopped }
-            , Js.Commands.send Js.Commands.StopAlarm
-            )
+            { model = { model | alarm = Stopped }
+            , command = Js.Commands.send Js.Commands.StopAlarm
+            , toasts = []
+            }
 
         AlarmEnded ->
-            ( { model | alarm = Stopped }
-            , Cmd.none
-            )
+            { model = { model | alarm = Stopped }
+            , command = Cmd.none
+            , toasts = []
+            }
 
         UnknownEvent ->
-            ( model, Cmd.none )
+            { model = model
+            , command = Cmd.none
+            , toasts = []
+            }
 
         GotMainTabMsg subMsg ->
-            ( model, Pages.Mob.Tabs.Home.update subMsg |> Cmd.map GotMainTabMsg )
+            { model = model
+            , command = Pages.Mob.Tabs.Home.update subMsg |> Cmd.map GotMainTabMsg
+            , toasts = []
+            }
 
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
                     Pages.Mob.Mobbers.Settings.update subMsg model.shared.mobbers model.name model.mobbersSettings
-
-                ( toasts, commands ) =
-                    Lib.Toaster.add mobbersResult.toasts model.toasts
             in
-            ( { model
-                | mobbersSettings = mobbersResult.updated
-                , toasts = toasts
-              }
-            , Cmd.batch <|
-                Cmd.map GotMobbersSettingsMsg mobbersResult.command
-                    :: List.map (Cmd.map GotToastMsg) commands
-            )
-
-        GotToastMsg subMsg ->
-            Lib.Toaster.update subMsg model.toasts
-                |> Tuple.mapBoth
-                    (\toasts -> { model | toasts = toasts })
-                    (Cmd.map GotToastMsg)
+            { model =
+                { model
+                    | mobbersSettings = mobbersResult.model
+                }
+            , command = Cmd.map GotMobbersSettingsMsg mobbersResult.command
+            , toasts = mobbersResult.toasts
+            }
 
         SwitchTab tab ->
-            ( { model | tab = tab }, Cmd.none )
-
-        Batch messages ->
-            Lib.BatchMsg.update messages model update
+            { model = { model | tab = tab }
+            , command = Cmd.none
+            , toasts = []
+            }
 
         GotShareTabMsg subMsg ->
-            ( model, Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg )
+            { model = model
+            , command = Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg
+            , toasts = []
+            }
 
         GotClockSettingsMsg subMsg ->
-            Pages.Mob.Clocks.Settings.update subMsg model.clockSettings model.name
-                |> Tuple.mapBoth
-                    (\a -> { model | clockSettings = a })
-                    (Cmd.map GotClockSettingsMsg)
+            let
+                ( clockSettings, command ) =
+                    Pages.Mob.Clocks.Settings.update subMsg model.clockSettings model.name
+            in
+            { model = { model | clockSettings = clockSettings }
+            , command = Cmd.map GotClockSettingsMsg command
+            , toasts = []
+            }
 
         GotSoundSettingsMsg subMsg ->
-            Pages.Mob.Sound.Settings.update subMsg model.soundSettings
-                |> Tuple.mapBoth
-                    (\a -> { model | soundSettings = a })
-                    (Cmd.map GotSoundSettingsMsg)
+            let
+                ( soundSettings, command ) =
+                    Pages.Mob.Sound.Settings.update subMsg model.soundSettings
+            in
+            { model = { model | soundSettings = soundSettings }
+            , command = Cmd.map GotSoundSettingsMsg command
+            , toasts = []
+            }
 
         KeyPressed stroke ->
-            ( { model
-                | dev = xor model.dev <| stroke == Keystroke "D" True True True
-              }
-            , Cmd.none
-            )
+            { model =
+                { model
+                    | dev = xor model.dev <| stroke == Keystroke "D" True True True
+                }
+            , command = Cmd.none
+            , toasts = []
+            }
 
 
 
@@ -278,7 +287,6 @@ subscriptions =
     Sub.batch
         [ Peers.Events.receiveOne <| Peers.Events.fromJson >> ReceivedEvent
         , Peers.Events.receiveHistory <| List.map Peers.Events.fromJson >> ReceivedHistory
-        , Js.Events.events toMsg
         , onKeyUp <|
             Json.Decode.map KeyPressed <|
                 Json.Decode.map4 Keystroke
@@ -289,17 +297,10 @@ subscriptions =
         ]
 
 
-toMsg : Js.Events.Event -> Msg
-toMsg event =
-    case event.name of
-        "AlarmEnded" ->
-            AlarmEnded
-
-        _ ->
-            Lib.Toaster.eventsMapping
-                |> EventsMapping.map GotToastMsg
-                |> EventsMapping.dispatch event
-                |> Batch
+jsEventMapping : EventsMapping Msg
+jsEventMapping =
+    [ Js.Events.EventMessage "AlarmEnded" (\_ -> AlarmEnded) ]
+        |> EventsMapping.create
 
 
 
@@ -377,7 +378,6 @@ view model url =
                 Share ->
                     Pages.Mob.Tabs.Share.view model.name url
                         |> Html.map GotShareTabMsg
-            , Lib.Toaster.view model.toasts |> Html.map GotToastMsg
             ]
         ]
     }
@@ -412,9 +412,10 @@ detectAction model =
 
                 On on ->
                     { icon = Lib.Icons.Ion.stop
-                    , message = Peers.Events.Clock Peers.Events.Stopped
-                        |> Peers.Events.MobEvent model.name
-                        |> ShareEvent
+                    , message =
+                        Peers.Events.Clock Peers.Events.Stopped
+                            |> Peers.Events.MobEvent model.name
+                            |> ShareEvent
                     , class = "on"
                     , text =
                         Duration.between model.now on.end

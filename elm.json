@@ -22,6 +22,7 @@
             "elm-community/random-extra": "3.1.0",
             "elm-explorations/test": "1.2.2",
             "ericgj/elm-validation": "2.0.0",
+            "hecrj/elm-slug": "1.0.2",
             "j-panasiuk/elm-ionicons": "2.0.0",
             "jaredramirez/elm-field": "1.1.2",
             "jzxhuang/http-extras": "2.1.0",

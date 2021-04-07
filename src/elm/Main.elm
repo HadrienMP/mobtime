@@ -2,8 +2,14 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Html
 import Js.Commands
+import Js.Events
+import Js.EventsMapping as EventsMapping exposing (EventsMapping)
+import Lib.BatchMsg
 import Lib.DocumentExtras
+import Lib.Toaster exposing (Toasts)
+import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Login
 import Pages.Mob.Main
 import Pages.Routing
@@ -43,6 +49,7 @@ type alias Model =
     , url : Url.Url
     , page : PageModel
     , preferences : UserPreferences.Model
+    , toasts : Toasts
     }
 
 
@@ -56,6 +63,7 @@ init preferences url key =
       , url = url
       , page = page
       , preferences = preferences
+      , toasts = []
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -91,6 +99,8 @@ type Msg
     | TimePassed Time.Posix
     | GotMobMsg Pages.Mob.Main.Msg
     | GotLoginMsg Pages.Login.Msg
+    | GotToastMsg Lib.Toaster.Msg
+    | Batch (List Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,22 +119,57 @@ update msg model =
                 |> Tuple.mapFirst (\page -> { model | page = page, url = url })
 
         ( GotLoginMsg subMsg, LoginModel subModel ) ->
-            Pages.Login.update subModel subMsg model.key
-                |> Tuple.mapBoth
-                    (\mob -> { model | page = LoginModel mob })
-                    (Cmd.map GotLoginMsg)
+            let
+                login =
+                    Pages.Login.update subModel subMsg model.key
+
+                ( allToasts, commands ) =
+                    Lib.Toaster.add login.toasts model.toasts
+                        |> Tuple.mapSecond (List.map (Cmd.map GotToastMsg))
+            in
+            ( { model
+                | page = LoginModel login.model
+                , toasts = allToasts
+              }
+            , Cmd.batch
+                (Cmd.map GotLoginMsg login.command
+                    :: commands
+                )
+            )
 
         ( GotMobMsg subMsg, MobModel subModel ) ->
-            Pages.Mob.Main.update subMsg subModel
-                |> Tuple.mapBoth
-                    (\mob -> { model | page = MobModel mob })
-                    (Cmd.map GotMobMsg)
+            let
+                mob =
+                    Pages.Mob.Main.update subMsg subModel
+
+                ( allToasts, commands ) =
+                    Lib.Toaster.add mob.toasts model.toasts
+                        |> Tuple.mapSecond (List.map (Cmd.map GotToastMsg))
+            in
+            ( { model
+                | page = MobModel mob.model
+                , toasts = allToasts
+              }
+            , Cmd.batch
+                (Cmd.map GotMobMsg mob.command
+                    :: commands
+                )
+            )
 
         ( TimePassed now, MobModel subModel ) ->
             Pages.Mob.Main.timePassed now subModel
                 |> Tuple.mapBoth
                     (\mob -> { model | page = MobModel mob })
                     (Cmd.map GotMobMsg)
+
+        ( GotToastMsg subMsg, _ ) ->
+            Lib.Toaster.update subMsg model.toasts
+                |> Tuple.mapBoth
+                    (\toasts -> { model | toasts = toasts })
+                    (Cmd.map GotToastMsg)
+
+        ( Batch messages, _ ) ->
+            Lib.BatchMsg.update messages model update
 
         _ ->
             ( model, Cmd.none )
@@ -139,6 +184,20 @@ subscriptions _ =
     Sub.batch
         [ Pages.Mob.Main.subscriptions |> Sub.map GotMobMsg
         , Time.every 500 TimePassed
+        , Js.Events.events (dispatch jsEventsMapping)
+        ]
+
+
+dispatch : EventsMapping Msg -> Js.Events.Event -> Msg
+dispatch mapping event =
+    Batch <| EventsMapping.dispatch event mapping
+
+
+jsEventsMapping : EventsMapping Msg
+jsEventsMapping =
+    EventsMapping.batch
+        [ EventsMapping.map GotMobMsg Pages.Mob.Main.jsEventMapping
+        , EventsMapping.map GotToastMsg Lib.Toaster.jsEventMapping
         ]
 
 
@@ -148,11 +207,17 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    case model.page of
-        LoginModel sub ->
-            Pages.Login.view sub
-                |> Lib.DocumentExtras.map GotLoginMsg
+    let
+        doc =
+            case model.page of
+                LoginModel sub ->
+                    Pages.Login.view sub
+                        |> Lib.DocumentExtras.map GotLoginMsg
 
-        MobModel sub ->
-            Pages.Mob.Main.view sub model.url
-                |> Lib.DocumentExtras.map GotMobMsg
+                MobModel sub ->
+                    Pages.Mob.Main.view sub model.url
+                        |> Lib.DocumentExtras.map GotMobMsg
+    in
+    { title = doc.title
+    , body = doc.body ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
+    }

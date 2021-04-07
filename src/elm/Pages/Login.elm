@@ -9,6 +9,9 @@ import Html exposing (Html, button, div, form, h1, header, i, input, label, text
 import Html.Attributes exposing (class, for, id, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Lib.Icons.Ion
+import Lib.Toaster exposing (Toasts)
+import Lib.UpdateResult exposing (UpdateResult)
+import Slug
 
 
 type alias Model =
@@ -16,9 +19,9 @@ type alias Model =
     }
 
 
-init : (Model, Cmd msg)
+init : ( Model, Cmd msg )
 init =
-    ({ mobName = "" }, Cmd.none)
+    ( { mobName = "" }, Cmd.none )
 
 
 
@@ -30,16 +33,25 @@ type Msg
     | JoinMob
 
 
-update : Model -> Msg -> Nav.Key -> ( Model, Cmd Msg )
+update : Model -> Msg -> Nav.Key -> UpdateResult Model Msg
 update model msg navKey =
     case msg of
         MobNameChanged name ->
-            ( { model | mobName = name }, Cmd.none )
+            { model = { model | mobName = name }, command = Cmd.none, toasts = [] }
 
         JoinMob ->
-            ( model
-            , Nav.pushUrl navKey <| "/mob/" ++ model.mobName
-            )
+            case Slug.generate model.mobName of
+                Just slug ->
+                    { model = model
+                    , command = Nav.pushUrl navKey <| "/mob/" ++ Slug.toString slug
+                    , toasts = []
+                    }
+
+                Nothing ->
+                    { model = model
+                    , command = Cmd.none
+                    , toasts = [ Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?" ]
+                    }
 
 
 

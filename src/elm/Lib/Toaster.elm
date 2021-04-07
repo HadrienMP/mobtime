@@ -25,6 +25,9 @@ type alias Toast =
     , content : String
     }
 
+error : String -> Toast
+error content =
+    Toast Error content
 
 type alias Toasts =
     List Toast
@@ -69,8 +72,8 @@ add toAdd model =
 -- EVENTS SUBSCRIPTIONS
 
 
-eventsMapping : EventsMapping Msg
-eventsMapping =
+jsEventMapping : EventsMapping Msg
+jsEventMapping =
     [ Js.Events.EventMessage "Copied" (\_ -> Add <| Toast Success "The text has been copied to your clipboard!") ]
         |> EventsMapping.create
 

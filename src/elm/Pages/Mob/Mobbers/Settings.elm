@@ -8,6 +8,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
 import Lib.Toaster exposing (Level(..), Toast, Toasts)
+import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Mobbers.Mobber exposing (Mobber)
 import Pages.Mob.Name exposing (MobName)
@@ -38,18 +39,11 @@ type Msg
     | ShareEvent Peers.Events.Event
 
 
-type alias UpdateResult =
-    { updated : Model
-    , command : Cmd Msg
-    , toasts : Toasts
-    }
-
-
-update : Msg -> Mobbers -> MobName -> Model -> UpdateResult
+update : Msg -> Mobbers -> MobName -> Model -> UpdateResult Model Msg
 update msg mobbers mob model =
     case msg of
         NameChanged name ->
-            { updated = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
+            { model = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
             , command = Cmd.none
             , toasts = []
             }
@@ -61,20 +55,20 @@ update msg mobbers mob model =
             in
             case Field.toResult name of
                 Ok validMobberName ->
-                    { updated = { model | mobberName = Field.init "" }
+                    { model = { model | mobberName = Field.init "" }
                     , command =
                         Random.generate (\id -> Add <| Mobber id validMobberName) Uuid.uuidGenerator
                     , toasts = []
                     }
 
                 Err _ ->
-                    { updated = { model | mobberName = name }
+                    { model = { model | mobberName = name }
                     , command = Cmd.none
                     , toasts = [ Toast Error "The mobber name cannot be empty" ]
                     }
 
         Add mobber ->
-            { updated = model
+            { model = model
             , command =
                 mobber
                     |> Peers.Events.AddedMobber
@@ -85,14 +79,14 @@ update msg mobbers mob model =
             }
 
         Shuffle ->
-            { updated = model
+            { model = model
             , command = Random.generate (ShareEvent << Peers.Events.ShuffledMobbers) <| Mobbers.shuffle mobbers
             , toasts = []
             }
 
         ShareEvent event ->
             -- TODO duplicated code
-            { updated = model
+            { model = model
             , command =
                 event
                     |> Peers.Events.MobEvent mob
