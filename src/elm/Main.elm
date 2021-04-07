@@ -48,22 +48,21 @@ type alias Model =
 
 init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init preferences url key =
-    loadPage url preferences
-        |> Tuple.mapBoth
-            (\page ->
-                { key = key
-                , url = url
-                , page = page
-                , preferences = preferences
-                }
-            )
-            (\command ->
-                Cmd.batch
-                    [ Task.perform TimePassed Time.now
-                    , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
-                    , command
-                    ]
-            )
+    let
+        ( page, pageCommand ) =
+            loadPage url preferences
+    in
+    ( { key = key
+      , url = url
+      , page = page
+      , preferences = preferences
+      }
+    , Cmd.batch
+        [ Task.perform TimePassed Time.now
+        , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
+        , pageCommand
+        ]
+    )
 
 
 loadPage : Url.Url -> UserPreferences.Model -> ( PageModel, Cmd Msg )
@@ -107,7 +106,7 @@ update msg model =
 
         ( UrlChanged url, _ ) ->
             loadPage url model.preferences
-                |> Tuple.mapFirst (\page -> { model | page = page })
+                |> Tuple.mapFirst (\page -> { model | page = page, url = url })
 
         ( GotLoginMsg subMsg, LoginModel subModel ) ->
             Pages.Login.update subModel subMsg model.key

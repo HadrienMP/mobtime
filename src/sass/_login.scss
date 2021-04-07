@@ -21,7 +21,7 @@
       flex: 1 1 6%;
     }
   }
-  button[type=submit] {
+  button {
     width: 100%;
     padding: $padding-space;
     background-image: repeating-linear-gradient(-45deg, #f8f8f8, #f8f8f8 20px, #efefef 20px, #efefef 40px);
@@ -30,16 +30,21 @@
     font-size: 1.1em;
     font-weight: bold;
 
+    @include icon(1.2em, black);
+
+
     &:hover {
       background: $dark-button-color;
       color: white;
+      @include icon(1.2em, white);
     }
 
-    i {
-      margin-right: $margin-space;
-      font-size: .8em;
-      margin-top: -.2em;
-      vertical-align: middle;
-    }
+
+    //i {
+    //  margin-right: $margin-space;
+    //  font-size: .8em;
+    //  margin-top: -.2em;
+    //  vertical-align: middle;
+    //}
   }
 }

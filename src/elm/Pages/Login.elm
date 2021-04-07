@@ -8,6 +8,7 @@ import Footer
 import Html exposing (Html, button, div, form, h1, header, i, input, label, text)
 import Html.Attributes exposing (class, for, id, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
+import Lib.Icons.Ion
 
 
 type alias Model =
@@ -72,8 +73,8 @@ view model =
                         []
                     ]
                 , button
-                    [ type_ "submit" ]
-                    [ i [ class "fas fa-paper-plane" ] []
+                    [ type_ "submit", class "labelled-icon-button" ]
+                    [ Lib.Icons.Ion.paperAirplane
                     , text "Join"
                     ]
                 ]

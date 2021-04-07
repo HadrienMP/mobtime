@@ -8,6 +8,9 @@ import Ionicon.Social
 import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
 
+paperAirplane : Svg msg
+paperAirplane =
+    display Ionicon.paperAirplane
 
 volumeLow : Svg msg
 volumeLow =

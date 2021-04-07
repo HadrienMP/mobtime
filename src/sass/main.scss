@@ -88,10 +88,12 @@ button {
 }
 
 .labelled-icon-button {
+  flex: auto;
+  justify-content: center;
   .icon {
     padding-right: .4em;
     margin-right: .4em;
-    border-right: 1px solid white;
+    border-right: 1px solid;
   }
 }
 
@@ -100,8 +102,6 @@ button {
   margin: $margin-space 0;
 
   button {
-    flex: auto;
-    justify-content: center;
     margin-left: .2em;
 
     &:first-child {
