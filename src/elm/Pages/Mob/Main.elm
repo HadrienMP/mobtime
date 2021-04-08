@@ -3,7 +3,7 @@ module Pages.Mob.Main exposing (..)
 import Browser
 import Browser.Events exposing (onKeyUp)
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, id)
+import Html.Attributes exposing (class, classList, id, title)
 import Html.Events exposing (onClick)
 import Js.Commands
 import Js.Events
@@ -352,11 +352,36 @@ view model url =
                     ]
                 ]
             , nav []
-                [ button [ onClick <| SwitchTab Main, classList [ ( "active", model.tab == Main ) ] ] [ Lib.Icons.Ion.home ]
-                , button [ onClick <| SwitchTab Clock, classList [ ( "active", model.tab == Clock ) ] ] [ Lib.Icons.Ion.clock ]
-                , button [ onClick <| SwitchTab Mobbers, classList [ ( "active", model.tab == Mobbers ) ] ] [ Lib.Icons.Ion.people ]
-                , button [ onClick <| SwitchTab Sound, classList [ ( "active", model.tab == Sound ) ] ] [ Lib.Icons.Ion.sound ]
-                , button [ onClick <| SwitchTab Share, classList [ ( "active", model.tab == Share ) ] ] [ Lib.Icons.Ion.share ]
+                [ button
+                    [ onClick <| SwitchTab Main
+                    , classList [ ( "active", model.tab == Main ) ]
+                    , title "Home"
+                    ]
+                    [ Lib.Icons.Ion.home ]
+                , button
+                    [ onClick <| SwitchTab Clock
+                    , classList [ ( "active", model.tab == Clock ) ]
+                    , title "Clock Settings"
+                    ]
+                    [ Lib.Icons.Ion.clock ]
+                , button
+                    [ onClick <| SwitchTab Mobbers
+                    , classList [ ( "active", model.tab == Mobbers ) ]
+                    , title "Mobbers"
+                    ]
+                    [ Lib.Icons.Ion.people ]
+                , button
+                    [ onClick <| SwitchTab Sound
+                    , classList [ ( "active", model.tab == Sound ) ]
+                    , title "Sound Settings"
+                    ]
+                    [ Lib.Icons.Ion.sound ]
+                , button
+                    [ onClick <| SwitchTab Share
+                    , classList [ ( "active", model.tab == Share ) ]
+                    , title "Share"
+                    ]
+                    [ Lib.Icons.Ion.share ]
                 ]
             , case model.tab of
                 Main ->

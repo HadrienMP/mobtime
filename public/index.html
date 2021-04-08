@@ -16,8 +16,9 @@
 <pre id="elm"></pre>
 <script src="/js/main.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 <script>
-
     const app = Elm.Main.init({
         node: document.getElementById('elm'),
         flags: JSON.parse(window.localStorage.getItem("preferences")) || {volume: 50}
@@ -26,6 +27,19 @@
     let alarm = document.createElement("audio");
     alarm.muted = true;
     document.body.appendChild(alarm);
+
+    // -----------------------------------------
+    // Socket IO
+    // -----------------------------------------
+
+    tippy('button[title]', {
+        delay: 200,
+        content(reference) {
+            const title = reference.getAttribute('title');
+            reference.removeAttribute('title');
+            return title;
+        },
+    });
 
     // -----------------------------------------
     // Socket IO
