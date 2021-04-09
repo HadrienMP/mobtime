@@ -8,6 +8,10 @@ import Ionicon.Social
 import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
 
+coffee : Svg msg
+coffee =
+    display Ionicon.coffee
+
 paperAirplane : Svg msg
 paperAirplane =
     display Ionicon.paperAirplane

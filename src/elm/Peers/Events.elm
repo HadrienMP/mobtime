@@ -38,6 +38,7 @@ type Event
     | TurnLengthChanged Duration
     | SelectedMusicProfile Pages.Mob.Sound.Library.Profile
     | Unknown Json.Decode.Value
+    | PomodoroStopped
 
 
 
@@ -64,6 +65,9 @@ eventFromNameDecoder eventName =
 
         "Stopped" ->
             Json.Decode.succeed <| Clock Stopped
+
+        "PomodoroStopped" ->
+            Json.Decode.succeed <| PomodoroStopped
 
         "AddedMobber" ->
             Json.Decode.map AddedMobber (Json.Decode.field "mobber" Mobber.jsonDecoder)
@@ -156,6 +160,10 @@ eventToJson event =
             [ ( "name", Json.Encode.string "Unknown" )
             , ( "event", value )
             ]
+
+        PomodoroStopped ->
+            [ ( "name", Json.Encode.string "PomodoroStopped" ) ]
+
 
 
 clockEventToJson : ClockEvent -> List ( String, Json.Encode.Value )

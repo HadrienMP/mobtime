@@ -9,6 +9,11 @@ import Time
 type Duration
     = Duration Int
 
+addToTime : Duration -> Time.Posix -> Time.Posix
+addToTime duration time =
+    Time.posixToMillis time
+    |> (+) (toMillis duration)
+    |> Time.millisToPosix
 
 minus : Duration -> Duration -> Duration
 minus a b =

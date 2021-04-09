@@ -40,16 +40,6 @@ ended on now =
     not on.ended && Duration.secondsBetween now on.end == 0
 
 
-clockEnded : ClockState -> Bool
-clockEnded clockState =
-    case clockState of
-        On on ->
-            on.ended
-
-        Off ->
-            False
-
-
 ratio : Time.Posix -> ClockState -> Lib.Ratio.Ratio
 ratio now model =
     case model of

@@ -73,6 +73,7 @@ button {
   display: inline-flex;
   align-items: center;
   padding: $padding-space;
+  justify-content: center;
 
   &:hover {
     background: $light-button-color;
@@ -89,7 +90,6 @@ button {
 
 .labelled-icon-button {
   flex: auto;
-  justify-content: center;
   .icon {
     padding-right: .4em;
     margin-right: .4em;
@@ -158,6 +158,23 @@ hr {
 
     i {
       flex: 0 0;
+    }
+  }
+
+  h3 {
+    border-bottom: 1px solid;
+    padding-bottom: $padding-space;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 2 * $margin-space;
+
+    .icon {
+      padding-right: $padding-space;
+      vertical-align: middle;
+    }
+
+    &:first-child {
+      margin-top: 0;
     }
   }
 }

@@ -15,7 +15,7 @@ import Lib.Icons.Ion
 import Lib.Ratio
 import Lib.Toaster exposing (Toasts)
 import Lib.UpdateResult exposing (UpdateResult)
-import Pages.Mob.Clocks.Clock exposing (ClockState(..))
+import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
 import Pages.Mob.Mobbers.Settings
 import Pages.Mob.Name exposing (MobName)
@@ -111,19 +111,19 @@ timePassed now model =
     ( { model
         | alarm =
             case timePassedResult.turnEvent of
-                Pages.Mob.Clocks.Clock.Ended ->
+                Clock.Ended ->
                     Playing
 
-                Pages.Mob.Clocks.Clock.Continued ->
+                Clock.Continued ->
                     model.alarm
         , now = now
         , shared = timePassedResult.updated
       }
     , case timePassedResult.turnEvent of
-        Pages.Mob.Clocks.Clock.Ended ->
+        Clock.Ended ->
             Js.Commands.send Js.Commands.SoundAlarm
 
-        Pages.Mob.Clocks.Clock.Continued ->
+        Clock.Continued ->
             Cmd.none
     )
 
@@ -139,8 +139,11 @@ update msg model =
 
         ReceivedEvent event ->
             let
-                ( shared, command ) =
-                    Peers.State.evolve model.shared event
+                shared =
+                    Peers.State.evolve event model.shared
+
+                command =
+                    Peers.State.command event model.shared
             in
             { model =
                 { model
@@ -338,9 +341,9 @@ view model url =
                         , Svg.width <| String.fromInt totalWidth
                         , Svg.height <| String.fromInt totalWidth
                         ]
-                      <|
-                        Lib.Circle.draw pomodoroCircle Lib.Ratio.full
-                            ++ Lib.Circle.draw mobCircle (Pages.Mob.Clocks.Clock.ratio model.now model.shared.clock)
+                        (Lib.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
+                            ++ Lib.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
+                        )
                     , button
                         [ id "action"
                         , class action.class
@@ -418,39 +421,54 @@ type alias ActionDescription =
 
 detectAction : Model -> ActionDescription
 detectAction model =
-    case model.alarm of
-        Playing ->
+    case ( model.alarm, model.shared.clock, model.shared.pomodoro ) of
+        ( Playing, _, _ ) ->
             { icon = Lib.Icons.Ion.mute
             , message = StopSound
             , class = ""
             , text = []
             }
 
-        _ ->
-            case model.shared.clock of
-                Off ->
-                    { icon = Lib.Icons.Ion.play
-                    , message = Start
-                    , class = ""
-                    , text = []
-                    }
+        ( _, On on, _ ) ->
+            { icon = Lib.Icons.Ion.stop
+            , message =
+                Peers.Events.Clock Peers.Events.Stopped
+                    |> Peers.Events.MobEvent model.name
+                    |> ShareEvent
+            , class = "on"
+            , text =
+                Duration.between model.now on.end
+                    |> (if model.clockSettings.displaySeconds then
+                            Duration.toLongString
 
-                On on ->
-                    { icon = Lib.Icons.Ion.stop
-                    , message =
-                        Peers.Events.Clock Peers.Events.Stopped
-                            |> Peers.Events.MobEvent model.name
-                            |> ShareEvent
-                    , class = "on"
-                    , text =
-                        Duration.between model.now on.end
-                            |> (if model.clockSettings.displaySeconds then
-                                    Duration.toLongString
+                        else
+                            Duration.toShortString
+                       )
+            }
 
-                                else
-                                    Duration.toShortString
-                               )
-                    }
+        ( _, Off, On pomodoro ) ->
+            if Duration.secondsBetween model.now pomodoro.end <= 0 then
+                { icon = Lib.Icons.Ion.coffee
+                , message = Peers.Events.PomodoroStopped
+                                |> Peers.Events.MobEvent model.name
+                                |> ShareEvent
+                , class = ""
+                , text = []
+                }
+
+            else
+                { icon = Lib.Icons.Ion.play
+                , message = Start
+                , class = ""
+                , text = []
+                }
+
+        ( _, Off, _ ) ->
+            { icon = Lib.Icons.Ion.play
+            , message = Start
+            , class = ""
+            , text = []
+            }
 
 
 timeLeftTitle : ActionDescription -> String

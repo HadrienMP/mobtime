@@ -1,18 +1,19 @@
 module Peers.State exposing (..)
 
-import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Js.Commands
-import Lib.Duration exposing (Duration)
+import Lib.Duration as Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
+import Pages.Mob.Clocks.Clock exposing (ClockState(..))
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
-import Peers.Events
 import Pages.Mob.Sound.Library
+import Peers.Events as Events
 import Time
 
 
 type alias State =
     { clock : ClockState
     , turnLength : Duration
+    , pomodoro : ClockState
     , mobbers : Mobbers
     , soundProfile : Pages.Mob.Sound.Library.Profile
     }
@@ -21,7 +22,8 @@ type alias State =
 init : State
 init =
     { clock = Off
-    , turnLength = Lib.Duration.ofMinutes 8
+    , turnLength = Duration.ofMinutes 8
+    , pomodoro = Off
     , mobbers = Mobbers.empty
     , soundProfile = Pages.Mob.Sound.Library.ClassicWeird
     }
@@ -44,66 +46,86 @@ timePassed now state =
     }
 
 
-evolveMany : State -> List Peers.Events.Event -> State
+evolveMany : State -> List Events.Event -> State
 evolveMany model events =
     case uncons events of
         ( Nothing, _ ) ->
             model
 
-        ( Just head, tail ) ->
-            evolveMany (evolve model head |> Tuple.first) tail
+        ( Just first, others ) ->
+            evolveMany (evolve first model) others
 
 
-evolve : State -> Peers.Events.Event -> ( State, Cmd msg )
-evolve state event =
+evolve : Events.Event -> State -> State
+evolve event state =
     case event of
-        Peers.Events.Clock clockEvent ->
+        Events.Clock clockEvent ->
             evolveClock clockEvent state
 
-        Peers.Events.AddedMobber mobber ->
-            ( { state | mobbers = Mobbers.add mobber state.mobbers }, Cmd.none )
+        Events.AddedMobber mobber ->
+            { state | mobbers = Mobbers.add mobber state.mobbers }
 
-        Peers.Events.DeletedMobber mobber ->
-            ( { state | mobbers = Mobbers.delete mobber state.mobbers }, Cmd.none )
+        Events.DeletedMobber mobber ->
+            { state | mobbers = Mobbers.delete mobber state.mobbers }
 
-        Peers.Events.RotatedMobbers ->
-            ( { state | mobbers = Mobbers.rotate state.mobbers }, Cmd.none )
+        Events.RotatedMobbers ->
+            { state | mobbers = Mobbers.rotate state.mobbers }
 
-        Peers.Events.ShuffledMobbers mobbers ->
-            ( { state | mobbers = Mobbers.merge mobbers state.mobbers }, Cmd.none )
+        Events.ShuffledMobbers mobbers ->
+            { state | mobbers = Mobbers.merge mobbers state.mobbers }
 
-        Peers.Events.TurnLengthChanged turnLength ->
-            ( { state | turnLength = turnLength }, Cmd.none )
+        Events.TurnLengthChanged turnLength ->
+            { state | turnLength = turnLength }
 
-        Peers.Events.SelectedMusicProfile profile ->
-            ( { state | soundProfile = profile }, Cmd.none )
+        Events.SelectedMusicProfile profile ->
+            { state | soundProfile = profile }
 
-        Peers.Events.Unknown _ ->
-            ( state, Cmd.none )
+        Events.Unknown _ ->
+            state
+
+        Events.PomodoroStopped ->
+            { state | pomodoro = Off }
 
 
-evolveClock : Peers.Events.ClockEvent -> State -> ( State, Cmd msg )
+command : Events.Event -> State -> Cmd msg
+command event state =
+    case ( event, state.clock ) of
+        ( Events.Clock (Events.Started started), Off ) ->
+            Js.Commands.send <| Js.Commands.SetAlarm started.alarm
+
+        _ ->
+            Cmd.none
+
+
+evolveClock : Events.ClockEvent -> State -> State
 evolveClock event state =
     case ( event, state.clock ) of
-        ( Peers.Events.Started started, Off ) ->
-            ( { state
+        ( Events.Started started, Off ) ->
+            { state
                 | clock =
                     On
-                        { end = Time.posixToMillis started.time + Lib.Duration.toMillis started.length |> Time.millisToPosix
+                        { end = Duration.addToTime started.length started.time
                         , length = started.length
                         , ended = False
                         }
-              }
-            , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
-            )
+                , pomodoro =
+                    case state.pomodoro of
+                        On _ ->
+                            state.pomodoro
 
-        ( Peers.Events.Stopped, On _ ) ->
-            ( { state
+                        Off ->
+                            On
+                                { end = Duration.addToTime (Duration.ofMinutes 25) started.time
+                                , length = Duration.ofMinutes 25
+                                , ended = False
+                                }
+            }
+
+        ( Events.Stopped, On _ ) ->
+            { state
                 | clock = Off
                 , mobbers = Mobbers.rotate state.mobbers
-              }
-            , Cmd.none
-            )
+            }
 
         _ ->
-            ( state, Cmd.none )
+            state
