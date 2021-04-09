@@ -392,7 +392,7 @@ view model url =
                         |> Html.map GotMainTabMsg
 
                 Clock ->
-                    Pages.Mob.Clocks.Settings.view model.shared.turnLength model.clockSettings
+                    Pages.Mob.Clocks.Settings.view model.clockSettings model.now model.shared
                         |> Html.map GotClockSettingsMsg
 
                 Mobbers ->

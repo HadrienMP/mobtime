@@ -35,6 +35,17 @@ timePassed now clockState =
             ( clockState, Continued )
 
 
+timeLeft : Time.Posix -> ClockState -> String
+timeLeft now clockState =
+    case clockState of
+        Off ->
+            "Off"
+
+        On onModel ->
+             Duration.between now onModel.end
+             |> Duration.toShortString
+             |> String.join " "
+
 ended : OnModel -> Time.Posix -> Bool
 ended on now =
     not on.ended && Duration.secondsBetween now on.end == 0

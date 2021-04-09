@@ -8,6 +8,14 @@ import Ionicon.Social
 import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
 
+batteryLow : Svg msg
+batteryLow =
+    display Ionicon.batteryLow
+
+batteryFull : Svg msg
+batteryFull =
+    display Ionicon.batteryHalf
+
 coffee : Svg msg
 coffee =
     display Ionicon.coffee

@@ -6,7 +6,7 @@
   }
 
   .form-field {
-    label {
+    & > *:first-child {
       flex: 1 1;
       margin-right: $margin-space;
       & + * {

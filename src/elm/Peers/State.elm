@@ -14,6 +14,7 @@ type alias State =
     { clock : ClockState
     , turnLength : Duration
     , pomodoro : ClockState
+    , pomodoroLength : Duration
     , mobbers : Mobbers
     , soundProfile : Pages.Mob.Sound.Library.Profile
     }
@@ -22,11 +23,15 @@ type alias State =
 init : State
 init =
     { clock = Off
-    , turnLength = Duration.ofMinutes 8
+    , turnLength = defaultTurnLength
     , pomodoro = Off
+    , pomodoroLength = defaultPomodoroLength
     , mobbers = Mobbers.empty
     , soundProfile = Pages.Mob.Sound.Library.ClassicWeird
     }
+
+defaultTurnLength = Duration.ofMinutes 8
+defaultPomodoroLength = Duration.ofMinutes 25
 
 
 type alias TimePassedResult =
@@ -86,6 +91,9 @@ evolve event state =
         Events.PomodoroStopped ->
             { state | pomodoro = Off }
 
+        Events.PomodoroLengthChanged duration ->
+            { state | pomodoroLength = duration }
+
 
 command : Events.Event -> State -> Cmd msg
 command event state =
@@ -115,8 +123,8 @@ evolveClock event state =
 
                         Off ->
                             On
-                                { end = Duration.addToTime (Duration.ofMinutes 25) started.time
-                                , length = Duration.ofMinutes 25
+                                { end = Duration.addToTime state.pomodoroLength started.time
+                                , length = state.pomodoroLength
                                 , ended = False
                                 }
             }
