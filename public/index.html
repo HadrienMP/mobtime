@@ -53,7 +53,10 @@
         console.log(data);
         return app.ports.receiveOne.send(data);
     });
-    socket.on('history', app.ports.receiveHistory.send);
+    socket.on('history', data => {
+        alarm.muted = false;
+        app.ports.receiveHistory.send(data);
+    });
 
     // -----------------------------------------
     // IO
