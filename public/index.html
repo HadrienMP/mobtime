@@ -29,7 +29,7 @@
     document.body.appendChild(alarm);
 
     // -----------------------------------------
-    // Socket IO
+    // Tooltips
     // -----------------------------------------
 
     tippy('button[title]', {
@@ -69,6 +69,7 @@
                 break;
             case "SetAlarm":
                 alarm.src = "/sound/" + command.value;
+                alarm.muted = false;
                 alarm.load();
                 break;
             case "StopAlarm":
