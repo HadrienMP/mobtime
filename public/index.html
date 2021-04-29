@@ -25,8 +25,11 @@
     });
 
     let alarm = document.createElement("audio");
-    alarm.muted = true;
     document.body.appendChild(alarm);
+    if (alarm.muted) {
+        alarm.muted = !confirm("Can we enable the sound to play a music at the end of turns ?");
+    }
+
 
     // -----------------------------------------
     // Tooltips
