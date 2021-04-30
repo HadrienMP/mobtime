@@ -68,7 +68,11 @@
                 break;
             case "SoundAlarm":
                 alarm.muted = false;
-                alarm.play();
+                alarm.play().catch(reason => {
+                    console.error(reason);
+                    alert("The alarm could not be played, please press play manually on the alarm controls once.")
+                    alarm.controls = true;
+                });
                 break;
             case "SetAlarm":
                 alarm.src = "/sound/" + command.value;
