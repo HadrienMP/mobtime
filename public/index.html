@@ -26,8 +26,10 @@
 
     let alarm = document.createElement("audio");
     document.body.appendChild(alarm);
-    if (alarm.muted) {
-        alarm.muted = !confirm("Can we enable the sound to play a music at the end of turns ?");
+    if (!alarm.autoplay) {
+        alarm.autoplay = confirm("Can we enable the sound to play a music at the end of turns ?");
+        alarm.play()
+            .catch(reason => alert(`Sound still seems to be off, you can try to enable it manually next to the url bar in the site permissions. Reason : ${reason}`))
     }
 
 
