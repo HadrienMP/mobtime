@@ -67,11 +67,7 @@
                 socket.emit('join', command.value);
                 break;
             case "SoundAlarm":
-                play().catch(reason => {
-                    console.error(reason);
-                    alert("The alarm could not be played, please press play manually on the alarm controls once.")
-                    alarm.controls = true;
-                });
+                play();
                 break;
             case "SetAlarm":
                 alarm.src = "/sound/" + command.value;
