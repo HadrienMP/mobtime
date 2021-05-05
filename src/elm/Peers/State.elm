@@ -30,8 +30,13 @@ init =
     , soundProfile = Pages.Mob.Sound.Library.ClassicWeird
     }
 
-defaultTurnLength = Duration.ofMinutes 8
-defaultPomodoroLength = Duration.ofMinutes 25
+
+defaultTurnLength =
+    Duration.ofMinutes 8
+
+
+defaultPomodoroLength =
+    Duration.ofMinutes 25
 
 
 type alias TimePassedResult =
@@ -51,65 +56,83 @@ timePassed now state =
     }
 
 
-evolveMany : State -> List Events.Event -> State
-evolveMany model events =
-    case uncons events of
-        ( Nothing, _ ) ->
-            model
-
-        ( Just first, others ) ->
-            evolveMany (evolve first model) others
-
-
-evolve : Events.Event -> State -> State
+evolve : Events.Event -> State -> ( State, Cmd msg )
 evolve event state =
+    evolve_ event (state, Cmd.none)
+
+evolve_ : Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
+evolve_ event (state, previousCommand) =
     case event of
         Events.Clock clockEvent ->
             evolveClock clockEvent state
 
         Events.AddedMobber mobber ->
-            { state | mobbers = Mobbers.add mobber state.mobbers }
+            ( { state | mobbers = Mobbers.add mobber state.mobbers }
+            , previousCommand
+            )
 
         Events.DeletedMobber mobber ->
-            { state | mobbers = Mobbers.delete mobber state.mobbers }
+            ( { state | mobbers = Mobbers.delete mobber state.mobbers }
+            , previousCommand
+            )
 
         Events.RotatedMobbers ->
-            { state | mobbers = Mobbers.rotate state.mobbers }
+            ( { state | mobbers = Mobbers.rotate state.mobbers }
+            , previousCommand
+            )
 
         Events.ShuffledMobbers mobbers ->
-            { state | mobbers = Mobbers.merge mobbers state.mobbers }
+            ( { state | mobbers = Mobbers.merge mobbers state.mobbers }
+            , previousCommand
+            )
 
         Events.TurnLengthChanged turnLength ->
-            { state | turnLength = turnLength }
+            ( { state | turnLength = turnLength }
+            , previousCommand
+            )
 
         Events.SelectedMusicProfile profile ->
-            { state | soundProfile = profile }
+            ( { state | soundProfile = profile }
+            , previousCommand
+            )
 
         Events.Unknown _ ->
-            state
+            ( state
+            , previousCommand
+            )
 
         Events.PomodoroStopped ->
-            { state | pomodoro = Off }
+            ( { state | pomodoro = Off }
+            , previousCommand
+            )
 
         Events.PomodoroLengthChanged duration ->
-            { state | pomodoroLength = duration }
+            ( { state | pomodoroLength = duration }
+            , previousCommand
+            )
 
 
-command : Events.Event -> State -> Cmd msg
-command event state =
-    case ( event, state.clock ) of
-        ( Events.Clock (Events.Started started), Off ) ->
-            Js.Commands.send <| Js.Commands.SetAlarm started.alarm
-
-        _ ->
-            Cmd.none
+evolveMany : List Events.Event -> State -> (State, Cmd msg)
+evolveMany events model =
+    evolveMany_ events (model, Cmd.none)
 
 
-evolveClock : Events.ClockEvent -> State -> State
+evolveMany_ : List Events.Event -> (State, Cmd msg) -> (State, Cmd msg)
+evolveMany_ events previous =
+    case uncons events of
+        ( Nothing, _ ) ->
+            previous
+
+        ( Just first, others ) ->
+            evolve_ first previous
+            |> evolveMany_ others
+
+
+evolveClock : Events.ClockEvent -> State -> ( State, Cmd msg )
 evolveClock event state =
     case ( event, state.clock ) of
         ( Events.Started started, Off ) ->
-            { state
+            ( { state
                 | clock =
                     On
                         { end = Duration.addToTime started.length started.time
@@ -127,13 +150,17 @@ evolveClock event state =
                                 , length = state.pomodoroLength
                                 , ended = False
                                 }
-            }
+              }
+            , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
+            )
 
         ( Events.Stopped, On _ ) ->
-            { state
+            ( { state
                 | clock = Off
                 , mobbers = Mobbers.rotate state.mobbers
-            }
+              }
+            , Cmd.none
+            )
 
         _ ->
-            state
+            ( state, Cmd.none )

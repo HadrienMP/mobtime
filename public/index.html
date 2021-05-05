@@ -67,8 +67,7 @@
                 socket.emit('join', command.value);
                 break;
             case "SoundAlarm":
-                alarm.muted = false;
-                alarm.play().catch(reason => {
+                play().catch(reason => {
                     console.error(reason);
                     alert("The alarm could not be played, please press play manually on the alarm controls once.")
                     alarm.controls = true;
@@ -97,6 +96,13 @@
     alarm.addEventListener("ended", () => {
         app.ports.events.send({name: "AlarmEnded", value: ""});
     });
+
+    function play() {
+        alarm.play().catch(reason => {
+            console.log(reason);
+            alert("Audio is disabled in your tab, if you know how, enable it manually in the permissions");
+        })
+    }
 </script>
 </body>
 </html>

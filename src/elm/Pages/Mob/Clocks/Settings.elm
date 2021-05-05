@@ -3,7 +3,6 @@ module Pages.Mob.Clocks.Settings exposing (..)
 import Html exposing (Html, button, div, h3, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Js.Events
 import Lib.Duration as Duration
 import Lib.Icons.Custom
 import Lib.Icons.Ion
