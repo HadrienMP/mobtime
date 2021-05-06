@@ -12,8 +12,6 @@ import Json.Decode
 import Lib.Circle
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons.Ion
-import Lib.Ratio
-import Lib.Toaster exposing (Toasts)
 import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
@@ -139,11 +137,8 @@ update msg model =
 
         ReceivedEvent event ->
             let
-                shared =
+                ( shared, command ) =
                     Peers.State.evolve event model.shared
-
-                command =
-                    Peers.State.command event model.shared
             in
             { model =
                 { model
@@ -162,8 +157,12 @@ update msg model =
             }
 
         ReceivedHistory eventsResults ->
-            { model = { model | shared = Peers.State.evolveMany model.shared eventsResults }
-            , command = Cmd.none
+            let
+                ( shared, command ) =
+                    Peers.State.evolveMany eventsResults model.shared
+            in
+            { model = { model | shared = shared }
+            , command = command
             , toasts = []
             }
 
@@ -449,9 +448,10 @@ detectAction model =
         ( _, Off, On pomodoro ) ->
             if Duration.secondsBetween model.now pomodoro.end <= 0 then
                 { icon = Lib.Icons.Ion.coffee
-                , message = Peers.Events.PomodoroStopped
-                                |> Peers.Events.MobEvent model.name
-                                |> ShareEvent
+                , message =
+                    Peers.Events.PomodoroStopped
+                        |> Peers.Events.MobEvent model.name
+                        |> ShareEvent
                 , class = ""
                 , text = []
                 }

@@ -25,6 +25,10 @@ type alias Toast =
     , content : String
     }
 
+info : String -> Toast
+info content =
+    Toast Error content
+
 error : String -> Toast
 error content =
     Toast Error content

@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html
+import Html exposing (Html)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
@@ -50,6 +50,7 @@ type alias Model =
     , page : PageModel
     , preferences : UserPreferences.Model
     , toasts : Toasts
+    , soundEnabled : Bool
     }
 
 
@@ -64,6 +65,7 @@ init preferences url key =
       , page = page
       , preferences = preferences
       , toasts = []
+      , soundEnabled = False
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -219,5 +221,7 @@ view model =
                         |> Lib.DocumentExtras.map GotMobMsg
     in
     { title = doc.title
-    , body = doc.body ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
+    , body =
+        doc.body
+            ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
     }
