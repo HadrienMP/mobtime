@@ -28,7 +28,6 @@
     });
 
     let alarm = load('/sound/silence.mp3');
-    alarm.play();
 
     // -----------------------------------------
     // Tooltips
@@ -71,17 +70,11 @@
             case "SoundAlarm":
                 alarm.play();
                 break;
-            case "EnableSound":
-                let previousAlarm = alarm;
-                alarm = load('/sound/silence.mp3');
-                alarm.play();
-                alarm = previousAlarm;
-                break;
             case "SetAlarm":
                 alarm = load("/sound/" + command.value);
                 break;
             case "StopAlarm":
-                alarm.pause();
+                alarm.stop();
                 break;
             case 'CopyInPasteBin':
                 navigator.clipboard
@@ -94,17 +87,14 @@
                 break;
         }
     });
+
     function load(sound) {
-        let alarm = new Howl({
-            src: [sound]
+        return new Howl({
+            src: [sound],
+            onend: function () {
+                app.ports.events.send({name: "AlarmEnded", value: ""});
+            },
         });
-        alarm.on('end', function(){
-            app.ports.events.send({name: "AlarmEnded", value: ""});
-        });
-        alarm.on('playerror', function(){
-            app.ports.events.send({name: "SoundFailed", value: ""});
-        });
-        return alarm;
     }
 </script>
 </body>

@@ -53,7 +53,7 @@ type alias Model =
     , page : PageModel
     , preferences : UserPreferences.Model
     , toasts : Toasts
-    , soundEnabled : Bool
+    , displayModal : Bool
     }
 
 
@@ -68,7 +68,10 @@ init preferences url key =
       , page = page
       , preferences = preferences
       , toasts = []
-      , soundEnabled = True
+      , displayModal =
+            case page of
+                LoginModel _ -> False
+                MobModel _ -> True
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -106,8 +109,7 @@ type Msg
     | GotLoginMsg Pages.Login.Msg
     | GotToastMsg Lib.Toaster.Msg
     | Batch (List Msg)
-    | SoundFailed
-    | EnableSound
+    | HideModal
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -178,13 +180,8 @@ update msg model =
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
 
-        ( SoundFailed, _ ) ->
-            ( { model | soundEnabled = False }
-            , Cmd.none
-            )
-
-        ( EnableSound, _ ) ->
-            ( { model | soundEnabled = True }
+        ( HideModal, _ ) ->
+            ( { model | displayModal = False }
             , Cmd.none
             )
 
@@ -215,8 +212,6 @@ jsEventsMapping =
     EventsMapping.batch
         [ EventsMapping.map GotMobMsg Pages.Mob.Main.jsEventMapping
         , EventsMapping.map GotToastMsg Lib.Toaster.jsEventMapping
-        , [ Js.Events.EventMessage "SoundFailed" (\_ -> SoundFailed) ]
-            |> EventsMapping.create
         ]
 
 
@@ -247,17 +242,14 @@ view model =
 
 soundModal : Model -> List (Html Msg)
 soundModal model =
-    if model.soundEnabled then
-        []
-
-    else
+    if model.displayModal then
         [ div
-            [ id "modal-container", onClick EnableSound ]
+            [ id "modal-container", onClick HideModal ]
             [ div [ id "modal" ]
                 [ h2 [] [ text "Welcome to Mobtime !" ]
                 , button
                     [ class "labelled-icon-button"
-                    , onClick <| EnableSound
+                    , onClick <| HideModal
                     ]
                     [ Lib.Icons.Ion.close
                     , text "Close"
@@ -265,3 +257,7 @@ soundModal model =
                 ]
             ]
         ]
+
+    else
+        []
+
