@@ -72,6 +72,10 @@ delete : Svg msg
 delete =
     display Ionicon.close
 
+close : Svg msg
+close =
+    display Ionicon.close
+
 rotate : Svg msg
 rotate =
     display Ionicon.refresh

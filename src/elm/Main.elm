@@ -2,12 +2,15 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (Html)
+import Html exposing (Html, button, div, h2, p, text)
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.BatchMsg
 import Lib.DocumentExtras
+import Lib.Icons.Ion
 import Lib.Toaster exposing (Toasts)
 import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Login
@@ -65,7 +68,7 @@ init preferences url key =
       , page = page
       , preferences = preferences
       , toasts = []
-      , soundEnabled = False
+      , soundEnabled = True
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -103,6 +106,8 @@ type Msg
     | GotLoginMsg Pages.Login.Msg
     | GotToastMsg Lib.Toaster.Msg
     | Batch (List Msg)
+    | SoundFailed
+    | EnableSound
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -173,6 +178,16 @@ update msg model =
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
 
+        ( SoundFailed, _ ) ->
+            ( { model | soundEnabled = False }
+            , Cmd.none
+            )
+
+        ( EnableSound, _ ) ->
+            ( { model | soundEnabled = True }
+            , Cmd.none
+            )
+
         _ ->
             ( model, Cmd.none )
 
@@ -200,6 +215,8 @@ jsEventsMapping =
     EventsMapping.batch
         [ EventsMapping.map GotMobMsg Pages.Mob.Main.jsEventMapping
         , EventsMapping.map GotToastMsg Lib.Toaster.jsEventMapping
+        , [ Js.Events.EventMessage "SoundFailed" (\_ -> SoundFailed) ]
+            |> EventsMapping.create
         ]
 
 
@@ -224,4 +241,27 @@ view model =
     , body =
         doc.body
             ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
+            ++ soundModal model
     }
+
+
+soundModal : Model -> List (Html Msg)
+soundModal model =
+    if model.soundEnabled then
+        []
+
+    else
+        [ div
+            [ id "modal-container", onClick EnableSound ]
+            [ div [ id "modal" ]
+                [ h2 [] [ text "Welcome to Mobtime !" ]
+                , button
+                    [ class "labelled-icon-button"
+                    , onClick <| EnableSound
+                    ]
+                    [ Lib.Icons.Ion.close
+                    , text "Close"
+                    ]
+                ]
+            ]
+        ]

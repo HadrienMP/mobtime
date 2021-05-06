@@ -28,6 +28,7 @@
     });
 
     let alarm = load('/sound/silence.mp3');
+    alarm.play();
 
     // -----------------------------------------
     // Tooltips
@@ -99,6 +100,9 @@
         });
         alarm.on('end', function(){
             app.ports.events.send({name: "AlarmEnded", value: ""});
+        });
+        alarm.on('playerror', function(){
+            app.ports.events.send({name: "SoundFailed", value: ""});
         });
         return alarm;
     }

@@ -11,10 +11,6 @@
   #modal {
     position: absolute;
 
-    width: 90%;
-    @media (min-width: $width) {
-      width: $width;
-    }
     background: white;
     margin: auto;
     top: 50%;
@@ -22,12 +18,13 @@
     transform: translate(-50%, -50%);
     padding: $padding-space;
 
-    button.no {
-      background: $error-color;
+    h2 {
+      font-size: 1.3em;
     }
 
-    button.yes {
-      background: $success-color;
+    button {
+      margin-top: $margin-space;
+      width: 100%;
     }
   }
 }
