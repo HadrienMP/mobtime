@@ -22,13 +22,13 @@
     @include icon(1.4em, white);
 
     &.success {
-      background: #35c135;
+      background: $success-color;
     }
     &.info {
-      background: #00a9eb;
+      background: $info-color;
     }
     &.error {
-      background: #eb0000;
+      background: $error-color;
     }
 
     .level-icon {

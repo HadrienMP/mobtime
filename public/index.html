@@ -18,15 +18,16 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script src="https://unpkg.com/tippy.js@6"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.1/howler.min.js"
+        integrity="sha512-L6Z/YtIPQ7eU3BProP34WGU5yIRk7tNHk7vaC2dB1Vy1atz6wl9mCkTPPZ2Rn1qPr+vY2mZ9odZLdGYuaBk7dQ=="
+        crossorigin="anonymous"></script>
 <script>
     const app = Elm.Main.init({
         node: document.getElementById('elm'),
         flags: JSON.parse(window.localStorage.getItem("preferences")) || {volume: 50}
     });
 
-    let alarm = document.createElement("audio");
-    alarm.autoplay = true;
-    document.body.appendChild(alarm);
+    let alarm = load('/sound/silence.mp3');
 
     // -----------------------------------------
     // Tooltips
@@ -59,7 +60,7 @@
     });
 
     // -----------------------------------------
-    // IO
+    // Commands
     // -----------------------------------------
     app.ports.commands.subscribe(command => {
         switch (command.name) {
@@ -67,16 +68,19 @@
                 socket.emit('join', command.value);
                 break;
             case "SoundAlarm":
-                play();
+                alarm.play();
+                break;
+            case "EnableSound":
+                let previousAlarm = alarm;
+                alarm = load('/sound/silence.mp3');
+                alarm.play();
+                alarm = previousAlarm;
                 break;
             case "SetAlarm":
-                alarm.src = "/sound/" + command.value;
-                alarm.load();
-                alarm.pause();
+                alarm = load("/sound/" + command.value);
                 break;
             case "StopAlarm":
                 alarm.pause();
-                alarm.src = '';
                 break;
             case 'CopyInPasteBin':
                 navigator.clipboard
@@ -85,19 +89,18 @@
                 break;
             case 'ChangeVolume':
                 window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
-                alarm.volume = parseInt(command.value) / 100.0;
+                Howler.volume(parseInt(command.value) / 100.0);
                 break;
         }
     });
-    alarm.addEventListener("ended", () => {
-        app.ports.events.send({name: "AlarmEnded", value: ""});
-    });
-
-    function play() {
-        alarm.play().catch(reason => {
-            console.log(reason);
-            alert("Audio is disabled in your tab, if you know how, enable it manually in the permissions");
-        })
+    function load(sound) {
+        let alarm = new Howl({
+            src: [sound]
+        });
+        alarm.on('end', function(){
+            app.ports.events.send({name: "AlarmEnded", value: ""});
+        });
+        return alarm;
     }
 </script>
 </body>

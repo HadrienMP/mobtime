@@ -2,7 +2,9 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html
+import Html exposing (Html, button, div, p, text)
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
@@ -14,6 +16,7 @@ import Pages.Login
 import Pages.Mob.Main
 import Pages.Routing
 import Task
+import Test.Html.Event exposing (click)
 import Time
 import Url
 import UserPreferences
@@ -50,6 +53,7 @@ type alias Model =
     , page : PageModel
     , preferences : UserPreferences.Model
     , toasts : Toasts
+    , soundEnabled : Bool
     }
 
 
@@ -64,6 +68,7 @@ init preferences url key =
       , page = page
       , preferences = preferences
       , toasts = []
+      , soundEnabled = False
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -101,6 +106,8 @@ type Msg
     | GotLoginMsg Pages.Login.Msg
     | GotToastMsg Lib.Toaster.Msg
     | Batch (List Msg)
+    | SoundDisabled
+    | EnableSound
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -171,6 +178,16 @@ update msg model =
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
 
+        ( SoundDisabled, _ ) ->
+            ( model
+            , Cmd.none
+            )
+
+        ( EnableSound, _ ) ->
+            ( { model | soundEnabled = True }
+            , Js.Commands.send Js.Commands.EnableSound
+            )
+
         _ ->
             ( model, Cmd.none )
 
@@ -198,6 +215,8 @@ jsEventsMapping =
     EventsMapping.batch
         [ EventsMapping.map GotMobMsg Pages.Mob.Main.jsEventMapping
         , EventsMapping.map GotToastMsg Lib.Toaster.jsEventMapping
+        , [ Js.Events.EventMessage "AudioDisabled" (\_ -> SoundDisabled) ]
+            |> EventsMapping.create
         ]
 
 
@@ -219,5 +238,22 @@ view model =
                         |> Lib.DocumentExtras.map GotMobMsg
     in
     { title = doc.title
-    , body = doc.body ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
+    , body =
+        doc.body
+            ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
+            ++ (soundModal model)
     }
+
+soundModal : Model -> List (Html Msg)
+soundModal model =
+    if model.soundEnabled then
+        []
+    else
+        [ div
+            [ id "modal-container", onClick EnableSound ]
+            [ div [ id "modal" ]
+                [ p [] [ text "Welcome to Mobtime !" ]
+                , button [ onClick EnableSound ] [ text "Close" ]
+                ]
+            ]
+       ]

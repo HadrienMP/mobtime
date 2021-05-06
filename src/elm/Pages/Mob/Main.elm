@@ -137,7 +137,7 @@ update msg model =
 
         ReceivedEvent event ->
             let
-                (shared, command) =
+                ( shared, command ) =
                     Peers.State.evolve event model.shared
             in
             { model =
@@ -158,7 +158,8 @@ update msg model =
 
         ReceivedHistory eventsResults ->
             let
-                (shared, command) = Peers.State.evolveMany eventsResults model.shared
+                ( shared, command ) =
+                    Peers.State.evolveMany eventsResults model.shared
             in
             { model = { model | shared = shared }
             , command = command
@@ -447,9 +448,10 @@ detectAction model =
         ( _, Off, On pomodoro ) ->
             if Duration.secondsBetween model.now pomodoro.end <= 0 then
                 { icon = Lib.Icons.Ion.coffee
-                , message = Peers.Events.PomodoroStopped
-                                |> Peers.Events.MobEvent model.name
-                                |> ShareEvent
+                , message =
+                    Peers.Events.PomodoroStopped
+                        |> Peers.Events.MobEvent model.name
+                        |> ShareEvent
                 , class = ""
                 , text = []
                 }
