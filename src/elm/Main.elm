@@ -251,8 +251,8 @@ soundModal model =
                     [ class "labelled-icon-button"
                     , onClick <| HideModal
                     ]
-                    [ Lib.Icons.Ion.close
-                    , text "Close"
+                    [ Lib.Icons.Ion.paperAirplane
+                    , text "Let's go!"
                     ]
                 ]
             ]
