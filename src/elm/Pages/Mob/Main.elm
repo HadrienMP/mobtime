@@ -2,9 +2,10 @@ module Pages.Mob.Main exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
-import Html exposing (..)
-import Html.Attributes exposing (class, classList, id, title)
-import Html.Events exposing (onClick)
+import Css exposing (height, px, width)
+import Html.Styled as Html exposing (..)
+import Html.Styled.Attributes exposing (class, classList, css, id, style, title)
+import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
@@ -24,8 +25,8 @@ import Pages.Mob.Tabs.Share
 import Peers.Events
 import Peers.State
 import Random
-import Svg exposing (Svg, svg)
-import Svg.Attributes as Svg
+import Svg.Styled exposing (Svg, svg)
+import Svg.Styled.Attributes as Svg
 import Time
 import Url
 import UserPreferences
@@ -314,100 +315,123 @@ view model url =
     let
         action =
             detectAction model
+    in
+    { title = timeLeftTitle action ++ "Mob Time"
+    , body = body model url action |> List.map toUnstyled
+    }
+
+
+body : Model -> Url.Url -> ActionDescription -> List (Html Msg)
+body model url action =
+    let
+        outerRadiant =
+            84
+
+        offset =
+            5
+
+        pomodoroStroke =
+            8
+
+        mainStroke =
+            14
 
         totalWidth =
-            220
-
-        outerRadiant =
-            104
+            outerRadiant * 2 + ( pomodoroStroke + mainStroke) / 2
 
         pomodoroCircle =
             Lib.Circle.Circle
                 outerRadiant
-                (Lib.Circle.Coordinates (outerRadiant + 6) (outerRadiant + 6))
-                (Lib.Circle.Stroke 10 "#999")
+                (Lib.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
+                (Lib.Circle.Stroke pomodoroStroke "#999")
 
         mobCircle =
-            Lib.Circle.inside pomodoroCircle <| Lib.Circle.Stroke 18 "#666"
+            Lib.Circle.inside pomodoroCircle <| Lib.Circle.Stroke mainStroke "#666"
     in
-    { title = timeLeftTitle action ++ "Mob Time"
-    , body =
-        [ div [ class "container" ]
-            [ header []
-                [ section []
-                    [ svg
-                        [ id "circles"
-                        , Svg.width <| String.fromInt totalWidth
-                        , Svg.height <| String.fromInt totalWidth
+    [ div [ class "container" ]
+        [ header []
+            [ section []
+                [ svg
+                    [ id "circles"
+                    , Svg.width <| String.fromFloat totalWidth
+                    , Svg.height <| String.fromFloat totalWidth
+                    ]
+                    (Lib.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
+                        ++ Lib.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
+                    )
+                , button
+                    [ id "action"
+                    , class action.class
+                    , onClick action.message
+                    , css
+                        [ width (px totalWidth)
+                        , height (px totalWidth)
                         ]
-                        (Lib.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
-                            ++ Lib.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
-                        )
-                    , button
-                        [ id "action"
-                        , class action.class
-                        , onClick action.message
-                        ]
-                        [ action.icon
-                        , span [ id "time-left" ] (action.text |> List.map (\a -> span [] [ text a ]))
-                        ]
+                    ]
+                    [ action.icon
+                    , span [ id "time-left" ] (action.text |> List.map (\a -> span [] [ text a ]))
                     ]
                 ]
-            , nav []
-                [ button
-                    [ onClick <| SwitchTab Main
-                    , classList [ ( "active", model.tab == Main ) ]
-                    , title "Home"
-                    ]
-                    [ Lib.Icons.Ion.home ]
-                , button
-                    [ onClick <| SwitchTab Clock
-                    , classList [ ( "active", model.tab == Clock ) ]
-                    , title "Clock Settings"
-                    ]
-                    [ Lib.Icons.Ion.clock ]
-                , button
-                    [ onClick <| SwitchTab Mobbers
-                    , classList [ ( "active", model.tab == Mobbers ) ]
-                    , title "Mobbers"
-                    ]
-                    [ Lib.Icons.Ion.people ]
-                , button
-                    [ onClick <| SwitchTab Sound
-                    , classList [ ( "active", model.tab == Sound ) ]
-                    , title "Sound Settings"
-                    ]
-                    [ Lib.Icons.Ion.sound ]
-                , button
-                    [ onClick <| SwitchTab Share
-                    , classList [ ( "active", model.tab == Share ) ]
-                    , title "Share"
-                    ]
-                    [ Lib.Icons.Ion.share ]
-                ]
-            , case model.tab of
-                Main ->
-                    Pages.Mob.Tabs.Home.view model.name url model.shared.mobbers
-                        |> Html.map GotMainTabMsg
-
-                Clock ->
-                    Pages.Mob.Clocks.Settings.view model.clockSettings model.now model.shared
-                        |> Html.map GotClockSettingsMsg
-
-                Mobbers ->
-                    Pages.Mob.Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
-                        |> Html.map GotMobbersSettingsMsg
-
-                Sound ->
-                    Pages.Mob.Sound.Settings.view model.soundSettings model.name model.shared.soundProfile
-                        |> Html.map GotSoundSettingsMsg
-
-                Share ->
-                    Pages.Mob.Tabs.Share.view model.name url
-                        |> Html.map GotShareTabMsg
             ]
+        , nav []
+            [ button
+                [ onClick <| SwitchTab Main
+                , classList [ ( "active", model.tab == Main ) ]
+                , title "Home"
+                ]
+                [ Lib.Icons.Ion.home |> fromUnstyled ]
+            , button
+                [ onClick <| SwitchTab Clock
+                , classList [ ( "active", model.tab == Clock ) ]
+                , title "Clock Settings"
+                ]
+                [ Lib.Icons.Ion.clock |> fromUnstyled ]
+            , button
+                [ onClick <| SwitchTab Mobbers
+                , classList [ ( "active", model.tab == Mobbers ) ]
+                , title "Mobbers"
+                ]
+                [ Lib.Icons.Ion.people |> fromUnstyled ]
+            , button
+                [ onClick <| SwitchTab Sound
+                , classList [ ( "active", model.tab == Sound ) ]
+                , title "Sound Settings"
+                ]
+                [ Lib.Icons.Ion.sound |> fromUnstyled ]
+            , button
+                [ onClick <| SwitchTab Share
+                , classList [ ( "active", model.tab == Share ) ]
+                , title "Share"
+                ]
+                [ Lib.Icons.Ion.share |> fromUnstyled ]
+            ]
+        , case model.tab of
+            Main ->
+                Pages.Mob.Tabs.Home.view model.name url model.shared.mobbers
+                    |> Html.fromUnstyled
+                    |> Html.map GotMainTabMsg
+
+            Clock ->
+                Pages.Mob.Clocks.Settings.view model.clockSettings model.now model.shared
+                    |> Html.fromUnstyled
+                    |> Html.map GotClockSettingsMsg
+
+            Mobbers ->
+                Pages.Mob.Mobbers.Settings.view model.shared.mobbers model.mobbersSettings
+                    |> Html.fromUnstyled
+                    |> Html.map GotMobbersSettingsMsg
+
+            Sound ->
+                Pages.Mob.Sound.Settings.view model.soundSettings model.name model.shared.soundProfile
+                    |> Html.fromUnstyled
+                    |> Html.map GotSoundSettingsMsg
+
+            Share ->
+                Pages.Mob.Tabs.Share.view model.name url
+                    |> Html.fromUnstyled
+                    |> Html.map GotShareTabMsg
         ]
-    }
+    ]
 
 
 type alias ActionDescription =
@@ -422,14 +446,14 @@ detectAction : Model -> ActionDescription
 detectAction model =
     case ( model.alarm, model.shared.clock, model.shared.pomodoro ) of
         ( Playing, _, _ ) ->
-            { icon = Lib.Icons.Ion.mute
+            { icon = Lib.Icons.Ion.mute |> fromUnstyled
             , message = StopSound
             , class = ""
             , text = []
             }
 
         ( _, On on, _ ) ->
-            { icon = Lib.Icons.Ion.stop
+            { icon = Lib.Icons.Ion.stop |> fromUnstyled
             , message =
                 Peers.Events.Clock Peers.Events.Stopped
                     |> Peers.Events.MobEvent model.name
@@ -447,7 +471,7 @@ detectAction model =
 
         ( _, Off, On pomodoro ) ->
             if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                { icon = Lib.Icons.Ion.coffee
+                { icon = Lib.Icons.Ion.coffee |> fromUnstyled
                 , message =
                     Peers.Events.PomodoroStopped
                         |> Peers.Events.MobEvent model.name
@@ -457,14 +481,14 @@ detectAction model =
                 }
 
             else
-                { icon = Lib.Icons.Ion.play
+                { icon = Lib.Icons.Ion.play |> fromUnstyled
                 , message = Start
                 , class = ""
                 , text = []
                 }
 
         ( _, Off, _ ) ->
-            { icon = Lib.Icons.Ion.play
+            { icon = Lib.Icons.Ion.play |> fromUnstyled
             , message = Start
             , class = ""
             , text = []

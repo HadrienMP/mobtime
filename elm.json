@@ -26,7 +26,8 @@
             "j-panasiuk/elm-ionicons": "2.0.0",
             "jaredramirez/elm-field": "1.1.2",
             "jzxhuang/http-extras": "2.1.0",
-            "pablohirafuji/elm-qrcode": "4.0.1"
+            "pablohirafuji/elm-qrcode": "4.0.1",
+            "rtfeldman/elm-css": "16.1.1"
         },
         "indirect": {
             "danfishgold/base64-bytes": "1.1.0",
@@ -37,7 +38,8 @@
             "elm-community/list-extra": "8.2.4",
             "folkertdev/elm-flate": "2.0.5",
             "justgook/elm-image": "4.0.0",
-            "owanturist/elm-union-find": "1.0.0"
+            "owanturist/elm-union-find": "1.0.0",
+            "rtfeldman/elm-hex": "1.0.0"
         }
     },
     "test-dependencies": {

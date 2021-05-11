@@ -1,9 +1,8 @@
 module Lib.Circle exposing (Circle, Coordinates, Stroke, draw, drawWithoutInsideBorder, inside)
 
-import Html.Attributes as Html
 import Lib.Ratio as Ratio exposing (Ratio)
-import Svg exposing (Svg)
-import Svg.Attributes as Svg
+import Svg.Styled as Svg exposing (Svg)
+import Svg.Styled.Attributes exposing (css, cx, cy, fillOpacity, r, stroke, strokeDasharray, strokeDashoffset, strokeWidth)
 
 
 borderStroke : Stroke
@@ -92,13 +91,13 @@ draw_ circle ratio =
             2 * pi * toFloat circle.radiant
     in
     Svg.circle
-        [ Svg.cx <| String.fromInt circle.center.x
-        , Svg.cy <| String.fromInt circle.center.y
-        , Svg.r <| String.fromInt circle.radiant
-        , Svg.stroke circle.stroke.color
-        , Svg.strokeWidth <| String.fromInt circle.stroke.width
-        , Svg.fillOpacity "0"
-        , Svg.strokeDasharray <| String.fromFloat perimeter
-        , Html.style "stroke-dashoffset" <| String.fromFloat <| Ratio.apply ratio perimeter
+        [ cx <| String.fromInt circle.center.x
+        , cy <| String.fromInt circle.center.y
+        , r <| String.fromInt circle.radiant
+        , stroke circle.stroke.color
+        , strokeWidth <| String.fromInt circle.stroke.width
+        , fillOpacity "0"
+        , strokeDasharray <| String.fromFloat perimeter
+        , strokeDashoffset <| String.fromFloat <| Ratio.apply ratio perimeter
         ]
         []
