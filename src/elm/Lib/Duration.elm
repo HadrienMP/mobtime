@@ -39,8 +39,8 @@ secondsBetween a b =
 
 
 between : Time.Posix -> Time.Posix -> Duration
-between a b =
-    ( a, b )
+between before after =
+    ( before, after )
         |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
         |> (\( a2, b2 ) -> b2 - a2)
         |> ofMillis
