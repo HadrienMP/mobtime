@@ -18,13 +18,10 @@ type alias TimeAdjustments =
     Dict PeerId TimeAdjustment
 
 
-type alias SyncingState a =
-    { start : Time.Posix, id : a, adjustments : TimeAdjustments }
-
-
-type State a
-    = NotSynced
-    | Syncing (SyncingState a)
+type alias Model a =
+    { context : Context a
+    , adjustments : TimeAdjustments
+    }
 
 
 type CommandType
@@ -33,11 +30,15 @@ type CommandType
     | MyTimeIs
 
 
+type Recipient
+    = All
+    | Peer PeerId
+
+
 type alias Message a =
-    { time : Time.Posix
-    , syncId : a
-    , peer : PeerId
+    { context : Context a
     , type_ : CommandType
+    , recipient : Recipient
     }
 
 
@@ -45,57 +46,54 @@ type alias Context a =
     { peerId : PeerId, time : Time.Posix, syncId : a }
 
 
-start : Context a -> ( State a, Message a )
+start : Context a -> ( Model a, Message a )
 start context =
-    ( Syncing { start = context.time, id = context.syncId, adjustments = Dict.empty }
-    , { time = context.time, syncId = context.syncId, peer = context.peerId, type_ = TellMeYourTime }
+    ( { context = context, adjustments = Dict.empty }
+    , { context = context, type_ = TellMeYourTime, recipient = All }
     )
 
 
-handle : Message a -> Time.Posix -> State a -> ( State a, Maybe (Message a) )
-handle command now state =
-    ( evolve command now state, Nothing )
-
-
-evolve : Message a -> Time.Posix -> State a -> State a
-evolve command now state =
-    case state of
-        Syncing syncing ->
-            Syncing <| evolveSyncing command now syncing
-
-        _ ->
-            state
-
-
-evolveSyncing : Message a -> Time.Posix -> SyncingState a -> SyncingState a
-evolveSyncing command now syncing =
-    if command.syncId == syncing.id then
+handle : Message a -> Time.Posix -> Model a -> ( Model a, Maybe (Message a) )
+handle command now model =
+    if command.context.syncId == model.context.syncId then
         case command.type_ of
             ExchangeTime ->
                 let
                     adjustment =
-                        calculateTimeAdjustment syncing.start command.time now
+                        calculateTimeAdjustment model.context.time command.context.time now
                 in
-                { syncing | adjustments = Dict.insert command.peer adjustment syncing.adjustments }
+                ( { model | adjustments = Dict.insert command.context.peerId adjustment model.adjustments }
+                , Just
+                    { context = model.context
+                    , type_ = MyTimeIs
+                    , recipient = Peer command.context.peerId
+                    }
+                )
 
             TellMeYourTime ->
-                { syncing | adjustments = Dict.insert command.peer (RequestedAt now) syncing.adjustments }
+                ( { model | adjustments = Dict.insert command.context.peerId (RequestedAt now) model.adjustments }
+                , Just
+                    { context = { peerId = model.context.peerId, time = now, syncId = model.context.syncId }
+                    , type_ = ExchangeTime
+                    , recipient = Peer command.context.peerId
+                    }
+                )
 
             MyTimeIs ->
                 let
                     adjustments =
-                        case Dict.get command.peer syncing.adjustments of
+                        case Dict.get command.context.peerId model.adjustments of
                             Just (RequestedAt t0) ->
-                                calculateTimeAdjustment t0 command.time now
-                                    |> (\t -> Dict.insert command.peer t syncing.adjustments)
+                                calculateTimeAdjustment t0 command.context.time now
+                                    |> (\t -> Dict.insert command.context.peerId t model.adjustments)
 
                             _ ->
-                                syncing.adjustments
+                                model.adjustments
                 in
-                { syncing | adjustments = adjustments }
+                ( { model | adjustments = adjustments }, Nothing )
 
     else
-        syncing
+        ( model, Nothing )
 
 
 calculateTimeAdjustment : Time.Posix -> Time.Posix -> Time.Posix -> TimeAdjustment
@@ -113,16 +111,11 @@ calculateTimeAdjustment t0 t1 t2 =
     Fixed <| Duration.between t1 expected
 
 
-adjustTimeFrom : PeerId -> State a -> Time.Posix -> Time.Posix
-adjustTimeFrom peerId state toAdjust =
-    case state of
-        NotSynced ->
-            toAdjust
-
-        Syncing syncing ->
-            Dict.get peerId syncing.adjustments
-                |> Maybe.map (adjust toAdjust)
-                |> Maybe.withDefault toAdjust
+adjustTimeFrom : PeerId -> Model a -> Time.Posix -> Time.Posix
+adjustTimeFrom peerId model toAdjust =
+    Dict.get peerId model.adjustments
+        |> Maybe.map (adjust toAdjust)
+        |> Maybe.withDefault toAdjust
 
 
 adjust : Time.Posix -> TimeAdjustment -> Time.Posix
