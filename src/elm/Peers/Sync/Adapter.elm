@@ -74,6 +74,14 @@ update msg m now =
                     UpdateResult.fromModel m
 
 
+adjust : Time.Posix -> PeerId -> Model -> Time.Posix
+adjust time peer m =
+    case m of
+        Starting startingModel ->
+            time
+
+        Started {model} ->
+            Peers.Sync.Core.adjustTimeFrom peer model time
 
 
 
