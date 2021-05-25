@@ -4,7 +4,7 @@ import Browser
 import Browser.Events exposing (onKeyUp)
 import Css exposing (height, px, width)
 import Html.Styled as Html exposing (..)
-import Html.Styled.Attributes exposing (class, classList, css, id, style, title)
+import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
@@ -13,7 +13,7 @@ import Json.Decode
 import Lib.Circle
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Icons.Ion
-import Lib.UpdateResult exposing (UpdateResult)
+import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
 import Pages.Mob.Mobbers.Settings
@@ -24,6 +24,7 @@ import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Share
 import Peers.Events
 import Peers.State
+import Peers.Sync.Adapter exposing (Msg(..))
 import Random
 import Svg.Styled exposing (Svg, svg)
 import Svg.Styled.Attributes as Svg
@@ -56,6 +57,7 @@ type alias Model =
     , mobbersSettings : Pages.Mob.Mobbers.Settings.Model
     , clockSettings : Pages.Mob.Clocks.Settings.Model
     , soundSettings : Pages.Mob.Sound.Settings.Model
+    , clockSync : Peers.Sync.Adapter.Model
     , alarm : AlarmState
     , now : Time.Posix
     , tab : Tab
@@ -65,17 +67,25 @@ type alias Model =
 
 init : MobName -> UserPreferences.Model -> ( Model, Cmd Msg )
 init name preferences =
+    let
+        ( clockSync, clockSyncCommand ) =
+            Peers.Sync.Adapter.init name
+    in
     ( { name = name
       , shared = Peers.State.init
       , mobbersSettings = Pages.Mob.Mobbers.Settings.init
       , clockSettings = Pages.Mob.Clocks.Settings.init
       , soundSettings = Pages.Mob.Sound.Settings.init preferences.volume
+      , clockSync = clockSync
       , alarm = Standby
       , now = Time.millisToPosix 0
       , tab = Main
       , dev = False
       }
-    , Js.Commands.send <| Js.Commands.Join name
+    , Cmd.batch
+        [ Js.Commands.send <| Js.Commands.Join name
+        , Cmd.map GotClockSyncMsg clockSyncCommand
+        ]
     )
 
 
@@ -97,6 +107,7 @@ type Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Pages.Mob.Mobbers.Settings.Msg
     | GotSoundSettingsMsg Pages.Mob.Sound.Settings.Msg
+    | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
     | KeyPressed Keystroke
 
@@ -272,6 +283,12 @@ update msg model =
             , toasts = []
             }
 
+        GotClockSyncMsg sub ->
+            Peers.Sync.Adapter.update sub model.clockSync model.now
+                |> UpdateResult.map
+                    (\m -> { model | clockSync = m })
+                    (Cmd.map GotClockSyncMsg)
+
 
 
 -- SUBSCRIPTIONS
@@ -290,6 +307,7 @@ subscriptions =
     Sub.batch
         [ Peers.Events.receiveOne <| Peers.Events.fromJson >> ReceivedEvent
         , Peers.Events.receiveHistory <| List.map Peers.Events.fromJson >> ReceivedHistory
+        , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
         , onKeyUp <|
             Json.Decode.map KeyPressed <|
                 Json.Decode.map4 Keystroke
@@ -302,8 +320,13 @@ subscriptions =
 
 jsEventMapping : EventsMapping Msg
 jsEventMapping =
-    [ Js.Events.EventMessage "AlarmEnded" (\_ -> AlarmEnded) ]
-        |> EventsMapping.create
+    EventsMapping.batch
+        [ EventsMapping.create <|
+            [ Js.Events.EventMessage "AlarmEnded" (\_ -> AlarmEnded)
+            , Js.Events.EventMessage "SocketConnected" (GotClockSyncMsg << GotSocketId)
+            ]
+        , EventsMapping.map GotClockSyncMsg Peers.Sync.Adapter.jsEventMapping
+        ]
 
 
 
@@ -337,7 +360,7 @@ body model url action =
             14
 
         totalWidth =
-            outerRadiant * 2 + ( pomodoroStroke + mainStroke) / 2
+            outerRadiant * 2 + (pomodoroStroke + mainStroke) / 2
 
         pomodoroCircle =
             Lib.Circle.Circle

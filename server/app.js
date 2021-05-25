@@ -15,6 +15,12 @@ io.on('connection', (socket) => {
         historize(room, message);
         io.in(room).emit('message', message);
     });
+    socket.on('sync', (room, message) => {
+        let channel = io.in(room);
+        if (message.recipient)
+            channel = io.to(message.recipient);
+        channel.emit('sync', message);
+    });
 });
 
 function historize(room, message) {

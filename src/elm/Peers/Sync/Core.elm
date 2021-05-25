@@ -1,4 +1,4 @@
-module Peers.Clock_Sync exposing (..)
+module Peers.Sync.Core exposing (..)
 
 import Dict exposing (Dict)
 import Lib.Duration as Duration exposing (Duration)
@@ -55,45 +55,41 @@ start context =
 
 handle : Message a -> Time.Posix -> Model a -> ( Model a, Maybe (Message a) )
 handle command now model =
-    if command.context.syncId == model.context.syncId then
-        case command.type_ of
-            ExchangeTime ->
-                let
-                    adjustment =
-                        calculateTimeAdjustment model.context.time command.context.time now
-                in
-                ( { model | adjustments = Dict.insert command.context.peerId adjustment model.adjustments }
-                , Just
-                    { context = model.context
-                    , type_ = MyTimeIs
-                    , recipient = Peer command.context.peerId
-                    }
-                )
+    case command.type_ of
+        ExchangeTime ->
+            let
+                adjustment =
+                    calculateTimeAdjustment model.context.time command.context.time now
+            in
+            ( { model | adjustments = Dict.insert command.context.peerId adjustment model.adjustments }
+            , Just
+                { context = model.context
+                , type_ = MyTimeIs
+                , recipient = Peer command.context.peerId
+                }
+            )
 
-            TellMeYourTime ->
-                ( { model | adjustments = Dict.insert command.context.peerId (RequestedAt now) model.adjustments }
-                , Just
-                    { context = { peerId = model.context.peerId, time = now, syncId = model.context.syncId }
-                    , type_ = ExchangeTime
-                    , recipient = Peer command.context.peerId
-                    }
-                )
+        TellMeYourTime ->
+            ( { model | adjustments = Dict.insert command.context.peerId (RequestedAt now) model.adjustments }
+            , Just
+                { context = { peerId = model.context.peerId, time = now, syncId = model.context.syncId }
+                , type_ = ExchangeTime
+                , recipient = Peer command.context.peerId
+                }
+            )
 
-            MyTimeIs ->
-                let
-                    adjustments =
-                        case Dict.get command.context.peerId model.adjustments of
-                            Just (RequestedAt t0) ->
-                                calculateTimeAdjustment t0 command.context.time now
-                                    |> (\t -> Dict.insert command.context.peerId t model.adjustments)
+        MyTimeIs ->
+            let
+                adjustments =
+                    case Dict.get command.context.peerId model.adjustments of
+                        Just (RequestedAt t0) ->
+                            calculateTimeAdjustment t0 command.context.time now
+                                |> (\t -> Dict.insert command.context.peerId t model.adjustments)
 
-                            _ ->
-                                model.adjustments
-                in
-                ( { model | adjustments = adjustments }, Nothing )
-
-    else
-        ( model, Nothing )
+                        _ ->
+                            model.adjustments
+            in
+            ( { model | adjustments = adjustments }, Nothing )
 
 
 calculateTimeAdjustment : Time.Posix -> Time.Posix -> Time.Posix -> TimeAdjustment

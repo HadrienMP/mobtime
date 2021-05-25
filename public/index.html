@@ -59,6 +59,17 @@
         app.ports.receiveHistory.send(data);
     });
 
+    socket.on('connect', () => {
+        app.ports.events.send({name: "GotSocketId", value: socket.id});
+    });
+   app.ports.clockSyncOutMessage.subscribe(message => {
+        console.log("out", message);
+        socket.emit("sync", message.mob, message);
+    });
+    socket.on("sync", data => {
+        console.log("in", data);
+        return app.ports.clockSyncInMessage.send(data);
+    });
     // -----------------------------------------
     // Commands
     // -----------------------------------------
