@@ -10,7 +10,6 @@ import Pages.Mob.Clocks.Clock as Clock
 import Pages.Mob.Name exposing (MobName)
 import Peers.Events
 import Peers.State
-import Peers.Sync.Core exposing (PeerId)
 import Time
 
 
@@ -28,8 +27,8 @@ type Msg
     | ShareEvent Peers.Events.Event
 
 
-update : Msg -> Model -> MobName -> Maybe PeerId -> Time.Posix -> ( Model, Cmd Msg )
-update msg model mob peer now =
+update : Msg -> Model -> MobName -> ( Model, Cmd Msg )
+update msg model mob =
     case msg of
         DisplaySecondsChanged bool ->
             ( { model | displaySeconds = bool }, Cmd.none )
@@ -37,7 +36,7 @@ update msg model mob peer now =
         ShareEvent event ->
             ( model
             , event
-                |> Peers.Events.MobEvent mob now peer
+                |> Peers.Events.MobEvent mob
                 |> Peers.Events.mobEventToJson
                 |> Peers.Events.sendEvent
             )

@@ -12,11 +12,9 @@ import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Mobbers.Mobber exposing (Mobber)
 import Pages.Mob.Name exposing (MobName)
-import Peers.Sync.Core exposing (PeerId)
 import Random
 import Random.List
 import Peers.Events
-import Time
 import Uuid
 
 
@@ -41,8 +39,8 @@ type Msg
     | ShareEvent Peers.Events.Event
 
 
-update : Msg -> Mobbers -> MobName -> Maybe PeerId -> Time.Posix -> Model -> UpdateResult Model Msg
-update msg mobbers mob peer now model =
+update : Msg -> Mobbers -> MobName -> Model -> UpdateResult Model Msg
+update msg mobbers mob model =
     case msg of
         NameChanged name ->
             { model = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
@@ -74,7 +72,7 @@ update msg mobbers mob peer now model =
             , command =
                 mobber
                     |> Peers.Events.AddedMobber
-                    |> Peers.Events.MobEvent mob now peer
+                    |> Peers.Events.MobEvent mob
                     |> Peers.Events.mobEventToJson
                     |> Peers.Events.sendEvent
             , toasts = []
@@ -91,7 +89,7 @@ update msg mobbers mob peer now model =
             { model = model
             , command =
                 event
-                    |> Peers.Events.MobEvent mob now peer
+                    |> Peers.Events.MobEvent mob
                     |> Peers.Events.mobEventToJson
                     |> Peers.Events.sendEvent
             , toasts = []

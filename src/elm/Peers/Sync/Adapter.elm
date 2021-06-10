@@ -73,31 +73,23 @@ update msg m now =
                 _ ->
                     UpdateResult.fromModel m
 
-peerId : Model -> Maybe PeerId
-peerId model =
-    case model of
-        Starting startingModel ->
-            startingModel.peerId
 
-        Started started ->
-            Just started.model.context.peerId
-
-
-adjust : Time.Posix -> Maybe PeerId -> Model -> Time.Posix
+adjust : Time.Posix -> PeerId -> Model -> Time.Posix
 adjust time peer m =
-    case (peer, m) of
-        (Just p, Started {model}) ->
-            Peers.Sync.Core.adjustTimeFrom p model time
-        _ ->
+    case m of
+        Starting startingModel ->
             time
+
+        Started {model} ->
+            Peers.Sync.Core.adjustTimeFrom peer model time
 
 
 
 updateStarting : Msg -> StartingModel -> UpdateResult StartingModel Msg
 updateStarting msg starting =
     case msg of
-        GotSocketId id ->
-            { starting | peerId = Just id } |> UpdateResult.fromModel
+        GotSocketId peerId ->
+            { starting | peerId = Just peerId } |> UpdateResult.fromModel
 
         SyncIdGenerated uuid ->
             { starting | syncId = Just uuid } |> UpdateResult.fromModel
@@ -112,10 +104,10 @@ updateStarting msg starting =
 finish : UpdateResult StartingModel Msg -> UpdateResult Model Msg
 finish updateResult =
     case ( updateResult.model.peerId, updateResult.model.syncId, updateResult.model.time ) of
-        ( Just id, Just syncId, Just time ) ->
+        ( Just peerId, Just syncId, Just time ) ->
             let
                 ( model, message ) =
-                    Peers.Sync.Core.start (Context id time syncId)
+                    Peers.Sync.Core.start (Context peerId time syncId)
             in
             { model = Started { model = model, mob = updateResult.model.mob }
             , command = message |> Message.fromCore updateResult.model.mob |> clockSyncOutMessage

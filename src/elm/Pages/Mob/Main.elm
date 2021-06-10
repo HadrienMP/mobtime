@@ -22,9 +22,9 @@ import Pages.Mob.Sound.Library
 import Pages.Mob.Sound.Settings
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Share
-import Peers.Events exposing (adjustTime)
+import Peers.Events
 import Peers.State
-import Peers.Sync.Adapter exposing (Msg(..), peerId)
+import Peers.Sync.Adapter exposing (Msg(..))
 import Random
 import Svg.Styled exposing (Svg, svg)
 import Svg.Styled.Attributes as Svg
@@ -95,8 +95,8 @@ init name preferences =
 
 type Msg
     = ShareEvent Peers.Events.MobEvent
-    | ReceivedEvent Peers.Events.InEvent
-    | ReceivedHistory (List Peers.Events.InEvent)
+    | ReceivedEvent Peers.Events.Event
+    | ReceivedHistory (List Peers.Events.Event)
     | Start
     | StartWithAlarm Pages.Mob.Sound.Library.Sound
     | StopSound
@@ -157,7 +157,7 @@ update msg model =
                     | shared = shared
                     , alarm =
                         -- Handle alarm (command) as separate from the evolve method ?
-                        case event.content of
+                        case event of
                             Peers.Events.Clock (Peers.Events.Started _) ->
                                 Stopped
 
@@ -188,7 +188,8 @@ update msg model =
             { model = model
             , command =
                 Peers.Events.Started
-                    { alarm = sound
+                    { time = model.now
+                    , alarm = sound
                     , length =
                         Duration.div model.shared.turnLength <|
                             if model.dev then
@@ -198,7 +199,7 @@ update msg model =
                                 1
                     }
                     |> Peers.Events.Clock
-                    |> Peers.Events.MobEvent model.name model.now (peerId model.clockSync)
+                    |> Peers.Events.MobEvent model.name
                     |> Peers.Events.mobEventToJson
                     |> Peers.Events.sendEvent
             , toasts = []
@@ -231,13 +232,7 @@ update msg model =
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
-                    Pages.Mob.Mobbers.Settings.update
-                        subMsg
-                        model.shared.mobbers
-                        model.name
-                        (peerId model.clockSync)
-                        model.now
-                        model.mobbersSettings
+                    Pages.Mob.Mobbers.Settings.update subMsg model.shared.mobbers model.name model.mobbersSettings
             in
             { model =
                 { model
@@ -262,12 +257,7 @@ update msg model =
         GotClockSettingsMsg subMsg ->
             let
                 ( clockSettings, command ) =
-                    Pages.Mob.Clocks.Settings.update
-                        subMsg
-                        model.clockSettings
-                        model.name
-                        (peerId model.clockSync)
-                        model.now
+                    Pages.Mob.Clocks.Settings.update subMsg model.clockSettings model.name
             in
             { model = { model | clockSettings = clockSettings }
             , command = Cmd.map GotClockSettingsMsg command
@@ -312,11 +302,11 @@ type alias Keystroke =
     }
 
 
-subscriptions : Peers.Sync.Adapter.Model -> Sub Msg
-subscriptions syncModel =
+subscriptions : Sub Msg
+subscriptions =
     Sub.batch
-        [ Peers.Events.receiveOne <| Peers.Events.fromJson >> adjustTime syncModel >> ReceivedEvent
-        , Peers.Events.receiveHistory <| List.map (Peers.Events.fromJson >> adjustTime syncModel) >> ReceivedHistory
+        [ Peers.Events.receiveOne <| Peers.Events.fromJson >> ReceivedEvent
+        , Peers.Events.receiveHistory <| List.map Peers.Events.fromJson >> ReceivedHistory
         , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
         , onKeyUp <|
             Json.Decode.map KeyPressed <|
@@ -455,12 +445,7 @@ body model url action =
                     |> Html.map GotMobbersSettingsMsg
 
             Sound ->
-                Pages.Mob.Sound.Settings.view
-                    model.soundSettings
-                    model.name
-                    (peerId model.clockSync)
-                    model.now
-                    model.shared.soundProfile
+                Pages.Mob.Sound.Settings.view model.soundSettings model.name model.shared.soundProfile
                     |> Html.fromUnstyled
                     |> Html.map GotSoundSettingsMsg
 
@@ -494,7 +479,7 @@ detectAction model =
             { icon = Lib.Icons.Ion.stop |> fromUnstyled
             , message =
                 Peers.Events.Clock Peers.Events.Stopped
-                    |> Peers.Events.MobEvent model.name model.now (peerId model.clockSync)
+                    |> Peers.Events.MobEvent model.name
                     |> ShareEvent
             , class = "on"
             , text =
@@ -512,7 +497,7 @@ detectAction model =
                 { icon = Lib.Icons.Ion.coffee |> fromUnstyled
                 , message =
                     Peers.Events.PomodoroStopped
-                        |> Peers.Events.MobEvent model.name model.now (peerId model.clockSync)
+                        |> Peers.Events.MobEvent model.name
                         |> ShareEvent
                 , class = ""
                 , text = []
