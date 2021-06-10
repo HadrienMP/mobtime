@@ -6,6 +6,8 @@ import Lib.Duration exposing (Duration)
 import Pages.Mob.Mobbers.Mobber as Mobber exposing (Mobber)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Sound.Library
+import Peers.Sync.Adapter
+import Peers.Sync.Core exposing (PeerId)
 import Time
 
 
@@ -19,14 +21,29 @@ port sendEvent : Json.Encode.Value -> Cmd msg
 
 
 type ClockEvent
-    = Started { time : Time.Posix, alarm : Pages.Mob.Sound.Library.Sound, length : Duration }
+    = Started { alarm : Pages.Mob.Sound.Library.Sound, length : Duration }
     | Stopped
 
 
 type alias MobEvent =
     { mob : String
+    , time : Time.Posix
+    , peer : Maybe PeerId
     , content : Event
     }
+
+
+type alias InEvent =
+    { content : Event
+    , peer : Maybe PeerId
+    , time : Time.Posix
+    }
+
+
+adjustTime : Peers.Sync.Adapter.Model -> InEvent -> InEvent
+adjustTime syncModel inEvent =
+    InEvent inEvent.content inEvent.peer <|
+        Peers.Sync.Adapter.adjust inEvent.time inEvent.peer syncModel
 
 
 type Event
@@ -46,16 +63,24 @@ type Event
 -- DECODING
 
 
-fromJson : Json.Decode.Value -> Event
+fromJson : Json.Decode.Value -> InEvent
 fromJson value =
     Json.Decode.decodeValue eventDecoder value
-        |> Result.withDefault (Unknown value)
+        |> Result.withDefault (InEvent (Unknown value) Nothing (Time.millisToPosix 0))
 
 
-eventDecoder : Json.Decode.Decoder Event
+eventDecoder : Json.Decode.Decoder InEvent
 eventDecoder =
     Json.Decode.field "name" Json.Decode.string
         |> Json.Decode.andThen eventFromNameDecoder
+        |> Json.Decode.andThen decodeInEvent
+
+
+decodeInEvent : Event -> Json.Decode.Decoder InEvent
+decodeInEvent event =
+    Json.Decode.map2 (InEvent event)
+        (Json.Decode.maybe <| Json.Decode.field "peerId" Json.Decode.string)
+        (Json.Decode.field "time" timeDecoder)
 
 
 eventFromNameDecoder : String -> Json.Decode.Decoder Event
@@ -106,9 +131,8 @@ eventFromNameDecoder eventName =
 
 startedDecoder : Json.Decode.Decoder Event
 startedDecoder =
-    Json.Decode.map3
-        (\start alarm length -> Clock <| Started { time = start, alarm = alarm, length = length })
-        (Json.Decode.field "time" timeDecoder)
+    Json.Decode.map2
+        (\alarm length -> Clock <| Started { alarm = alarm, length = length })
         (Json.Decode.field "alarm" Json.Decode.string)
         (Json.Decode.field "length" Lib.Duration.jsonDecoder)
 
@@ -126,6 +150,8 @@ mobEventToJson : MobEvent -> Json.Encode.Value
 mobEventToJson event =
     eventToJson event.content
         |> (::) ( "mob", Json.Encode.string event.mob )
+        |> (::) ( "peerId", event.peer |> Maybe.map Json.Encode.string |> Maybe.withDefault Json.Encode.null )
+        |> (::) ( "time", Json.Encode.int <| Time.posixToMillis event.time )
         |> Json.Encode.object
 
 
@@ -182,7 +208,6 @@ clockEventToJson clockEvent =
     case clockEvent of
         Started started ->
             [ ( "name", Json.Encode.string "Started" )
-            , ( "time", Json.Encode.int <| Time.posixToMillis started.time )
             , ( "alarm", Json.Encode.string started.alarm )
             , ( "length", Lib.Duration.toJson started.length )
             ]

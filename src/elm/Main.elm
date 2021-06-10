@@ -70,8 +70,11 @@ init preferences url key =
       , toasts = []
       , displayModal =
             case page of
-                LoginModel _ -> False
-                MobModel _ -> True
+                LoginModel _ ->
+                    False
+
+                MobModel _ ->
+                    True
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -194,12 +197,22 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch
-        [ Pages.Mob.Main.subscriptions |> Sub.map GotMobMsg
-        , Time.every 500 TimePassed
-        , Js.Events.events (dispatch jsEventsMapping)
-        ]
+subscriptions model =
+    Sub.batch <|
+        pageSubscriptions model.page
+            :: [ Time.every 500 TimePassed
+               , Js.Events.events (dispatch jsEventsMapping)
+               ]
+
+
+pageSubscriptions : PageModel -> Sub Msg
+pageSubscriptions model =
+    case model of
+        MobModel mob ->
+            Pages.Mob.Main.subscriptions mob.clockSync |> Sub.map GotMobMsg
+
+        _ ->
+            Sub.none
 
 
 dispatch : EventsMapping Msg -> Js.Events.Event -> Msg
@@ -260,4 +273,3 @@ soundModal model =
 
     else
         []
-

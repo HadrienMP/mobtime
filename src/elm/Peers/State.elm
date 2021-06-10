@@ -56,15 +56,15 @@ timePassed now state =
     }
 
 
-evolve : Events.Event -> State -> ( State, Cmd msg )
+evolve : Events.InEvent -> State -> ( State, Cmd msg )
 evolve event state =
     evolve_ event (state, Cmd.none)
 
-evolve_ : Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
+evolve_ : Events.InEvent -> ( State, Cmd msg ) -> ( State, Cmd msg )
 evolve_ event (state, previousCommand) =
-    case event of
+    case event.content of
         Events.Clock clockEvent ->
-            evolveClock clockEvent state
+            evolveClock clockEvent event.time state
 
         Events.AddedMobber mobber ->
             ( { state | mobbers = Mobbers.add mobber state.mobbers }
@@ -112,12 +112,12 @@ evolve_ event (state, previousCommand) =
             )
 
 
-evolveMany : List Events.Event -> State -> (State, Cmd msg)
+evolveMany : List Events.InEvent -> State -> (State, Cmd msg)
 evolveMany events model =
     evolveMany_ events (model, Cmd.none)
 
 
-evolveMany_ : List Events.Event -> (State, Cmd msg) -> (State, Cmd msg)
+evolveMany_ : List Events.InEvent -> (State, Cmd msg) -> (State, Cmd msg)
 evolveMany_ events previous =
     case uncons events of
         ( Nothing, _ ) ->
@@ -128,14 +128,14 @@ evolveMany_ events previous =
             |> evolveMany_ others
 
 
-evolveClock : Events.ClockEvent -> State -> ( State, Cmd msg )
-evolveClock event state =
+evolveClock : Events.ClockEvent -> Time.Posix -> State -> ( State, Cmd msg )
+evolveClock event eventTime state =
     case ( event, state.clock ) of
         ( Events.Started started, Off ) ->
             ( { state
                 | clock =
                     On
-                        { end = Duration.addToTime started.length started.time
+                        { end = Duration.addToTime started.length eventTime
                         , length = started.length
                         , ended = False
                         }
@@ -146,7 +146,7 @@ evolveClock event state =
 
                         Off ->
                             On
-                                { end = Duration.addToTime state.pomodoroLength started.time
+                                { end = Duration.addToTime state.pomodoroLength eventTime
                                 , length = state.pomodoroLength
                                 , ended = False
                                 }

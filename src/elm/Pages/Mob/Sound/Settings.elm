@@ -9,6 +9,8 @@ import Lib.Icons.Ion
 import Pages.Mob.Name exposing (MobName)
 import Peers.Events
 import Pages.Mob.Sound.Library as SoundLibrary
+import Peers.Sync.Core exposing (PeerId)
+import Time
 
 
 type alias CommandPort =
@@ -53,8 +55,8 @@ update msg model =
             )
 
 
-view : Model -> MobName -> SoundLibrary.Profile -> Html Msg
-view model mob profile =
+view : Model -> MobName -> Maybe PeerId -> Time.Posix -> SoundLibrary.Profile -> Html Msg
+view model mob peer now profile =
     div [ id "sound", class "tab" ]
         [ div
             [ id "volume-field", class "form-field" ]
@@ -80,7 +82,7 @@ view model mob profile =
                     , onClick
                         (SoundLibrary.ClassicWeird
                             |> Peers.Events.SelectedMusicProfile
-                            |> Peers.Events.MobEvent mob
+                            |> Peers.Events.MobEvent mob now peer
                             |> ShareEvent
                         )
                     ]
@@ -92,7 +94,7 @@ view model mob profile =
                     , onClick
                         (SoundLibrary.Riot
                             |> Peers.Events.SelectedMusicProfile
-                            |> Peers.Events.MobEvent mob
+                            |> Peers.Events.MobEvent mob now peer
                             |> ShareEvent
                         )
                     ]
