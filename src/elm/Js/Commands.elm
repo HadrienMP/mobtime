@@ -14,7 +14,6 @@ type Command
     | CopyInPasteBin String
     | ChangeVolume Int
     | Join String
-    | EnableSound
 
 
 type alias OutCommand =
@@ -44,8 +43,3 @@ send command =
 
             Join mobName ->
                 OutCommand "Join" <| Json.Encode.string mobName
-
-            EnableSound ->
-                OutCommand "EnableSound" Json.Encode.null
-
-

@@ -2,7 +2,7 @@ module Peers.State_Spec exposing (..)
 
 import Expect
 import Js.Commands
-import Lib.Duration as Duration exposing (Duration)
+import Lib.Duration as Duration
 import Pages.Mob.Clocks.Clock as Clock
 import Pages.Mob.Sound.Library as Library
 import Peers.Events exposing (ClockEvent(..), Event(..))
@@ -83,24 +83,25 @@ suite =
                     in
                     command
                         |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
-            , skip <| test "only the first alarm is kept for a duplicate start event" <|
-                \_ ->
-                    let
-                        alarm =
-                            Library.default
+            , skip <|
+                test "only the first alarm is kept for a duplicate start event" <|
+                    \_ ->
+                        let
+                            alarm =
+                                Library.default
 
-                        started =
-                            Clock <| turnOnWithAlarm alarm
+                            started =
+                                Clock <| turnOnWithAlarm alarm
 
-                        startedDuplicated =
-                            Clock <| turnOnWithAlarm "some sound"
+                            startedDuplicated =
+                                Clock <| turnOnWithAlarm "some sound"
 
-                        ( _, command ) =
-                            Peers.State.init
-                                |> Peers.State.evolveMany [ started, startedDuplicated ]
-                    in
-                    command
-                        |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
+                            ( _, command ) =
+                                Peers.State.init
+                                    |> Peers.State.evolveMany [ started, startedDuplicated ]
+                        in
+                        command
+                            |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
             ]
         ]
 

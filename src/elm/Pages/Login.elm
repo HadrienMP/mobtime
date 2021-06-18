@@ -5,11 +5,11 @@ module Pages.Login exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Footer
-import Html exposing (Html, button, div, form, h1, header, i, input, label, text)
+import Html exposing (button, div, form, h1, header, input, label, text)
 import Html.Attributes exposing (class, for, id, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Lib.Icons.Ion
-import Lib.Toaster exposing (Toasts)
+import Lib.Toaster
 import Lib.UpdateResult exposing (UpdateResult)
 import Slug
 

@@ -3,10 +3,10 @@ module Lib.Toaster exposing (..)
 import Html exposing (Html, div, i, section, span, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
+import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
 import Lib.Icons.Ion
-import Js.Events
 
 
 
@@ -25,13 +25,16 @@ type alias Toast =
     , content : String
     }
 
+
 info : String -> Toast
 info content =
     Toast Error content
 
+
 error : String -> Toast
 error content =
     Toast Error content
+
 
 type alias Toasts =
     List Toast

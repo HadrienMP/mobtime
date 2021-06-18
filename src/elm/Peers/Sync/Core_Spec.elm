@@ -1,8 +1,8 @@
 module Peers.Sync.Core_Spec exposing (..)
 
-import Expect exposing (Expectation)
+import Expect
 import Iso8601
-import Peers.Sync.Core exposing (CommandType(..), Message, Recipient(..), adjustTimeFrom, handle, start)
+import Peers.Sync.Core exposing (CommandType(..), Recipient(..), adjustTimeFrom, handle, start)
 import Test exposing (Test, describe, skip, test)
 import Time
 
@@ -155,30 +155,31 @@ suite =
                     in
                     [ command2, command3 ]
                         |> Expect.equal
-                            ([ Just { context = { peerId = "peer 2", time = (toPosix "T00:00:04"), syncId = syncId }
-                               , type_ = ExchangeTime
-                               , recipient = Peer "peer 1"
-                               }
-                             , Nothing
-                             ]
-                            )
+                            [ Just
+                                { context = { peerId = "peer 2", time = toPosix "T00:00:04", syncId = syncId }
+                                , type_ = ExchangeTime
+                                , recipient = Peer "peer 1"
+                                }
+                            , Nothing
+                            ]
             ]
-        , skip <| test "ignores messages for an unknown sync id" <|
-            \_ ->
-                let
-                    ( state1, _ ) =
-                        start { peerId = "peer 1", time = toPosix "T00:00:01", syncId = "syncId" }
+        , skip <|
+            test "ignores messages for an unknown sync id" <|
+                \_ ->
+                    let
+                        ( state1, _ ) =
+                            start { peerId = "peer 1", time = toPosix "T00:00:01", syncId = "syncId" }
 
-                    ( state2, _ ) =
-                        handle
-                            { context = { peerId = "peer 2", time = toPosix "T00:00:04", syncId = "unknown" }
-                            , type_ = ExchangeTime
-                            , recipient = Peer "peer 2"
-                            }
-                            (toPosix "T00:00:05")
-                            state1
-                in
-                Expect.equal state1 state2
+                        ( state2, _ ) =
+                            handle
+                                { context = { peerId = "peer 2", time = toPosix "T00:00:04", syncId = "unknown" }
+                                , type_ = ExchangeTime
+                                , recipient = Peer "peer 2"
+                                }
+                                (toPosix "T00:00:05")
+                                state1
+                    in
+                    Expect.equal state1 state2
         ]
 
 

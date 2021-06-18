@@ -11,7 +11,7 @@ import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
 import Lib.Circle
-import Lib.Duration as Duration exposing (Duration)
+import Lib.Duration as Duration
 import Lib.Icons.Ion
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
@@ -101,7 +101,6 @@ type Msg
     | StartWithAlarm Pages.Mob.Sound.Library.Sound
     | StopSound
     | AlarmEnded
-    | UnknownEvent
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Clocks.Settings.Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
@@ -213,12 +212,6 @@ update msg model =
 
         AlarmEnded ->
             { model = { model | alarm = Stopped }
-            , command = Cmd.none
-            , toasts = []
-            }
-
-        UnknownEvent ->
-            { model = model
             , command = Cmd.none
             , toasts = []
             }

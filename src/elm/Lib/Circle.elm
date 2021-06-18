@@ -1,8 +1,8 @@
-module Lib.Circle exposing (Circle, Coordinates, Stroke, draw, drawWithoutInsideBorder, inside)
+module Lib.Circle exposing (Circle, Coordinates, Stroke, draw, inside)
 
 import Lib.Ratio as Ratio exposing (Ratio)
 import Svg.Styled as Svg exposing (Svg)
-import Svg.Styled.Attributes exposing (css, cx, cy, fillOpacity, r, stroke, strokeDasharray, strokeDashoffset, strokeWidth)
+import Svg.Styled.Attributes exposing (cx, cy, fillOpacity, r, stroke, strokeDasharray, strokeDashoffset, strokeWidth)
 
 
 borderStroke : Stroke
@@ -40,13 +40,6 @@ inside outer stroke =
 draw : Circle -> Ratio -> List (Svg msg)
 draw circle ratio =
     circles circle ratio 2
-        |> List.map (\( c, r ) -> draw_ c r)
-
-
-drawWithoutInsideBorder : Circle -> Ratio -> List (Svg msg)
-drawWithoutInsideBorder circle ratio =
-    circles circle ratio 1
-        |> List.take 3
         |> List.map (\( c, r ) -> draw_ c r)
 
 

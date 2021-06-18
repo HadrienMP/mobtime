@@ -1,6 +1,6 @@
 port module Peers.Sync.Adapter exposing (..)
 
-import Js.Events exposing (..)
+import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Toaster
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
@@ -52,24 +52,25 @@ update msg m now =
             updateStarting msg starting
                 |> finish
 
-        Started {model, mob} ->
+        Started { model, mob } ->
             case msg of
                 GotPeerMessage result ->
                     case result of
                         Ok syncMessage ->
                             Peers.Sync.Core.handle syncMessage now model
-                            |> (\(subM, message) ->
-                                { model = Started {model = subM, mob = mob }
-                                , command = message |> Maybe.map (Message.fromCore mob >> clockSyncOutMessage) |> Maybe.withDefault Cmd.none
-                                , toasts = []
-                                }
-                            )
+                                |> (\( subM, message ) ->
+                                        { model = Started { model = subM, mob = mob }
+                                        , command = message |> Maybe.map (Message.fromCore mob >> clockSyncOutMessage) |> Maybe.withDefault Cmd.none
+                                        , toasts = []
+                                        }
+                                   )
 
                         Err error ->
                             { model = m
                             , command = Cmd.none
-                            , toasts = [Lib.Toaster.error <| "Could not parse the clock sync message: " ++ error]
+                            , toasts = [ Lib.Toaster.error <| "Could not parse the clock sync message: " ++ error ]
                             }
+
                 _ ->
                     UpdateResult.fromModel m
 
@@ -77,12 +78,11 @@ update msg m now =
 adjust : Time.Posix -> PeerId -> Model -> Time.Posix
 adjust time peer m =
     case m of
-        Starting startingModel ->
+        Starting _ ->
             time
 
-        Started {model} ->
+        Started { model } ->
             Peers.Sync.Core.adjustTimeFrom peer model time
-
 
 
 updateStarting : Msg -> StartingModel -> UpdateResult StartingModel Msg
@@ -126,4 +126,4 @@ subscriptions =
 
 jsEventMapping : EventsMapping Msg
 jsEventMapping =
-    EventsMapping.create [ Js.Events.EventMessage "GotSocketId" GotSocketId]
+    EventsMapping.create [ Js.Events.EventMessage "GotSocketId" GotSocketId ]

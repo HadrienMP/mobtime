@@ -1,6 +1,6 @@
 module Pages.Mob.Tabs.Share exposing (..)
 
-import Html exposing (Html, button, div, i, span, strong, text)
+import Html exposing (Html, button, div, span, strong, text)
 import Html.Attributes exposing (class, id, title)
 import Html.Events exposing (onClick)
 import Js.Commands

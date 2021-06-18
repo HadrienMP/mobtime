@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (Html, button, div, h2, p, text)
+import Html exposing (Html, button, div, h2, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Js.Commands
@@ -12,7 +12,6 @@ import Lib.BatchMsg
 import Lib.DocumentExtras
 import Lib.Icons.Ion
 import Lib.Toaster exposing (Toasts)
-import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Login
 import Pages.Mob.Main
 import Pages.Routing
@@ -70,8 +69,11 @@ init preferences url key =
       , toasts = []
       , displayModal =
             case page of
-                LoginModel _ -> False
-                MobModel _ -> True
+                LoginModel _ ->
+                    False
+
+                MobModel _ ->
+                    True
       }
     , Cmd.batch
         [ Task.perform TimePassed Time.now
@@ -260,4 +262,3 @@ soundModal model =
 
     else
         []
-

@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "node server/app.js",
+		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all",
 		"dev:all": "concurrently --kill-others \"npm run dev:build-front\" \"npm run dev:server\"",
 		"dev:build-front": "elm-live src/elm/Main.elm --dir=./public/js --no-server -- --output=./public/js/main.js --debug",
 		"dev:server": "nodemon server/app.js",
@@ -17,6 +18,7 @@
 	"devDependencies": {
 		"concurrently": "^5.3.0",
 		"elm-live": "^4.0.2",
+		"elm-review": "^2.5.3",
 		"https-local": "^1.0.0",
 		"nodemon": "^2.0.7",
 		"release-it": "^14.4.1"

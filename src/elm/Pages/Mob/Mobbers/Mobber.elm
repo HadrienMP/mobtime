@@ -1,6 +1,5 @@
 module Pages.Mob.Mobbers.Mobber exposing (..)
 
-import Dict exposing (Dict)
 import Json.Decode
 import Json.Encode
 import Uuid exposing (Uuid)
