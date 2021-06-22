@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
         io.in(room).emit('message', message);
     });
     socket.on('sync', (room, message) => {
-        let channel = io.in(room);
+        let channel = socket.to(room);
         if (message.recipient)
             channel = io.to(message.recipient);
         channel.emit('sync', message);

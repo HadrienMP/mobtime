@@ -8,6 +8,10 @@ import Ionicon.Social
 import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
 
+code : Svg msg
+code =
+    display Ionicon.code
+
 batteryLow : Svg msg
 batteryLow =
     display Ionicon.batteryLow

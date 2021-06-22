@@ -14,6 +14,7 @@ type Command
     | CopyInPasteBin String
     | ChangeVolume Int
     | Join String
+    | GetSocketId
 
 
 type alias OutCommand =
@@ -43,3 +44,7 @@ send command =
 
             Join mobName ->
                 OutCommand "Join" <| Json.Encode.string mobName
+
+            GetSocketId ->
+                OutCommand "GetSocketId" Json.Encode.null
+

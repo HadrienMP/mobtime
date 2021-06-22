@@ -20,11 +20,13 @@ import Pages.Mob.Mobbers.Settings
 import Pages.Mob.Name exposing (MobName)
 import Pages.Mob.Sound.Library
 import Pages.Mob.Sound.Settings
+import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Share
 import Peers.Events
 import Peers.State
 import Peers.Sync.Adapter exposing (Msg(..))
+import Peers.Sync.Core exposing (PeerId)
 import Random
 import Svg.Styled exposing (Svg, svg)
 import Svg.Styled.Attributes as Svg
@@ -49,6 +51,7 @@ type Tab
     | Clock
     | Sound
     | Share
+    | Dev
 
 
 type alias Model =
@@ -62,6 +65,7 @@ type alias Model =
     , now : Time.Posix
     , tab : Tab
     , dev : Bool
+    , peerId : Maybe PeerId
     }
 
 
@@ -81,6 +85,7 @@ init name preferences =
       , now = Time.millisToPosix 0
       , tab = Main
       , dev = False
+      , peerId = Nothing
       }
     , Cmd.batch
         [ Js.Commands.send <| Js.Commands.Join name
@@ -104,11 +109,13 @@ type Msg
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Clocks.Settings.Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
+    | GotDevTabMsg Pages.Mob.Tabs.Dev.Msg
     | GotMobbersSettingsMsg Pages.Mob.Mobbers.Settings.Msg
     | GotSoundSettingsMsg Pages.Mob.Sound.Settings.Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
     | KeyPressed Keystroke
+    | GotSocketId PeerId
 
 
 timePassed : Time.Posix -> Model -> ( Model, Cmd Msg )
@@ -247,6 +254,12 @@ update msg model =
             , toasts = []
             }
 
+        GotDevTabMsg sub ->
+            { model = model
+            , command = Pages.Mob.Tabs.Dev.update sub |> Cmd.map GotDevTabMsg
+            , toasts = []
+            }
+
         GotClockSettingsMsg subMsg ->
             let
                 ( clockSettings, command ) =
@@ -282,6 +295,9 @@ update msg model =
                     (\m -> { model | clockSync = m })
                     (Cmd.map GotClockSyncMsg)
 
+        GotSocketId peerId ->
+            UpdateResult.fromModel { model | peerId = Just peerId }
+
 
 
 -- SUBSCRIPTIONS
@@ -316,7 +332,7 @@ jsEventMapping =
     EventsMapping.batch
         [ EventsMapping.create <|
             [ Js.Events.EventMessage "AlarmEnded" (\_ -> AlarmEnded)
-            , Js.Events.EventMessage "SocketConnected" (GotClockSyncMsg << GotSocketId)
+            , Js.Events.EventMessage "SocketConnected" GotSocketId
             ]
         , EventsMapping.map GotClockSyncMsg Peers.Sync.Adapter.jsEventMapping
         ]
@@ -390,37 +406,50 @@ body model url action =
                 ]
             ]
         , nav []
-            [ button
+            ([ button
                 [ onClick <| SwitchTab Main
                 , classList [ ( "active", model.tab == Main ) ]
                 , title "Home"
                 ]
                 [ Lib.Icons.Ion.home |> fromUnstyled ]
-            , button
+             , button
                 [ onClick <| SwitchTab Clock
                 , classList [ ( "active", model.tab == Clock ) ]
                 , title "Clock Settings"
                 ]
                 [ Lib.Icons.Ion.clock |> fromUnstyled ]
-            , button
+             , button
                 [ onClick <| SwitchTab Mobbers
                 , classList [ ( "active", model.tab == Mobbers ) ]
                 , title "Mobbers"
                 ]
                 [ Lib.Icons.Ion.people |> fromUnstyled ]
-            , button
+             , button
                 [ onClick <| SwitchTab Sound
                 , classList [ ( "active", model.tab == Sound ) ]
                 , title "Sound Settings"
                 ]
                 [ Lib.Icons.Ion.sound |> fromUnstyled ]
-            , button
+             , button
                 [ onClick <| SwitchTab Share
                 , classList [ ( "active", model.tab == Share ) ]
                 , title "Share"
                 ]
                 [ Lib.Icons.Ion.share |> fromUnstyled ]
-            ]
+             ]
+                ++ (if model.dev then
+                        [ button
+                            [ onClick <| SwitchTab Dev
+                            , classList [ ( "active", model.tab == Dev ) ]
+                            , title "Dev"
+                            ]
+                            [ Lib.Icons.Ion.code |> fromUnstyled ]
+                        ]
+
+                    else
+                        []
+                   )
+            )
         , case model.tab of
             Main ->
                 Pages.Mob.Tabs.Home.view model.name url model.shared.mobbers
@@ -446,6 +475,10 @@ body model url action =
                 Pages.Mob.Tabs.Share.view model.name url
                     |> Html.fromUnstyled
                     |> Html.map GotShareTabMsg
+
+            Dev ->
+                Pages.Mob.Tabs.Dev.view model.clockSync
+                    |> Html.map GotDevTabMsg
         ]
     ]
 

@@ -96,6 +96,11 @@
                 window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
                 Howler.volume(parseInt(command.value) / 100.0);
                 break;
+            case 'GetSocketId':
+                // If there is no socket id, it means we are still connecting and so the event will be sent when the connection is established
+                if (socket.id)
+                    app.ports.events.send({name: "GotSocketId", value: socket.id});
+                break;
         }
     });
 

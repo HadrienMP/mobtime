@@ -1,5 +1,6 @@
 port module Peers.Sync.Adapter exposing (..)
 
+import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Toaster
@@ -40,6 +41,7 @@ init mob =
     ( Starting { peerId = Nothing, syncId = Nothing, time = Nothing, mob = mob }
     , Cmd.batch
         [ Random.generate SyncIdGenerated Uuid.uuidGenerator
+        , Js.Commands.send Js.Commands.GetSocketId
         , Task.perform GotTime Time.now
         ]
     )
