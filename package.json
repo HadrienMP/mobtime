@@ -12,6 +12,7 @@
 		"release": "./dist.sh && git status && release-it --ci",
 		"test": "npx elm-test --watch \"./src/elm/**/*Spec.elm\""
 	},
+	"des": "bétises",
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
@@ -35,6 +36,7 @@
 		}
 	},
 	"dependencies": {
+		"elm": "^0.19.1-5",
 		"elm-test": "^0.19.1-revision6",
 		"express": "^4.17.1",
 		"socket.io": "^3.1.2"
