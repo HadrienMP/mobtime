@@ -30,41 +30,52 @@ update msg =
 view : Peers.Sync.Adapter.Model -> Html Msg
 view model =
     div [ id "dev", class "tab" ]
-        [ toto model
+        (case model of
+            Peers.Sync.Adapter.Starting _ ->
+                [ div [] [ text "Starting..." ] ]
+
+            Peers.Sync.Adapter.Started started ->
+                [ displayTimeAdjustments started ]
+        )
+
+
+displayTimeAdjustments started =
+    div []
+        [ p [] [ text ("Me " ++ started.model.context.peerId) ]
+        , dl []
+            (started.model.adjustments
+                |> Dict.toList
+                |> List.map (\( key, value ) -> [ dd [] [ text key ], dt [] [ displayTimeAdjusment value ] ])
+                |> List.foldr List.append []
+            )
         ]
 
 
-toto : Peers.Sync.Adapter.Model -> Html Msg
-toto model =
-    case model of
-        Peers.Sync.Adapter.Starting _ ->
-            div [] [ text "Starting..." ]
-
-        Peers.Sync.Adapter.Started record ->
-            div []
-                [ p [] [ text ("Me " ++ record.model.context.peerId) ]
-                , dl []
-                    (record.model.adjustments
-                        |> Dict.toList
-                        |> List.map (\( key, value ) -> [ dd [] [ text key ], dt [] [ tata value ] ])
-                        |> List.foldr List.append []
-                    )
-                ]
-
-
-tata : TimeAdjustment -> Html Msg
-tata timeAdjustment =
+displayTimeAdjusment : TimeAdjustment -> Html Msg
+displayTimeAdjusment timeAdjustment =
     case timeAdjustment of
-        RequestedAt posix ->
+        RequestedAt _ ->
             div [] [ text "Requested" ]
 
         Fixed duration ->
-            div [] [ print_delta duration |> text ]
+            div [] [ durationtoString duration |> text ]
 
-print_delta : Duration -> String
-print_delta duration =
-    Duration.toMillis duration
-    |> toFloat
-    |> (\ms -> ms / 1000)
-    |> String.fromFloat
-    |> (\a -> a ++ " s")
+
+durationtoString : Duration -> String
+durationtoString duration =
+    let
+        m =
+            Duration.toMinutes duration
+
+        seconds_left =
+            Duration.ofMinutes m
+                |> Duration.subtract duration
+
+        s =
+            seconds_left
+                |> Duration.toMillis
+                |> toFloat
+                |> abs
+                |> (\ms -> ms / 1000)
+    in
+    String.fromInt m ++ ":" ++ String.fromFloat s
