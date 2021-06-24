@@ -1,0 +1,29 @@
+@import "../theme";
+
+#dev.tab {
+  strong {
+    font-weight: bold;
+  }
+  table {
+    margin: $margin-space 0;
+    padding: $padding-space 0;
+    width: 100%;
+
+    tr:first-child {
+      border-bottom: 1px solid;
+
+      th {
+        font-weight: bold;
+      }
+    }
+
+    td, th {
+      text-align: right;
+      padding: $padding-space 0;
+    }
+    td:first-child, th:first-child {
+      width: 75%;
+      text-align: left;
+    }
+  }
+}

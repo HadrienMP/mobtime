@@ -1,7 +1,7 @@
 module Pages.Mob.Tabs.Dev exposing (..)
 
 import Dict
-import Html.Styled exposing (Html, dd, div, dl, dt, p, text)
+import Html.Styled exposing (Html, div, p, strong, table, td, text, th, tr)
 import Html.Styled.Attributes exposing (class, id)
 import Lib.Duration as Duration exposing (Duration(..))
 import Peers.Sync.Adapter
@@ -41,28 +41,33 @@ view model =
 
 displayTimeAdjustments started =
     div []
-        [ p [] [ text ("Me " ++ started.model.context.peerId) ]
-        , dl []
-            (started.model.adjustments
-                |> Dict.toList
-                |> List.map (\( key, value ) -> [ dd [] [ text key ], dt [] [ displayTimeAdjusment value ] ])
-                |> List.foldr List.append []
+        [ p [] [ strong [] [text "Peer Id: "], text started.model.context.peerId ]
+        , table []
+            ([ tr []
+                [ th [] [ text "Peer" ]
+                , th [] [ text "Adjustment" ]
+                ]
+             ]
+                ++ (started.model.adjustments
+                        |> Dict.toList
+                        |> List.map (\( key, value ) -> tr [] [ td [] [ text key ], td [] [ displayTimeAdjustment value ] ])
+                   )
             )
         ]
 
 
-displayTimeAdjusment : TimeAdjustment -> Html Msg
-displayTimeAdjusment timeAdjustment =
+displayTimeAdjustment : TimeAdjustment -> Html Msg
+displayTimeAdjustment timeAdjustment =
     case timeAdjustment of
         RequestedAt _ ->
             div [] [ text "Requested" ]
 
         Fixed duration ->
-            div [] [ durationtoString duration |> text ]
+            div [] [ durationToString duration |> text ]
 
 
-durationtoString : Duration -> String
-durationtoString duration =
+durationToString : Duration -> String
+durationToString duration =
     let
         m =
             Duration.toMinutes duration
