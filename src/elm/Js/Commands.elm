@@ -15,6 +15,7 @@ type Command
     | ChangeVolume Int
     | Join String
     | GetSocketId
+    | TestTheSound
 
 
 type alias OutCommand =
@@ -47,4 +48,8 @@ send command =
 
             GetSocketId ->
                 OutCommand "GetSocketId" Json.Encode.null
+
+            TestTheSound ->
+                OutCommand "TestTheSound" Json.Encode.null
+
 

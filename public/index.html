@@ -27,7 +27,7 @@
         flags: JSON.parse(window.localStorage.getItem("preferences")) || {volume: 50}
     });
 
-    let alarm = load('/sound/silence.mp3');
+    let alarm = load('/sound/silence.mp3').play();
 
     // -----------------------------------------
     // Tooltips
@@ -62,7 +62,7 @@
     socket.on('connect', () => {
         app.ports.events.send({name: "GotSocketId", value: socket.id});
     });
-   app.ports.clockSyncOutMessage.subscribe(message => {
+    app.ports.clockSyncOutMessage.subscribe(message => {
         console.log("out", message);
         socket.emit("sync", message.mob, message);
     });
@@ -101,6 +101,13 @@
                 if (socket.id)
                     app.ports.events.send({name: "GotSocketId", value: socket.id});
                 break;
+            case 'TestTheSound':
+                Howler.stop();
+                new Howl({
+                    src: ["/sound/hello.mp3"],
+                    onplayerror: console.error,
+                }).play();
+                break;
         }
     });
 
@@ -112,6 +119,7 @@
             },
         });
     }
+
 </script>
 </body>
 </html>

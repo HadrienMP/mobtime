@@ -5,10 +5,10 @@ import Html.Attributes exposing (alt, class, classList, for, id, src, step, type
 import Html.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
-import Lib.Icons.Ion
+import Lib.Icons.Ion exposing (musicNote)
 import Pages.Mob.Name exposing (MobName)
-import Peers.Events
 import Pages.Mob.Sound.Library as SoundLibrary
+import Peers.Events
 
 
 type alias CommandPort =
@@ -31,6 +31,7 @@ init volume =
 type Msg
     = VolumeChanged String
     | ShareEvent Peers.Events.MobEvent
+    | TestTheSound
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -52,6 +53,11 @@ update msg model =
                 |> Peers.Events.sendEvent
             )
 
+        TestTheSound ->
+            ( model
+            , Js.Commands.send <| Js.Commands.TestTheSound
+            )
+
 
 view : Model -> MobName -> SoundLibrary.Profile -> Html Msg
 view model mob profile =
@@ -70,9 +76,15 @@ view model mob profile =
                 []
             , Lib.Icons.Ion.volumeHigh
             ]
+        , button
+            [ id "test-audio"
+            , class "labelled-icon-button"
+            , onClick TestTheSound
+            ]
+            [ musicNote, text "Test the audio !" ]
         , div
             [ id "sounds-field", class "form-field" ]
-            [ label [] [ text "Profiles" ]
+            [ label [] [ text "Playlist" ]
             , div
                 [ id "sound-cards" ]
                 [ button

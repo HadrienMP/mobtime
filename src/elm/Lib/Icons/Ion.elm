@@ -4,6 +4,7 @@ import Html exposing (i)
 import Html.Attributes exposing (class)
 import Ionicon
 import Ionicon.Android
+import Ionicon.Ios
 import Ionicon.Social
 import Lib.Icons.Rgba exposing (RGBA)
 import Svg exposing (Svg)
@@ -43,6 +44,10 @@ github =
 info : Svg msg
 info =
     display Ionicon.informationCircled
+
+musicNote : Svg msg
+musicNote =
+    display Ionicon.Ios.musicalNote
 
 error : Svg msg
 error =
