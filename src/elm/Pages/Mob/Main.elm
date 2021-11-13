@@ -13,6 +13,7 @@ import Json.Decode
 import Lib.Circle
 import Lib.Duration as Duration
 import Lib.Icons.Ion
+import Lib.Toaster as Toast
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
@@ -293,7 +294,7 @@ update msg model =
             Peers.Sync.Adapter.update sub model.clockSync model.now
                 |> UpdateResult.map
                     (\m -> { model | clockSync = m })
-                    (Cmd.map GotClockSyncMsg)
+                    GotClockSyncMsg
 
         GotSocketId peerId ->
             UpdateResult.fromModel { model | peerId = Just peerId }
@@ -332,7 +333,7 @@ jsEventMapping =
     EventsMapping.batch
         [ EventsMapping.create <|
             [ Js.Events.EventMessage "AlarmEnded" (\_ -> AlarmEnded)
-            , Js.Events.EventMessage "SocketConnected" GotSocketId
+            , Js.Events.EventMessage "GotSocketId" GotSocketId
             ]
         , EventsMapping.map GotClockSyncMsg Peers.Sync.Adapter.jsEventMapping
         ]

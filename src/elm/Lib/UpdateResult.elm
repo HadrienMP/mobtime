@@ -18,9 +18,9 @@ fromModel model =
     }
 
 
-map : (model1 -> model2) -> (Cmd cmd1 -> Cmd cmd2) -> UpdateResult model1 cmd1 -> UpdateResult model2 cmd2
+map : (model1 -> model2) -> (msg -> msg2) -> UpdateResult model1 msg -> UpdateResult model2 msg2
 map modelF cmdF updateResult =
     { model = modelF updateResult.model
-    , command = cmdF updateResult.command
+    , command = Cmd.map cmdF updateResult.command
     , toasts = updateResult.toasts
     }

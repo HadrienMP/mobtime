@@ -23,17 +23,22 @@ type Level
 type alias Toast =
     { level : Level
     , content : String
+    , autoRemove: Bool
     }
 
 
-info : String -> Toast
-info content =
-    Toast Error content
+success : String -> Toast
+success content =
+    Toast Success content True
 
 
 error : String -> Toast
 error content =
-    Toast Error content
+    Toast Error content True
+
+keepOn : Toast -> Toast
+keepOn content =
+    { content | autoRemove = False }
 
 
 type alias Toasts =
@@ -71,17 +76,22 @@ add : Toasts -> Toasts -> ( Toasts, List (Cmd Msg) )
 add toAdd model =
     toAdd
         |> List.filter (\toast -> not (List.member toast model))
-        |> List.map (\toast -> ( toast, Lib.Delay.after (Lib.Delay.Seconds 10) (Remove toast) ))
+        |> List.map (\toast -> ( toast, autoRemove toast ))
         |> List.foldr (\( toast, cmd ) ( ts, cs ) -> ( toast :: ts, cmd :: cs )) ( model, [] )
 
-
+autoRemove : Toast -> Cmd Msg
+autoRemove toast =
+    if (toast.autoRemove) then
+        Lib.Delay.after (Lib.Delay.Seconds 10) (Remove toast)
+    else
+        Cmd.none
 
 -- EVENTS SUBSCRIPTIONS
 
 
 jsEventMapping : EventsMapping Msg
 jsEventMapping =
-    [ Js.Events.EventMessage "Copied" (\_ -> Add <| Toast Success "The text has been copied to your clipboard!") ]
+    [ Js.Events.EventMessage "Copied" (\_ -> Add <| success "The text has been copied to your clipboard!") ]
         |> EventsMapping.create
 
 

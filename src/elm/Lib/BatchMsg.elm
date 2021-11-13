@@ -9,8 +9,8 @@ update msg model updateF =
 
 
 update_ : List msg -> model -> List (Cmd msg) -> UpdateFunction msg model -> ( model, List (Cmd msg) )
-update_ msg model commandAcc updateF =
-    case msg of
+update_ messages model commandAcc updateF =
+    case messages of
         first :: other ->
             let
                 ( updated, command ) =

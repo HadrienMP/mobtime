@@ -27,6 +27,7 @@
         flags: JSON.parse(window.localStorage.getItem("preferences")) || {volume: 50}
     });
 
+
     let alarm = load('/sound/silence.mp3').play();
 
     // -----------------------------------------
@@ -62,6 +63,9 @@
     socket.on('connect', () => {
         app.ports.events.send({name: "GotSocketId", value: socket.id});
     });
+    socket.on("disconnect", () => {
+        app.ports.events.send({name: "SocketDisconnected", value: "" });
+    });
     app.ports.clockSyncOutMessage.subscribe(message => {
         console.log("out", message);
         socket.emit("sync", message.mob, message);
@@ -88,9 +92,15 @@
                 alarm.stop();
                 break;
             case 'CopyInPasteBin':
-                navigator.clipboard
-                    .writeText(command.value)
-                    .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
+                if (navigator.clipboard) {
+                    navigator.clipboard
+                        .writeText(command.value)
+                        .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
+                } else {
+                    command.value.select();
+                    document.execCommand('copy');
+                    app.ports.events.send({name: 'Copied', value: ""})
+                }
                 break;
             case 'ChangeVolume':
                 window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));

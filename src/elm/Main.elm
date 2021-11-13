@@ -11,7 +11,8 @@ import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.BatchMsg
 import Lib.DocumentExtras
 import Lib.Icons.Ion
-import Lib.Toaster exposing (Toasts)
+import Lib.Toaster as Toaster exposing (Toasts)
+import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Login
 import Pages.Mob.Main
 import Pages.Routing
@@ -109,9 +110,10 @@ type Msg
     | TimePassed Time.Posix
     | GotMobMsg Pages.Mob.Main.Msg
     | GotLoginMsg Pages.Login.Msg
-    | GotToastMsg Lib.Toaster.Msg
+    | GotToastMsg Toaster.Msg
     | Batch (List Msg)
     | HideModal
+    | SocketDisconnected
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -130,42 +132,16 @@ update msg model =
                 |> Tuple.mapFirst (\page -> { model | page = page, url = url })
 
         ( GotLoginMsg subMsg, LoginModel subModel ) ->
-            let
-                login =
-                    Pages.Login.update subModel subMsg model.key
-
-                ( allToasts, commands ) =
-                    Lib.Toaster.add login.toasts model.toasts
-                        |> Tuple.mapSecond (List.map (Cmd.map GotToastMsg))
-            in
-            ( { model
-                | page = LoginModel login.model
-                , toasts = allToasts
-              }
-            , Cmd.batch
-                (Cmd.map GotLoginMsg login.command
-                    :: commands
-                )
-            )
+            Pages.Login.update subModel subMsg model.key
+                |> UpdateResult.map LoginModel GotLoginMsg
+                |> handleToasts model
+                |> toElm model
 
         ( GotMobMsg subMsg, MobModel subModel ) ->
-            let
-                mob =
-                    Pages.Mob.Main.update subMsg subModel
-
-                ( allToasts, commands ) =
-                    Lib.Toaster.add mob.toasts model.toasts
-                        |> Tuple.mapSecond (List.map (Cmd.map GotToastMsg))
-            in
-            ( { model
-                | page = MobModel mob.model
-                , toasts = allToasts
-              }
-            , Cmd.batch
-                (Cmd.map GotMobMsg mob.command
-                    :: commands
-                )
-            )
+            Pages.Mob.Main.update subMsg subModel
+                |> UpdateResult.map MobModel GotMobMsg
+                |> handleToasts model
+                |> toElm model
 
         ( TimePassed now, MobModel subModel ) ->
             Pages.Mob.Main.timePassed now subModel
@@ -174,7 +150,7 @@ update msg model =
                     (Cmd.map GotMobMsg)
 
         ( GotToastMsg subMsg, _ ) ->
-            Lib.Toaster.update subMsg model.toasts
+            Toaster.update subMsg model.toasts
                 |> Tuple.mapBoth
                     (\toasts -> { model | toasts = toasts })
                     (Cmd.map GotToastMsg)
@@ -187,8 +163,48 @@ update msg model =
             , Cmd.none
             )
 
+        ( SocketDisconnected, _ ) ->
+            toast socketDisconnectedToast model
+
         _ ->
             ( model, Cmd.none )
+
+
+toElm : Model -> UpdateResult PageModel Msg -> ( Model, Cmd Msg )
+toElm model updateResult =
+    ( { model | page = updateResult.model, toasts = updateResult.toasts }, updateResult.command )
+
+
+handleToasts : Model -> UpdateResult PageModel Msg -> UpdateResult PageModel Msg
+handleToasts model result =
+    let
+        ( allToasts, toastCommands ) =
+            Toaster.add result.toasts model.toasts
+
+        command =
+            toastCommands
+                |> List.map (Cmd.map GotToastMsg)
+                |> (::) result.command
+                |> Cmd.batch
+    in
+    UpdateResult result.model command allToasts
+
+
+toast : Toaster.Toast -> Model -> ( Model, Cmd Msg )
+toast toToast model =
+    let
+        ( toasts, commands ) =
+            Toaster.add [ toToast ] model.toasts
+    in
+    ( { model | toasts = toasts }
+    , commands
+        |> List.map (Cmd.map GotToastMsg)
+        |> Cmd.batch
+    )
+
+
+socketDisconnectedToast =
+    Toaster.keepOn <| Toaster.error "You were disconnected from the server. Please refresh the page to login again."
 
 
 
@@ -213,7 +229,8 @@ jsEventsMapping : EventsMapping Msg
 jsEventsMapping =
     EventsMapping.batch
         [ EventsMapping.map GotMobMsg Pages.Mob.Main.jsEventMapping
-        , EventsMapping.map GotToastMsg Lib.Toaster.jsEventMapping
+        , EventsMapping.map GotToastMsg Toaster.jsEventMapping
+        , EventsMapping.create [ Js.Events.EventMessage "SocketDisconnected" (\_ -> SocketDisconnected) ]
         ]
 
 
@@ -237,7 +254,7 @@ view model =
     { title = doc.title
     , body =
         doc.body
-            ++ [ Lib.Toaster.view model.toasts |> Html.map GotToastMsg ]
+            ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
             ++ soundModal model
     }
 
