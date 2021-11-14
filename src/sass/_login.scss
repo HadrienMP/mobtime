@@ -2,7 +2,7 @@
 
 #login {
   header {
-    background: url("/images/mob.png") top no-repeat;
+    @include mob-header-background();
     padding-top: 300px;
 
     h1 {

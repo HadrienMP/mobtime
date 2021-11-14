@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Oswald&display=swap);
+
 $width: 433px;
 $light-bg-color: #ffffff;
 $dark-bg-color: #c9c9c9;
@@ -16,10 +18,7 @@ $info-color: #00a9eb;
 $error-color: #eb0000;
 
 @mixin mob-header-background() {
-  background: url("/images/mob.png") top no-repeat;
-
-  //background: url("/images/mob-children.png") top no-repeat;
-  //background-size: cover;
+  background: url("/public/images/mob.png") top no-repeat;
 }
 
 @mixin icon($size, $icon-color) {
