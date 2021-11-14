@@ -2,7 +2,7 @@ dist
 node_modules
 package-lock.json
 elm-stuff
-public/js/main.js
+public/js/
 public/css/main.css
 .sass-cache
 .idea
