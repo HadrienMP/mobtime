@@ -4,18 +4,25 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"build": "webpack --mode production",
 		"start": "node server/app.js",
-		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all",
+
 		"dev:all": "concurrently --kill-others \"npm run dev:build-front\" \"npm run dev:server\"",
 		"dev:build-front": "webpack --mode development --watch",
-		"build": "webpack --mode production",
 		"dev:server": "nodemon server/app.js",
-		"test": "npx elm-test --watch \"./src/elm/**/*Spec.elm\""
+
+		"test": "npx elm-test --watch \"./src/elm/**/*Spec.elm\"",
+		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"elm": "^0.19.1-5",
+		"elm-format": "^0.8.5",
+		"elm-test": "^0.19.1-revision6",
+		"elm-webpack-loader": "^8.0.0",
+		"howler": "^2.2.3",
 		"concurrently": "^5.3.0",
 		"css-loader": "^6.5.1",
 		"elm-live": "^4.0.2",
@@ -25,7 +32,11 @@
 		"release-it": "^14.4.1",
 		"style-loader": "^3.3.1",
 		"webpack": "^5.64.0",
-		"webpack-cli": "^4.9.1"
+		"webpack-cli": "^4.9.1",
+		"socket.io-client": "^4.3.2",
+		"sass": "^1.43.4",
+		"sass-loader": "^12.3.0",
+		"tippy.js": "^6.3.7"
 	},
 	"release-it": {
 		"npm": {
@@ -39,16 +50,7 @@
 		}
 	},
 	"dependencies": {
-		"elm": "^0.19.1-5",
-		"elm-format": "^0.8.5",
-		"elm-test": "^0.19.1-revision6",
-		"elm-webpack-loader": "^8.0.0",
 		"express": "^4.17.1",
-		"howler": "^2.2.3",
-		"sass": "^1.43.4",
-		"sass-loader": "^12.3.0",
-		"socket.io": "^3.1.2",
-		"socket.io-client": "^4.3.2",
-		"tippy.js": "^6.3.7"
+		"socket.io": "^3.1.2"
 	}
 }
