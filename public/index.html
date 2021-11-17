@@ -2,134 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <link rel="preconnect" href="https://fonts.gstatic.com"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Oswald&display=swap"
-          rel="stylesheet"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <title>Mob Time</title>
-    <link rel="stylesheet" href="/css/main.css">
 </head>
-
 <body>
-
 <pre id="elm"></pre>
 <script src="/js/main.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.1/howler.min.js"
-        integrity="sha512-L6Z/YtIPQ7eU3BProP34WGU5yIRk7tNHk7vaC2dB1Vy1atz6wl9mCkTPPZ2Rn1qPr+vY2mZ9odZLdGYuaBk7dQ=="
-        crossorigin="anonymous"></script>
-<script>
-    const app = Elm.Main.init({
-        node: document.getElementById('elm'),
-        flags: JSON.parse(window.localStorage.getItem("preferences")) || {volume: 50}
-    });
-
-
-    let alarm = load('/sound/silence.mp3').play();
-
-    // -----------------------------------------
-    // Tooltips
-    // -----------------------------------------
-
-    tippy('button[title]', {
-        delay: 200,
-        content(reference) {
-            const title = reference.getAttribute('title');
-            reference.removeAttribute('title');
-            return title;
-        },
-    });
-
-    // -----------------------------------------
-    // Socket IO
-    // -----------------------------------------
-
-    const socket = io();
-    app.ports.sendEvent.subscribe(event => {
-        socket.emit('message', event.mob, event);
-    });
-    socket.on('message', data => {
-        console.log(data);
-        return app.ports.receiveOne.send(data);
-    });
-    socket.on('history', data => {
-        alarm.muted = false;
-        app.ports.receiveHistory.send(data);
-    });
-
-    socket.on('connect', () => {
-        app.ports.events.send({name: "GotSocketId", value: socket.id});
-    });
-    socket.on("disconnect", () => {
-        app.ports.events.send({name: "SocketDisconnected", value: "" });
-    });
-    app.ports.clockSyncOutMessage.subscribe(message => {
-        console.log("out", message);
-        socket.emit("sync", message.mob, message);
-    });
-    socket.on("sync", data => {
-        console.log("in", data);
-        return app.ports.clockSyncInMessage.send(data);
-    });
-    // -----------------------------------------
-    // Commands
-    // -----------------------------------------
-    app.ports.commands.subscribe(command => {
-        switch (command.name) {
-            case "Join":
-                socket.emit('join', command.value);
-                break;
-            case "SoundAlarm":
-                alarm.play();
-                break;
-            case "SetAlarm":
-                alarm = load("/sound/" + command.value);
-                break;
-            case "StopAlarm":
-                alarm.stop();
-                break;
-            case 'CopyInPasteBin':
-                if (navigator.clipboard) {
-                    navigator.clipboard
-                        .writeText(command.value)
-                        .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
-                } else {
-                    command.value.select();
-                    document.execCommand('copy');
-                    app.ports.events.send({name: 'Copied', value: ""})
-                }
-                break;
-            case 'ChangeVolume':
-                window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
-                Howler.volume(parseInt(command.value) / 100.0);
-                break;
-            case 'GetSocketId':
-                // If there is no socket id, it means we are still connecting and so the event will be sent when the connection is established
-                if (socket.id)
-                    app.ports.events.send({name: "GotSocketId", value: socket.id});
-                break;
-            case 'TestTheSound':
-                Howler.stop();
-                new Howl({
-                    src: ["/sound/hello.mp3"],
-                    onplayerror: console.error,
-                }).play();
-                break;
-        }
-    });
-
-    function load(sound) {
-        return new Howl({
-            src: [sound],
-            onend: function () {
-                app.ports.events.send({name: "AlarmEnded", value: ""});
-            },
-        });
-    }
-
-</script>
 </body>
 </html>

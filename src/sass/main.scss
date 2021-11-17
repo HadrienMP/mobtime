@@ -1,6 +1,7 @@
-@import "compass";
-@import "compass/reset";
+@import "reset";
+@import url(https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Oswald&display=swap);
 @import "theme";
+@import "range";
 
 @mixin gradient-background {
   background: $dark-bg-color; /* fallback for old browsers */
@@ -34,7 +35,7 @@ body * {
   max-width: $width;
 }
 
-input {
+input[type="text"] {
   border: none;
   border-bottom: 1px solid;
   font-weight: bold;

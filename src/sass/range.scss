@@ -1,0 +1,104 @@
+@import "theme";
+$track-color: $dark-button-color;
+$track-border-color: #010101;
+$track-shadow-2: #0d0d0d;
+$track-shadow-1: #000000;
+
+
+@mixin thumb-style() {
+  border: 1px solid #000000;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: #f2f2f2;
+  cursor: pointer;
+}
+
+@mixin track-stuff() {
+  border-radius: 1.3px;
+  background: $track-color;
+  border: 0.2px solid $track-border-color;
+  box-shadow: 1px 1px 1px $track-shadow-1, 0px 0px 1px $track-shadow-2;
+}
+
+@mixin track-style() {
+  width: 100%;
+  height: 2px;
+  cursor: pointer;
+  @include track-stuff();
+}
+
+input[type=range] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+
+  &:focus {
+    outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+  }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    @include thumb-style();
+    margin-top: -14px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  }
+
+  /* All the same stuff for Firefox */
+  &::-moz-range-thumb {
+    @include thumb-style();
+  }
+
+  /* All the same stuff for IE */
+  &::-ms-thumb {
+    @include thumb-style();
+  }
+
+  &::-ms-track {
+    width: 100%;
+    cursor: pointer;
+
+    /* Hides the slider so custom styles can be added */
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+
+  &::-webkit-slider-runnable-track {
+    @include track-style();
+  }
+
+  &:focus::-webkit-slider-runnable-track {
+    background: #367ebd;
+  }
+
+  &::-moz-range-track {
+    @include track-style();
+  }
+
+  &::-ms-track {
+    width: 100%;
+    height: 8.4px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    border-width: 16px 0;
+    color: transparent;
+  }
+  &::-ms-fill-lower {
+    @include track-stuff();
+  }
+  &:focus::-ms-fill-lower {
+    background: $track-color;
+  }
+  &::-ms-fill-upper {
+    @include track-stuff();
+  }
+  &:focus::-ms-fill-upper {
+    background: $track-color;
+  }
+}
+
+
