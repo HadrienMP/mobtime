@@ -254,8 +254,8 @@ view model =
     { title = doc.title
     , body =
         doc.body
-            ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
             ++ soundModal model
+            ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
     }
 
 

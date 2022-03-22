@@ -43,12 +43,10 @@ displayTimeAdjustments started =
     div []
         [ p [] [ strong [] [text "Peer Id: "], text started.model.context.peerId ]
         , table []
-            ([ tr []
+            (tr []
                 [ th [] [ text "Peer" ]
-                , th [] [ text "Adjustment" ]
-                ]
-             ]
-                ++ (started.model.adjustments
+                , th [] [ text "Adjustment" ]]
+                :: (started.model.adjustments
                         |> Dict.toList
                         |> List.map (\( key, value ) -> tr [] [ td [] [ text key ], td [] [ displayTimeAdjustment value ] ])
                    )

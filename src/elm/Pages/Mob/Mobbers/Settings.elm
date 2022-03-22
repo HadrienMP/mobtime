@@ -7,7 +7,7 @@ import Html.Attributes as Attributes exposing (class, disabled, id, placeholder,
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
-import Lib.Toaster as Toaster exposing (Level(..), Toast)
+import Lib.Toaster as Toaster exposing (Level(..))
 import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Mob.Mobbers.Mobber exposing (Mobber)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)

@@ -13,7 +13,6 @@ import Json.Decode
 import Lib.Circle
 import Lib.Duration as Duration
 import Lib.Icons.Ion
-import Lib.Toaster as Toast
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings

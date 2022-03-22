@@ -167,4 +167,4 @@ toLongString duration =
         ( first, second ) =
             uncons a |> Tuple.mapFirst (Maybe.withDefault "" >> (++) (overtimeSign duration))
     in
-    [ first ] ++ second
+    first :: second
