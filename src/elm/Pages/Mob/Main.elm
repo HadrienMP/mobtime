@@ -33,6 +33,7 @@ import Svg.Styled.Attributes as Svg
 import Time
 import Url
 import UserPreferences
+import Lib.Konami as Konami exposing (Konami)
 
 
 
@@ -65,6 +66,7 @@ type alias Model =
     , now : Time.Posix
     , tab : Tab
     , dev : Bool
+    , konami : Konami
     , peerId : Maybe PeerId
     }
 
@@ -85,6 +87,7 @@ init name preferences =
       , now = Time.millisToPosix 0
       , tab = Main
       , dev = False
+      , konami = Konami.empty
       , peerId = Nothing
       }
     , Cmd.batch
@@ -280,10 +283,11 @@ update msg model =
             , toasts = []
             }
 
-        KeyPressed stroke ->
+        KeyPressed {key} ->
             { model =
                 { model
-                    | dev = xor model.dev <| stroke == Keystroke "D" True True True
+                    | dev = xor model.dev <| Konami.isActivated model.konami
+                    , konami = Konami.add key model.konami
                 }
             , command = Cmd.none
             , toasts = []
