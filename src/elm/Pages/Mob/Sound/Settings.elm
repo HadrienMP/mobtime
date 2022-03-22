@@ -70,7 +70,7 @@ view model mob profile =
                 [ id "volume"
                 , type_ "range"
                 , onInput VolumeChanged
-                , step "10"
+                , step "1"
                 , value <| String.fromInt model.volume
                 ]
                 []
