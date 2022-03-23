@@ -172,10 +172,10 @@ mobberView ( role, maybeMobber ) =
         |> Maybe.map
             (\mobber ->
                 li []
-                    [ p [] [ text <| Maybe.withDefault "Mobber" role ]
+                    [ p [class "role"] [ text <| Maybe.withDefault "Mobber" role ]
                     , div
                         []
-                        [ input [ type_ "text", value mobber.name ] []
+                        [ p [class "name"] [ text mobber.name ]
                         , button
                             [ onClick <| ShareEvent <| Peers.Events.DeletedMobber mobber ]
                             [ Icons.delete ]

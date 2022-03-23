@@ -43,14 +43,14 @@
     li {
       margin: 20px 0;
 
-      p {
+      p.role {
         font-size: .8em;
         margin-bottom: 5px;
       }
 
       div {
         display: flex;
-        align-items: center;
+        align-items: bottom;
         width: 100%;
 
         & > i {
@@ -59,12 +59,14 @@
           flex-grow: 0;
         }
 
-        input {
+        p.name {
           width: 50%;
           flex-grow: 1;
           flex-shrink: 1;
-          border: none;
-          border-bottom: 1px solid;
+          font-size: 1.1em;
+          text-transform: capitalize;
+          font-weight: bold;
+          padding-bottom: 5px;
         }
 
         button {
