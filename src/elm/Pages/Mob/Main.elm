@@ -11,8 +11,9 @@ import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
 import Lib.Circle
-import Lib.Duration as Duration
+import Lib.Duration as Duration exposing (DurationStringParts)
 import Lib.Icons.Ion
+import Lib.Konami as Konami exposing (Konami)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
@@ -33,7 +34,6 @@ import Svg.Styled.Attributes as Svg
 import Time
 import Url
 import UserPreferences
-import Lib.Konami as Konami exposing (Konami)
 
 
 
@@ -126,6 +126,14 @@ timePassed now model =
     let
         timePassedResult =
             Peers.State.timePassed now model.shared
+
+        toto =
+            case timePassedResult.turnEvent of
+                Clock.Ended ->
+                    Js.Commands.send Js.Commands.SoundAlarm
+
+                Clock.Continued ->
+                    Cmd.none
     in
     ( { model
         | alarm =
@@ -138,12 +146,10 @@ timePassed now model =
         , now = now
         , shared = timePassedResult.updated
       }
-    , case timePassedResult.turnEvent of
-        Clock.Ended ->
-            Js.Commands.send Js.Commands.SoundAlarm
-
-        Clock.Continued ->
-            Cmd.none
+    , Cmd.batch
+        [ toto
+        , Js.Commands.send <| Js.Commands.ChangeTitle <| timeLeftTitle <| timeLeftString model
+        ]
     )
 
 
@@ -283,7 +289,7 @@ update msg model =
             , toasts = []
             }
 
-        KeyPressed {key} ->
+        KeyPressed { key } ->
             { model =
                 { model
                     | dev = xor model.dev <| Konami.isActivated model.konami
@@ -352,7 +358,7 @@ view model url =
         action =
             detectAction model
     in
-    { title = timeLeftTitle action ++ "Mob Time"
+    { title = timeLeftTitle action.timeLeft
     , body = body model url action |> List.map toUnstyled
     }
 
@@ -405,7 +411,7 @@ body model url action =
                         ]
                     ]
                     [ action.icon
-                    , span [ id "time-left" ] (action.text |> List.map (\a -> span [] [ text a ]))
+                    , span [ id "time-left" ] (action.timeLeft |> List.map (\a -> span [] [ text a ]))
                     ]
                 ]
             ]
@@ -490,36 +496,33 @@ body model url action =
 type alias ActionDescription =
     { icon : Svg Msg
     , message : Msg
-    , text : List String
+    , timeLeft : DurationStringParts
     , class : String
     }
 
 
 detectAction : Model -> ActionDescription
 detectAction model =
+    let
+        timeLeft =
+            timeLeftString model
+    in
     case ( model.alarm, model.shared.clock, model.shared.pomodoro ) of
         ( Playing, _, _ ) ->
             { icon = Lib.Icons.Ion.mute |> fromUnstyled
             , message = StopSound
             , class = ""
-            , text = []
+            , timeLeft = timeLeft
             }
 
-        ( _, On on, _ ) ->
+        ( _, On _, _ ) ->
             { icon = Lib.Icons.Ion.stop |> fromUnstyled
             , message =
                 Peers.Events.Clock Peers.Events.Stopped
                     |> Peers.Events.MobEvent model.name
                     |> ShareEvent
             , class = "on"
-            , text =
-                Duration.between model.now on.end
-                    |> (if model.clockSettings.displaySeconds then
-                            Duration.toLongString
-
-                        else
-                            Duration.toShortString
-                       )
+            , timeLeft = timeLeft
             }
 
         ( _, Off, On pomodoro ) ->
@@ -530,29 +533,45 @@ detectAction model =
                         |> Peers.Events.MobEvent model.name
                         |> ShareEvent
                 , class = ""
-                , text = []
+                , timeLeft = timeLeft
                 }
 
             else
                 { icon = Lib.Icons.Ion.play |> fromUnstyled
                 , message = Start
                 , class = ""
-                , text = []
+                , timeLeft = timeLeft
                 }
 
         ( _, Off, _ ) ->
             { icon = Lib.Icons.Ion.play |> fromUnstyled
             , message = Start
             , class = ""
-            , text = []
+            , timeLeft = timeLeft
             }
 
 
-timeLeftTitle : ActionDescription -> String
-timeLeftTitle action =
-    case action.text of
-        [] ->
-            ""
+timeLeftString : Model -> DurationStringParts
+timeLeftString model =
+    case model.shared.clock of
+        On on ->
+            Duration.between model.now on.end
+                |> (if model.clockSettings.displaySeconds then
+                        Duration.toLongString
+
+                    else
+                        Duration.toShortString
+                   )
 
         _ ->
-            String.join " " action.text ++ " | "
+            []
+
+
+timeLeftTitle : DurationStringParts -> String
+timeLeftTitle action =
+    case action of
+        [] ->
+            "Mob Time"
+
+        _ ->
+            String.join " " action ++ " | " ++ "Mob Time"

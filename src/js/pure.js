@@ -59,5 +59,8 @@ app.ports.commands.subscribe(command => {
         case 'TestTheSound':
             sound.play("/sound/hello.mp3");
             break;
+        case 'ChangeTitle':
+            document.title = command.value;
+            break;
     }
 });

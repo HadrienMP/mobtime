@@ -9,6 +9,8 @@ import Time
 type Duration
     = Duration Int
 
+type alias DurationStringParts = List String
+
 addToTime : Duration -> Time.Posix -> Time.Posix
 addToTime duration time =
     Time.posixToMillis time
@@ -129,7 +131,7 @@ overtimeSign duration =
         ""
 
 
-toLongString : Duration -> List String
+toLongString : Duration -> DurationStringParts
 toLongString duration =
     let
         seconds =

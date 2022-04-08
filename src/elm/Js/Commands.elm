@@ -11,6 +11,7 @@ type Command
     = SoundAlarm
     | SetAlarm Pages.Mob.Sound.Library.Sound
     | StopAlarm
+    | ChangeTitle String
     | CopyInPasteBin String
     | ChangeVolume Int
     | Join String
@@ -51,5 +52,8 @@ send command =
 
             TestTheSound ->
                 OutCommand "TestTheSound" Json.Encode.null
+
+            ChangeTitle title ->
+                OutCommand "ChangeTitle" <| Json.Encode.string title
 
 
