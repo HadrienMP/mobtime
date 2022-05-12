@@ -1,7 +1,7 @@
 module Pages.Mob.Sound.Settings exposing (..)
 
 import Html exposing (Html, button, div, img, input, label, p, text)
-import Html.Attributes exposing (alt, class, classList, for, id, src, step, type_, value)
+import Html.Attributes exposing (alt, class, classList, for, id, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
@@ -70,7 +70,7 @@ view model mob profile =
                 [ id "volume"
                 , type_ "range"
                 , onInput VolumeChanged
-                , step "1"
+                , Html.Attributes.max "50"
                 , value <| String.fromInt model.volume
                 ]
                 []

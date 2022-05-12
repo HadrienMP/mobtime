@@ -7,7 +7,7 @@ const Elm = require('../elm/Main.elm').Elm;
 
 const app = Elm.Main.init({
     node: document.getElementById('elm'),
-    flags: JSON.parse(window.localStorage.getItem("preferences")) || {volume: 50}
+    flags: JSON.parse(window.localStorage.getItem("preferences")) || { volume: 30 }
 });
 
 tooltips.setup();
@@ -31,7 +31,7 @@ app.ports.commands.subscribe(command => {
         case "SetAlarm":
             alarm = sound.load(
                 "/sound/" + command.value,
-                () => app.ports.events.send({name: "AlarmEnded", value: ""}));
+                () => app.ports.events.send({ name: "AlarmEnded", value: "" }));
             break;
         case "StopAlarm":
             alarm.stop();
@@ -40,21 +40,21 @@ app.ports.commands.subscribe(command => {
             if (navigator.clipboard) {
                 navigator.clipboard
                     .writeText(command.value)
-                    .finally(() => app.ports.events.send({name: 'Copied', value: ""}))
+                    .finally(() => app.ports.events.send({ name: 'Copied', value: "" }))
             } else {
                 command.value.select();
                 document.execCommand('copy');
-                app.ports.events.send({name: 'Copied', value: ""})
+                app.ports.events.send({ name: 'Copied', value: "" })
             }
             break;
         case 'ChangeVolume':
-            window.localStorage.setItem("preferences", JSON.stringify({volume: parseInt(command.value)}));
+            window.localStorage.setItem("preferences", JSON.stringify({ volume: parseInt(command.value) }));
             sound.volume(command.value);
             break;
         case 'GetSocketId':
             // If there is no socket id, it means we are still connecting and so the event will be sent when the connection is established
             if (socket.id)
-                app.ports.events.send({name: "GotSocketId", value: socket.id});
+                app.ports.events.send({ name: "GotSocketId", value: socket.id });
             break;
         case 'TestTheSound':
             sound.play("/sound/hello.mp3");
