@@ -3,11 +3,11 @@ module Pages.Mob.Mobbers.Settings exposing (..)
 import Field
 import Field.String
 import Html exposing (Html, button, div, form, input, li, p, text, ul)
-import Html.Attributes as Attributes exposing (class, disabled, id, placeholder, type_, value)
+import Html.Attributes as Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
-import Lib.Toaster as Toaster exposing (Level(..))
+import Lib.Toaster as Toaster
 import Lib.UpdateResult exposing (UpdateResult)
 import Pages.Mob.Mobbers.Mobber exposing (Mobber)
 import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
@@ -172,10 +172,10 @@ mobberView ( role, maybeMobber ) =
         |> Maybe.map
             (\mobber ->
                 li []
-                    [ p [class "role"] [ text <| Maybe.withDefault "Mobber" role ]
+                    [ p [ class "role" ] [ text <| Maybe.withDefault "Mobber" role ]
                     , div
                         []
-                        [ p [class "name"] [ text mobber.name ]
+                        [ p [ class "name" ] [ text mobber.name ]
                         , button
                             [ onClick <| ShareEvent <| Peers.Events.DeletedMobber mobber ]
                             [ Icons.delete ]

@@ -6,7 +6,7 @@ import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Toaster
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Mob.Name exposing (MobName)
-import Peers.Sync.Core exposing (Context, Model, PeerId, Recipient(..))
+import Peers.Sync.Core exposing (Context, Model, PeerId)
 import Peers.Sync.Message as Message exposing (SyncMessage)
 import Random
 import Task

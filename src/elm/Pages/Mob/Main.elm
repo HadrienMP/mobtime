@@ -26,7 +26,7 @@ import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Share
 import Peers.Events
 import Peers.State
-import Peers.Sync.Adapter exposing (Msg(..))
+import Peers.Sync.Adapter
 import Peers.Sync.Core exposing (PeerId)
 import Random
 import Svg.Styled exposing (Svg, svg)
@@ -112,7 +112,6 @@ type Msg
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Clocks.Settings.Msg
     | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
-    | GotDevTabMsg Pages.Mob.Tabs.Dev.Msg
     | GotMobbersSettingsMsg Pages.Mob.Mobbers.Settings.Msg
     | GotSoundSettingsMsg Pages.Mob.Sound.Settings.Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
@@ -260,12 +259,6 @@ update msg model =
         GotShareTabMsg subMsg ->
             { model = model
             , command = Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg
-            , toasts = []
-            }
-
-        GotDevTabMsg sub ->
-            { model = model
-            , command = Pages.Mob.Tabs.Dev.update sub |> Cmd.map GotDevTabMsg
             , toasts = []
             }
 
@@ -488,7 +481,6 @@ body model url action =
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
-                    |> Html.map GotDevTabMsg
         ]
     ]
 

@@ -3,31 +3,16 @@ module Pages.Mob.Tabs.Dev exposing (..)
 import Dict
 import Html.Styled exposing (Html, div, p, strong, table, td, text, th, tr)
 import Html.Styled.Attributes exposing (class, id)
-import Lib.Duration as Duration exposing (Duration(..))
+import Lib.Duration as Duration exposing (Duration)
 import Peers.Sync.Adapter
 import Peers.Sync.Core exposing (TimeAdjustment(..))
-
-
-
--- UPDATE
-
-
-type Msg
-    = None
-
-
-update : Msg -> Cmd Msg
-update msg =
-    case msg of
-        None ->
-            Cmd.none
 
 
 
 -- VIEW
 
 
-view : Peers.Sync.Adapter.Model -> Html Msg
+view : Peers.Sync.Adapter.Model -> Html msg
 view model =
     div [ id "dev", class "tab" ]
         (case model of
@@ -41,11 +26,12 @@ view model =
 
 displayTimeAdjustments started =
     div []
-        [ p [] [ strong [] [text "Peer Id: "], text started.model.context.peerId ]
+        [ p [] [ strong [] [ text "Peer Id: " ], text started.model.context.peerId ]
         , table []
             (tr []
                 [ th [] [ text "Peer" ]
-                , th [] [ text "Adjustment" ]]
+                , th [] [ text "Adjustment" ]
+                ]
                 :: (started.model.adjustments
                         |> Dict.toList
                         |> List.map (\( key, value ) -> tr [] [ td [] [ text key ], td [] [ displayTimeAdjustment value ] ])
@@ -54,7 +40,7 @@ displayTimeAdjustments started =
         ]
 
 
-displayTimeAdjustment : TimeAdjustment -> Html Msg
+displayTimeAdjustment : TimeAdjustment -> Html msg
 displayTimeAdjustment timeAdjustment =
     case timeAdjustment of
         RequestedAt _ ->

@@ -3,7 +3,7 @@ module Lib.Icons.Custom exposing (..)
 import Html exposing (i)
 import Html.Attributes exposing (class)
 import Svg exposing (Svg, g, path, svg)
-import Svg.Attributes exposing (d, display, enableBackground, height, id, viewBox, width)
+import Svg.Attributes exposing (d, enableBackground, height, id, viewBox, width)
 
 
 tomato : Svg msg

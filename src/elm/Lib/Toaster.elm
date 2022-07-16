@@ -14,16 +14,14 @@ import Lib.Icons.Ion
 
 
 type Level
-    = Info
-    | Error
-    | Warning
+    = Error
     | Success
 
 
 type alias Toast =
     { level : Level
     , content : String
-    , autoRemove: Bool
+    , autoRemove : Bool
     }
 
 
@@ -35,6 +33,7 @@ success content =
 error : String -> Toast
 error content =
     Toast Error content True
+
 
 keepOn : Toast -> Toast
 keepOn content =
@@ -79,12 +78,16 @@ add toAdd model =
         |> List.map (\toast -> ( toast, autoRemove toast ))
         |> List.foldr (\( toast, cmd ) ( ts, cs ) -> ( toast :: ts, cmd :: cs )) ( model, [] )
 
+
 autoRemove : Toast -> Cmd Msg
 autoRemove toast =
-    if (toast.autoRemove) then
+    if toast.autoRemove then
         Lib.Delay.after (Lib.Delay.Seconds 10) (Remove toast)
+
     else
         Cmd.none
+
+
 
 -- EVENTS SUBSCRIPTIONS
 
@@ -121,14 +124,8 @@ viewToast toast =
 classOf : Level -> String
 classOf level =
     case level of
-        Info ->
-            "info"
-
         Error ->
             "error"
-
-        Warning ->
-            "warning"
 
         Success ->
             "success"
@@ -137,14 +134,8 @@ classOf level =
 icon : Level -> Html msg
 icon level =
     case level of
-        Info ->
-            Lib.Icons.Ion.info
-
         Error ->
             Lib.Icons.Ion.error
-
-        Warning ->
-            Lib.Icons.Ion.warning
 
         Success ->
             Lib.Icons.Ion.success

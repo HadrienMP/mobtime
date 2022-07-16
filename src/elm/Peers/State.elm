@@ -31,10 +31,12 @@ init =
     }
 
 
+defaultTurnLength : Duration
 defaultTurnLength =
     Duration.ofMinutes 8
 
 
+defaultPomodoroLength : Duration
 defaultPomodoroLength =
     Duration.ofMinutes 25
 
@@ -58,10 +60,11 @@ timePassed now state =
 
 evolve : Events.Event -> State -> ( State, Cmd msg )
 evolve event state =
-    evolve_ event (state, Cmd.none)
+    evolve_ event ( state, Cmd.none )
+
 
 evolve_ : Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
-evolve_ event (state, previousCommand) =
+evolve_ event ( state, previousCommand ) =
     case event of
         Events.Clock clockEvent ->
             evolveClock clockEvent state
@@ -112,20 +115,19 @@ evolve_ event (state, previousCommand) =
             )
 
 
-evolveMany : List Events.Event -> State -> (State, Cmd msg)
+evolveMany : List Events.Event -> State -> ( State, Cmd msg )
 evolveMany events model =
-    evolveMany_ events (model, Cmd.none)
+    evolveMany_ events ( model, Cmd.none )
 
 
-evolveMany_ : List Events.Event -> (State, Cmd msg) -> (State, Cmd msg)
+evolveMany_ : List Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
 evolveMany_ events previous =
     case uncons events of
         ( Nothing, _ ) ->
             previous
 
         ( Just first, others ) ->
-            evolve_ first previous
-            |> evolveMany_ others
+            evolveMany_ others <| evolve_ first previous
 
 
 evolveClock : Events.ClockEvent -> State -> ( State, Cmd msg )
