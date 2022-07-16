@@ -10,7 +10,8 @@
 		"dev:build-front": "webpack --mode development --watch",
 		"dev:server": "nodemon server/app.js",
 		"test": "npx elm-test --watch \"./src/elm/**/*Spec.elm\"",
-		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all"
+		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all",
+		"postinstall": "elm-tooling install"
 	},
 	"keywords": [],
 	"author": "",
@@ -18,16 +19,15 @@
 	"devDependencies": {
 		"concurrently": "^7.0.0",
 		"css-loader": "^6.5.1",
-		"elm": "^0.19.1-5",
-		"elm-format": "^0.8.5",
 		"elm-live": "^3.4.1",
 		"elm-review": "^2.5.3",
 		"elm-test": "^0.19.1-revision6",
+		"elm-tooling": "^1.8.0",
 		"elm-webpack-loader": "^8.0.0",
+		"gitmoji-cli": "^5.0.2",
 		"howler": "^2.2.3",
 		"https-local": "^1.0.0",
 		"nodemon": "^2.0.7",
-		"release-it": "^14.4.1",
 		"sass": "^1.43.4",
 		"sass-loader": "^12.3.0",
 		"socket.io-client": "^4.3.2",
@@ -49,6 +49,7 @@
 	},
 	"dependencies": {
 		"express": "^4.17.1",
+		"husky": "^8.0.1",
 		"socket.io": "^3.1.2"
 	}
 }
