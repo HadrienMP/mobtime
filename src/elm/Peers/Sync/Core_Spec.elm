@@ -3,7 +3,7 @@ module Peers.Sync.Core_Spec exposing (..)
 import Expect
 import Iso8601
 import Peers.Sync.Core exposing (CommandType(..), Recipient(..), adjustTimeFrom, handle, start)
-import Test exposing (Test, describe, skip, test)
+import Test exposing (Test, describe, test)
 import Time
 
 
@@ -163,23 +163,6 @@ suite =
                             , Nothing
                             ]
             ]
-        , skip <|
-            test "ignores messages for an unknown sync id" <|
-                \_ ->
-                    let
-                        ( state1, _ ) =
-                            start { peerId = "peer 1", time = toPosix "T00:00:01", syncId = "syncId" }
-
-                        ( state2, _ ) =
-                            handle
-                                { context = { peerId = "peer 2", time = toPosix "T00:00:04", syncId = "unknown" }
-                                , type_ = ExchangeTime
-                                , recipient = Peer "peer 2"
-                                }
-                                (toPosix "T00:00:05")
-                                state1
-                    in
-                    Expect.equal state1 state2
         ]
 
 

@@ -7,7 +7,7 @@ import Pages.Mob.Clocks.Clock as Clock
 import Pages.Mob.Sound.Library as Library
 import Peers.Events exposing (ClockEvent(..), Event(..))
 import Peers.State
-import Test exposing (Test, describe, skip, test)
+import Test exposing (Test, describe, test)
 import Time
 
 
@@ -83,25 +83,6 @@ suite =
                     in
                     command
                         |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
-            , skip <|
-                test "only the first alarm is kept for a duplicate start event" <|
-                    \_ ->
-                        let
-                            alarm =
-                                Library.default
-
-                            started =
-                                Clock <| turnOnWithAlarm alarm
-
-                            startedDuplicated =
-                                Clock <| turnOnWithAlarm "some sound"
-
-                            ( _, command ) =
-                                Peers.State.init
-                                    |> Peers.State.evolveMany [ started, startedDuplicated ]
-                        in
-                        command
-                            |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
             ]
         ]
 
