@@ -4,10 +4,9 @@ import Footer
 import Html exposing (Html, div, li, span, text, ul)
 import Html.Attributes exposing (class, id)
 import Js.Commands
-import Pages.Mob.Tabs.Share
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers exposing (Mobbers)
-import Pages.Mob.Mobbers.Settings
+import Pages.Mob.Tabs.Share
 import Url
 
 
@@ -36,9 +35,8 @@ view mobName url mobbers =
 
 roles : Mobbers -> Html msg
 roles mobbers =
-    Pages.Mob.Mobbers.Settings.assignRoles mobbers
-        |> List.filter (\(_, mobber) -> mobber /= Nothing)
-        |> List.take 2
+    Model.Mobbers.assignRoles mobbers
+        |> List.take 3
         |> List.map roleView
         |> (\list ->
                 case list of
@@ -50,9 +48,9 @@ roles mobbers =
            )
 
 
-roleView : ( Maybe String, Maybe Mobber ) -> Html msg
-roleView (role, mobber) =
+roleView : ( String, Mobber ) -> Html msg
+roleView ( role, mobber ) =
     li [ class "mobber-role" ]
-        [ span [ class "role" ] [ role |> Maybe.withDefault "Wut ?" |> text ]
-        , span [ class "mobber" ] [ mobber |> Maybe.map .name |> Maybe.withDefault "Wut ?" |> text ]
+        [ span [ class "role" ] [ role |> text ]
+        , span [ class "mobber" ] [ mobber.name |> text ]
         ]

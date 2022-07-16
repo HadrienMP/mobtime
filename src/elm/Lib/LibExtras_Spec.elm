@@ -1,7 +1,7 @@
 module Lib.LibExtras_Spec exposing (..)
 
 import Expect
-import Lib.ListExtras exposing (assign, rotate)
+import Lib.ListExtras exposing (zip, rotate)
 import Test exposing (Test, describe, test)
 
 
@@ -18,12 +18,16 @@ suite =
                 \_ ->
                     [] |> rotate |> Expect.equalLists []
             ]
-        , describe "assign"
+        , describe "zip"
             [ test "pairs values at the same indexes of two lists" <|
                 \_ ->
-                    assign [ 1, 2 ] [ "a" ]
-                        |> Expect.equalLists [ ( Just 1, Just "a" ), ( Just 2, Nothing ) ]
+                    zip [ 1, 2 ] [ "a", "b" ]
+                        |> Expect.equalLists [ ( 1, "a" ),( 2, "b" ) ]
+            , test "ignores values that can't be paired" <|
+                \_ ->
+                    zip [ 1, 2 ] [ "a" ]
+                        |> Expect.equalLists [ ( 1, "a" ) ]
             , test "returns an empty list for two empty lists" <|
-                \_ -> assign [] [] |> Expect.equalLists []
+                \_ -> zip [] [] |> Expect.equalLists []
             ]
         ]

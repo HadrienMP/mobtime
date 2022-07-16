@@ -1,6 +1,6 @@
 module Pages.Routing exposing (..)
 
-import Pages.Mob.Name exposing (MobName)
+import Model.MobName exposing (MobName)
 import Url
 import Url.Parser as UrlParser exposing ((</>), Parser, map, oneOf, s, top)
 

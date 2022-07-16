@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
 import Lib.Icons.Ion exposing (musicNote)
-import Pages.Mob.Name exposing (MobName)
+import Model.MobName exposing (MobName)
 import Sounds as SoundLibrary
 import Peers.Events
 

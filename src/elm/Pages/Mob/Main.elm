@@ -18,7 +18,7 @@ import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
 import Pages.Mob.Mobbers.Settings
-import Pages.Mob.Name exposing (MobName)
+import Model.MobName exposing (MobName)
 import Sounds
 import Pages.Mob.Sound.Settings
 import Pages.Mob.Tabs.Dev

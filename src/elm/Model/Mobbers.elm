@@ -61,6 +61,12 @@ toList mobbers =
             list
 
 
+assignRoles : Mobbers -> List ( String, Mobber )
+assignRoles mobbers =
+    toList mobbers
+        |> ListExtras.zip ([ "Driver", "Navigator", "Next" ] ++ List.repeat (List.length (toList mobbers) - 3) "Mobber")
+
+
 rotatable : Mobbers -> Bool
 rotatable mobbers =
     (List.length <| toList mobbers) >= 2

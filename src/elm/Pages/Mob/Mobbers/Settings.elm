@@ -6,12 +6,11 @@ import Html exposing (Html, button, div, form, input, li, p, text, ul)
 import Html.Attributes as Attributes exposing (class, disabled, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
-import Lib.ListExtras exposing (assign)
 import Lib.Toaster as Toaster
 import Lib.UpdateResult exposing (UpdateResult)
+import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
-import Pages.Mob.Name exposing (MobName)
 import Peers.Events
 import Random
 import Uuid
@@ -127,17 +126,10 @@ view mobbers model =
                 ]
             ]
         , ul []
-            (assignRoles mobbers
+            (Mobbers.assignRoles mobbers
                 |> List.map mobberView
-                |> List.filter ((/=) Nothing)
-                |> List.map (Maybe.withDefault (li [] []))
             )
         ]
-
-
-assignRoles : Mobbers -> List ( Maybe String, Maybe Mobber )
-assignRoles mobbers =
-    assign [ "Driver", "Navigator" ] <| Mobbers.toList mobbers
 
 
 textFieldConfig : String -> (String -> msg) -> Field.String.ViewConfig msg
@@ -166,19 +158,15 @@ textInput title toMsg value meta =
         []
 
 
-mobberView : ( Maybe String, Maybe Mobber ) -> Maybe (Html Msg)
-mobberView ( role, maybeMobber ) =
-    maybeMobber
-        |> Maybe.map
-            (\mobber ->
-                li []
-                    [ p [ class "role" ] [ text <| Maybe.withDefault "Mobber" role ]
-                    , div
-                        []
-                        [ p [ class "name" ] [ text mobber.name ]
-                        , button
-                            [ onClick <| ShareEvent <| Peers.Events.DeletedMobber mobber ]
-                            [ Icons.delete ]
-                        ]
-                    ]
-            )
+mobberView : ( String, Mobber ) -> Html Msg
+mobberView ( role, mobber ) =
+    li []
+        [ p [ class "role" ] [ text role ]
+        , div
+            []
+            [ p [ class "name" ] [ text mobber.name ]
+            , button
+                [ onClick <| ShareEvent <| Peers.Events.DeletedMobber mobber ]
+                [ Icons.delete ]
+            ]
+        ]

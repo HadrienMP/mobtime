@@ -1,7 +1,7 @@
 module Peers.Sync.Message exposing (..)
 
 import Iso8601
-import Pages.Mob.Name exposing (MobName)
+import Model.MobName exposing (MobName)
 import Peers.Sync.Core exposing (Context, Recipient(..))
 import Uuid exposing (Uuid)
 

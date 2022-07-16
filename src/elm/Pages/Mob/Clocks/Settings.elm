@@ -7,7 +7,7 @@ import Lib.Duration as Duration
 import Lib.Icons.Custom
 import Lib.Icons.Ion
 import Model.Clock as Clock
-import Pages.Mob.Name exposing (MobName)
+import Model.MobName exposing (MobName)
 import Peers.Events
 import Peers.State
 import Time
