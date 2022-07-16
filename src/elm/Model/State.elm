@@ -1,4 +1,4 @@
-module Peers.State exposing (..)
+module Model.State exposing (..)
 
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
@@ -6,7 +6,7 @@ import Lib.ListExtras exposing (uncons)
 import Model.Clock exposing (ClockState(..))
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Sounds
-import Peers.Events as Events
+import Model.Events as Events
 import Time
 
 

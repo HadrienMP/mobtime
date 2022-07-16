@@ -1,12 +1,12 @@
-module Peers.State_Spec exposing (..)
+module Model.State_Spec exposing (..)
 
 import Expect
 import Js.Commands
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Sounds
-import Peers.Events exposing (ClockEvent(..), Event(..))
-import Peers.State
+import Model.Events exposing (ClockEvent(..), Event(..))
+import Model.State
 import Test exposing (Test, describe, test)
 import Time
 
@@ -19,8 +19,8 @@ suite =
                 \_ ->
                     let
                         ( state, _ ) =
-                            Peers.State.init
-                                |> Peers.State.evolve (Clock <| turnOnAt midnight)
+                            Model.State.init
+                                |> Model.State.evolve (Clock <| turnOnAt midnight)
                     in
                     state.pomodoro
                         |> Expect.equal
@@ -34,10 +34,10 @@ suite =
                 \_ ->
                     let
                         ( state, _ ) =
-                            Peers.State.init
-                                |> Peers.State.evolve (Clock <| turnOnAt midnight)
-                                |> Peers.State.evolve_ (Clock <| Stopped)
-                                |> Peers.State.evolve_ (Clock <| turnOnAt <| minutesPast 10 midnight)
+                            Model.State.init
+                                |> Model.State.evolve (Clock <| turnOnAt midnight)
+                                |> Model.State.evolve_ (Clock <| Stopped)
+                                |> Model.State.evolve_ (Clock <| turnOnAt <| minutesPast 10 midnight)
                     in
                     state.pomodoro
                         |> Expect.equal
@@ -51,9 +51,9 @@ suite =
                 \_ ->
                     let
                         ( state, _ ) =
-                            Peers.State.init
-                                |> Peers.State.evolve (Clock <| turnOnAt midnight)
-                                |> Peers.State.evolve_ PomodoroStopped
+                            Model.State.init
+                                |> Model.State.evolve (Clock <| turnOnAt midnight)
+                                |> Model.State.evolve_ PomodoroStopped
                     in
                     state.pomodoro
                         |> Expect.equal Clock.Off
@@ -63,8 +63,8 @@ suite =
                 \_ ->
                     let
                         ( _, command ) =
-                            Peers.State.init
-                                |> Peers.State.evolveMany []
+                            Model.State.init
+                                |> Model.State.evolveMany []
                     in
                     command
                         |> Expect.equal Cmd.none
@@ -78,8 +78,8 @@ suite =
                             Clock <| turnOnWithAlarm alarm
 
                         ( _, command ) =
-                            Peers.State.init
-                                |> Peers.State.evolveMany [ started ]
+                            Model.State.init
+                                |> Model.State.evolveMany [ started ]
                     in
                     command
                         |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)

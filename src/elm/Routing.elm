@@ -1,4 +1,4 @@
-module Pages.Routing exposing (..)
+module Routing exposing (..)
 
 import Model.MobName exposing (MobName)
 import Url

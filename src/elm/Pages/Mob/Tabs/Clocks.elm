@@ -1,4 +1,4 @@
-module Pages.Mob.Clocks.Settings exposing (..)
+module Pages.Mob.Tabs.Clocks exposing (..)
 
 import Html exposing (Html, button, div, h3, input, label, p, text)
 import Html.Attributes exposing (class, classList, for, id, step, type_, value)
@@ -8,8 +8,8 @@ import Lib.Icons.Custom
 import Lib.Icons.Ion
 import Model.Clock as Clock
 import Model.MobName exposing (MobName)
-import Peers.Events
-import Peers.State
+import Model.Events
+import Model.State
 import Time
 
 
@@ -24,7 +24,7 @@ init =
 
 type Msg
     = DisplaySecondsChanged Bool
-    | ShareEvent Peers.Events.Event
+    | ShareEvent Model.Events.Event
 
 
 update : Msg -> Model -> MobName -> ( Model, Cmd Msg )
@@ -36,13 +36,13 @@ update msg model mob =
         ShareEvent event ->
             ( model
             , event
-                |> Peers.Events.MobEvent mob
-                |> Peers.Events.mobEventToJson
-                |> Peers.Events.sendEvent
+                |> Model.Events.MobEvent mob
+                |> Model.Events.mobEventToJson
+                |> Model.Events.sendEvent
             )
 
 
-view : Model -> Time.Posix -> Peers.State.State -> Html Msg
+view : Model -> Time.Posix -> Model.State.State -> Html Msg
 view model now shared =
     div [ id "timer", class "tab" ]
         [ h3 []
@@ -83,9 +83,9 @@ view model now shared =
                     , step "1"
                     , onInput <|
                         String.toInt
-                            >> Maybe.withDefault (Duration.toMinutes Peers.State.defaultTurnLength)
+                            >> Maybe.withDefault (Duration.toMinutes Model.State.defaultTurnLength)
                             >> Duration.ofMinutes
-                            >> Peers.Events.TurnLengthChanged
+                            >> Model.Events.TurnLengthChanged
                             >> ShareEvent
                     , Html.Attributes.min "2"
                     , Html.Attributes.max "20"
@@ -103,7 +103,7 @@ view model now shared =
             [ class "form-field" ]
             [ label [ for "stop-pomodoro" ] [ text "Action" ]
             , button
-                [ onClick <| ShareEvent <| Peers.Events.PomodoroStopped ]
+                [ onClick <| ShareEvent <| Model.Events.PomodoroStopped ]
                 [ text "Stop" ]
             ]
         , div
@@ -128,9 +128,9 @@ view model now shared =
                     , step "1"
                     , onInput <|
                         String.toInt
-                            >> Maybe.withDefault (Duration.toMinutes Peers.State.defaultPomodoroLength)
+                            >> Maybe.withDefault (Duration.toMinutes Model.State.defaultPomodoroLength)
                             >> Duration.ofMinutes
-                            >> Peers.Events.PomodoroLengthChanged
+                            >> Model.Events.PomodoroLengthChanged
                             >> ShareEvent
                     , Html.Attributes.min "10"
                     , Html.Attributes.max "45"

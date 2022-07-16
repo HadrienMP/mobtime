@@ -1,4 +1,4 @@
-module Pages.Mob.Sound.Settings exposing (..)
+module Pages.Mob.Tabs.Sound exposing (..)
 
 import Html exposing (Html, button, div, img, input, label, p, text)
 import Html.Attributes exposing (alt, class, classList, for, id, src, type_, value)
@@ -8,7 +8,7 @@ import Json.Encode
 import Lib.Icons.Ion exposing (musicNote)
 import Model.MobName exposing (MobName)
 import Sounds as SoundLibrary
-import Peers.Events
+import Model.Events
 
 
 type alias CommandPort =
@@ -30,7 +30,7 @@ init volume =
 
 type Msg
     = VolumeChanged String
-    | ShareEvent Peers.Events.MobEvent
+    | ShareEvent Model.Events.MobEvent
     | TestTheSound
 
 
@@ -49,8 +49,8 @@ update msg model =
         ShareEvent event ->
             ( model
             , event
-                |> Peers.Events.mobEventToJson
-                |> Peers.Events.sendEvent
+                |> Model.Events.mobEventToJson
+                |> Model.Events.sendEvent
             )
 
         TestTheSound ->
@@ -91,8 +91,8 @@ view model mob profile =
                     [ classList [ ( "active", profile == SoundLibrary.ClassicWeird ) ]
                     , onClick
                         (SoundLibrary.ClassicWeird
-                            |> Peers.Events.SelectedMusicProfile
-                            |> Peers.Events.MobEvent mob
+                            |> Model.Events.SelectedMusicProfile
+                            |> Model.Events.MobEvent mob
                             |> ShareEvent
                         )
                     ]
@@ -103,8 +103,8 @@ view model mob profile =
                     [ classList [ ( "active", profile == SoundLibrary.Riot ) ]
                     , onClick
                         (SoundLibrary.Riot
-                            |> Peers.Events.SelectedMusicProfile
-                            |> Peers.Events.MobEvent mob
+                            |> Model.Events.SelectedMusicProfile
+                            |> Model.Events.MobEvent mob
                             |> ShareEvent
                         )
                     ]

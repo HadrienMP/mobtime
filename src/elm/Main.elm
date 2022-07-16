@@ -15,7 +15,7 @@ import Lib.Toaster as Toaster exposing (Toasts)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Login
 import Pages.Mob.Main
-import Pages.Routing
+import Routing
 import Task
 import Time
 import Url
@@ -86,14 +86,14 @@ init preferences url key =
 
 loadPage : Url.Url -> UserPreferences.Model -> ( PageModel, Cmd Msg )
 loadPage url preferences =
-    case Pages.Routing.toPage url of
-        Pages.Routing.Login ->
+    case Routing.toPage url of
+        Routing.Login ->
             Pages.Login.init
                 |> Tuple.mapBoth
                     LoginModel
                     (Cmd.map GotLoginMsg)
 
-        Pages.Routing.Mob mobName ->
+        Routing.Mob mobName ->
             Pages.Mob.Main.init mobName preferences
                 |> Tuple.mapBoth
                     MobModel

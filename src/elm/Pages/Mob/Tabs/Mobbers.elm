@@ -1,4 +1,4 @@
-module Pages.Mob.Mobbers.Settings exposing (..)
+module Pages.Mob.Tabs.Mobbers exposing (..)
 
 import Field
 import Field.String
@@ -11,7 +11,7 @@ import Lib.UpdateResult exposing (UpdateResult)
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
-import Peers.Events
+import Model.Events
 import Random
 import Uuid
 
@@ -34,7 +34,7 @@ type Msg
     | StartAdding
     | Add Mobber
     | Shuffle
-    | ShareEvent Peers.Events.Event
+    | ShareEvent Model.Events.Event
 
 
 update : Msg -> Mobbers -> MobName -> Model -> UpdateResult Model Msg
@@ -69,16 +69,16 @@ update msg mobbers mob model =
             { model = model
             , command =
                 mobber
-                    |> Peers.Events.AddedMobber
-                    |> Peers.Events.MobEvent mob
-                    |> Peers.Events.mobEventToJson
-                    |> Peers.Events.sendEvent
+                    |> Model.Events.AddedMobber
+                    |> Model.Events.MobEvent mob
+                    |> Model.Events.mobEventToJson
+                    |> Model.Events.sendEvent
             , toasts = []
             }
 
         Shuffle ->
             { model = model
-            , command = Random.generate (ShareEvent << Peers.Events.ShuffledMobbers) <| Mobbers.shuffle mobbers
+            , command = Random.generate (ShareEvent << Model.Events.ShuffledMobbers) <| Mobbers.shuffle mobbers
             , toasts = []
             }
 
@@ -87,9 +87,9 @@ update msg mobbers mob model =
             { model = model
             , command =
                 event
-                    |> Peers.Events.MobEvent mob
-                    |> Peers.Events.mobEventToJson
-                    |> Peers.Events.sendEvent
+                    |> Model.Events.MobEvent mob
+                    |> Model.Events.mobEventToJson
+                    |> Model.Events.sendEvent
             , toasts = []
             }
 
@@ -111,7 +111,7 @@ view mobbers model =
             [ button
                 [ class "labelled-icon-button"
                 , disabled (not <| Mobbers.rotatable mobbers)
-                , onClick <| ShareEvent <| Peers.Events.RotatedMobbers
+                , onClick <| ShareEvent <| Model.Events.RotatedMobbers
                 ]
                 [ Icons.rotate
                 , text "Rotate"
@@ -166,7 +166,7 @@ mobberView ( role, mobber ) =
             []
             [ p [ class "name" ] [ text mobber.name ]
             , button
-                [ onClick <| ShareEvent <| Peers.Events.DeletedMobber mobber ]
+                [ onClick <| ShareEvent <| Model.Events.DeletedMobber mobber ]
                 [ Icons.delete ]
             ]
         ]
