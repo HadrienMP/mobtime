@@ -3,9 +3,9 @@ port module Peers.Events exposing (..)
 import Json.Decode
 import Json.Encode
 import Lib.Duration exposing (Duration)
-import Pages.Mob.Mobbers.Mobber as Mobber exposing (Mobber)
-import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
-import Pages.Mob.Sound.Library
+import Model.Mobber as Mobber exposing (Mobber)
+import Model.Mobbers as Mobbers exposing (Mobbers)
+import Sounds
 import Time
 
 
@@ -19,7 +19,7 @@ port sendEvent : Json.Encode.Value -> Cmd msg
 
 
 type ClockEvent
-    = Started { time : Time.Posix, alarm : Pages.Mob.Sound.Library.Sound, length : Duration }
+    = Started { time : Time.Posix, alarm :  Sounds.Sound, length : Duration }
     | Stopped
 
 
@@ -36,7 +36,7 @@ type Event
     | RotatedMobbers
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
-    | SelectedMusicProfile Pages.Mob.Sound.Library.Profile
+    | SelectedMusicProfile  Sounds.Profile
     | Unknown Json.Decode.Value
     | PomodoroStopped
     | PomodoroLengthChanged Duration
@@ -96,7 +96,7 @@ eventFromNameDecoder eventName =
 
         "SelectedMusicProfile" ->
             Json.Decode.string
-                |> Json.Decode.map Pages.Mob.Sound.Library.profileFromString
+                |> Json.Decode.map Sounds.profileFromString
                 |> Json.Decode.field "profile"
                 |> Json.Decode.map SelectedMusicProfile
 
@@ -160,7 +160,7 @@ eventToJson event =
 
         SelectedMusicProfile profile ->
             [ ( "name", Json.Encode.string "SelectedMusicProfile" )
-            , ( "profile", Json.Encode.string <| Pages.Mob.Sound.Library.profileToString profile )
+            , ( "profile", Json.Encode.string <| Sounds.profileToString profile )
             ]
 
         Unknown value ->

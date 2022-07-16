@@ -7,7 +7,7 @@ import Js.Commands
 import Json.Encode
 import Lib.Icons.Ion exposing (musicNote)
 import Pages.Mob.Name exposing (MobName)
-import Pages.Mob.Sound.Library as SoundLibrary
+import Sounds as SoundLibrary
 import Peers.Events
 
 

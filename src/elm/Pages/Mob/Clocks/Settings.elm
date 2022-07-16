@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Lib.Duration as Duration
 import Lib.Icons.Custom
 import Lib.Icons.Ion
-import Pages.Mob.Clocks.Clock as Clock
+import Model.Clock as Clock
 import Pages.Mob.Name exposing (MobName)
 import Peers.Events
 import Peers.State

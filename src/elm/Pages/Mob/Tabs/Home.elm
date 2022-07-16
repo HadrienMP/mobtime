@@ -5,8 +5,8 @@ import Html exposing (Html, div, li, span, text, ul)
 import Html.Attributes exposing (class, id)
 import Js.Commands
 import Pages.Mob.Tabs.Share
-import Pages.Mob.Mobbers.Mobber exposing (Mobber)
-import Pages.Mob.Mobbers.Mobbers exposing (Mobbers)
+import Model.Mobber exposing (Mobber)
+import Model.Mobbers exposing (Mobbers)
 import Pages.Mob.Mobbers.Settings
 import Url
 

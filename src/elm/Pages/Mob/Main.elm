@@ -15,11 +15,11 @@ import Lib.Duration as Duration exposing (DurationStringParts)
 import Lib.Icons.Ion
 import Lib.Konami as Konami exposing (Konami)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
-import Pages.Mob.Clocks.Clock as Clock exposing (ClockState(..))
+import Model.Clock as Clock exposing (ClockState(..))
 import Pages.Mob.Clocks.Settings
 import Pages.Mob.Mobbers.Settings
 import Pages.Mob.Name exposing (MobName)
-import Pages.Mob.Sound.Library
+import Sounds
 import Pages.Mob.Sound.Settings
 import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
@@ -106,7 +106,7 @@ type Msg
     | ReceivedEvent Peers.Events.Event
     | ReceivedHistory (List Peers.Events.Event)
     | Start
-    | StartWithAlarm Pages.Mob.Sound.Library.Sound
+    | StartWithAlarm  Sounds.Sound
     | StopSound
     | AlarmEnded
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
@@ -194,7 +194,7 @@ update msg model =
 
         Start ->
             { model = model
-            , command = Random.generate StartWithAlarm <| Pages.Mob.Sound.Library.pick model.shared.soundProfile
+            , command = Random.generate StartWithAlarm <| Sounds.pick model.shared.soundProfile
             , toasts = []
             }
 

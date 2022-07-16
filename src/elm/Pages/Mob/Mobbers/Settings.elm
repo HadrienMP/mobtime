@@ -9,8 +9,8 @@ import Lib.Icons.Ion as Icons
 import Lib.ListExtras exposing (assign)
 import Lib.Toaster as Toaster
 import Lib.UpdateResult exposing (UpdateResult)
-import Pages.Mob.Mobbers.Mobber exposing (Mobber)
-import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
+import Model.Mobber exposing (Mobber)
+import Model.Mobbers as Mobbers exposing (Mobbers)
 import Pages.Mob.Name exposing (MobName)
 import Peers.Events
 import Random

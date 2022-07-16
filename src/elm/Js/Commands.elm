@@ -1,7 +1,7 @@
 port module Js.Commands exposing (..)
 
 import Json.Encode
-import Pages.Mob.Sound.Library
+import Sounds
 
 
 port commands : OutCommand -> Cmd msg
@@ -9,7 +9,7 @@ port commands : OutCommand -> Cmd msg
 
 type Command
     = SoundAlarm
-    | SetAlarm Pages.Mob.Sound.Library.Sound
+    | SetAlarm  Sounds.Sound
     | StopAlarm
     | ChangeTitle String
     | CopyInPasteBin String

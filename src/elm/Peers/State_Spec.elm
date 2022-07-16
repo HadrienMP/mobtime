@@ -3,8 +3,8 @@ module Peers.State_Spec exposing (..)
 import Expect
 import Js.Commands
 import Lib.Duration as Duration
-import Pages.Mob.Clocks.Clock as Clock
-import Pages.Mob.Sound.Library as Library
+import Model.Clock as Clock
+import Sounds
 import Peers.Events exposing (ClockEvent(..), Event(..))
 import Peers.State
 import Test exposing (Test, describe, test)
@@ -72,7 +72,7 @@ suite =
                 \_ ->
                     let
                         alarm =
-                            Library.default
+                            Sounds.default
 
                         started =
                             Clock <| turnOnWithAlarm alarm
@@ -87,14 +87,14 @@ suite =
         ]
 
 
-turnOnWithAlarm : Library.Sound -> ClockEvent
+turnOnWithAlarm :  Sounds.Sound -> ClockEvent
 turnOnWithAlarm sound =
     Started { time = midnight, alarm = sound, length = Duration.ofMinutes 10 }
 
 
 turnOnAt : Time.Posix -> ClockEvent
 turnOnAt posix =
-    Started { time = posix, alarm = Library.default, length = Duration.ofMinutes 10 }
+    Started { time = posix, alarm = Sounds.default, length = Duration.ofMinutes 10 }
 
 
 midnight =

@@ -1,4 +1,4 @@
-module Pages.Mob.Clocks.Clock exposing (..)
+module Model.Clock exposing (..)
 
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio

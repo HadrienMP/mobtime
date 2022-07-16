@@ -1,9 +1,9 @@
-module Pages.Mob.Mobbers.Mobbers exposing (..)
+module Model.Mobbers exposing (..)
 
 import Json.Decode
 import Json.Encode
 import Lib.ListExtras as ListExtras
-import Pages.Mob.Mobbers.Mobber as Mobber exposing (Mobber)
+import Model.Mobber as Mobber exposing (Mobber)
 import Random
 import Random.List
 

@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "webpack --mode production",
 		"start": "node server/app.js",
-		"dev:all": "concurrently --kill-others \"npm run dev:build-front\" \"npm run dev:server\"",
+		"dev": "concurrently --kill-others \"yarn dev:build-front\" \"yarn dev:server\"",
 		"dev:build-front": "webpack --mode development --watch",
 		"dev:server": "nodemon server/app.js",
 		"test": "npx elm-test \"./src/elm/**/*Spec.elm\"",

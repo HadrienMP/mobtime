@@ -3,9 +3,9 @@ module Peers.State exposing (..)
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
-import Pages.Mob.Clocks.Clock exposing (ClockState(..))
-import Pages.Mob.Mobbers.Mobbers as Mobbers exposing (Mobbers)
-import Pages.Mob.Sound.Library
+import Model.Clock exposing (ClockState(..))
+import Model.Mobbers as Mobbers exposing (Mobbers)
+import Sounds
 import Peers.Events as Events
 import Time
 
@@ -16,7 +16,7 @@ type alias State =
     , pomodoro : ClockState
     , pomodoroLength : Duration
     , mobbers : Mobbers
-    , soundProfile : Pages.Mob.Sound.Library.Profile
+    , soundProfile :  Sounds.Profile
     }
 
 
@@ -27,7 +27,7 @@ init =
     , pomodoro = Off
     , pomodoroLength = defaultPomodoroLength
     , mobbers = Mobbers.empty
-    , soundProfile = Pages.Mob.Sound.Library.ClassicWeird
+    , soundProfile =  Sounds.ClassicWeird
     }
 
 
@@ -43,7 +43,7 @@ defaultPomodoroLength =
 
 type alias TimePassedResult =
     { updated : State
-    , turnEvent : Pages.Mob.Clocks.Clock.Event
+    , turnEvent : Model.Clock.Event
     }
 
 
@@ -51,7 +51,7 @@ timePassed : Time.Posix -> State -> TimePassedResult
 timePassed now state =
     let
         ( clock, event ) =
-            Pages.Mob.Clocks.Clock.timePassed now state.clock
+            Model.Clock.timePassed now state.clock
     in
     { updated = { state | clock = clock }
     , turnEvent = event
