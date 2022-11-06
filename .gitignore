@@ -8,3 +8,4 @@ public/css/main.css
 .idea
 server/elm-server.js
 .DS_Store
+.direnv

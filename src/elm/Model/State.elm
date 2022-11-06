@@ -127,7 +127,7 @@ evolveMany_ events previous =
             previous
 
         ( Just first, others ) ->
-            evolveMany_ others <| evolve_ first previous
+            evolveMany_ others (evolve_ first previous)
 
 
 evolveClock : Events.ClockEvent -> State -> ( State, Cmd msg )
