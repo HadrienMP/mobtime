@@ -2,7 +2,6 @@ module Model.State exposing (..)
 
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
-import Lib.ListExtras exposing (uncons)
 import Model.Clock exposing (ClockState(..))
 import Model.Events as Events
 import Model.Mobber exposing (Mobber)
@@ -109,11 +108,6 @@ evolve_ event ( state, previousCommand ) =
             , previousCommand
             )
 
-        Events.Unknown _ ->
-            ( state
-            , previousCommand
-            )
-
         Events.PomodoroStopped ->
             ( { state | pomodoro = Off }
             , previousCommand
@@ -132,11 +126,11 @@ evolveMany events model =
 
 evolveMany_ : List Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
 evolveMany_ events previous =
-    case uncons events of
-        ( Nothing, _ ) ->
+    case events of
+        [] ->
             previous
 
-        ( Just first, others ) ->
+        first :: others ->
             evolveMany_ others (evolve_ first previous)
 
 

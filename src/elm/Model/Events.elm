@@ -39,7 +39,6 @@ type Event
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
     | SelectedMusicProfile Sounds.Profile
-    | Unknown Json.Decode.Value
     | PomodoroStopped
     | PomodoroLengthChanged Duration
 
@@ -48,10 +47,11 @@ type Event
 -- DECODING
 
 
-fromJson : Json.Decode.Value -> Event
+fromJson : Json.Decode.Value -> Result String Event
 fromJson value =
-    Json.Decode.decodeValue eventDecoder value
-        |> Result.withDefault (Unknown value)
+    value
+        |> Json.Decode.decodeValue eventDecoder
+        |> Result.mapError Json.Decode.errorToString
 
 
 eventDecoder : Json.Decode.Decoder Event
@@ -173,11 +173,6 @@ eventToJson event =
         SelectedMusicProfile profile ->
             [ ( "name", Json.Encode.string "SelectedMusicProfile" )
             , ( "profile", Json.Encode.string <| Sounds.code profile )
-            ]
-
-        Unknown value ->
-            [ ( "name", Json.Encode.string "Unknown" )
-            , ( "event", value )
             ]
 
         PomodoroStopped ->

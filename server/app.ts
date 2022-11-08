@@ -1,21 +1,23 @@
-const express = require('express')
-const app = require('express')();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-const path = require('path');
+import express from 'express';
+const app = express();
+import http from 'http';
+const server = http.createServer(app);
+import socket from 'socket.io';
+const io = new socket.Server(server);
+import path from 'path';
 
-const history = {}
+const history: Record<string, unknown[]> = {}
 
 io.on('connection', (socket) => {
-    socket.on('join', room => {
+    socket.on('join', (room: string) => {
         socket.join(room);
         socket.emit('history', history[room] ? history[room] : []);
     });
-    socket.on('message', (room, message) => {
+    socket.on('message', (room: string, message: unknown) => {
         historize(room, message);
         io.in(room).emit('message', message);
     });
-    socket.on('sync', (room, message) => {
+    socket.on('sync', (room: string, message: { recipient: string }) => {
         let channel = socket.to(room);
         if (message.recipient)
             channel = io.to(message.recipient);
@@ -23,7 +25,7 @@ io.on('connection', (socket) => {
     });
 });
 
-function historize(room, message) {
+function historize(room: string, message: unknown) {
     let roomHistory = history[room] || [];
     roomHistory.push(message);
     history[room] = roomHistory;

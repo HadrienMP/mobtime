@@ -1,13 +1,14 @@
 'use strict';
 import '../sass/main.scss';
 import * as tooltips from "./tooltips";
-import * as sockets from "./sockets";
+import * as p2p from "./p2p";
 import * as sound from "./sound";
 const Elm = require('../elm/Main.elm').Elm;
 
+const rawPreferences = window.localStorage.getItem("preferences");
 const app = Elm.Main.init({
     node: document.getElementById('elm'),
-    flags: JSON.parse(window.localStorage.getItem("preferences")) || { volume: 30 }
+    flags: rawPreferences ? JSON.parse(rawPreferences) : { volume: 30 }
 });
 
 tooltips.setup();
@@ -15,15 +16,15 @@ tooltips.setup();
 let alarm = sound.load('/sound/silence.mp3');
 alarm.play();
 
-const socket = sockets.setup(app);
+const tokiNanpa = p2p.setup(app);
 
 // -----------------------------------------
 // Commands
 // -----------------------------------------
-app.ports.commands.subscribe(command => {
+app.ports.commands.subscribe((command: { name: string, value: any }) => {
     switch (command.name) {
         case "Join":
-            socket.emit('join', command.value);
+            tokiNanpa.join(command.value);
             break;
         case "SoundAlarm":
             alarm.play();
@@ -52,11 +53,6 @@ app.ports.commands.subscribe(command => {
         case 'ChangeVolume':
             window.localStorage.setItem("preferences", JSON.stringify({ volume: parseInt(command.value) }));
             sound.volume(command.value);
-            break;
-        case 'GetSocketId':
-            // If there is no socket id, it means we are still connecting and so the event will be sent when the connection is established
-            if (socket.id)
-                app.ports.events.send({ name: "GotSocketId", value: socket.id });
             break;
         case 'TestTheSound':
             sound.play("/sound/hello.mp3");

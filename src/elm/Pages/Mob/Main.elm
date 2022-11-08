@@ -2,7 +2,7 @@ module Pages.Mob.Main exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
-import Css exposing (height, px, width)
+import Css exposing (height, invalid, px, width)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
@@ -14,6 +14,7 @@ import Lib.Circle
 import Lib.Duration as Duration exposing (DurationStringParts)
 import Lib.Icons.Ion
 import Lib.Konami as Konami exposing (Konami)
+import Lib.Toaster
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
@@ -105,10 +106,10 @@ init name preferences =
 
 type Msg
     = ShareEvent Model.Events.MobEvent
-    | ReceivedEvent Model.Events.Event
-    | ReceivedHistory (List Model.Events.Event)
     | StartClicked
     | StartWith ( Time.Posix, Sounds.Sound )
+    | ReceivedEvent (Result String Model.Events.Event)
+    | ReceivedHistory (List (Result String Model.Events.Event))
     | StopSound
     | AlarmEnded
     | TimePassed Time.Posix
@@ -164,7 +165,7 @@ update msg model =
             , toasts = []
             }
 
-        ReceivedEvent event ->
+        ReceivedEvent (Ok event) ->
             let
                 ( shared, command ) =
                     Model.State.evolve event model.shared
@@ -185,14 +186,50 @@ update msg model =
             , toasts = []
             }
 
+        ReceivedEvent (Err err) ->
+            { model = model
+            , command = Cmd.none
+            , toasts =
+                Lib.Toaster.error err
+                    |> Lib.Toaster.keepOn
+                    |> List.singleton
+            }
+
         ReceivedHistory eventsResults ->
             let
+                ( valid, invalid ) =
+                    eventsResults
+                        |> List.partition
+                            (\r ->
+                                case r of
+                                    Ok _ ->
+                                        True
+
+                                    Err _ ->
+                                        False
+                            )
+                        |> Tuple.mapBoth
+                            (List.filterMap Result.toMaybe)
+                            (List.filterMap
+                                (\r ->
+                                    case r of
+                                        Ok _ ->
+                                            Nothing
+
+                                        Err err ->
+                                            Just err
+                                )
+                            )
+
+                toasts =
+                    invalid |> List.map (Lib.Toaster.error >> Lib.Toaster.keepOn)
+
                 ( shared, command ) =
-                    Model.State.evolveMany eventsResults model.shared
+                    Model.State.evolveMany valid model.shared
             in
             { model = { model | shared = shared }
             , command = command
-            , toasts = []
+            , toasts = toasts
             }
 
         StartClicked ->
