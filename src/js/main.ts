@@ -1,5 +1,3 @@
-'use strict';
-import '../sass/main.scss';
 import * as tooltips from "./tooltips";
 import * as p2p from "./p2p";
 import * as sound from "./sound";

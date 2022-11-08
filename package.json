@@ -2,13 +2,10 @@
 	"name": "mob-time-elm",
 	"version": "1.0.22",
 	"description": "",
-	"main": "index.js",
+	"source": "src/index.html",
 	"scripts": {
-		"build": "webpack --mode production",
-		"start": "ts-node server/app.ts",
-		"dev": "npm-run-all --parallel dev:*",
-		"dev:build-front": "webpack --mode development --watch",
-		"dev:server": "nodemon server/app.ts",
+		"build": "parcel build",
+		"start": "parcel",
 		"test": "npx elm-test \"./src/elm/**/*Spec.elm\"",
 		"postinstall": "elm-tooling install ; husky install",
 		"review": "elm-review --fix-all"
@@ -17,50 +14,29 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@parcel/transformer-elm": "^2.7.0",
+		"@parcel/transformer-sass": "^2.7.0",
 		"@types/express": "^4.17.14",
+		"@types/hash-sum": "^1.0.0",
 		"@types/howler": "^2.2.7",
 		"@types/node": "^18.11.9",
-		"@types/hash-sum": "^1.0.0",
-		"concurrently": "^7.0.0",
-		"css-loader": "^6.5.1",
-		"elm-live": "^3.4.1",
+		"elm": "^0.19.1-5",
 		"elm-review": "^2.7.3",
 		"elm-test": "^0.19.1-revision6",
 		"elm-tooling": "^1.8.0",
-		"elm-webpack-loader": "^8.0.0",
 		"gitmoji-cli": "^5.0.2",
-		"howler": "^2.2.3",
 		"https-local": "^1.0.0",
+		"husky": "^8.0.1",
 		"nodemon": "^2.0.7",
-		"npm-run-all": "^4.1.5",
+		"parcel": "^2.7.0",
 		"sass": "^1.43.4",
-		"sass-loader": "^12.3.0",
-		"socket.io-client": "^4.3.2",
-		"style-loader": "^3.3.1",
-		"tippy.js": "^6.3.7",
-		"ts-loader": "^9.4.1",
-		"ts-node": "^10.9.1",
 		"tslib": "^2.4.1",
-		"typescript": "^4.8.4",
-		"webpack": "^5.64.0",
-		"webpack-cli": "^4.9.1"
-	},
-	"release-it": {
-		"npm": {
-			"publish": false
-		},
-		"github": {
-			"release": true,
-			"assets": [
-				"./dist/dist.zip"
-			]
-		}
+		"typescript": "^4.8.4"
 	},
 	"dependencies": {
-		"elm": "^0.19.1-5",
-		"express": "^4.17.1",
 		"hash-sum": "^2.0.0",
-		"husky": "^8.0.1",
-		"socket.io": "^3.1.2"
+		"howler": "^2.2.3",
+		"tippy.js": "^6.3.7",
+		"socket.io-client": "^4.5.3"
 	}
 }

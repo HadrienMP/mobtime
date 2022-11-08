@@ -16,7 +16,7 @@ $info-color: #00a9eb;
 $error-color: #eb0000;
 
 @mixin mob-header-background() {
-  background: url("/public/images/k7.jpg") top no-repeat;
+  background: url("../images/k7.jpg") top no-repeat;
   background-size: cover;
 }
 
