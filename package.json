@@ -30,13 +30,14 @@
 		"nodemon": "^2.0.7",
 		"parcel": "^2.7.0",
 		"sass": "^1.43.4",
+		"sharp": "^0.29.3",
 		"tslib": "^2.4.1",
 		"typescript": "^4.8.4"
 	},
 	"dependencies": {
 		"hash-sum": "^2.0.0",
 		"howler": "^2.2.3",
-		"tippy.js": "^6.3.7",
-		"socket.io-client": "^4.5.3"
+		"socket.io-client": "^4.5.3",
+		"tippy.js": "^6.3.7"
 	}
 }
