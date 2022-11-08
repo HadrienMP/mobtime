@@ -172,6 +172,20 @@
   dependencies:
     chalk "^4.1.0"
 
+"@parcel/compressor-brotli@^2.7.0":
+  "integrity" "sha512-dXyV/jXS2fqhU9Uj+29xPt/txTXnSJcvUtjo3R8cjKbJYK2vu4e1s0QCo5rndpCYgbYKevwNdHmIuxN2us+A3Q=="
+  "resolved" "https://registry.npmjs.org/@parcel/compressor-brotli/-/compressor-brotli-2.7.0.tgz"
+  "version" "2.7.0"
+  dependencies:
+    "@parcel/plugin" "2.7.0"
+
+"@parcel/compressor-gzip@^2.7.0":
+  "integrity" "sha512-k4qwF7i+2ouGAyjXfCeeT8nEcSAXQVPdF0eG35pZeMsT+vrQ1+MI1L3AwBhLIuXRPXDMv47Eqx+KTsatP9gVmg=="
+  "resolved" "https://registry.npmjs.org/@parcel/compressor-gzip/-/compressor-gzip-2.7.0.tgz"
+  "version" "2.7.0"
+  dependencies:
+    "@parcel/plugin" "2.7.0"
+
 "@parcel/compressor-raw@2.7.0":
   version "2.7.0"
   resolved "https://registry.npmjs.org/@parcel/compressor-raw/-/compressor-raw-2.7.0.tgz"
@@ -460,6 +474,15 @@
   integrity sha512-qqgx+nnMn6/0lRc4lKbLGmhNtBiT93S2gFNB4Eb4Pfz/SxVYoW+fmml+KdfOSiZffWOAH5L6NwhyD7N8aSikzw==
   dependencies:
     "@parcel/types" "2.7.0"
+
+"@parcel/reporter-bundle-analyzer@^2.7.0":
+  "integrity" "sha512-bPvI+cF0cRXekGsavjemvYCFVsOW6XSNELHSb/b38oTPBE5zAhkDkk4ZNC0neIYqtxcOk/NMZZ4V7XPncddGVg=="
+  "resolved" "https://registry.npmjs.org/@parcel/reporter-bundle-analyzer/-/reporter-bundle-analyzer-2.7.0.tgz"
+  "version" "2.7.0"
+  dependencies:
+    "@parcel/plugin" "2.7.0"
+    "@parcel/utils" "2.7.0"
+    "nullthrows" "^1.1.1"
 
 "@parcel/reporter-cli@2.7.0":
   version "2.7.0"
