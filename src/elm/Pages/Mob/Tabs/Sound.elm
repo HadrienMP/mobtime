@@ -1,14 +1,14 @@
 module Pages.Mob.Tabs.Sound exposing (..)
 
 import Html exposing (Html, button, div, img, input, label, p, text)
-import Html.Attributes exposing (alt, class, classList, for, id, src, type_, value)
+import Html.Attributes exposing (class, classList, for, id, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
 import Lib.Icons.Ion exposing (musicNote)
+import Model.Events
 import Model.MobName exposing (MobName)
 import Sounds as SoundLibrary
-import Model.Events
 
 
 type alias CommandPort =
@@ -60,7 +60,7 @@ update msg model =
 
 
 view : Model -> MobName -> SoundLibrary.Profile -> Html Msg
-view model mob profile =
+view model mob activeProfile =
     div [ id "sound", class "tab" ]
         [ div
             [ id "volume-field", class "form-field" ]
@@ -87,30 +87,29 @@ view model mob profile =
             [ label [] [ text "Playlist" ]
             , div
                 [ id "sound-cards" ]
-                [ button
-                    [ classList [ ( "active", profile == SoundLibrary.ClassicWeird ) ]
-                    , onClick
-                        (SoundLibrary.ClassicWeird
-                            |> Model.Events.SelectedMusicProfile
-                            |> Model.Events.MobEvent mob
-                            |> ShareEvent
-                        )
-                    ]
-                    [ img [ src "/images/weird.jpeg", alt "Man wearing a watermelon as a hat" ] []
-                    , p [] [ text "Classic Weird" ]
-                    ]
-                , button
-                    [ classList [ ( "active", profile == SoundLibrary.Riot ) ]
-                    , onClick
-                        (SoundLibrary.Riot
-                            |> Model.Events.SelectedMusicProfile
-                            |> Model.Events.MobEvent mob
-                            |> ShareEvent
-                        )
-                    ]
-                    [ img [ src "/images/commune.jpg", alt "Comic book drawing of the paris commune revolution" ] []
-                    , p [] [ text "Revolution" ]
-                    ]
-                ]
+                (SoundLibrary.allProfiles
+                    |> List.map (\profile -> viewProfile { active = activeProfile, current = profile } mob)
+                )
             ]
         ]
+
+
+viewProfile : { active : SoundLibrary.Profile, current : SoundLibrary.Profile } -> MobName -> Html Msg
+viewProfile { active, current } mob =
+    button
+        [ classList [ ( "active", active == current ) ]
+        , onClick
+            (current
+                |> Model.Events.SelectedMusicProfile
+                |> Model.Events.MobEvent mob
+                |> ShareEvent
+            )
+        ]
+        [ SoundLibrary.poster current |> viewPoster
+        , p [] [ text <| SoundLibrary.title current ]
+        ]
+
+
+viewPoster : SoundLibrary.Image -> Html Msg
+viewPoster { url, alt } =
+    img [ src url, Html.Attributes.alt alt ] []

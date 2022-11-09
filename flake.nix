@@ -16,6 +16,9 @@
             nodejs-18_x
             yarn
             nodePackages.gitmoji-cli
+            lame
+            audacity
+            imageworsener
           ];
           shellHook = ''
             yarn install

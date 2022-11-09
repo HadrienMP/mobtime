@@ -6,22 +6,22 @@
   display: block;
 
   #sound-cards {
-    display: flex;
-    align-items: start;
     padding: $margin-space 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: $padding-space;
 
     button {
-      flex: 1 0;
+      min-width: 170px;
+      max-width: 300px;
       width: 130px;
       text-align: center;
       padding: 0;
-      vertical-align: top;
       display: block;
-      margin-left: $margin-space;
-
-      &:first-child {
-        margin-left: 0;
-      }
+      flex-grow: 1;
+      border: 1px solid $light-button-color;
 
       p {
         padding: $padding-space;
@@ -32,7 +32,8 @@
         opacity: .6;
       }
 
-      &.active, &:hover {
+      &.active,
+      &:hover {
         img {
           opacity: 1;
         }

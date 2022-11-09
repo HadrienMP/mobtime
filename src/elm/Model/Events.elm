@@ -96,7 +96,7 @@ eventFromNameDecoder eventName =
 
         "SelectedMusicProfile" ->
             Json.Decode.string
-                |> Json.Decode.map Sounds.profileFromString
+                |> Json.Decode.map Sounds.fromCode
                 |> Json.Decode.field "profile"
                 |> Json.Decode.map SelectedMusicProfile
 
@@ -160,7 +160,7 @@ eventToJson event =
 
         SelectedMusicProfile profile ->
             [ ( "name", Json.Encode.string "SelectedMusicProfile" )
-            , ( "profile", Json.Encode.string <| Sounds.profileToString profile )
+            , ( "profile", Json.Encode.string <| Sounds.code profile )
             ]
 
         Unknown value ->
