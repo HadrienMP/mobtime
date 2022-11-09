@@ -9,3 +9,5 @@ public/css/main.css
 server/elm-server.js
 .DS_Store
 .direnv
+.parcel-cache
+parcel-bundle-reports
