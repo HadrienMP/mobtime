@@ -3,6 +3,7 @@ module Footer exposing (..)
 import Html exposing (Html, a, footer, text)
 import Html.Attributes exposing (href, id, target)
 import Lib.Icons.Ion
+import Lib.Icons.Custom
 
 
 view : Html msg
@@ -15,6 +16,10 @@ view =
             , target "blank"
             ]
             [ Lib.Icons.Ion.github
-            , text "Fork me on github!"
+            , text "Checkout the code!"
+            ]
+        , a [ href "https://liberapay.com/HadrienMP/donate", target "blank", id "liberapay" ]
+            [ Lib.Icons.Custom.rocket
+            , text "Support hosting"
             ]
         ]

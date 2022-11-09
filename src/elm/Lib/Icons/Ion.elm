@@ -112,7 +112,7 @@ mute =
 people : Svg msg
 people =
     display Ionicon.personStalker
-
+    
 display : (Int -> RGBA -> Svg msg) -> Svg msg
 display icon =
     i [ class "icon" ] [ icon 32 (RGBA 0 0 0 0) ]
