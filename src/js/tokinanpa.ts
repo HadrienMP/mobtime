@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 type InboundMessage = {
     room: string;
@@ -18,57 +18,64 @@ type OutboundDm = {
 };
 
 export type Subscriptions = {
-    onMessage: ((message: InboundMessage) => void);
-    onJoined: (message: InboundMessage) => void;
-    onLeft: (message: InboundMessage) => void;
-    onDirectMessage: (message: InboundDM) => void;
-    onConnect: (peerId: string) => void;
-    onDisconnect: () => void;
+    onMessage?: ((message: InboundMessage) => void);
+    onJoined?: (message: InboundMessage) => void;
+    onLeft?: (message: InboundMessage) => void;
+    onDirectMessage?: (message: InboundDM) => void;
 };
 
-export const noSubscriptions: Subscriptions = {
-    onMessage: _ => { },
-    onJoined: _ => { },
-    onLeft: _ => { },
-    onDirectMessage: _ => { },
-    onConnect: () => { },
-    onDisconnect: () => { },
-}
-
 export class TokiNanpa {
-    private socket = io("https://toki-nanpa.onrender.com");
+    private socket: Socket;
 
-    subscribe = (props: Subscriptions) => {
+    constructor(props: {
+        onConnect?: (peerId: string) => void;
+        onDisconnect?: () => void;
+    }) {
+        const socket = io("https://toki-nanpa.onrender.com");
+        this.socket = socket;
+        this.socket.on('connect', () => {
+            if (props.onConnect)
+                props.onConnect(this.socket.id);
+            else
+                console.warn('unhandled connection event')
+        });
+
+        this.socket.on('disconnect', () => {
+            if (props.onDisconnect)
+                props.onDisconnect;
+            else
+                console.warn('unhandled disconnection event')
+        });
+    }
+
+    subscribe = (subscriptions: Subscriptions) => {
         this.socket.on('message', msg => {
             const { room, type, data, from: peer } = msg;
-            switch (type) {
-                case 'message':
-                    if (data !== 'Hello') {
-                        console.debug("#️⃣ ⬅️ message", data);
-                        props.onMessage({ room, data, from: peer })
-                    }
-                    break;
-                case 'joined':
-                    console.debug("#️⃣ 👋 joined", peer);
-                    props.onJoined({ room, data, from: peer })
-                    break;
-                case 'left':
-                    console.debug("#️⃣ 👋 left", peer);
-                    props.onLeft({ room, data, from: peer })
-                    break;
-                default:
-                    console.error('unknown peer event: ' + JSON.stringify(msg))
-                    break;
+            if (type === 'message' && subscriptions.onMessage) {
+                if (data !== 'Hello') {
+                    console.debug("#️⃣ ⬅️ message", data);
+                    subscriptions.onMessage({ room, data, from: peer })
+                }
+            }
+            else if (type === 'joined' && subscriptions.onJoined) {
+                console.debug("#️⃣ 👋 joined", peer);
+                subscriptions.onJoined({ room, data, from: peer })
+            }
+            else if (type === 'left' && subscriptions.onLeft) {
+                console.debug("#️⃣ 👋 left", peer);
+                subscriptions.onLeft({ room, data, from: peer })
+            } else {
+                console.error('unhandled peer event: ' + JSON.stringify(msg))
             }
         });
         this.socket.on('direct-message', msg => {
             const dm: InboundDM = msg;
             console.debug("#️⃣ ⬅️ DM", dm);
-            props.onDirectMessage(dm);
+            if (subscriptions.onDirectMessage)
+                subscriptions.onDirectMessage(dm);
+            else
+                console.warn('unhandled direct message')
         });
-
-        this.socket.on('connect', () => props.onConnect(this.socket.id));
-        this.socket.on('disconnect', props.onDisconnect);
     }
 
     broadcast = (message: { room: string, data: unknown }) => {

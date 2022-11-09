@@ -1,14 +1,14 @@
-import { TokiNanpa, noSubscriptions } from './tokinanpa';
+import { TokiNanpa } from './tokinanpa';
 import { RommHistories } from './history';
 
 
 export function setup(app: { ports: any }): TokiNanpa {
     const history = new RommHistories();
-    const tokiNanpa = new TokiNanpa();
-    tokiNanpa.subscribe({
-        ...noSubscriptions,
+    const tokiNanpa = new TokiNanpa({
         onConnect: peerId => app.ports.events.send({ name: "GotSocketId", value: peerId }),
         onDisconnect: () => app.ports.events.send({ name: "SocketDisconnected", value: "" }),
+    });
+    tokiNanpa.subscribe({
         onMessage: msg => {
             const { type, value } = msg.data;
             if (type === 'sync') {
