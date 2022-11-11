@@ -5,7 +5,8 @@ import Html exposing (Html, div, li, span, text, ul)
 import Html.Attributes exposing (class, id)
 import Js.Commands
 import Model.Mobber exposing (Mobber)
-import Model.Mobbers exposing (Mobbers)
+import Model.Role exposing (Role)
+import Model.State exposing (State)
 import Pages.Mob.Tabs.Share
 import Url
 
@@ -23,20 +24,19 @@ update msg =
                 |> Js.Commands.send
 
 
-view : String -> Url.Url -> Mobbers -> Html Msg
-view mobName url mobbers =
+view : String -> Url.Url -> State -> Html Msg
+view mobName url state =
     div
         [ id "home", class "tab" ]
         [ Pages.Mob.Tabs.Share.shareButton mobName <| PutLinkInPasteBin url
-        , roles mobbers
+        , roles state
         , Footer.view
         ]
 
 
-roles : Mobbers -> Html msg
-roles mobbers =
-    Model.Mobbers.assignRoles mobbers
-        |> List.take 3
+roles : State -> Html msg
+roles state =
+    Model.State.assignSpecialRoles state
         |> List.map roleView
         |> (\list ->
                 case list of
@@ -48,9 +48,9 @@ roles mobbers =
            )
 
 
-roleView : ( String, Mobber ) -> Html msg
+roleView : ( Role, Mobber ) -> Html msg
 roleView ( role, mobber ) =
     li [ class "mobber-role" ]
-        [ span [ class "role" ] [ role |> text ]
+        [ span [ class "role" ] [ role |> Model.Role.print |> text ]
         , span [ class "mobber" ] [ mobber.name |> text ]
         ]

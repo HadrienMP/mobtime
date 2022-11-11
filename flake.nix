@@ -19,6 +19,9 @@
             lame
             audacity
             imageworsener
+            elmPackages.elm
+            elmPackages.elm-test
+            elmPackages.elm-format
           ];
           shellHook = ''
             yarn install

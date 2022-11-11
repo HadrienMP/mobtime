@@ -18,6 +18,8 @@ type Event
     = Ended
     | Continued
 
+isOn : ClockState -> Bool
+isOn clockState = clockState /= Off
 
 timePassed : Time.Posix -> ClockState -> ( ClockState, Event )
 timePassed now clockState =

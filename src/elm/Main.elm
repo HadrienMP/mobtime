@@ -16,8 +16,6 @@ import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Login
 import Pages.Mob.Main
 import Routing
-import Task
-import Time
 import Url
 import UserPreferences
 
@@ -43,8 +41,8 @@ main =
 
 
 type PageModel
-    = LoginModel Pages.Login.Model
-    | MobModel Pages.Mob.Main.Model
+    = Login Pages.Login.Model
+    | Mob Pages.Mob.Main.Model
 
 
 type alias Model =
@@ -70,15 +68,14 @@ init preferences url key =
       , toasts = []
       , displayModal =
             case page of
-                LoginModel _ ->
+                Login _ ->
                     False
 
-                MobModel _ ->
+                Mob _ ->
                     True
       }
     , Cmd.batch
-        [ Task.perform TimePassed Time.now
-        , Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
+        [ Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
         , pageCommand
         ]
     )
@@ -90,13 +87,13 @@ loadPage url preferences =
         Routing.Login ->
             Pages.Login.init
                 |> Tuple.mapBoth
-                    LoginModel
+                    Login
                     (Cmd.map GotLoginMsg)
 
         Routing.Mob mobName ->
             Pages.Mob.Main.init mobName preferences
                 |> Tuple.mapBoth
-                    MobModel
+                    Mob
                     (Cmd.map GotMobMsg)
 
 
@@ -107,7 +104,6 @@ loadPage url preferences =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | TimePassed Time.Posix
     | GotMobMsg Pages.Mob.Main.Msg
     | GotLoginMsg Pages.Login.Msg
     | GotToastMsg Toaster.Msg
@@ -131,23 +127,17 @@ update msg model =
             loadPage url model.preferences
                 |> Tuple.mapFirst (\page -> { model | page = page, url = url })
 
-        ( GotLoginMsg subMsg, LoginModel subModel ) ->
+        ( GotLoginMsg subMsg, Login subModel ) ->
             Pages.Login.update subModel subMsg model.key
-                |> UpdateResult.map LoginModel GotLoginMsg
+                |> UpdateResult.map Login GotLoginMsg
                 |> handleToasts model
                 |> toElm model
 
-        ( GotMobMsg subMsg, MobModel subModel ) ->
+        ( GotMobMsg subMsg, Mob subModel ) ->
             Pages.Mob.Main.update subMsg subModel
-                |> UpdateResult.map MobModel GotMobMsg
+                |> UpdateResult.map Mob GotMobMsg
                 |> handleToasts model
                 |> toElm model
-
-        ( TimePassed now, MobModel subModel ) ->
-            Pages.Mob.Main.timePassed now subModel
-                |> Tuple.mapBoth
-                    (\mob -> { model | page = MobModel mob })
-                    (Cmd.map GotMobMsg)
 
         ( GotToastMsg subMsg, _ ) ->
             Toaster.update subMsg model.toasts
@@ -212,10 +202,14 @@ socketDisconnectedToast =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     Sub.batch
-        [ Pages.Mob.Main.subscriptions |> Sub.map GotMobMsg
-        , Time.every 500 TimePassed
+        [ case model.page of
+            Login _ ->
+                Sub.none
+
+            Mob mobModel ->
+                Pages.Mob.Main.subscriptions mobModel |> Sub.map GotMobMsg
         , Js.Events.events (dispatch jsEventsMapping)
         ]
 
@@ -243,11 +237,11 @@ view model =
     let
         doc =
             case model.page of
-                LoginModel sub ->
+                Login sub ->
                     Pages.Login.view sub
                         |> Lib.DocumentExtras.map GotLoginMsg
 
-                MobModel sub ->
+                Mob sub ->
                     Pages.Mob.Main.view sub model.url
                         |> Lib.DocumentExtras.map GotMobMsg
     in

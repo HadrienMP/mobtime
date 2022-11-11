@@ -4,6 +4,8 @@ import Json.Decode
 import Json.Encode
 import Lib.ListExtras as ListExtras
 import Model.Mobber as Mobber exposing (Mobber)
+import Model.Role exposing (Role)
+import Model.Roles exposing (Roles)
 import Random
 import Random.List
 
@@ -61,10 +63,22 @@ toList mobbers =
             list
 
 
-assignRoles : Mobbers -> List ( String, Mobber )
-assignRoles mobbers =
+assignRoles : Roles -> Mobbers -> List ( Role, Mobber )
+assignRoles roles mobbers =
+    let
+        list =
+            toList mobbers
+    in
     toList mobbers
-        |> ListExtras.zip ([ "Driver", "Navigator", "Next" ] ++ List.repeat (List.length (toList mobbers) - 3) "Mobber")
+        |> ListExtras.zip
+            (roles.special
+                ++ List.repeat (List.length list - List.length roles.special) roles.default
+            )
+
+
+assignSpecialRoles : Roles -> Mobbers -> List ( Role, Mobber )
+assignSpecialRoles roles mobbers =
+    toList mobbers |> ListExtras.zip roles.special
 
 
 rotatable : Mobbers -> Bool

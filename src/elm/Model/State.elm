@@ -4,9 +4,12 @@ import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
 import Model.Clock exposing (ClockState(..))
-import Model.Mobbers as Mobbers exposing (Mobbers)
-import Sounds
 import Model.Events as Events
+import Model.Mobber exposing (Mobber)
+import Model.Mobbers as Mobbers exposing (Mobbers)
+import Model.Role exposing (Role)
+import Model.Roles
+import Sounds
 import Time
 
 
@@ -16,7 +19,8 @@ type alias State =
     , pomodoro : ClockState
     , pomodoroLength : Duration
     , mobbers : Mobbers
-    , soundProfile :  Sounds.Profile
+    , roles : Model.Roles.Roles
+    , soundProfile : Sounds.Profile
     }
 
 
@@ -27,7 +31,8 @@ init =
     , pomodoro = Off
     , pomodoroLength = defaultPomodoroLength
     , mobbers = Mobbers.empty
-    , soundProfile =  Sounds.ClassicWeird
+    , roles = Model.Roles.default
+    , soundProfile = Sounds.ClassicWeird
     }
 
 
@@ -68,6 +73,11 @@ evolve_ event ( state, previousCommand ) =
     case event of
         Events.Clock clockEvent ->
             evolveClock clockEvent state
+
+        Events.ChangedRoles roles ->
+            ( { state | roles = roles }
+            , previousCommand
+            )
 
         Events.AddedMobber mobber ->
             ( { state | mobbers = Mobbers.add mobber state.mobbers }
@@ -166,3 +176,13 @@ evolveClock event state =
 
         _ ->
             ( state, Cmd.none )
+
+
+assignRoles : State -> List ( Role, Mobber )
+assignRoles state =
+    Mobbers.assignRoles state.roles state.mobbers
+
+
+assignSpecialRoles : State -> List ( Role, Mobber )
+assignSpecialRoles state =
+    Mobbers.assignSpecialRoles state.roles state.mobbers

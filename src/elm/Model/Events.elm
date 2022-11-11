@@ -5,6 +5,7 @@ import Json.Encode
 import Lib.Duration exposing (Duration)
 import Model.Mobber as Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
+import Model.Roles
 import Sounds
 import Time
 
@@ -19,7 +20,7 @@ port sendEvent : Json.Encode.Value -> Cmd msg
 
 
 type ClockEvent
-    = Started { time : Time.Posix, alarm :  Sounds.Sound, length : Duration }
+    = Started { time : Time.Posix, alarm : Sounds.Sound, length : Duration }
     | Stopped
 
 
@@ -31,12 +32,13 @@ type alias MobEvent =
 
 type Event
     = Clock ClockEvent
+    | ChangedRoles Model.Roles.Roles
     | AddedMobber Mobber
     | DeletedMobber Mobber
     | RotatedMobbers
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
-    | SelectedMusicProfile  Sounds.Profile
+    | SelectedMusicProfile Sounds.Profile
     | Unknown Json.Decode.Value
     | PomodoroStopped
     | PomodoroLengthChanged Duration
@@ -100,6 +102,11 @@ eventFromNameDecoder eventName =
                 |> Json.Decode.field "profile"
                 |> Json.Decode.map SelectedMusicProfile
 
+        "ChangedRoles" ->
+            Model.Roles.decoder
+                |> Json.Decode.field "roles"
+                |> Json.Decode.map ChangedRoles
+
         _ ->
             Json.Decode.fail <| "I don't know this event " ++ eventName
 
@@ -134,6 +141,11 @@ eventToJson event =
     case event of
         Clock clockEvent ->
             clockEventToJson clockEvent
+
+        ChangedRoles roles ->
+            [ ( "name", Json.Encode.string "ChangedRoles" )
+            , ( "roles", Model.Roles.encode roles )
+            ]
 
         AddedMobber mobber ->
             [ ( "name", Json.Encode.string "AddedMobber" )

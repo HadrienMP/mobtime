@@ -8,10 +8,12 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Lib.Icons.Ion as Icons
 import Lib.Toaster as Toaster
 import Lib.UpdateResult exposing (UpdateResult)
+import Model.Events
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
-import Model.Events
+import Model.Role exposing (Role)
+import Model.State exposing (State)
 import Random
 import Uuid
 
@@ -55,7 +57,14 @@ update msg mobbers mob model =
                 Ok validMobberName ->
                     { model = { model | mobberName = Field.init "" }
                     , command =
-                        Random.generate (\id -> Add <| Mobber id validMobberName) Uuid.uuidGenerator
+                        Random.generate
+                            (\id ->
+                                Add
+                                    { id = id |> Uuid.toString |> Model.Mobber.idFromString
+                                    , name = validMobberName
+                                    }
+                            )
+                            Uuid.uuidGenerator
                     , toasts = []
                     }
 
@@ -98,8 +107,8 @@ update msg mobbers mob model =
 -- VIEW
 
 
-view : Mobbers -> Model -> Html Msg
-view mobbers model =
+view : State -> Model -> Html Msg
+view { mobbers, roles } model =
     div
         [ id "mobbers", class "tab" ]
         [ form
@@ -126,7 +135,7 @@ view mobbers model =
                 ]
             ]
         , ul []
-            (Mobbers.assignRoles mobbers
+            (Mobbers.assignRoles roles mobbers
                 |> List.map mobberView
             )
         ]
@@ -158,10 +167,10 @@ textInput title toMsg value meta =
         []
 
 
-mobberView : ( String, Mobber ) -> Html Msg
+mobberView : ( Role, Mobber ) -> Html Msg
 mobberView ( role, mobber ) =
     li []
-        [ p [ class "role" ] [ text role ]
+        [ p [ class "role" ] [ text <| Model.Role.print role ]
         , div
             []
             [ p [ class "name" ] [ text mobber.name ]

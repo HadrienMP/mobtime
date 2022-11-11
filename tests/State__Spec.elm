@@ -1,12 +1,14 @@
-module Model.State_Spec exposing (..)
+module State__Spec exposing (..)
 
 import Expect
 import Js.Commands
 import Lib.Duration as Duration
 import Model.Clock as Clock
-import Sounds
 import Model.Events exposing (ClockEvent(..), Event(..))
+import Model.Mobber as Mobber
+import Model.Role
 import Model.State
+import Sounds
 import Test exposing (Test, describe, test)
 import Time
 
@@ -84,10 +86,46 @@ suite =
                     command
                         |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
             ]
+        , describe "full turn: when every mobber has been driver and navigator"
+            [ test "notify everyone" <|
+                \_ ->
+                    let
+                        driver =
+                            Model.Role.fromString "Driver"
+
+                        navigator =
+                            Model.Role.fromString "Navigator"
+
+                        mobber =
+                            Model.Role.fromString "Mobber"
+
+                        jane =
+                            { id = Mobber.idFromString "jane", name = "Jane" }
+
+                        camille =
+                            { id = Mobber.idFromString "camille", name = "Camille" }
+
+                        roles =
+                            { default = mobber, special = [ driver, navigator ] }
+
+                        ( state, _ ) =
+                            Model.State.init
+                                |> Model.State.evolveMany
+                                    [ AddedMobber jane
+                                    , AddedMobber camille
+                                    , ChangedRoles roles
+                                    , Clock <| turnOnAt midnight
+                                    , Clock Stopped
+                                    ]
+                    in
+                    state
+                        |> Model.State.assignRoles
+                        |> Expect.equal [ ( driver, camille ), ( navigator, jane ) ]
+            ]
         ]
 
 
-turnOnWithAlarm :  Sounds.Sound -> ClockEvent
+turnOnWithAlarm : Sounds.Sound -> ClockEvent
 turnOnWithAlarm sound =
     Started { time = midnight, alarm = sound, length = Duration.ofMinutes 10 }
 
@@ -97,6 +135,7 @@ turnOnAt posix =
     Started { time = posix, alarm = Sounds.default, length = Duration.ofMinutes 10 }
 
 
+midnight : Time.Posix
 midnight =
     Time.millisToPosix 0
 

@@ -42,9 +42,11 @@ app.ports.commands.subscribe(command => {
                     .writeText(command.value)
                     .finally(() => app.ports.events.send({ name: 'Copied', value: "" }))
             } else {
-                command.value.select();
-                document.execCommand('copy');
-                app.ports.events.send({ name: 'Copied', value: "" })
+                if (fallbackCopyTextToClipboard(command.value))
+                    app.ports.events.send({ name: 'Copied', value: "" });
+                else {
+                    alert('wut')
+                }
             }
             break;
         case 'ChangeVolume':
@@ -64,3 +66,26 @@ app.ports.commands.subscribe(command => {
             break;
     }
 });
+
+function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        return document.execCommand('copy');
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+        return false;
+    } finally {
+        document.body.removeChild(textArea);
+    }
+}
