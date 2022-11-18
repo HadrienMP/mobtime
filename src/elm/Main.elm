@@ -13,8 +13,8 @@ import Lib.DocumentExtras
 import Lib.Icons.Ion
 import Lib.Toaster as Toaster exposing (Toasts)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
-import Pages.Login
-import Pages.Mob.Main
+import Pages.Home
+import Pages.Mob
 import Routing
 import Url
 import UserPreferences
@@ -40,15 +40,15 @@ main =
 -- MODEL
 
 
-type PageModel
-    = Login Pages.Login.Model
-    | Mob Pages.Mob.Main.Model
+type Page
+    = Home Pages.Home.Model
+    | Mob Pages.Mob.Model
 
 
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
-    , page : PageModel
+    , page : Page
     , preferences : UserPreferences.Model
     , toasts : Toasts
     , displayModal : Bool
@@ -68,7 +68,7 @@ init preferences url key =
       , toasts = []
       , displayModal =
             case page of
-                Login _ ->
+                Home _ ->
                     False
 
                 Mob _ ->
@@ -81,17 +81,17 @@ init preferences url key =
     )
 
 
-loadPage : Url.Url -> UserPreferences.Model -> ( PageModel, Cmd Msg )
+loadPage : Url.Url -> UserPreferences.Model -> ( Page, Cmd Msg )
 loadPage url preferences =
     case Routing.toPage url of
         Routing.Login ->
-            Pages.Login.init
+            Pages.Home.init
                 |> Tuple.mapBoth
-                    Login
-                    (Cmd.map GotLoginMsg)
+                    Home
+                    (Cmd.map GotHomeMsg)
 
         Routing.Mob mobName ->
-            Pages.Mob.Main.init mobName preferences
+            Pages.Mob.init mobName preferences
                 |> Tuple.mapBoth
                     Mob
                     (Cmd.map GotMobMsg)
@@ -104,8 +104,8 @@ loadPage url preferences =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | GotMobMsg Pages.Mob.Main.Msg
-    | GotLoginMsg Pages.Login.Msg
+    | GotMobMsg Pages.Mob.Msg
+    | GotHomeMsg Pages.Home.Msg
     | GotToastMsg Toaster.Msg
     | Batch (List Msg)
     | HideModal
@@ -127,14 +127,14 @@ update msg model =
             loadPage url model.preferences
                 |> Tuple.mapFirst (\page -> { model | page = page, url = url })
 
-        ( GotLoginMsg subMsg, Login subModel ) ->
-            Pages.Login.update subModel subMsg model.key
-                |> UpdateResult.map Login GotLoginMsg
+        ( GotHomeMsg subMsg, Home subModel ) ->
+            Pages.Home.update subModel subMsg model.key
+                |> UpdateResult.map Home GotHomeMsg
                 |> handleToasts model
                 |> toElm model
 
         ( GotMobMsg subMsg, Mob subModel ) ->
-            Pages.Mob.Main.update subMsg subModel
+            Pages.Mob.update subMsg subModel
                 |> UpdateResult.map Mob GotMobMsg
                 |> handleToasts model
                 |> toElm model
@@ -160,12 +160,12 @@ update msg model =
             ( model, Cmd.none )
 
 
-toElm : Model -> UpdateResult PageModel Msg -> ( Model, Cmd Msg )
+toElm : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )
 toElm model updateResult =
     ( { model | page = updateResult.model, toasts = updateResult.toasts }, updateResult.command )
 
 
-handleToasts : Model -> UpdateResult PageModel Msg -> UpdateResult PageModel Msg
+handleToasts : Model -> UpdateResult Page Msg -> UpdateResult Page Msg
 handleToasts model result =
     let
         ( allToasts, toastCommands ) =
@@ -205,11 +205,11 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ case model.page of
-            Login _ ->
+            Home _ ->
                 Sub.none
 
             Mob mobModel ->
-                Pages.Mob.Main.subscriptions mobModel |> Sub.map GotMobMsg
+                Pages.Mob.subscriptions mobModel |> Sub.map GotMobMsg
         , Js.Events.events (dispatch jsEventsMapping)
         ]
 
@@ -222,7 +222,7 @@ dispatch mapping event =
 jsEventsMapping : EventsMapping Msg
 jsEventsMapping =
     EventsMapping.batch
-        [ EventsMapping.map GotMobMsg Pages.Mob.Main.jsEventMapping
+        [ EventsMapping.map GotMobMsg Pages.Mob.jsEventMapping
         , EventsMapping.map GotToastMsg Toaster.jsEventMapping
         , EventsMapping.create [ Js.Events.EventMessage "SocketDisconnected" (\_ -> SocketDisconnected) ]
         ]
@@ -237,12 +237,12 @@ view model =
     let
         doc =
             case model.page of
-                Login sub ->
-                    Pages.Login.view sub
-                        |> Lib.DocumentExtras.map GotLoginMsg
+                Home sub ->
+                    Pages.Home.view sub
+                        |> Lib.DocumentExtras.map GotHomeMsg
 
                 Mob sub ->
-                    Pages.Mob.Main.view sub model.url
+                    Pages.Mob.view sub model.url
                         |> Lib.DocumentExtras.map GotMobMsg
     in
     { title = doc.title

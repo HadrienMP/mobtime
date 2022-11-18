@@ -1,4 +1,4 @@
-module Pages.Login exposing (..)
+module Pages.Home exposing (..)
 
 -- MODEL
 

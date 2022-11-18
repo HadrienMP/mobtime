@@ -1,4 +1,4 @@
-module Pages.Mob.Main exposing (..)
+module Pages.Mob exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
