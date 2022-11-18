@@ -5,6 +5,7 @@ import Browser.Navigation as Nav
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
+import Html.Styled
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
@@ -16,6 +17,7 @@ import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Pages.Home
 import Pages.Mob
 import Routing
+import Socket
 import Url
 import UserPreferences
 
@@ -52,6 +54,7 @@ type alias Model =
     , preferences : UserPreferences.Model
     , toasts : Toasts
     , displayModal : Bool
+    , socket : Socket.Model
     }
 
 
@@ -60,6 +63,9 @@ init preferences url key =
     let
         ( page, pageCommand ) =
             loadPage url preferences
+
+        ( socket, socketCommand ) =
+            Socket.init
     in
     ( { key = key
       , url = url
@@ -73,10 +79,12 @@ init preferences url key =
 
                 Mob _ ->
                     True
+      , socket = socket
       }
     , Cmd.batch
         [ Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
         , pageCommand
+        , socketCommand |> Cmd.map SocketMsg
         ]
     )
 
@@ -109,7 +117,7 @@ type Msg
     | GotToastMsg Toaster.Msg
     | Batch (List Msg)
     | HideModal
-    | SocketDisconnected
+    | SocketMsg Socket.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -153,8 +161,11 @@ update msg model =
             , Cmd.none
             )
 
-        ( SocketDisconnected, _ ) ->
-            toast socketDisconnectedToast model
+        ( SocketMsg subMsg, _ ) ->
+            Socket.update subMsg model.socket
+                |> Tuple.mapBoth
+                    (\updated -> { model | socket = updated })
+                    (Cmd.map SocketMsg)
 
         _ ->
             ( model, Cmd.none )
@@ -193,10 +204,6 @@ toast toToast model =
     )
 
 
-socketDisconnectedToast =
-    Toaster.keepOn <| Toaster.error "You were disconnected from the server. Please refresh the page to login again."
-
-
 
 -- SUBSCRIPTIONS
 
@@ -211,6 +218,8 @@ subscriptions model =
             Mob mobModel ->
                 Pages.Mob.subscriptions mobModel |> Sub.map GotMobMsg
         , Js.Events.events (dispatch jsEventsMapping)
+        , Socket.subscriptions model.socket
+            |> Sub.map SocketMsg
         ]
 
 
@@ -224,7 +233,6 @@ jsEventsMapping =
     EventsMapping.batch
         [ EventsMapping.map GotMobMsg Pages.Mob.jsEventMapping
         , EventsMapping.map GotToastMsg Toaster.jsEventMapping
-        , EventsMapping.create [ Js.Events.EventMessage "SocketDisconnected" (\_ -> SocketDisconnected) ]
         ]
 
 
@@ -247,9 +255,17 @@ view model =
     in
     { title = doc.title
     , body =
-        doc.body
-            ++ soundModal model
-            ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
+        [ Html.Styled.toUnstyled <|
+            Html.Styled.div []
+                [ Html.Styled.div []
+                    (doc.body
+                        ++ soundModal model
+                        ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
+                        |> List.map Html.Styled.fromUnstyled
+                    )
+                , Socket.view model.socket
+                ]
+        ]
     }
 
 

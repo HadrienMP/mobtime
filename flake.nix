@@ -21,7 +21,9 @@
             imageworsener
             elmPackages.elm
             elmPackages.elm-test
+            elmPackages.elm-json
             elmPackages.elm-format
+            elmPackages.elm-review
           ];
           shellHook = ''
             yarn install

@@ -6,6 +6,7 @@ import Html.Events exposing (onClick)
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
+import Lib.Duration
 import Lib.Icons.Ion
 
 
@@ -82,7 +83,7 @@ add toAdd model =
 autoRemove : Toast -> Cmd Msg
 autoRemove toast =
     if toast.autoRemove then
-        Lib.Delay.after (Lib.Delay.Seconds 10) (Remove toast)
+        Lib.Delay.after (Lib.Duration.ofSeconds 10) (Remove toast)
 
     else
         Cmd.none

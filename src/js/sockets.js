@@ -13,12 +13,10 @@ export function setup(app) {
         app.ports.receiveHistory.send(data);
     });
 
-    socket.on('connect', () => {
-        app.ports.events.send({ name: "GotSocketId", value: socket.id });
-    });
-    
+    socket.on('connect', () => app.ports.socketConnected.send(socket.id));
+
     socket.on("disconnect", (reason) => {
-        app.ports.events.send({ name: "SocketDisconnected", value: "" });
+        app.ports.socketDisconnected.send(Date.now());
         if (reason === "io server disconnect") {
             socket.connect();
         }
