@@ -12,7 +12,7 @@ type alias SyncMessage =
     , sender : String
     , time : String
     , syncId : String
-    , mob : MobName
+    , mob : String
     }
 
 
@@ -38,7 +38,7 @@ fromCore mob coreMsg =
     , sender = coreMsg.context.peerId
     , time = Iso8601.fromTime coreMsg.context.time
     , syncId = Uuid.toString coreMsg.context.syncId
-    , mob = mob
+    , mob = Model.MobName.print mob
     }
 
 

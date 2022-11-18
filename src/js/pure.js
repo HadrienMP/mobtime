@@ -22,9 +22,6 @@ const socket = sockets.setup(app);
 // -----------------------------------------
 app.ports.commands.subscribe(command => {
     switch (command.name) {
-        case "Join":
-            socket.emit('join', command.value);
-            break;
         case "SoundAlarm":
             alarm.play();
             break;

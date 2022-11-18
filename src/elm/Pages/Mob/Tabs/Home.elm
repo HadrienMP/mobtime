@@ -4,6 +4,7 @@ import Footer
 import Html exposing (Html, div, li, span, text, ul)
 import Html.Attributes exposing (class, id)
 import Js.Commands
+import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Role exposing (Role)
 import Model.State exposing (State)
@@ -24,7 +25,7 @@ update msg =
                 |> Js.Commands.send
 
 
-view : String -> Url.Url -> State -> Html Msg
+view : MobName -> Url.Url -> State -> Html Msg
 view mobName url state =
     div
         [ id "home", class "tab" ]

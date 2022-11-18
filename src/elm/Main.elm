@@ -14,6 +14,7 @@ import Lib.DocumentExtras
 import Lib.Icons.Ion
 import Lib.Toaster as Toaster exposing (Toasts)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
+import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
 import Routing
@@ -162,13 +163,23 @@ update msg model =
             )
 
         ( SocketMsg subMsg, _ ) ->
-            Socket.update subMsg model.socket
+            Socket.update (getMob model) subMsg model.socket
                 |> Tuple.mapBoth
                     (\updated -> { model | socket = updated })
                     (Cmd.map SocketMsg)
 
         _ ->
             ( model, Cmd.none )
+
+
+getMob : Model -> Maybe MobName
+getMob model =
+    case model.page of
+        Mob mob ->
+            Just <| mob.name
+
+        _ ->
+            Nothing
 
 
 toElm : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )

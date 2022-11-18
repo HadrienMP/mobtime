@@ -5,6 +5,7 @@ import Html.Attributes exposing (class, id, title)
 import Html.Events exposing (onClick)
 import Js.Commands
 import Lib.Icons.Ion
+import Model.MobName exposing (MobName)
 import QRCode
 import Svg.Attributes as Svg
 import Url
@@ -31,7 +32,7 @@ update msg =
 -- VIEW
 
 
-view : String -> Url.Url -> Html Msg
+view : MobName -> Url.Url -> Html Msg
 view mob url =
     div [ id "share", class "tab" ]
         [ shareButton mob <| PutLinkInPasteBin url
@@ -46,7 +47,7 @@ view mob url =
         ]
 
 
-shareButton : String -> msg -> Html msg
+shareButton : MobName -> msg -> Html msg
 shareButton mob shareMsg =
     button
         [ onClick shareMsg
@@ -58,10 +59,10 @@ shareButton mob shareMsg =
         ]
 
 
-shareText : String -> Html msg
+shareText : MobName -> Html msg
 shareText mob =
     span []
         [ text "You are in the "
-        , strong [] [ text mob ]
+        , strong [] [ text <| Model.MobName.print mob ]
         , text " mob"
         ]

@@ -3,6 +3,7 @@ port module Model.Events exposing (..)
 import Json.Decode
 import Json.Encode
 import Lib.Duration exposing (Duration)
+import Model.MobName exposing (MobName)
 import Model.Mobber as Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Roles
@@ -25,7 +26,7 @@ type ClockEvent
 
 
 type alias MobEvent =
-    { mob : String
+    { mob : MobName
     , content : Event
     }
 
@@ -132,7 +133,7 @@ timeDecoder =
 mobEventToJson : MobEvent -> Json.Encode.Value
 mobEventToJson event =
     eventToJson event.content
-        |> (::) ( "mob", Json.Encode.string event.mob )
+        |> (::) ( "mob", Model.MobName.encode event.mob )
         |> Json.Encode.object
 
 

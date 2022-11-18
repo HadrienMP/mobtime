@@ -4,6 +4,7 @@ import Css
 import Html.Styled as Html
 import Html.Styled.Attributes exposing (css)
 import Lib.Delay
+import Model.MobName exposing (MobName)
 import UI.Animations
 import UI.Elements
 import UI.Palettes
@@ -14,6 +15,14 @@ port socketConnected : (String -> msg) -> Sub msg
 
 
 port socketDisconnected : ({} -> msg) -> Sub msg
+
+
+port socketJoin : String -> Cmd msg
+
+
+joinRoom : String -> Cmd msg
+joinRoom =
+    socketJoin
 
 
 
@@ -59,11 +68,21 @@ type Msg
     | Finished
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Maybe MobName -> Msg -> Model -> ( Model, Cmd Msg )
+update mob msg model =
     case msg of
         Connected id ->
-            ( SwitchOn <| SocketId id, Lib.Delay.after UI.Animations.fadeDuration Finished )
+            ( SwitchOn <| SocketId id
+            , Cmd.batch
+                [ Lib.Delay.after UI.Animations.fadeDuration Finished
+                , case mob of
+                    Just value ->
+                        socketJoin <| Model.MobName.print value
+
+                    Nothing ->
+                        Cmd.none
+                ]
+            )
 
         Disconnected ->
             ( SwitchOff, Lib.Delay.after UI.Animations.fadeDuration Finished )

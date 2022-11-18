@@ -28,6 +28,7 @@ import Pages.Mob.Tabs.Sound
 import Peers.Sync.Adapter
 import Peers.Sync.Core exposing (PeerId)
 import Random
+import Socket
 import Sounds
 import Svg.Styled exposing (Svg, svg)
 import Svg.Styled.Attributes as Svg
@@ -92,7 +93,7 @@ init name preferences =
       , peerId = Nothing
       }
     , Cmd.batch
-        [ Js.Commands.send <| Js.Commands.Join name
+        [ Socket.joinRoom <| Model.MobName.print name
         , Time.now |> Task.perform TimePassed
         , Cmd.map GotClockSyncMsg clockSyncCommand
         ]

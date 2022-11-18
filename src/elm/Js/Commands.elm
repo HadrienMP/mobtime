@@ -9,12 +9,11 @@ port commands : OutCommand -> Cmd msg
 
 type Command
     = SoundAlarm
-    | SetAlarm  Sounds.Sound
+    | SetAlarm Sounds.Sound
     | StopAlarm
     | ChangeTitle String
     | CopyInPasteBin String
     | ChangeVolume Int
-    | Join String
     | GetSocketId
     | TestTheSound
 
@@ -44,9 +43,6 @@ send command =
             ChangeVolume volume ->
                 OutCommand "ChangeVolume" <| Json.Encode.string <| String.fromInt volume
 
-            Join mobName ->
-                OutCommand "Join" <| Json.Encode.string mobName
-
             GetSocketId ->
                 OutCommand "GetSocketId" Json.Encode.null
 
@@ -55,5 +51,3 @@ send command =
 
             ChangeTitle title ->
                 OutCommand "ChangeTitle" <| Json.Encode.string title
-
-
