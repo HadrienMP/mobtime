@@ -1,4 +1,4 @@
-import {io} from "socket.io-client";
+import { io } from "socket.io-client";
 
 export function setup(app) {
     const socket = io();
@@ -14,10 +14,14 @@ export function setup(app) {
     });
 
     socket.on('connect', () => {
-        app.ports.events.send({name: "GotSocketId", value: socket.id});
+        app.ports.events.send({ name: "GotSocketId", value: socket.id });
     });
-    socket.on("disconnect", () => {
-        app.ports.events.send({name: "SocketDisconnected", value: ""});
+    
+    socket.on("disconnect", (reason) => {
+        app.ports.events.send({ name: "SocketDisconnected", value: "" });
+        if (reason === "io server disconnect") {
+            socket.connect();
+        }
     });
 
     app.ports.clockSyncOutMessage.subscribe(message => {

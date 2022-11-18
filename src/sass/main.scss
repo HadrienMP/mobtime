@@ -236,6 +236,29 @@ footer {
   }
 }
 
+#connectionLost {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 100%;
+  width: 8px;
+  height: 8px;
+  animation: blink 2s infinite;
+  background: red;
+  box-shadow: 1px 1px 4px red;
+}
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @import "toasts";
 @import "login";
 @import "header";

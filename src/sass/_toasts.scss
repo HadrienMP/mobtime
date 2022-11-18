@@ -4,20 +4,21 @@
   position: absolute;
   top: 0;
   right: 0;
-  max-width: 400px;
+  left: 0;
   margin: 0 10px;
 
   .toast {
+    width: 100%;
+    max-width: 400px;
     margin: 10px 0 10px auto;
     border-radius: 5px;
     display: flex;
     position: relative;
+    box-sizing: border-box;
     cursor: pointer;
     box-shadow: 0 0 10px rgba(0,0,0,.6);
     color: white;
     align-items: center;
-    width: max-content;
-    max-width: 100%;
     padding: 15px;
     @include icon(1.4em, white);
 
