@@ -1,6 +1,8 @@
 module UI.Palettes exposing (..)
 
-import Css exposing (Color, hex)
+import Color exposing (Color)
+import Hex
+import Parser exposing ((|.), (|=))
 
 
 type alias Palette =
@@ -52,3 +54,36 @@ monochrome =
         , surfaceActive = white
         }
     }
+
+
+hex : String -> Color.Color
+hex =
+    Parser.run hexColorParser
+        >> Result.withDefault Color.green
+
+
+hexColorParser : Parser.Parser Color.Color
+hexColorParser =
+    Parser.succeed Color.rgb255
+        |. Parser.symbol "#"
+        |= hexParser
+        |= hexParser
+        |= hexParser
+
+
+hexParser : Parser.Parser Int
+hexParser =
+    Parser.getChompedString
+        (Parser.succeed ()
+            |. Parser.chompIf (always True)
+            |. Parser.chompIf (always True)
+        )
+        |> Parser.andThen
+            (\s ->
+                case Hex.fromString <| String.toLower s of
+                    Ok it ->
+                        Parser.succeed it
+
+                    Err err ->
+                        Parser.problem err
+            )

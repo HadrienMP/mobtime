@@ -10,7 +10,6 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
-import Lib.Circle
 import Lib.Duration as Duration exposing (DurationStringParts)
 import Lib.Icons.Ion
 import Lib.Konami as Konami exposing (Konami)
@@ -30,10 +29,12 @@ import Peers.Sync.Core exposing (PeerId)
 import Random
 import Socket
 import Sounds
-import Svg.Styled exposing (Svg, svg)
-import Svg.Styled.Attributes as Svg
+import Svg.Styled exposing (Svg)
 import Task
 import Time
+import UI.Circle2
+import UI.Palettes
+import UI.Rem
 import Url
 import UserPreferences
 
@@ -342,6 +343,11 @@ type alias Keystroke =
     }
 
 
+turnRefreshRate : Duration.Duration
+turnRefreshRate =
+    Duration.ofMillis 500
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -350,7 +356,7 @@ subscriptions model =
         , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
         , case ( Clock.isOn model.shared.clock, Clock.isOn model.shared.pomodoro ) of
             ( True, _ ) ->
-                Time.every 500 TimePassed
+                Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
 
             ( False, True ) ->
                 Time.every 2000 TimePassed
@@ -399,9 +405,8 @@ body model url action =
         outerRadiant =
             84
 
-        offset =
-            5
-
+        -- offset =
+        --     5
         pomodoroStroke =
             8
 
@@ -411,26 +416,39 @@ body model url action =
         totalWidth =
             outerRadiant * 2 + (pomodoroStroke + mainStroke) / 2
 
-        pomodoroCircle =
-            Lib.Circle.Circle
-                outerRadiant
-                (Lib.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
-                (Lib.Circle.Stroke pomodoroStroke "#999")
-
-        mobCircle =
-            Lib.Circle.inside pomodoroCircle <| Lib.Circle.Stroke mainStroke "#666"
+        -- pomodoroCircle =
+        --     UI.Circle.Circle
+        --         outerRadiant
+        --         (UI.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
+        --         (UI.Circle.Stroke pomodoroStroke "#999")
+        -- mobCircle =
+        --     UI.Circle.inside pomodoroCircle <| UI.Circle.Stroke mainStroke "#666"
     in
     [ div [ class "container" ]
         [ header []
             [ section []
-                [ svg
-                    [ id "circles"
-                    , Svg.width <| String.fromFloat totalWidth
-                    , Svg.height <| String.fromFloat totalWidth
+                [ --     svg
+                  --     [ id "circles"
+                  --     , Svg.width <| String.fromFloat totalWidth
+                  --     , Svg.height <| String.fromFloat totalWidth
+                  --     ]
+                  --     (UI.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
+                  --         ++ UI.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
+                  --     )
+                  -- ,
+                  UI.Circle2.draw
+                    [ css
+                        [ Css.display Css.block
+                        , Css.margin Css.auto
+                        , Css.transform (Css.rotateZ (Css.deg -90))
+                        ]
                     ]
-                    (Lib.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
-                        ++ Lib.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
-                    )
+                    { color = UI.Palettes.monochrome.surface
+                    , strokeWidth = UI.Rem.Rem 0.7
+                    , diameter = UI.Rem.Rem 8
+                    , progress = Clock.ratio model.now model.shared.clock
+                    , refreshRate = (turnRefreshRate)
+                    }
                 , button
                     [ id "action"
                     , class action.class
