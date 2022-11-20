@@ -2,7 +2,7 @@ module Pages.Mob exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
-import Css exposing (height, px, width)
+import Css exposing (absolute, height, px, width)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
@@ -29,10 +29,12 @@ import Peers.Sync.Core exposing (PeerId)
 import Random
 import Socket
 import Sounds
-import Svg.Styled exposing (Svg)
+import Svg.Styled exposing (Svg, svg)
+import Svg.Styled.Attributes
 import Task
 import Time
-import UI.Circle2
+import UI.Circle
+import UI.CircularProgressBar
 import UI.Palettes
 import UI.Rem
 import Url
@@ -405,8 +407,9 @@ body model url action =
         outerRadiant =
             84
 
-        -- offset =
-        --     5
+        offset =
+            5
+
         pomodoroStroke =
             8
 
@@ -416,38 +419,40 @@ body model url action =
         totalWidth =
             outerRadiant * 2 + (pomodoroStroke + mainStroke) / 2
 
-        -- pomodoroCircle =
-        --     UI.Circle.Circle
-        --         outerRadiant
-        --         (UI.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
-        --         (UI.Circle.Stroke pomodoroStroke "#999")
-        -- mobCircle =
-        --     UI.Circle.inside pomodoroCircle <| UI.Circle.Stroke mainStroke "#666"
+        pomodoroCircle =
+            UI.Circle.Circle
+                outerRadiant
+                (UI.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
+                (UI.Circle.Stroke pomodoroStroke "#999")
     in
     [ div [ class "container" ]
         [ header []
             [ section []
-                [ --     svg
-                  --     [ id "circles"
-                  --     , Svg.width <| String.fromFloat totalWidth
-                  --     , Svg.height <| String.fromFloat totalWidth
-                  --     ]
-                  --     (UI.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
-                  --         ++ UI.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
-                  --     )
-                  -- ,
-                  UI.Circle2.draw
+                [ svg
+                    [ id "circles"
+                    , Svg.Styled.Attributes.width <| String.fromFloat totalWidth
+                    , Svg.Styled.Attributes.height <| String.fromFloat totalWidth
+                    ]
+                    (UI.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro))
+                , UI.CircularProgressBar.draw
                     [ css
                         [ Css.display Css.block
                         , Css.margin Css.auto
-                        , Css.transform (Css.rotateZ (Css.deg -90))
+                        , Css.position absolute
+                        , Css.top <| Css.pct 50
+                        , Css.left <| Css.pct 50
+                        , Css.transforms
+                            [ Css.translateX <| Css.pct -50
+                            , Css.translateY <| Css.pct -50
+                            , Css.rotate <| Css.deg -90
+                            ]
                         ]
                     ]
                     { color = UI.Palettes.monochrome.surface
                     , strokeWidth = UI.Rem.Rem 0.7
-                    , diameter = UI.Rem.Rem 8
+                    , diameter = UI.Rem.Rem 7.3
                     , progress = Clock.ratio model.now model.shared.clock
-                    , refreshRate = (turnRefreshRate)
+                    , refreshRate = turnRefreshRate |> Duration.multiply 2
                     }
                 , button
                     [ id "action"
