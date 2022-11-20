@@ -449,8 +449,8 @@ body model url action =
                         ]
                     ]
                     { color = UI.Palettes.monochrome.surface
-                    , strokeWidth = UI.Rem.Rem 0.7
-                    , diameter = UI.Rem.Rem 7.3
+                    , strokeWidth = UI.Rem.Rem 0.5
+                    , diameter = UI.Rem.Rem 7.5
                     , progress = Clock.ratio model.now model.shared.clock
                     , refreshRate = turnRefreshRate |> Duration.multiply 2
                     }

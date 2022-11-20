@@ -1,38 +1,26 @@
 module UI.Palettes exposing (..)
 
-import Color exposing (Color)
-import UI.Color
+import UI.Color exposing (RGBA255)
 
 
 type alias Palette =
-    { error : Color
-    , success : Color
-    , warn : Color
-    , info : Color
-    , background : Color
-    , surface : Color
-    , surfaceActive : Color
+    { error : RGBA255
+    , success : RGBA255
+    , warn : RGBA255
+    , info : RGBA255
+    , background : RGBA255
+    , surface : RGBA255
+    , surfaceActive : RGBA255
     , on :
-        { error : Color
-        , success : Color
-        , warn : Color
-        , info : Color
-        , background : Color
-        , surface : Color
-        , surfaceActive : Color
+        { error : RGBA255
+        , success : RGBA255
+        , warn : RGBA255
+        , info : RGBA255
+        , background : RGBA255
+        , surface : RGBA255
+        , surfaceActive : RGBA255
         }
     }
-
-
-white : Color
-white =
-    UI.Color.fromHex "#fff"
-
-
-black : Color
-black =
-    UI.Color.fromHex "#000"
-
 
 monochrome : Palette
 monochrome =
@@ -40,16 +28,16 @@ monochrome =
     , success = UI.Color.fromHex "#35c135"
     , warn = UI.Color.fromHex "#eb8400"
     , info = UI.Color.fromHex "#00a9eb"
-    , background = white
+    , background = UI.Color.white
     , surface = UI.Color.fromHex "#666666"
     , surfaceActive = UI.Color.fromHex "#999999"
     , on =
-        { error = white
-        , success = white
-        , warn = white
-        , info = white
-        , background = black
-        , surface = white
-        , surfaceActive = white
+        { error = UI.Color.white
+        , success = UI.Color.white
+        , warn = UI.Color.white
+        , info = UI.Color.white
+        , background = UI.Color.white
+        , surface = UI.Color.white
+        , surfaceActive = UI.Color.white
         }
     }

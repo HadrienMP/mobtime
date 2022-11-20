@@ -1,40 +1,62 @@
-module UI.Color exposing (..)
+module UI.Color exposing (RGBA255, fromHex, toCss, toElmCss, white)
 
-import Color exposing (Color)
 import Css
 import Hex
 import Parser exposing ((|.), (|=))
+
+
+type alias RGBA255 =
+    { red : Int, green : Int, blue : Int, alpha : Float }
+
+
+rgb : Int -> Int -> Int -> RGBA255
+rgb red green blue =
+    { red = red, green = green, blue = blue, alpha = 1 }
+
+
+-- Colors
+
+
+white : RGBA255
+white =
+    fromHex "#fff"
 
 
 
 -- Interop
 
 
-toElmCss : Color -> Css.Color
-toElmCss color =
-    Color.toRgba color
-        |> (\{ red, green, blue, alpha } ->
-                Css.rgba
-                    (red * 255 |> round)
-                    (green * 255 |> round)
-                    (blue * 255 |> round)
-                    alpha
-           )
+toElmCss : RGBA255 -> Css.Color
+toElmCss { red, green, blue, alpha } =
+    Css.rgba red green blue alpha
+
+
+toCss : RGBA255 -> String
+toCss { red, green, blue, alpha } =
+    ([ red, green, blue ] |> List.map String.fromInt)
+        ++ [ String.fromFloat alpha ]
+        |> String.join ", "
+        |> (\values -> "rgba(" ++ values ++ ")")
 
 
 
 -- Parsing
 
 
-fromHex : String -> Color.Color
+fromHex : String -> RGBA255
 fromHex =
     Parser.run hexColorParser
-        >> Result.withDefault Color.green
+        >> Result.withDefault
+            { red = 255
+            , green = 0
+            , blue = 0
+            , alpha = 1
+            }
 
 
-hexColorParser : Parser.Parser Color.Color
+hexColorParser : Parser.Parser RGBA255
 hexColorParser =
-    Parser.succeed Color.rgb255
+    Parser.succeed rgb
         |. Parser.symbol "#"
         |= hexParser
         |= hexParser

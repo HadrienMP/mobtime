@@ -1,13 +1,12 @@
 module UI.Elements exposing (..)
 
-import Color
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes exposing (css)
 import UI.Color
 
 
-dot : Color.Color -> Html.Html msg
+dot : UI.Color.RGBA255 -> Html.Html msg
 dot color =
     Html.div
         [ css
