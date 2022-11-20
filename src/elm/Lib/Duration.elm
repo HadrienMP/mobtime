@@ -9,18 +9,29 @@ import Time
 type Duration
     = Duration Int
 
-type alias DurationStringParts = List String
+
+type alias DurationStringParts =
+    List String
+
 
 addToTime : Duration -> Time.Posix -> Time.Posix
 addToTime duration time =
     Time.posixToMillis time
-    |> (+) (toMillis duration)
-    |> Time.millisToPosix
+        |> (+) (toMillis duration)
+        |> Time.millisToPosix
+
 
 minus : Duration -> Duration -> Duration
 minus a b =
     toMillis a
         - toMillis b
+        |> ofMillis
+
+
+multiply : Int -> Duration -> Duration
+multiply multiplier duration =
+    toMillis duration
+        |> (*) multiplier
         |> ofMillis
 
 
@@ -46,6 +57,7 @@ between before after =
         |> Tuple.mapBoth Time.posixToMillis Time.posixToMillis
         |> (\( a2, b2 ) -> b2 - a2)
         |> ofMillis
+
 
 div : Duration -> Int -> Duration
 div numerator denominator =

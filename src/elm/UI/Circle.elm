@@ -1,4 +1,4 @@
-module Lib.Circle exposing (Circle, Coordinates, Stroke, draw, inside)
+module UI.Circle exposing (Circle, Coordinates, Stroke, draw)
 
 import Lib.Ratio as Ratio exposing (Ratio)
 import Svg.Styled as Svg exposing (Svg)

@@ -2,7 +2,7 @@ module Pages.Mob exposing (..)
 
 import Browser
 import Browser.Events exposing (onKeyUp)
-import Css exposing (height, px, width)
+import Css exposing (absolute, height, px, width)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
@@ -10,7 +10,6 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
-import Lib.Circle
 import Lib.Duration as Duration exposing (DurationStringParts)
 import Lib.Icons.Ion
 import Lib.Konami as Konami exposing (Konami)
@@ -31,9 +30,13 @@ import Random
 import Socket
 import Sounds
 import Svg.Styled exposing (Svg, svg)
-import Svg.Styled.Attributes as Svg
+import Svg.Styled.Attributes
 import Task
 import Time
+import UI.Circle
+import UI.CircularProgressBar
+import UI.Palettes
+import UI.Rem
 import Url
 import UserPreferences
 
@@ -342,6 +345,11 @@ type alias Keystroke =
     }
 
 
+turnRefreshRate : Duration.Duration
+turnRefreshRate =
+    Duration.ofMillis 500
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -350,7 +358,7 @@ subscriptions model =
         , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
         , case ( Clock.isOn model.shared.clock, Clock.isOn model.shared.pomodoro ) of
             ( True, _ ) ->
-                Time.every 500 TimePassed
+                Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
 
             ( False, True ) ->
                 Time.every 2000 TimePassed
@@ -412,25 +420,40 @@ body model url action =
             outerRadiant * 2 + (pomodoroStroke + mainStroke) / 2
 
         pomodoroCircle =
-            Lib.Circle.Circle
+            UI.Circle.Circle
                 outerRadiant
-                (Lib.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
-                (Lib.Circle.Stroke pomodoroStroke "#999")
-
-        mobCircle =
-            Lib.Circle.inside pomodoroCircle <| Lib.Circle.Stroke mainStroke "#666"
+                (UI.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
+                (UI.Circle.Stroke pomodoroStroke "#999")
     in
     [ div [ class "container" ]
         [ header []
             [ section []
                 [ svg
                     [ id "circles"
-                    , Svg.width <| String.fromFloat totalWidth
-                    , Svg.height <| String.fromFloat totalWidth
+                    , Svg.Styled.Attributes.width <| String.fromFloat totalWidth
+                    , Svg.Styled.Attributes.height <| String.fromFloat totalWidth
                     ]
-                    (Lib.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro)
-                        ++ Lib.Circle.draw mobCircle (Clock.ratio model.now model.shared.clock)
-                    )
+                    (UI.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro))
+                , UI.CircularProgressBar.draw
+                    [ css
+                        [ Css.display Css.block
+                        , Css.margin Css.auto
+                        , Css.position absolute
+                        , Css.top <| Css.pct 50
+                        , Css.left <| Css.pct 50
+                        , Css.transforms
+                            [ Css.translateX <| Css.pct -50
+                            , Css.translateY <| Css.pct -50
+                            , Css.rotate <| Css.deg -90
+                            ]
+                        ]
+                    ]
+                    { color = UI.Palettes.monochrome.surface
+                    , strokeWidth = UI.Rem.Rem 0.5
+                    , diameter = UI.Rem.Rem 7.5
+                    , progress = Clock.ratio model.now model.shared.clock
+                    , refreshRate = turnRefreshRate |> Duration.multiply 2
+                    }
                 , button
                     [ id "action"
                     , class action.class
