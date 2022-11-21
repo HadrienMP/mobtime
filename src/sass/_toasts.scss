@@ -16,18 +16,21 @@
     position: relative;
     box-sizing: border-box;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(0,0,0,.6);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .6);
     color: white;
     align-items: center;
     padding: 15px;
-    @include icon(1.4em, white);
+    @include icon(1.4em);
+    @include iconColor(white);
 
     &.success {
       background: $success-color;
     }
+
     &.info {
       background: $info-color;
     }
+
     &.error {
       background: $error-color;
     }

@@ -16,8 +16,8 @@ header {
       right: 0;
       bottom: 0;
       left: 0;
-      z-index: -1;
       opacity: .2;
+      z-index: -1;
     }
 
     svg#circles {
@@ -33,29 +33,6 @@ header {
     }
 
     #action {
-      position: absolute;
-      top: $header-padding;
-      left: 0;
-      right: 0;
-      display: block;
-
-      margin: auto;
-      padding: 0;
-
-      cursor: pointer;
-      color: $dark-button-color;
-
-      background: none;
-      border: none;
-      border-radius: 100%;
-      font-weight: bold;
-
-      @include icon(100px, $dark-button-color);
-
-      &:hover {
-        background: none;
-      }
-
       &.on {
         .icon {
           display: none;
@@ -83,8 +60,6 @@ header {
 
       #time-left {
         display: none;
-        font-size: 2.2em;
-        line-height: 1em;
 
         span {
           display: block;
@@ -143,7 +118,8 @@ nav {
     border-right: 1px solid $border-color;
     color: white;
 
-    @include icon(2.1em, white);
+    @include icon(2.1em);
+    @include iconColor(white);
 
     &:first-child {
       border-left: 1px solid $border-color;

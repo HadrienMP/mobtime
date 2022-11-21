@@ -1,5 +1,6 @@
 module UI.Rem exposing (..)
 
+import Css
 import Lib.Ratio
 
 
@@ -49,3 +50,8 @@ subtract b a =
 toCssString : Rem -> String
 toCssString rem =
     (open rem |> String.fromFloat) ++ "rem"
+
+
+toElmCss : Rem -> Css.Rem
+toElmCss rem =
+    open rem |> Css.rem

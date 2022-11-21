@@ -1,9 +1,9 @@
-module Footer exposing (..)
+module UI.Footer exposing (..)
 
-import Html exposing (Html, a, footer, text)
-import Html.Attributes exposing (href, id, target)
-import Lib.Icons.Ion
-import Lib.Icons.Custom
+import Html.Styled exposing (Html, a, footer, text)
+import Html.Styled.Attributes exposing (href, id, target)
+import UI.Icons.Custom
+import UI.Icons.Ion
 
 
 view : Html msg
@@ -15,11 +15,11 @@ view =
             , id "git"
             , target "blank"
             ]
-            [ Lib.Icons.Ion.github
+            [ UI.Icons.Ion.github
             , text "Checkout the code!"
             ]
         , a [ href "https://liberapay.com/HadrienMP/donate", target "blank", id "liberapay" ]
-            [ Lib.Icons.Custom.rocket
+            [ UI.Icons.Custom.rocket
             , text "Support hosting"
             ]
         ]

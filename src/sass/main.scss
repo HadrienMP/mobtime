@@ -54,7 +54,8 @@ button {
   cursor: pointer;
 }
 
-@include icon(1.2em, black);
+@include icon(1.2em);
+@include iconColor(black);
 
 button {
   border-radius: 0;
@@ -64,7 +65,6 @@ button {
   outline: none;
   cursor: pointer;
   font-size: .9em;
-  @include icon(1.3em, white);
   display: inline-flex;
   align-items: center;
   padding: $padding-space;
@@ -87,6 +87,7 @@ button {
 .labelled-icon-button {
   flex: auto;
 
+  @include iconColor(white);
   .icon {
     padding-right: .4em;
     margin-right: .4em;
@@ -150,7 +151,8 @@ hr {
     font-size: 1em;
     align-items: center;
     width: 100%;
-    @include icon(1.4em, black);
+    @include icon(1.4em);
+    @include iconColor(black);
 
     span {
       flex: 1 1;
@@ -196,7 +198,8 @@ footer {
     &:hover {
       background: $dark-button-color;
       color: white;
-      @include icon(1.2em, white);
+      @include icon(1.2em);
+      @include iconColor(white);
     }
 
     i {
@@ -206,7 +209,8 @@ footer {
   }
 
   a#liberapay {
-    @include icon(1.2em, transparent);
+    @include icon(1.2em);
+    @include iconColor(transparent);
     font-weight: lighter;
     font-size: 1rem;
   }
@@ -247,13 +251,16 @@ footer {
   background: red;
   box-shadow: 1px 1px 4px red;
 }
+
 @keyframes blink {
   0% {
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }

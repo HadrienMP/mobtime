@@ -1,8 +1,7 @@
 module Pages.Mob exposing (..)
 
-import Browser
 import Browser.Events exposing (onKeyUp)
-import Css exposing (absolute, height, px, width)
+import Css exposing (absolute)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
@@ -11,7 +10,6 @@ import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode
 import Lib.Duration as Duration exposing (DurationStringParts)
-import Lib.Icons.Ion
 import Lib.Konami as Konami exposing (Konami)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.Clock as Clock exposing (ClockState(..))
@@ -29,16 +27,18 @@ import Peers.Sync.Core exposing (PeerId)
 import Random
 import Socket
 import Sounds
-import Svg.Styled exposing (Svg, svg)
-import Svg.Styled.Attributes
+import Svg.Styled exposing (Svg)
 import Task
 import Time
-import UI.Circle
 import UI.CircularProgressBar
+import UI.Color
+import UI.Icons
+import UI.Icons.Ion
 import UI.Palettes
 import UI.Rem
 import Url
 import UserPreferences
+import View exposing (View)
 
 
 
@@ -379,7 +379,7 @@ jsEventMapping : EventsMapping Msg
 jsEventMapping =
     EventsMapping.batch
         [ EventsMapping.create <|
-            [ Js.Events.EventMessage "AlarmEnded" (\_ -> AlarmEnded)
+            [ Js.Events.EventMessage "AlarmEnded" (always AlarmEnded)
             , Js.Events.EventMessage "GotSocketId" GotSocketId
             ]
         , EventsMapping.map GotClockSyncMsg Peers.Sync.Adapter.jsEventMapping
@@ -390,81 +390,69 @@ jsEventMapping =
 -- VIEW
 
 
-view : Model -> Url.Url -> Browser.Document Msg
+view : Model -> Url.Url -> View Msg
 view model url =
     let
         action =
             detectAction model
     in
     { title = timeLeftTitle action.timeLeft
-    , body = body model url action |> List.map toUnstyled
+    , body = body model url action
     }
 
 
 body : Model -> Url.Url -> ActionDescription -> List (Html Msg)
 body model url action =
-    let
-        outerRadiant =
-            84
-
-        offset =
-            5
-
-        pomodoroStroke =
-            8
-
-        mainStroke =
-            14
-
-        totalWidth =
-            outerRadiant * 2 + (pomodoroStroke + mainStroke) / 2
-
-        pomodoroCircle =
-            UI.Circle.Circle
-                outerRadiant
-                (UI.Circle.Coordinates (outerRadiant + offset) (outerRadiant + offset))
-                (UI.Circle.Stroke pomodoroStroke "#999")
-    in
     [ div [ class "container" ]
         [ header []
             [ section []
-                [ svg
-                    [ id "circles"
-                    , Svg.Styled.Attributes.width <| String.fromFloat totalWidth
-                    , Svg.Styled.Attributes.height <| String.fromFloat totalWidth
-                    ]
-                    (UI.Circle.draw pomodoroCircle (Clock.ratio model.now model.shared.pomodoro))
-                , UI.CircularProgressBar.draw
+                [ Html.div
                     [ css
-                        [ Css.display Css.block
+                        [ Css.position Css.relative
                         , Css.margin Css.auto
-                        , Css.position absolute
-                        , Css.top <| Css.pct 50
-                        , Css.left <| Css.pct 50
-                        , Css.transforms
-                            [ Css.translateX <| Css.pct -50
-                            , Css.translateY <| Css.pct -50
-                            , Css.rotate <| Css.deg -90
+                        , Css.maxWidth Css.fitContent
+                        ]
+                    ]
+                    [ UI.CircularProgressBar.draw
+                        { colors =
+                            { main = UI.Palettes.monochrome.surface |> UI.Color.lighten 6
+                            , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
+                            , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
+                            }
+                        , strokeWidth = UI.Rem.Rem 0.3
+                        , diameter = UI.Rem.Rem 8.7
+                        , progress = Clock.ratio model.now model.shared.pomodoro
+                        , refreshRate = turnRefreshRate |> Duration.multiply 2
+                        }
+                    , Html.div
+                        [ css
+                            [ Css.position Css.absolute
+                            , Css.top <| Css.rem 0.4
+                            , Css.left <| Css.rem 0.4
                             ]
                         ]
-                    ]
-                    { color = UI.Palettes.monochrome.surface
-                    , strokeWidth = UI.Rem.Rem 0.5
-                    , diameter = UI.Rem.Rem 7.8
-                    , progress = Clock.ratio model.now model.shared.clock
-                    , refreshRate = turnRefreshRate |> Duration.multiply 2
-                    }
-                , button
-                    [ id "action"
-                    , class action.class
-                    , onClick action.message
-                    , css
-                        [ width (px totalWidth)
-                        , height (px totalWidth)
+                        [ UI.CircularProgressBar.draw
+                            { colors =
+                                { main = UI.Palettes.monochrome.surface
+                                , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
+                                , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
+                                }
+                            , strokeWidth = UI.Rem.Rem 0.5
+                            , diameter = UI.Rem.Rem 7.8
+                            , progress = Clock.ratio model.now model.shared.clock
+                            , refreshRate = turnRefreshRate |> Duration.multiply 2
+                            }
                         ]
-                    ]
-                    [ action.icon
-                    , span [ id "time-left" ] (action.timeLeft |> List.map (\a -> span [] [ text a ]))
+                    , UI.Icons.style
+                        { class = "action"
+                        , size = UI.Rem.Rem 3
+                        , colors =
+                            { normal = UI.Palettes.monochrome.surface
+                            , hover = UI.Palettes.monochrome.surface
+                            }
+                        }
+                      <|
+                        actionButton action
                     ]
                 ]
             ]
@@ -474,31 +462,31 @@ body model url action =
                 , classList [ ( "active", model.tab == Main ) ]
                 , title "Home"
                 ]
-                [ Lib.Icons.Ion.home |> fromUnstyled ]
+                [ UI.Icons.Ion.home ]
              , button
                 [ onClick <| SwitchTab Clock
                 , classList [ ( "active", model.tab == Clock ) ]
                 , title "Clock Settings"
                 ]
-                [ Lib.Icons.Ion.clock |> fromUnstyled ]
+                [ UI.Icons.Ion.clock ]
              , button
                 [ onClick <| SwitchTab Mobbers
                 , classList [ ( "active", model.tab == Mobbers ) ]
                 , title "Mobbers"
                 ]
-                [ Lib.Icons.Ion.people |> fromUnstyled ]
+                [ UI.Icons.Ion.people ]
              , button
                 [ onClick <| SwitchTab Sound
                 , classList [ ( "active", model.tab == Sound ) ]
                 , title "Sound Settings"
                 ]
-                [ Lib.Icons.Ion.sound |> fromUnstyled ]
+                [ UI.Icons.Ion.sound ]
              , button
                 [ onClick <| SwitchTab Share
                 , classList [ ( "active", model.tab == Share ) ]
                 , title "Share"
                 ]
-                [ Lib.Icons.Ion.share |> fromUnstyled ]
+                [ UI.Icons.Ion.share ]
              ]
                 ++ (if model.dev then
                         [ button
@@ -506,7 +494,7 @@ body model url action =
                             , classList [ ( "active", model.tab == Dev ) ]
                             , title "Dev"
                             ]
-                            [ Lib.Icons.Ion.code |> fromUnstyled ]
+                            [ UI.Icons.Ion.code ]
                         ]
 
                     else
@@ -516,31 +504,84 @@ body model url action =
         , case model.tab of
             Main ->
                 Pages.Mob.Tabs.Home.view model.name url model.shared
-                    |> Html.fromUnstyled
                     |> Html.map GotMainTabMsg
 
             Clock ->
                 Pages.Mob.Tabs.Clocks.view model.clockSettings model.now model.shared
-                    |> Html.fromUnstyled
                     |> Html.map GotClockSettingsMsg
 
             Mobbers ->
                 Pages.Mob.Tabs.Mobbers.view model.shared model.mobbersSettings
-                    |> Html.fromUnstyled
                     |> Html.map GotMobbersSettingsMsg
 
             Sound ->
                 Pages.Mob.Tabs.Sound.view model.soundSettings model.name model.shared.soundProfile
-                    |> Html.fromUnstyled
                     |> Html.map GotSoundSettingsMsg
 
             Share ->
                 Pages.Mob.Tabs.Share.view model.name url
-                    |> Html.fromUnstyled
                     |> Html.map GotShareTabMsg
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
+        ]
+    ]
+
+
+actionButton : ActionDescription -> Html Msg
+actionButton action =
+    button
+        [ onClick action.message
+        , id "action"
+        , class action.class
+        , css
+            [ Css.width <| Css.rem 6.6
+            , Css.height <| Css.rem 6.6
+            , Css.borderRadius <| Css.pct 100
+            , Css.position Css.absolute
+            , Css.top <| Css.rem 1.1
+            , Css.left <| Css.rem 1.1
+            , Css.flexDirection Css.column
+            , Css.backgroundColor <|
+                UI.Color.toElmCss <|
+                    UI.Color.opactity 0.5 <|
+                        UI.Palettes.monochrome.background
+            , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
+            , Css.hover
+                [ Css.backgroundColor <|
+                    UI.Color.toElmCss <|
+                        UI.Color.opactity 0.8 <|
+                            UI.Palettes.monochrome.background
+                ]
+            ]
+        ]
+        [ div [] [ action.icon ]
+        , div
+            [ id "time-left"
+            , css
+                [ Css.fontWeight Css.bold
+                , Css.fontSize <| Css.rem 1.6
+                ]
+            ]
+            (action.timeLeft
+                |> List.map
+                    (\a ->
+                        span
+                            [ css [ Css.display Css.block ] ]
+                            [ text a ]
+                    )
+            )
+        ]
+
+
+centerXY : List Css.Style
+centerXY =
+    [ Css.position absolute
+    , Css.top <| Css.pct 50
+    , Css.left <| Css.pct 50
+    , Css.transforms
+        [ Css.translateX <| Css.pct -50
+        , Css.translateY <| Css.pct -50
         ]
     ]
 
@@ -561,14 +602,14 @@ detectAction model =
     in
     case ( model.alarm, model.shared.clock, model.shared.pomodoro ) of
         ( Playing, _, _ ) ->
-            { icon = Lib.Icons.Ion.mute |> fromUnstyled
+            { icon = UI.Icons.Ion.mute
             , message = StopSound
-            , class = ""
             , timeLeft = timeLeft
+            , class = ""
             }
 
         ( _, On _, _ ) ->
-            { icon = Lib.Icons.Ion.stop |> fromUnstyled
+            { icon = UI.Icons.Ion.stop
             , message =
                 Model.Events.Clock Model.Events.Stopped
                     |> Model.Events.MobEvent model.name
@@ -579,7 +620,7 @@ detectAction model =
 
         ( _, Off, On pomodoro ) ->
             if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                { icon = Lib.Icons.Ion.coffee |> fromUnstyled
+                { icon = UI.Icons.Ion.coffee
                 , message =
                     Model.Events.PomodoroStopped
                         |> Model.Events.MobEvent model.name
@@ -589,14 +630,14 @@ detectAction model =
                 }
 
             else
-                { icon = Lib.Icons.Ion.play |> fromUnstyled
+                { icon = UI.Icons.Ion.play
                 , message = StartClicked
                 , class = ""
                 , timeLeft = timeLeft
                 }
 
         ( _, Off, _ ) ->
-            { icon = Lib.Icons.Ion.play |> fromUnstyled
+            { icon = UI.Icons.Ion.play
             , message = StartClicked
             , class = ""
             , timeLeft = timeLeft

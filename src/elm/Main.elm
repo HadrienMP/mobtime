@@ -2,16 +2,13 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (Html, button, div, h2, text)
-import Html.Attributes exposing (class, id)
-import Html.Events exposing (onClick)
-import Html.Styled
+import Html.Styled as Html exposing (Html, button, div, h2, text)
+import Html.Styled.Attributes exposing (class, id)
+import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.BatchMsg
-import Lib.DocumentExtras
-import Lib.Icons.Ion
 import Lib.Toaster as Toaster exposing (Toasts)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.MobName exposing (MobName)
@@ -21,6 +18,8 @@ import Routing
 import Socket
 import Url
 import UserPreferences
+import View
+import UI.Icons.Ion
 
 
 
@@ -258,21 +257,20 @@ view model =
             case model.page of
                 Home sub ->
                     Pages.Home.view sub
-                        |> Lib.DocumentExtras.map GotHomeMsg
+                        |> View.map GotHomeMsg
 
                 Mob sub ->
                     Pages.Mob.view sub model.url
-                        |> Lib.DocumentExtras.map GotMobMsg
+                        |> View.map GotMobMsg
     in
     { title = doc.title
     , body =
-        [ Html.Styled.toUnstyled <|
-            Html.Styled.div []
-                [ Html.Styled.div []
+        [ Html.toUnstyled <|
+            Html.div []
+                [ Html.div []
                     (doc.body
                         ++ soundModal model
                         ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
-                        |> List.map Html.Styled.fromUnstyled
                     )
                 , Socket.view model.socket
                 ]
@@ -291,7 +289,7 @@ soundModal model =
                     [ class "labelled-icon-button"
                     , onClick <| HideModal
                     ]
-                    [ Lib.Icons.Ion.paperAirplane
+                    [ UI.Icons.Ion.paperAirplane
                     , text "Let's go!"
                     ]
                 ]

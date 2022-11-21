@@ -1,8 +1,8 @@
 module Pages.Mob.Tabs.Home exposing (..)
 
-import Footer
-import Html exposing (Html, div, li, span, text, ul)
-import Html.Attributes exposing (class, id)
+import UI.Footer
+import Html.Styled exposing (Html, div, li, span, text, ul)
+import Html.Styled.Attributes exposing (class, id)
 import Js.Commands
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
@@ -31,7 +31,7 @@ view mobName url state =
         [ id "home", class "tab" ]
         [ Pages.Mob.Tabs.Share.shareButton mobName <| PutLinkInPasteBin url
         , roles state
-        , Footer.view
+        , UI.Footer.view
         ]
 
 

@@ -2,10 +2,13 @@ module Pages.Mob.Tabs.Mobbers exposing (..)
 
 import Field
 import Field.String
-import Html exposing (Html, button, div, form, input, li, p, text, ul)
-import Html.Attributes as Attributes exposing (class, disabled, id, placeholder, type_)
-import Html.Events exposing (onClick, onInput, onSubmit)
-import Lib.Icons.Ion as Icons
+import Html as Unstyled
+import Html.Attributes as UnstyledAttr
+import Html.Events as UnstyledEvts
+import Html.Styled exposing (Html, button, div, form, li, p, text, ul)
+import Html.Styled.Attributes exposing (class, disabled, id, type_)
+import Html.Styled.Events exposing (onClick, onSubmit)
+import UI.Icons.Ion as Icons
 import Lib.Toaster as Toaster
 import Lib.UpdateResult exposing (UpdateResult)
 import Model.Events
@@ -114,6 +117,7 @@ view { mobbers, roles } model =
         [ form
             [ id "add", onSubmit StartAdding ]
             [ Field.view (textFieldConfig "Mobber to be added" NameChanged) model.mobberName
+                |> Html.Styled.fromUnstyled
             , button [ type_ "submit" ] [ Icons.plus ]
             ]
         , div [ class "button-row" ]
@@ -145,24 +149,24 @@ textFieldConfig : String -> (String -> msg) -> Field.String.ViewConfig msg
 textFieldConfig title toMsg =
     { valid =
         \meta value ->
-            div [ class "form-field" ]
+            Unstyled.div [ UnstyledAttr.class "form-field" ]
                 [ textInput title toMsg value meta ]
     , invalid =
         \meta value _ ->
-            div [ class "form-field" ]
+            Unstyled.div [ UnstyledAttr.class "form-field" ]
                 [ textInput title toMsg value meta
                 ]
     }
 
 
-textInput : String -> (String -> msg) -> String -> { a | disabled : Bool } -> Html msg
+textInput : String -> (String -> msg) -> String -> { a | disabled : Bool } -> Unstyled.Html msg
 textInput title toMsg value meta =
-    input
-        [ onInput toMsg
-        , type_ "text"
-        , placeholder title
-        , Attributes.value value
-        , disabled meta.disabled
+    Unstyled.input
+        [ UnstyledEvts.onInput toMsg
+        , UnstyledAttr.type_ "text"
+        , UnstyledAttr.placeholder title
+        , UnstyledAttr.value value
+        , UnstyledAttr.disabled meta.disabled
         ]
         []
 

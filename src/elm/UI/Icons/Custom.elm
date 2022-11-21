@@ -1,17 +1,32 @@
-module Lib.Icons.Custom exposing (..)
+module UI.Icons.Custom exposing (..)
 
-import Html exposing (i)
-import Html.Attributes exposing (class)
-import Svg exposing (Svg, g, path, svg)
-import Svg.Attributes exposing (d, enableBackground, height, id, viewBox, width)
-import Svg.Attributes exposing (fill)
-import Svg.Attributes exposing (stroke)
-import Svg.Attributes exposing (strokeLinecap)
-import Svg.Attributes exposing (strokeLinejoin)
-import Svg.Attributes exposing (strokeWidth)
+import Html.Styled exposing (i)
+import Html.Styled.Attributes exposing (class)
+import UI.Icons.Common exposing (Icon)
+import Svg.Styled
+    exposing
+        ( Svg
+        , g
+        , path
+        , svg
+        )
+import Svg.Styled.Attributes
+    exposing
+        ( d
+        , enableBackground
+        , fill
+        , height
+        , id
+        , stroke
+        , strokeLinecap
+        , strokeLinejoin
+        , strokeWidth
+        , viewBox
+        , width
+        )
 
 
-tomato : Svg msg
+tomato : Icon msg
 tomato =
     display_
         [ path [ d "m461.071 161.081c-23.788 11.751-54.203 22.468-86.994 22.468-7.231 0-14.31-.509-21.219-1.562-14.004 42.828-30.147 83.89-64.403 94.551l-10.338 3.225-10.338-3.225c-34.255-10.66-50.399-51.723-64.403-94.551-6.909 1.052-13.987 1.562-21.202 1.562-6.975.002-13.756-.77-20.489-1.642-46.518 40.623-74.775 98.875-74.775 165.739 0 29.288 4.133 56.527 11.645 81.539-18.324-31.005-29.027-69.644-29.027-116.304 0-57.112 22.999-104.551 60.183-137.911-12.585-3.917-24.181-8.761-34.552-13.885-37.801 39.556-60.395 92.199-60.395 151.796 0 145.56 97.793 243.353 243.353 243.353s243.353-97.792 243.353-243.352c0-59.599-22.593-112.245-60.399-151.801z" ]
@@ -21,7 +36,7 @@ tomato =
         ]
 
 
-elephant : Svg msg
+elephant : Icon msg
 elephant =
     display_
         [ g []
@@ -37,7 +52,7 @@ elephant =
         ]
 
 
-rabbit : Svg msg
+rabbit : Icon msg
 rabbit =
     display_
         [ g [ id "XMLID_71_" ]
@@ -59,7 +74,7 @@ rabbit =
         ]
 
 
-display_ : List (Svg msg) -> Svg msg
+display_ : List (Svg msg) -> Icon msg
 display_ a =
     i [ class "icon" ]
         [ svg
@@ -72,7 +87,7 @@ display_ a =
         ]
 
 
-mobber : Svg msg
+mobber : Icon msg
 mobber =
     display_
         [ g []
@@ -85,7 +100,7 @@ mobber =
         ]
 
 
-driver : Svg msg
+driver : Icon msg
 driver =
     display_
         [ g []
@@ -98,7 +113,7 @@ driver =
         ]
 
 
-navigator : Svg msg
+navigator : Icon msg
 navigator =
     display_
         [ g []
@@ -111,7 +126,7 @@ navigator =
         ]
 
 
-rocket : Svg msg
+rocket : Icon msg
 rocket =
     display_
         [ path

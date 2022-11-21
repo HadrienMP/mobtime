@@ -1,14 +1,14 @@
 module Pages.Mob.Tabs.Clocks exposing (..)
 
-import Html exposing (Html, button, div, h3, input, label, p, text)
-import Html.Attributes exposing (class, classList, for, id, step, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Styled exposing (Html, button, div, h3, input, label, p, text)
+import Html.Styled.Attributes as Attr exposing (class, classList, for, id, step, type_, value)
+import Html.Styled.Events exposing (onClick, onInput)
 import Lib.Duration as Duration
-import Lib.Icons.Custom
-import Lib.Icons.Ion
+import UI.Icons.Custom
+import UI.Icons.Ion
 import Model.Clock as Clock
-import Model.MobName exposing (MobName)
 import Model.Events
+import Model.MobName exposing (MobName)
 import Model.State
 import Time
 
@@ -46,7 +46,7 @@ view : Model -> Time.Posix -> Model.State.State -> Html Msg
 view model now shared =
     div [ id "timer", class "tab" ]
         [ h3 []
-            [ Lib.Icons.Ion.people
+            [ UI.Icons.Ion.people
             , text "Turn"
             ]
         , div
@@ -76,7 +76,7 @@ view model now shared =
                         ++ " min"
                 ]
             , div [ class "field-input" ]
-                [ Lib.Icons.Custom.rabbit
+                [ UI.Icons.Custom.rabbit
                 , input
                     [ id "turn-length"
                     , type_ "range"
@@ -87,16 +87,16 @@ view model now shared =
                             >> Duration.ofMinutes
                             >> Model.Events.TurnLengthChanged
                             >> ShareEvent
-                    , Html.Attributes.min "2"
-                    , Html.Attributes.max "20"
+                    , Attr.min "2"
+                    , Attr.max "20"
                     , value <| String.fromInt <| Duration.toMinutes shared.turnLength
                     ]
                     []
-                , Lib.Icons.Custom.elephant
+                , UI.Icons.Custom.elephant
                 ]
             ]
         , h3 []
-            [ Lib.Icons.Custom.tomato
+            [ UI.Icons.Custom.tomato
             , text "Pomodoro"
             ]
         , div
@@ -121,7 +121,7 @@ view model now shared =
                         ++ " min"
                 ]
             , div [ class "field-input" ]
-                [ Lib.Icons.Ion.batteryFull
+                [ UI.Icons.Ion.batteryFull
                 , input
                     [ id "pomodoro-length"
                     , type_ "range"
@@ -132,12 +132,12 @@ view model now shared =
                             >> Duration.ofMinutes
                             >> Model.Events.PomodoroLengthChanged
                             >> ShareEvent
-                    , Html.Attributes.min "10"
-                    , Html.Attributes.max "45"
+                    , Attr.min "10"
+                    , Attr.max "45"
                     , value <| String.fromInt <| Duration.toMinutes shared.pomodoroLength
                     ]
                     []
-                , Lib.Icons.Ion.batteryLow
+                , UI.Icons.Ion.batteryLow
                 ]
             ]
         ]

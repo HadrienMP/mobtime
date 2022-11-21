@@ -1,118 +1,159 @@
-module Lib.Icons.Ion exposing (..)
+module UI.Icons.Ion exposing (..)
 
-import Html exposing (i)
-import Html.Attributes exposing (class)
+import Html.Styled exposing (i)
+import Html.Styled.Attributes exposing (class)
 import Ionicon
 import Ionicon.Android
 import Ionicon.Ios
 import Ionicon.Social
-import Lib.Icons.Rgba exposing (RGBA)
-import Svg exposing (Svg)
+import UI.Icons.Common exposing (Icon)
+import Svg as Unstyled
+import Svg.Styled as Svg exposing (Svg)
 
-code : Svg msg
+
+code : Icon msg
 code =
     display Ionicon.code
 
-batteryLow : Svg msg
+
+batteryLow : Icon msg
 batteryLow =
     display Ionicon.batteryLow
 
-batteryFull : Svg msg
+
+batteryFull : Icon msg
 batteryFull =
     display Ionicon.batteryHalf
 
-coffee : Svg msg
+
+coffee : Icon msg
 coffee =
     display Ionicon.coffee
 
-paperAirplane : Svg msg
+
+paperAirplane : Icon msg
 paperAirplane =
     display Ionicon.paperAirplane
 
-volumeLow : Svg msg
+
+volumeLow : Icon msg
 volumeLow =
     display Ionicon.volumeLow
 
-volumeHigh : Svg msg
+
+volumeHigh : Icon msg
 volumeHigh =
     display Ionicon.volumeHigh
 
-github : Svg msg
+
+github : Icon msg
 github =
     display Ionicon.Social.github
 
-info : Svg msg
+
+info : Icon msg
 info =
     display Ionicon.informationCircled
 
-musicNote : Svg msg
+
+musicNote : Icon msg
 musicNote =
     display Ionicon.Ios.musicalNote
 
-error : Svg msg
+
+error : Icon msg
 error =
     display Ionicon.closeCircled
 
-warning : Svg msg
+
+warning : Icon msg
 warning =
     display Ionicon.alertCircled
 
-success : Svg msg
+
+success : Icon msg
 success =
     display Ionicon.checkmarkCircled
 
-sound : Svg msg
+
+sound : Icon msg
 sound =
     display Ionicon.musicNote
 
-share : Svg msg
+
+share : Icon msg
 share =
     display Ionicon.Android.shareAlt
 
-clock : Svg msg
+
+clock : Icon msg
 clock =
     display Ionicon.Android.alarmClock
 
-home : Svg msg
+
+home : Icon msg
 home =
     display Ionicon.home
 
-delete : Svg msg
+
+delete : Icon msg
 delete =
     display Ionicon.close
 
-close : Svg msg
+
+close : Icon msg
 close =
     display Ionicon.close
 
-rotate : Svg msg
+
+rotate : Icon msg
 rotate =
     display Ionicon.refresh
 
-shuffle : Svg msg
+
+shuffle : Icon msg
 shuffle =
     display Ionicon.shuffle
 
-plus : Svg msg
+
+plus : Icon msg
 plus =
     display Ionicon.plus
 
-play : Svg msg
+
+play : Icon msg
 play =
     display Ionicon.play
 
-stop : Svg msg
+
+stop : Icon msg
 stop =
     display Ionicon.stop
 
-mute : Svg msg
+
+mute : Icon msg
 mute =
     display Ionicon.Android.volumeOff
 
-people : Svg msg
+
+people : Icon msg
 people =
     display Ionicon.personStalker
-    
-display : (Int -> RGBA -> Svg msg) -> Svg msg
+
+
+display :
+    (Int
+     ->
+        { red : Float
+        , green : Float
+        , blue : Float
+        , alpha : Float
+        }
+     -> Unstyled.Svg msg
+    )
+    -> Svg msg
 display icon =
-    i [ class "icon" ] [ icon 32 (RGBA 0 0 0 0) ]
+    i [ class "icon" ]
+        [ icon 32 { red = 0, green = 0, blue = 0, alpha = 0 }
+            |> Svg.fromUnstyled
+        ]

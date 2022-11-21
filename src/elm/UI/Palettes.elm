@@ -36,7 +36,7 @@ monochrome =
         , success = UI.Color.white
         , warn = UI.Color.white
         , info = UI.Color.white
-        , background = UI.Color.white
+        , background = UI.Color.black
         , surface = UI.Color.white
         , surfaceActive = UI.Color.white
         }

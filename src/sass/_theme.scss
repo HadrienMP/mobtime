@@ -20,14 +20,15 @@ $error-color: #eb0000;
   background-size: cover;
 }
 
-@mixin icon($size, $icon-color) {
-  .icon {
-    svg {
-      width: $size;
-      height: $size;
-      * {
-        fill: $icon-color;
-      }
-    }
+@mixin iconColor($icon-color) {
+  .icon svg * {
+    fill: $icon-color;
+  }
+}
+
+@mixin icon($size) {
+  .icon svg {
+    width: $size;
+    height: $size;
   }
 }

@@ -1,13 +1,14 @@
 module Pages.Mob.Tabs.Share exposing (..)
 
-import Html exposing (Html, button, div, span, strong, text)
-import Html.Attributes exposing (class, id, title)
-import Html.Events exposing (onClick)
+import Html.Styled as Html exposing (Html, button, div, span, strong, text)
+import Html.Styled.Attributes exposing (class, id, title)
+import Html.Styled.Events exposing (onClick)
 import Js.Commands
-import Lib.Icons.Ion
+import UI.Icons.Ion
 import Model.MobName exposing (MobName)
 import QRCode
 import Svg.Attributes as Svg
+import Svg.Styled exposing (fromUnstyled)
 import Url
 
 
@@ -42,6 +43,7 @@ view mob url =
                     [ Svg.width "300px"
                     , Svg.height "300px"
                     ]
+                    >> fromUnstyled
                 )
             |> Result.withDefault (Html.text "Error while encoding to QRCode.")
         ]
@@ -55,7 +57,7 @@ shareButton mob shareMsg =
         , title "Copy this mob's link in your clipboard"
         ]
         [ shareText mob
-        , Lib.Icons.Ion.share
+        , UI.Icons.Ion.share
         ]
 
 

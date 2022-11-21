@@ -2,16 +2,16 @@ module Pages.Home exposing (..)
 
 -- MODEL
 
-import Browser
 import Browser.Navigation as Nav
-import Footer
-import Html exposing (button, div, form, h1, header, input, label, text)
-import Html.Attributes exposing (class, for, id, placeholder, required, type_, value)
-import Html.Events exposing (onInput, onSubmit)
-import Lib.Icons.Ion
+import Html.Styled exposing (button, div, form, h1, header, input, label, text)
+import Html.Styled.Attributes as Attr exposing (class, for, id, placeholder, required, type_, value)
+import Html.Styled.Events exposing (onInput, onSubmit)
+import UI.Icons.Ion
 import Lib.Toaster
 import Lib.UpdateResult exposing (UpdateResult)
 import Slug
+import UI.Footer
+import View exposing (View)
 
 
 type alias Model =
@@ -58,7 +58,7 @@ update model msg navKey =
 -- VIEW
 
 
-view : Model -> Browser.Document Msg
+view : Model -> View Msg
 view model =
     { title = "Login | Mob Time"
     , body =
@@ -78,19 +78,19 @@ view model =
                         , onInput MobNameChanged
                         , placeholder "Awesome"
                         , required True
-                        , Html.Attributes.min "4"
-                        , Html.Attributes.max "50"
+                        , Attr.min "4"
+                        , Attr.max "50"
                         , value model.mobName
                         ]
                         []
                     ]
                 , button
                     [ type_ "submit", class "labelled-icon-button" ]
-                    [ Lib.Icons.Ion.paperAirplane
+                    [ UI.Icons.Ion.paperAirplane
                     , text "Join"
                     ]
                 ]
-            , Footer.view
+            , UI.Footer.view
             ]
         ]
     }

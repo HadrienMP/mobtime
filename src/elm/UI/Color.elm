@@ -1,4 +1,4 @@
-module UI.Color exposing (RGBA255, fromHex, toCss, toElmCss, white, lighten)
+module UI.Color exposing (RGBA255, black, fromHex, lighten, toCss, toElmCss, white, opactity)
 
 import Css
 import Hex
@@ -20,6 +20,11 @@ rgb red green blue =
 
 
 -- FUnctions
+
+
+opactity : Float -> RGBA255 -> RGBA255
+opactity alpha color =
+    { color | alpha = alpha }
 
 
 lighten : Int -> RGBA255 -> RGBA255
@@ -45,7 +50,12 @@ lightenValue factor value =
 
 white : RGBA255
 white =
-    fromHex "#fff"
+    fromHex "#ffffff"
+
+
+black : RGBA255
+black =
+    fromHex "#000000"
 
 
 

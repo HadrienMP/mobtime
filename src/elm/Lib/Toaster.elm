@@ -1,13 +1,13 @@
 module Lib.Toaster exposing (..)
 
-import Html exposing (Html, div, i, section, span, text)
-import Html.Attributes exposing (class, id)
-import Html.Events exposing (onClick)
+import Html.Styled exposing (Html, div, i, section, span, text)
+import Html.Styled.Attributes exposing (class, id)
+import Html.Styled.Events exposing (onClick)
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
 import Lib.Duration
-import Lib.Icons.Ion
+import UI.Icons.Ion
 
 
 
@@ -136,7 +136,7 @@ icon : Level -> Html msg
 icon level =
     case level of
         Error ->
-            Lib.Icons.Ion.error
+            UI.Icons.Ion.error
 
         Success ->
-            Lib.Icons.Ion.success
+            UI.Icons.Ion.success

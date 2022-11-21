@@ -1,11 +1,11 @@
 module Pages.Mob.Tabs.Sound exposing (..)
 
-import Html exposing (Html, button, div, img, input, label, p, text)
-import Html.Attributes exposing (class, classList, for, id, src, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Styled exposing (Html, button, div, img, input, label, p, text)
+import Html.Styled.Attributes as Attr exposing (class, classList, for, id, src, type_, value)
+import Html.Styled.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
-import Lib.Icons.Ion exposing (musicNote)
+import UI.Icons.Ion exposing (musicNote)
 import Model.Events
 import Model.MobName exposing (MobName)
 import Sounds as SoundLibrary
@@ -65,23 +65,25 @@ view model mob activeProfile =
         [ div
             [ id "volume-field", class "form-field" ]
             [ label [ for "volume" ] [ text "Volume" ]
-            , Lib.Icons.Ion.volumeLow
+            , UI.Icons.Ion.volumeLow
             , input
                 [ id "volume"
                 , type_ "range"
                 , onInput VolumeChanged
-                , Html.Attributes.max "50"
+                , Attr.max "50"
                 , value <| String.fromInt model.volume
                 ]
                 []
-            , Lib.Icons.Ion.volumeHigh
+            , UI.Icons.Ion.volumeHigh
             ]
         , button
             [ id "test-audio"
             , class "labelled-icon-button"
             , onClick TestTheSound
             ]
-            [ musicNote, text "Test the audio !" ]
+            [ musicNote
+            , text "Test the audio !"
+            ]
         , div
             [ id "sounds-field", class "form-field" ]
             [ label [] [ text "Playlist" ]
@@ -112,4 +114,4 @@ viewProfile { active, current } mob =
 
 viewPoster : SoundLibrary.Image -> Html Msg
 viewPoster { url, alt } =
-    img [ src url, Html.Attributes.alt alt ] []
+    img [ src url, Attr.alt alt ] []

@@ -25,10 +25,12 @@
     label {
       flex: 1 1;
     }
+
     input {
       flex: 1 1 6%;
     }
   }
+
   button {
     width: 100%;
     padding: $padding-space;
@@ -38,13 +40,15 @@
     font-size: 1.1em;
     font-weight: bold;
 
-    @include icon(1.2em, black);
+    @include icon(1.2em);
+    @include iconColor(black);
 
 
     &:hover {
       background: $dark-button-color;
       color: white;
-      @include icon(1.2em, white);
+      @include icon(1.2em);
+      @include iconColor(white);
     }
 
 
