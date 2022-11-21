@@ -1,14 +1,14 @@
 module UI.CircularProgressBar exposing (..)
 
-import Css
 import Html.Styled as Html
 import Html.Styled.Attributes exposing (css)
 import Lib.Duration
 import Lib.Ratio
 import Svg.Styled exposing (Svg)
-import UI.CircleFragment
+import UI.ConcentricCircles
 import UI.Color
 import UI.Rem exposing (..)
+import UI.TransitionExtra
 
 
 draw :
@@ -22,23 +22,16 @@ draw :
         }
     -> Svg msg
 draw attributes { color, strokeWidth, diameter, progress, refreshRate } =
-    UI.CircleFragment.draw
+    UI.ConcentricCircles.buildFragment
         { color = color
         , strokeWidth = strokeWidth
         , diameter = diameter
         , fragment = progress
-        , svgAttr = attributes
-        , background = UI.Color.fromHex "#cccccc"
-        , circleAttr =
-            [ css
-                [ Css.property "transition"
-                    ("stroke-dashoffset "
-                        ++ (refreshRate
-                                |> Lib.Duration.toMillis
-                                |> String.fromInt
-                           )
-                        ++ "ms linear"
-                    )
-                ]
-            ]
         }
+        |> UI.ConcentricCircles.withAttributes [ css [ UI.TransitionExtra.dashoffset refreshRate ] ]
+        |> UI.ConcentricCircles.addBackground (UI.Color.lighten 9 color)
+        |> UI.ConcentricCircles.addBorders
+            { color = UI.Color.lighten 7 color
+            , width = strokeWidth |> divideBy 6
+            }
+        |> UI.ConcentricCircles.draw attributes

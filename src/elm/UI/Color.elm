@@ -1,8 +1,12 @@
-module UI.Color exposing (RGBA255, fromHex, toCss, toElmCss, white)
+module UI.Color exposing (RGBA255, fromHex, toCss, toElmCss, white, lighten)
 
 import Css
 import Hex
 import Parser exposing ((|.), (|=))
+
+
+
+-- Init
 
 
 type alias RGBA255 =
@@ -12,6 +16,28 @@ type alias RGBA255 =
 rgb : Int -> Int -> Int -> RGBA255
 rgb red green blue =
     { red = red, green = green, blue = blue, alpha = 1 }
+
+
+
+-- FUnctions
+
+
+lighten : Int -> RGBA255 -> RGBA255
+lighten factor color =
+    { color
+        | red = lightenValue factor color.red
+        , green = lightenValue factor color.green
+        , blue = lightenValue factor color.blue
+    }
+
+
+lightenValue : Int -> Int -> Int
+lightenValue factor value =
+    toFloat value
+        * (1 + (toFloat factor / 10))
+        |> round
+        |> min 255
+
 
 
 -- Colors

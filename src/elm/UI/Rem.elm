@@ -42,7 +42,7 @@ add a b =
 
 
 subtract : Rem -> Rem -> Rem
-subtract a b =
+subtract b a =
     open a - open b |> Rem
 
 
