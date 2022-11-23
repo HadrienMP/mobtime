@@ -25,8 +25,10 @@ import Pages.Mob.Tabs.Sound
 import Peers.Sync.Adapter
 import Peers.Sync.Core exposing (PeerId)
 import Random
+import Shared exposing (Shared)
 import Socket
 import Sounds
+import Spa
 import Svg.Styled exposing (Svg)
 import Task
 import Time
@@ -34,9 +36,9 @@ import UI.CircularProgressBar
 import UI.Color
 import UI.Icons
 import UI.Icons.Ion
+import UI.Layout
 import UI.Palettes
 import UI.Rem
-import Url
 import UserPreferences
 import View exposing (View)
 
@@ -390,103 +392,72 @@ jsEventMapping =
 -- VIEW
 
 
-view : Model -> Url.Url -> View Msg
-view model url =
+view : Shared -> Model -> View (Spa.Msg Msg)
+view shared model =
     let
         action =
             detectAction model
     in
     { title = timeLeftTitle action.timeLeft
-    , body = body model url action
+    , body = [ UI.Layout.wrap shared model.name <| body model action ]
     }
 
 
-body : Model -> Url.Url -> ActionDescription -> List (Html Msg)
-body model url action =
-    [ div [ class "container" ]
-        [ header []
-            [ section []
-                [ Html.div
-                    [ css
-                        [ Css.position Css.relative
-                        , Css.margin Css.auto
-                        , Css.maxWidth Css.fitContent
-                        ]
-                    ]
-                    [ UI.CircularProgressBar.draw
-                        { colors =
-                            { main = UI.Palettes.monochrome.surface |> UI.Color.lighten 6
-                            , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
-                            , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
-                            }
-                        , strokeWidth = UI.Rem.Rem 0.3
-                        , diameter = UI.Rem.Rem 8.7
-                        , progress = Clock.ratio model.now model.shared.pomodoro
-                        , refreshRate = turnRefreshRate |> Duration.multiply 2
-                        }
-                    , Html.div
-                        [ css
-                            [ Css.position Css.absolute
-                            , Css.top <| Css.rem 0.4
-                            , Css.left <| Css.rem 0.4
-                            ]
-                        ]
-                        [ UI.CircularProgressBar.draw
-                            { colors =
-                                { main = UI.Palettes.monochrome.surface
-                                , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
-                                , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
-                                }
-                            , strokeWidth = UI.Rem.Rem 0.5
-                            , diameter = UI.Rem.Rem 7.8
-                            , progress = Clock.ratio model.now model.shared.clock
-                            , refreshRate = turnRefreshRate |> Duration.multiply 2
-                            }
-                        ]
-                    , UI.Icons.style
-                        { class = "action"
-                        , size = UI.Rem.Rem 3
-                        , colors =
-                            { normal = UI.Palettes.monochrome.surface
-                            , hover = UI.Palettes.monochrome.surface
-                            }
-                        }
-                      <|
-                        actionButton action
-                    ]
-                ]
-            ]
+body : Model -> ActionDescription -> Html Msg
+body model action =
+    div [ class "container" ]
+        [ clockArea model action
         , nav []
             ([ button
                 [ onClick <| SwitchTab Main
                 , classList [ ( "active", model.tab == Main ) ]
                 , title "Home"
                 ]
-                [ UI.Icons.Ion.home ]
+                [ UI.Icons.Ion.home
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
              , button
                 [ onClick <| SwitchTab Clock
                 , classList [ ( "active", model.tab == Clock ) ]
                 , title "Clock Settings"
                 ]
-                [ UI.Icons.Ion.clock ]
+                [ UI.Icons.Ion.clock
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
              , button
                 [ onClick <| SwitchTab Mobbers
                 , classList [ ( "active", model.tab == Mobbers ) ]
                 , title "Mobbers"
                 ]
-                [ UI.Icons.Ion.people ]
+                [ UI.Icons.Ion.people
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
              , button
                 [ onClick <| SwitchTab Sound
                 , classList [ ( "active", model.tab == Sound ) ]
                 , title "Sound Settings"
                 ]
-                [ UI.Icons.Ion.sound ]
+                [ UI.Icons.Ion.sound
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
              , button
                 [ onClick <| SwitchTab Share
                 , classList [ ( "active", model.tab == Share ) ]
                 , title "Share"
                 ]
-                [ UI.Icons.Ion.share ]
+                [ UI.Icons.Ion.share
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
              ]
                 ++ (if model.dev then
                         [ button
@@ -494,7 +465,11 @@ body model url action =
                             , classList [ ( "active", model.tab == Dev ) ]
                             , title "Dev"
                             ]
-                            [ UI.Icons.Ion.code ]
+                            [ UI.Icons.Ion.code
+                                { size = UI.Rem.Rem 1
+                                , color = UI.Palettes.monochrome.on.background
+                                }
+                            ]
                         ]
 
                     else
@@ -503,7 +478,7 @@ body model url action =
             )
         , case model.tab of
             Main ->
-                Pages.Mob.Tabs.Home.view model.name url model.shared
+                Pages.Mob.Tabs.Home.view model.name model.shared
                     |> Html.map GotMainTabMsg
 
             Clock ->
@@ -519,13 +494,68 @@ body model url action =
                     |> Html.map GotSoundSettingsMsg
 
             Share ->
-                Pages.Mob.Tabs.Share.view model.name url
+                Pages.Mob.Tabs.Share.view model.name
                     |> Html.map GotShareTabMsg
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
         ]
-    ]
+
+
+clockArea : Model -> ActionDescription -> Html Msg
+clockArea model action =
+    header []
+        [ section []
+            [ Html.div
+                [ css
+                    [ Css.position Css.relative
+                    , Css.margin Css.auto
+                    , Css.maxWidth Css.fitContent
+                    ]
+                ]
+                [ UI.CircularProgressBar.draw
+                    { colors =
+                        { main = UI.Palettes.monochrome.surface |> UI.Color.lighten 6
+                        , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
+                        , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
+                        }
+                    , strokeWidth = UI.Rem.Rem 0.3
+                    , diameter = UI.Rem.Rem 8.7
+                    , progress = Clock.ratio model.now model.shared.pomodoro
+                    , refreshRate = turnRefreshRate |> Duration.multiply 2
+                    }
+                , Html.div
+                    [ css
+                        [ Css.position Css.absolute
+                        , Css.top <| Css.rem 0.4
+                        , Css.left <| Css.rem 0.4
+                        ]
+                    ]
+                    [ UI.CircularProgressBar.draw
+                        { colors =
+                            { main = UI.Palettes.monochrome.surface
+                            , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
+                            , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
+                            }
+                        , strokeWidth = UI.Rem.Rem 0.5
+                        , diameter = UI.Rem.Rem 7.8
+                        , progress = Clock.ratio model.now model.shared.clock
+                        , refreshRate = turnRefreshRate |> Duration.multiply 2
+                        }
+                    ]
+                , UI.Icons.style
+                    { class = "action"
+                    , size = UI.Rem.Rem 3
+                    , colors =
+                        { normal = UI.Palettes.monochrome.surface
+                        , hover = UI.Palettes.monochrome.surface
+                        }
+                    }
+                  <|
+                    actionButton action
+                ]
+            ]
+        ]
 
 
 actionButton : ActionDescription -> Html Msg
@@ -602,14 +632,22 @@ detectAction model =
     in
     case ( model.alarm, model.shared.clock, model.shared.pomodoro ) of
         ( Playing, _, _ ) ->
-            { icon = UI.Icons.Ion.mute
+            { icon =
+                UI.Icons.Ion.mute
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
             , message = StopSound
             , timeLeft = timeLeft
             , class = ""
             }
 
         ( _, On _, _ ) ->
-            { icon = UI.Icons.Ion.stop
+            { icon =
+                UI.Icons.Ion.stop
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
             , message =
                 Model.Events.Clock Model.Events.Stopped
                     |> Model.Events.MobEvent model.name
@@ -620,7 +658,11 @@ detectAction model =
 
         ( _, Off, On pomodoro ) ->
             if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                { icon = UI.Icons.Ion.coffee
+                { icon =
+                    UI.Icons.Ion.coffee
+                        { size = UI.Rem.Rem 1
+                        , color = UI.Palettes.monochrome.on.background
+                        }
                 , message =
                     Model.Events.PomodoroStopped
                         |> Model.Events.MobEvent model.name
@@ -630,14 +672,22 @@ detectAction model =
                 }
 
             else
-                { icon = UI.Icons.Ion.play
+                { icon =
+                    UI.Icons.Ion.play
+                        { size = UI.Rem.Rem 1
+                        , color = UI.Palettes.monochrome.on.background
+                        }
                 , message = StartClicked
                 , class = ""
                 , timeLeft = timeLeft
                 }
 
         ( _, Off, _ ) ->
-            { icon = UI.Icons.Ion.play
+            { icon =
+                UI.Icons.Ion.play
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
             , message = StartClicked
             , class = ""
             , timeLeft = timeLeft

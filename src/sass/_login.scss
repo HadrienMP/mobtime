@@ -1,25 +1,6 @@
 @import "theme";
 
 #login {
-  header {
-    @include mob-header-background();
-    padding-top: 300px;
-
-    h1 {
-      font-size: 21vw;
-      border-top: 4px solid $dark-button-color;
-      border-bottom: 4px solid $dark-button-color;
-      color: $dark-button-color;
-      padding: 20px 0;
-      text-align: center;
-      font-family: 'Fredericka the Great', fantasy;
-      background: white;
-
-      @media (min-width: $width) {
-        font-size: 4.5em;
-      }
-    }
-  }
 
   .form-field {
     label {
@@ -31,32 +12,5 @@
     }
   }
 
-  button {
-    width: 100%;
-    padding: $padding-space;
-    background-image: repeating-linear-gradient(-45deg, #f8f8f8, #f8f8f8 20px, #efefef 20px, #efefef 40px);
-    border: 1px solid $dark-button-color;
-    color: black;
-    font-size: 1.1em;
-    font-weight: bold;
 
-    @include icon(1.2em);
-    @include iconColor(black);
-
-
-    &:hover {
-      background: $dark-button-color;
-      color: white;
-      @include icon(1.2em);
-      @include iconColor(white);
-    }
-
-
-    //i {
-    //  margin-right: $margin-space;
-    //  font-size: .8em;
-    //  margin-top: -.2em;
-    //  vertical-align: middle;
-    //}
-  }
 }

@@ -4,13 +4,15 @@ import Html.Styled exposing (Html, button, div, h3, input, label, p, text)
 import Html.Styled.Attributes as Attr exposing (class, classList, for, id, step, type_, value)
 import Html.Styled.Events exposing (onClick, onInput)
 import Lib.Duration as Duration
-import UI.Icons.Custom
-import UI.Icons.Ion
 import Model.Clock as Clock
 import Model.Events
 import Model.MobName exposing (MobName)
 import Model.State
 import Time
+import UI.Icons.Custom
+import UI.Icons.Ion
+import UI.Palettes
+import UI.Rem
 
 
 type alias Model =
@@ -47,6 +49,9 @@ view model now shared =
     div [ id "timer", class "tab" ]
         [ h3 []
             [ UI.Icons.Ion.people
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.background
+                }
             , text "Turn"
             ]
         , div
@@ -77,6 +82,9 @@ view model now shared =
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Custom.rabbit
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
                 , input
                     [ id "turn-length"
                     , type_ "range"
@@ -93,10 +101,16 @@ view model now shared =
                     ]
                     []
                 , UI.Icons.Custom.elephant
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
                 ]
             ]
         , h3 []
             [ UI.Icons.Custom.tomato
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.background
+                }
             , text "Pomodoro"
             ]
         , div
@@ -122,6 +136,9 @@ view model now shared =
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Ion.batteryFull
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
                 , input
                     [ id "pomodoro-length"
                     , type_ "range"
@@ -138,6 +155,9 @@ view model now shared =
                     ]
                     []
                 , UI.Icons.Ion.batteryLow
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
                 ]
             ]
         ]

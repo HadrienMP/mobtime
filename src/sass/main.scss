@@ -1,5 +1,5 @@
 @import "reset";
-@import url(https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Oswald:wght@200;400&display=swap);
+@import url(https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Oswald:wght@200;400;500;600;700;800;900&display=swap);
 @import "theme";
 @import "range";
 
@@ -17,10 +17,12 @@ html {
   font-size: 15pt;
   margin: 0;
   line-height: 1em;
+  height: 100%;
 }
 
 body {
   color: $color;
+  height: 100%;
 
   @media (min-width: $width) {
     //margin-top: $margin-space;
@@ -35,7 +37,7 @@ body * {
 
 .container {
   margin: auto;
-  max-width: $width;
+  // max-width: $width;
 }
 
 input[type="text"] {
@@ -55,7 +57,7 @@ button {
 }
 
 @include icon(1.2em);
-@include iconColor(black);
+// @include iconColor(black);
 
 button {
   border-radius: 0;
@@ -88,6 +90,7 @@ button {
   flex: auto;
 
   @include iconColor(white);
+
   .icon {
     padding-right: .4em;
     margin-right: .4em;
@@ -178,41 +181,6 @@ hr {
     &:first-child {
       margin-top: 0;
     }
-  }
-}
-
-footer {
-  border-top: 1px solid $dark-button-color;
-  border-bottom: 1px solid $dark-button-color;
-  margin-top: 2 * $margin-space;
-  display: flex;
-
-  a {
-    color: $dark-button-color;
-    text-decoration: none;
-    text-align: center;
-    display: block;
-    flex-grow: 1;
-    padding: $padding-space 0;
-
-    &:hover {
-      background: $dark-button-color;
-      color: white;
-      @include icon(1.2em);
-      @include iconColor(white);
-    }
-
-    i {
-      padding-right: 10px;
-      vertical-align: sub;
-    }
-  }
-
-  a#liberapay {
-    @include icon(1.2em);
-    @include iconColor(transparent);
-    font-weight: lighter;
-    font-size: 1rem;
   }
 }
 

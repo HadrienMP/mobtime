@@ -55,3 +55,8 @@ toCssString rem =
 toElmCss : Rem -> Css.Rem
 toElmCss rem =
     open rem |> Css.rem
+
+
+toPixelsFake : Rem -> Int
+toPixelsFake rem =
+    open rem |> (*) 12 |> round

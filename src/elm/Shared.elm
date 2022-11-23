@@ -1,0 +1,138 @@
+module Shared exposing (..)
+
+import Browser
+import Browser.Navigation as Nav
+import Js.Commands
+import Js.Events
+import Js.EventsMapping exposing (EventsMapping)
+import Lib.Toaster exposing (Toasts)
+import Model.MobName exposing (MobName)
+import Socket
+import Url
+import UserPreferences
+
+
+
+-- Init
+
+
+type alias Shared =
+    { socket : Socket.Model
+    , toasts : Toasts
+    , key : Nav.Key
+    , preferences : UserPreferences.Model
+    , mob : Maybe MobName
+    }
+
+
+init :
+    { key : Nav.Key
+    , preferences : UserPreferences.Model
+    , mob : Maybe MobName
+    }
+    -> ( Shared, Cmd Msg )
+init { key, preferences, mob } =
+    let
+        ( socket, socketCmd ) =
+            Socket.init |> Tuple.mapSecond (Cmd.map SocketMsg)
+    in
+    ( { socket = socket
+      , toasts = Lib.Toaster.init
+      , key = key
+      , preferences = preferences
+      , mob = mob
+      }
+    , Cmd.batch
+        [ socketCmd
+        , Js.Commands.ChangeVolume preferences.volume
+            |> Js.Commands.send
+        ]
+    )
+
+
+
+-- Update
+
+
+type Msg
+    = Toast Lib.Toaster.Msg
+    | SocketMsg Socket.Msg
+    | LinkClicked Browser.UrlRequest
+    | Batch (List Msg)
+
+
+update : Msg -> Shared -> ( Shared, Cmd Msg )
+update msg shared =
+    case msg of
+        Batch msgs ->
+            msgs
+                |> List.foldl
+                    (\nextMsg ( model, cmds ) -> update_ nextMsg model |> Tuple.mapSecond (\cmd -> cmd :: cmds))
+                    ( shared, [] )
+                |> Tuple.mapSecond Cmd.batch
+
+        _ ->
+            update_ msg shared
+
+
+update_ : Msg -> Shared -> ( Shared, Cmd Msg )
+update_ msg shared =
+    case msg of
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( shared, Nav.pushUrl shared.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( shared, Nav.load href )
+
+        SocketMsg subMsg ->
+            Socket.update shared.mob subMsg shared.socket
+                |> Tuple.mapBoth
+                    (\updated -> { shared | socket = updated })
+                    (Cmd.map SocketMsg)
+
+        Toast subMsg ->
+            Lib.Toaster.update subMsg shared.toasts
+                |> Tuple.mapBoth
+                    (\toasts -> { shared | toasts = toasts })
+                    (Cmd.map Toast)
+
+        _ ->
+            ( shared, Cmd.none )
+
+
+toast : Toasts -> Shared -> ( Shared, Cmd Msg )
+toast toasts shared =
+    let
+        ( allToasts, toastCommands ) =
+            Lib.Toaster.add toasts shared.toasts
+    in
+    ( { shared | toasts = allToasts }
+    , toastCommands
+        |> List.map (Cmd.map Toast)
+        |> Cmd.batch
+    )
+
+
+
+-- Subscriptions
+
+
+subscriptions : Shared -> Sub Msg
+subscriptions shared =
+    Sub.batch
+        [ Js.Events.events (dispatch jsEventsMapping)
+        , Socket.subscriptions shared.socket
+            |> Sub.map SocketMsg
+        ]
+
+
+dispatch : EventsMapping Msg -> Js.Events.Event -> Msg
+dispatch mapping event =
+    Batch <| Js.EventsMapping.dispatch event mapping
+
+
+jsEventsMapping : EventsMapping Msg
+jsEventsMapping =
+    Js.EventsMapping.map Toast Lib.Toaster.jsEventMapping

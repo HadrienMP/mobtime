@@ -1,13 +1,16 @@
 module Lib.Toaster exposing (..)
 
+import Css
 import Html.Styled exposing (Html, div, i, section, span, text)
-import Html.Styled.Attributes exposing (class, id)
+import Html.Styled.Attributes exposing (class, css, id)
 import Html.Styled.Events exposing (onClick)
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
 import Lib.Duration
 import UI.Icons.Ion
+import UI.Palettes
+import UI.Rem
 
 
 
@@ -115,6 +118,7 @@ viewToast toast =
     div
         [ class <| "toast " ++ classOf toast.level
         , onClick <| Remove toast
+        , css [ Css.zIndex <| Css.int 1000 ]
         ]
         [ icon toast.level
         , span [ class "content" ] [ text toast.content ]
@@ -137,6 +141,12 @@ icon level =
     case level of
         Error ->
             UI.Icons.Ion.error
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.error
+                }
 
         Success ->
             UI.Icons.Ion.success
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.success
+                }
