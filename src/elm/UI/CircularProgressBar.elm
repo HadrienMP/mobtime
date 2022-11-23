@@ -6,7 +6,7 @@ import Html.Styled.Attributes exposing (css)
 import Lib.Duration
 import Lib.Ratio
 import UI.Color
-import UI.ConcentricCircles
+import UI.Circle
 import UI.Rem exposing (..)
 import UI.TransitionExtra
 
@@ -24,16 +24,16 @@ draw :
     }
     -> Html msg
 draw { colors, strokeWidth, diameter, progress, refreshRate } =
-    UI.ConcentricCircles.buildFragment
+    UI.Circle.buildFragment
         { color = colors.main
         , strokeWidth = strokeWidth
         , diameter = diameter
         , fragment = progress
         }
-        |> UI.ConcentricCircles.withAttributes [ css [ UI.TransitionExtra.dashoffset refreshRate ] ]
-        |> UI.ConcentricCircles.addBackground colors.background
-        |> UI.ConcentricCircles.addBorders
+        |> UI.Circle.withAttributes [ css [ UI.TransitionExtra.dashoffset refreshRate ] ]
+        |> UI.Circle.addBackground colors.background
+        |> UI.Circle.addBorders
             { color = colors.border
             , width = strokeWidth |> divideBy 6
             }
-        |> UI.ConcentricCircles.draw [ css [ Css.transform <| Css.rotate <| Css.deg -90 ] ]
+        |> UI.Circle.draw [ css [ Css.transform <| Css.rotate <| Css.deg -90 ] ]

@@ -1,4 +1,4 @@
-module UI.ConcentricCircles exposing (..)
+module UI.Circle exposing (..)
 
 import Html.Styled as Html
 import Lib.Ratio
