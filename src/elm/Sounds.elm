@@ -30,6 +30,7 @@ type Profile
     | OfficeSafe
     | Riot
     | Funky
+    | Kaamelott
 
 
 poster : Profile -> Image
@@ -48,6 +49,8 @@ poster profile =
 
                 Funky ->
                     "funky.webp"
+                Kaamelott ->
+                    "Kaamelott.webp"
     , alt =
         case profile of
             ClassicWeird ->
@@ -61,6 +64,8 @@ poster profile =
 
             Funky ->
                 "Photography of George Clinton"
+            Kaamelott ->
+                "Kaamelott"
     }
 
 
@@ -85,6 +90,9 @@ nextProfile list =
             nextProfile (Funky :: list)
 
         Just Funky ->
+            nextProfile (Kaamelott :: list)
+
+        Just Kaamelott ->
             list
 
 
@@ -102,6 +110,8 @@ title profile =
 
         Funky ->
             "Funky"
+        Kaamelott ->
+            "Kaamelott"
 
 
 code : Profile -> String
@@ -118,6 +128,8 @@ code profile =
 
         Funky ->
             "Funky"
+        Kaamelott ->
+            "Kaamelott"
 
 
 fromCode : String -> Profile
@@ -162,6 +174,12 @@ soundsOf profile =
             ( "funky/essence.mp3"
             , funky
             )
+
+        Kaamelott ->
+            ( "kaamelott/il_ne_comprennent_jamais_le_code.mp3"
+            , kaamelottSounds
+            )
+
 
 
 riot : List Sound
@@ -342,3 +360,7 @@ officeSafe =
 
     -- TODO: what is love
     ]
+
+kaamelottSounds : List Sound
+kaamelottSounds =
+    [ "kaamelott/il_ne_comprennent_jamais_le_code.mp3" ]
