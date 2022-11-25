@@ -29,6 +29,7 @@ type Profile
     = ClassicWeird
     | Riot
     | New
+    | Kaamelott
 
 
 poster : Profile -> Image
@@ -44,6 +45,9 @@ poster profile =
 
                 New ->
                     "WhatsNew-1.webp"
+
+                Kaamelott ->
+                    "Kaamelott.webp"
     , alt =
         case profile of
             ClassicWeird ->
@@ -54,6 +58,9 @@ poster profile =
 
             New ->
                 "Stylized logo saying \"What's new\""
+
+            Kaamelott ->
+                "Kaamelott"
     }
 
 
@@ -75,6 +82,9 @@ nextProfile list =
             nextProfile (New :: list)
 
         Just New ->
+            nextProfile (Kaamelott :: list)
+
+        Just Kaamelott ->
             list
 
 
@@ -90,6 +100,9 @@ title profile =
         New ->
             "New 2022/11"
 
+        Kaamelott ->
+            "Kaamelott"
+
 
 code : Profile -> String
 code profile =
@@ -102,6 +115,9 @@ code profile =
 
         New ->
             "New2022/11"
+
+        Kaamelott ->
+            "Kaamelott"
 
 
 fromCode : String -> Profile
@@ -140,6 +156,11 @@ soundsOf profile =
         New ->
             ( "classic-weird/banane.wav.mp3"
             , newSounds
+            )
+
+        Kaamelott ->
+            ( "kaamelott/il_ne_comprennent_jamais_le_code.mp3"
+            , kaamelottSounds
             )
 
 
@@ -266,3 +287,8 @@ classicWeird =
     , "classic-weird/we-are-the-champions-copia.mp3"
     , "classic-weird/zelda.mp3"
     ]
+
+
+kaamelottSounds : List Sound
+kaamelottSounds =
+    [ "kaamelott/il_ne_comprennent_jamais_le_code.mp3" ]
