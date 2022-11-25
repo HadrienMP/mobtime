@@ -29,6 +29,7 @@ type Profile
     = ClassicWeird
     | OfficeSafe
     | Riot
+    | Kaamelott
 
 
 poster : Profile -> Image
@@ -44,6 +45,9 @@ poster profile =
 
                 OfficeSafe ->
                     "officesafe.jpg"
+
+                Kaamelott ->
+                    "Kaamelott.webp"
     , alt =
         case profile of
             ClassicWeird ->
@@ -54,6 +58,9 @@ poster profile =
 
             OfficeSafe ->
                 "An office meeting room full of multicolored plastic balls"
+
+            Kaamelott ->
+                "Kaamelott"
     }
 
 
@@ -75,6 +82,9 @@ nextProfile list =
             nextProfile (OfficeSafe :: list)
 
         Just OfficeSafe ->
+            nextProfile (Kaamelott :: list)
+
+        Just Kaamelott ->
             list
 
 
@@ -90,6 +100,9 @@ title profile =
         OfficeSafe ->
             "Office Safe"
 
+        Kaamelott ->
+            "Kaamelott"
+
 
 code : Profile -> String
 code profile =
@@ -102,6 +115,9 @@ code profile =
 
         OfficeSafe ->
             "OfficeSafe"
+
+        Kaamelott ->
+            "Kaamelott"
 
 
 fromCode : String -> Profile
@@ -141,6 +157,12 @@ soundsOf profile =
             ( "classic-weird/celebration.mp3"
             , officeSafe
             )
+
+        Kaamelott ->
+            ( "kaamelott/il_ne_comprennent_jamais_le_code.mp3"
+            , kaamelottSounds
+            )
+
 
 
 riot : List Sound
@@ -303,3 +325,7 @@ officeSafe =
 
     -- TODO: what is love
     ]
+
+kaamelottSounds : List Sound
+kaamelottSounds =
+    [ "kaamelott/il_ne_comprennent_jamais_le_code.mp3" ]
