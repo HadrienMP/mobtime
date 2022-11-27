@@ -9,6 +9,12 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages."${system}";
+        update_sounds_requirements = with pkgs; [
+          curl
+          gnutar
+          gnused
+          gawk
+        ];
       in
       {
         devShell = pkgs.mkShell {
@@ -24,7 +30,7 @@
             elmPackages.elm-json
             elmPackages.elm-format
             elmPackages.elm-review
-          ];
+          ] ++ update_sounds_requirements;
           shellHook = ''
             yarn install
           '';
