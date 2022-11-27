@@ -200,6 +200,10 @@ footerLink attributes { url, icon, label } =
          , Attr.target "blank"
          , Attr.css
             [ Css.padding2 (Css.rem 0.4) Css.zero
+            , Css.fontSize (Css.rem 0.9)
+            , Css.color <|
+                UI.Color.toElmCss <|
+                    UI.Palettes.monochrome.on.background
             , Css.visited
                 [ Css.color <|
                     UI.Color.toElmCss <|
