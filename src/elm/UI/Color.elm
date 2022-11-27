@@ -1,4 +1,4 @@
-module UI.Color exposing (RGBA255, black, fromHex, lighten, toCss, toElmCss, white, opactity)
+module UI.Color exposing (RGBA255, black, fromHex, lighten, opactity, toCss, toElmCss, white, toIonIconRgba)
 
 import Css
 import Hex
@@ -73,6 +73,15 @@ toCss { red, green, blue, alpha } =
         ++ [ String.fromFloat alpha ]
         |> String.join ", "
         |> (\values -> "rgba(" ++ values ++ ")")
+
+
+toIonIconRgba : RGBA255 -> { red : Float, green : Float, blue : Float, alpha : Float }
+toIonIconRgba { red, green, blue, alpha } =
+    { red = toFloat red / 255
+    , green = toFloat green / 255
+    , blue = toFloat blue / 255
+    , alpha = alpha
+    }
 
 
 

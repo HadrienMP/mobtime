@@ -2,24 +2,28 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Css
 import Html.Styled as Html exposing (Html, button, div, h2, text)
-import Html.Styled.Attributes exposing (class, id)
+import Html.Styled.Attributes exposing (class, css, id)
 import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.BatchMsg
-import Lib.Toaster as Toaster exposing (Toasts)
+import Lib.Toaster as Toaster
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
 import Routing
-import Socket
+import Shared
+import Spa
+import UI.Icons.Ion
+import UI.Palettes
+import UI.Rem
 import Url
 import UserPreferences
 import View
-import UI.Icons.Ion
 
 
 
@@ -34,7 +38,7 @@ main =
         , update = update
         , subscriptions = subscriptions
         , onUrlChange = UrlChanged
-        , onUrlRequest = LinkClicked
+        , onUrlRequest = SharedMsg << Shared.LinkClicked
         }
 
 
@@ -48,13 +52,9 @@ type Page
 
 
 type alias Model =
-    { key : Nav.Key
-    , url : Url.Url
-    , page : Page
-    , preferences : UserPreferences.Model
-    , toasts : Toasts
+    { page : Page
     , displayModal : Bool
-    , socket : Socket.Model
+    , shared : Shared.Shared
     }
 
 
@@ -64,14 +64,14 @@ init preferences url key =
         ( page, pageCommand ) =
             loadPage url preferences
 
-        ( socket, socketCommand ) =
-            Socket.init
+        ( shared, socketCommand ) =
+            Shared.init
+                { key = key
+                , preferences = preferences
+                , mob = getMob page
+                }
     in
-    ( { key = key
-      , url = url
-      , page = page
-      , preferences = preferences
-      , toasts = []
+    ( { page = page
       , displayModal =
             case page of
                 Home _ ->
@@ -79,12 +79,12 @@ init preferences url key =
 
                 Mob _ ->
                     True
-      , socket = socket
+      , shared = shared
       }
     , Cmd.batch
         [ Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
         , pageCommand
-        , socketCommand |> Cmd.map SocketMsg
+        , socketCommand |> Cmd.map SharedMsg
         ]
     )
 
@@ -102,7 +102,7 @@ loadPage url preferences =
             Pages.Mob.init mobName preferences
                 |> Tuple.mapBoth
                     Mob
-                    (Cmd.map GotMobMsg)
+                    (Cmd.map (GotMobMsg << Spa.Regular))
 
 
 
@@ -110,48 +110,35 @@ loadPage url preferences =
 
 
 type Msg
-    = LinkClicked Browser.UrlRequest
-    | UrlChanged Url.Url
-    | GotMobMsg Pages.Mob.Msg
+    = GotMobMsg (Spa.Msg Pages.Mob.Msg)
     | GotHomeMsg Pages.Home.Msg
-    | GotToastMsg Toaster.Msg
     | Batch (List Msg)
     | HideModal
-    | SocketMsg Socket.Msg
+    | SharedMsg Shared.Msg
+    | UrlChanged Url.Url
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.page ) of
-        ( LinkClicked urlRequest, _ ) ->
-            case urlRequest of
-                Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
-
-                Browser.External href ->
-                    ( model, Nav.load href )
-
         ( UrlChanged url, _ ) ->
-            loadPage url model.preferences
-                |> Tuple.mapFirst (\page -> { model | page = page, url = url })
+            loadPage url model.shared.preferences
+                |> Tuple.mapFirst (\page -> { model | page = page })
 
         ( GotHomeMsg subMsg, Home subModel ) ->
-            Pages.Home.update subModel subMsg model.key
+            Pages.Home.update model.shared subModel subMsg
                 |> UpdateResult.map Home GotHomeMsg
-                |> handleToasts model
-                |> toElm model
+                |> toModelCmd model
 
-        ( GotMobMsg subMsg, Mob subModel ) ->
+        ( GotMobMsg (Spa.Regular subMsg), Mob subModel ) ->
             Pages.Mob.update subMsg subModel
-                |> UpdateResult.map Mob GotMobMsg
-                |> handleToasts model
-                |> toElm model
+                |> UpdateResult.map Mob (GotMobMsg << Spa.Regular)
+                |> toModelCmd model
 
-        ( GotToastMsg subMsg, _ ) ->
-            Toaster.update subMsg model.toasts
-                |> Tuple.mapBoth
-                    (\toasts -> { model | toasts = toasts })
-                    (Cmd.map GotToastMsg)
+        ( GotMobMsg (Spa.Shared subMsg), _ ) ->
+            Shared.update subMsg model.shared
+                |> Tuple.mapBoth (\updated -> { model | shared = updated })
+                    (Cmd.map SharedMsg)
 
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
@@ -161,19 +148,18 @@ update msg model =
             , Cmd.none
             )
 
-        ( SocketMsg subMsg, _ ) ->
-            Socket.update (getMob model) subMsg model.socket
-                |> Tuple.mapBoth
-                    (\updated -> { model | socket = updated })
-                    (Cmd.map SocketMsg)
+        ( SharedMsg subMsg, _ ) ->
+            Shared.update subMsg model.shared
+                |> Tuple.mapBoth (\updated -> { model | shared = updated })
+                    (Cmd.map SharedMsg)
 
         _ ->
             ( model, Cmd.none )
 
 
-getMob : Model -> Maybe MobName
-getMob model =
-    case model.page of
+getMob : Page -> Maybe MobName
+getMob page =
+    case page of
         Mob mob ->
             Just <| mob.name
 
@@ -181,36 +167,17 @@ getMob model =
             Nothing
 
 
-toElm : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )
-toElm model updateResult =
-    ( { model | page = updateResult.model, toasts = updateResult.toasts }, updateResult.command )
-
-
-handleToasts : Model -> UpdateResult Page Msg -> UpdateResult Page Msg
-handleToasts model result =
+toModelCmd : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )
+toModelCmd model result =
     let
-        ( allToasts, toastCommands ) =
-            Toaster.add result.toasts model.toasts
-
-        command =
-            toastCommands
-                |> List.map (Cmd.map GotToastMsg)
-                |> (::) result.command
-                |> Cmd.batch
+        ( shared, sharedCommand ) =
+            Shared.toast result.toasts model.shared
     in
-    UpdateResult result.model command allToasts
-
-
-toast : Toaster.Toast -> Model -> ( Model, Cmd Msg )
-toast toToast model =
-    let
-        ( toasts, commands ) =
-            Toaster.add [ toToast ] model.toasts
-    in
-    ( { model | toasts = toasts }
-    , commands
-        |> List.map (Cmd.map GotToastMsg)
-        |> Cmd.batch
+    ( { model
+        | page = result.model
+        , shared = shared
+      }
+    , Cmd.batch [ Cmd.map SharedMsg sharedCommand, result.command ]
     )
 
 
@@ -226,10 +193,9 @@ subscriptions model =
                 Sub.none
 
             Mob mobModel ->
-                Pages.Mob.subscriptions mobModel |> Sub.map GotMobMsg
+                Pages.Mob.subscriptions mobModel |> Sub.map (GotMobMsg << Spa.Regular)
         , Js.Events.events (dispatch jsEventsMapping)
-        , Socket.subscriptions model.socket
-            |> Sub.map SocketMsg
+        , Shared.subscriptions model.shared |> Sub.map SharedMsg
         ]
 
 
@@ -240,10 +206,7 @@ dispatch mapping event =
 
 jsEventsMapping : EventsMapping Msg
 jsEventsMapping =
-    EventsMapping.batch
-        [ EventsMapping.map GotMobMsg Pages.Mob.jsEventMapping
-        , EventsMapping.map GotToastMsg Toaster.jsEventMapping
-        ]
+    EventsMapping.map (GotMobMsg << Spa.Regular) Pages.Mob.jsEventMapping
 
 
 
@@ -256,23 +219,22 @@ view model =
         doc =
             case model.page of
                 Home sub ->
-                    Pages.Home.view sub
+                    Pages.Home.view model.shared sub
                         |> View.map GotHomeMsg
 
                 Mob sub ->
-                    Pages.Mob.view sub model.url
+                    Pages.Mob.view model.shared sub
                         |> View.map GotMobMsg
     in
     { title = doc.title
     , body =
         [ Html.toUnstyled <|
-            Html.div []
-                [ Html.div []
+            Html.div [ css [ Css.height <| Css.pct 100 ] ]
+                [ Html.div [ css [ Css.height <| Css.pct 100 ] ]
                     (doc.body
                         ++ soundModal model
-                        ++ [ Toaster.view model.toasts |> Html.map GotToastMsg ]
+                        ++ [ Toaster.view model.shared.toasts |> Html.map (SharedMsg << Shared.Toast) ]
                     )
-                , Socket.view model.socket
                 ]
         ]
     }
@@ -290,6 +252,9 @@ soundModal model =
                     , onClick <| HideModal
                     ]
                     [ UI.Icons.Ion.paperAirplane
+                        { size = UI.Rem.Rem 1
+                        , color = UI.Palettes.monochrome.on.surface
+                        }
                     , text "Let's go!"
                     ]
                 ]

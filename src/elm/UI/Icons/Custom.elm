@@ -2,7 +2,6 @@ module UI.Icons.Custom exposing (..)
 
 import Html.Styled exposing (i)
 import Html.Styled.Attributes exposing (class)
-import UI.Icons.Common exposing (Icon)
 import Svg.Styled
     exposing
         ( Svg
@@ -24,6 +23,8 @@ import Svg.Styled.Attributes
         , viewBox
         , width
         )
+import UI.Icons.Common exposing (Icon)
+import UI.Rem
 
 
 tomato : Icon msg
@@ -75,11 +76,11 @@ rabbit =
 
 
 display_ : List (Svg msg) -> Icon msg
-display_ a =
+display_ a { size } =
     i [ class "icon" ]
         [ svg
-            [ height "1.4em"
-            , width "1.4em"
+            [ height <| UI.Rem.toCssString size
+            , width <| UI.Rem.toCssString size
             , viewBox "0 0 512 512"
             , enableBackground "new 0 0 512 512"
             ]

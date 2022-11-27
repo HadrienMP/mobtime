@@ -8,7 +8,6 @@ import Html.Events as UnstyledEvts
 import Html.Styled exposing (Html, button, div, form, li, p, text, ul)
 import Html.Styled.Attributes exposing (class, disabled, id, type_)
 import Html.Styled.Events exposing (onClick, onSubmit)
-import UI.Icons.Ion as Icons
 import Lib.Toaster as Toaster
 import Lib.UpdateResult exposing (UpdateResult)
 import Model.Events
@@ -18,6 +17,9 @@ import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Role exposing (Role)
 import Model.State exposing (State)
 import Random
+import UI.Icons.Ion as Icons
+import UI.Palettes
+import UI.Rem
 import Uuid
 
 
@@ -118,7 +120,12 @@ view { mobbers, roles } model =
             [ id "add", onSubmit StartAdding ]
             [ Field.view (textFieldConfig "Mobber to be added" NameChanged) model.mobberName
                 |> Html.Styled.fromUnstyled
-            , button [ type_ "submit" ] [ Icons.plus ]
+            , button [ type_ "submit" ]
+                [ Icons.plus
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
             ]
         , div [ class "button-row" ]
             [ button
@@ -127,6 +134,9 @@ view { mobbers, roles } model =
                 , onClick <| ShareEvent <| Model.Events.RotatedMobbers
                 ]
                 [ Icons.rotate
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
                 , text "Rotate"
                 ]
             , button
@@ -135,6 +145,9 @@ view { mobbers, roles } model =
                 , onClick Shuffle
                 ]
                 [ Icons.shuffle
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
                 , text "Shuffle"
                 ]
             ]
@@ -180,6 +193,10 @@ mobberView ( role, mobber ) =
             [ p [ class "name" ] [ text mobber.name ]
             , button
                 [ onClick <| ShareEvent <| Model.Events.DeletedMobber mobber ]
-                [ Icons.delete ]
+                [ Icons.delete
+                    { size = UI.Rem.Rem 1
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                ]
             ]
         ]

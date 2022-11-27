@@ -5,10 +5,12 @@ import Html.Styled.Attributes as Attr exposing (class, classList, for, id, src, 
 import Html.Styled.Events exposing (onClick, onInput)
 import Js.Commands
 import Json.Encode
-import UI.Icons.Ion exposing (musicNote)
 import Model.Events
 import Model.MobName exposing (MobName)
 import Sounds as SoundLibrary
+import UI.Icons.Ion exposing (musicNote)
+import UI.Palettes
+import UI.Rem
 
 
 type alias CommandPort =
@@ -66,6 +68,9 @@ view model mob activeProfile =
             [ id "volume-field", class "form-field" ]
             [ label [ for "volume" ] [ text "Volume" ]
             , UI.Icons.Ion.volumeLow
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.background
+                }
             , input
                 [ id "volume"
                 , type_ "range"
@@ -75,6 +80,9 @@ view model mob activeProfile =
                 ]
                 []
             , UI.Icons.Ion.volumeHigh
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.background
+                }
             ]
         , button
             [ id "test-audio"
@@ -82,6 +90,9 @@ view model mob activeProfile =
             , onClick TestTheSound
             ]
             [ musicNote
+                { size = UI.Rem.Rem 1
+                , color = UI.Palettes.monochrome.on.background
+                }
             , text "Test the audio !"
             ]
         , div

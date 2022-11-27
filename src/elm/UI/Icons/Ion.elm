@@ -6,9 +6,11 @@ import Ionicon
 import Ionicon.Android
 import Ionicon.Ios
 import Ionicon.Social
-import UI.Icons.Common exposing (Icon)
 import Svg as Unstyled
-import Svg.Styled as Svg exposing (Svg)
+import Svg.Styled as Svg
+import UI.Color
+import UI.Icons.Common exposing (Icon)
+import UI.Rem
 
 
 code : Icon msg
@@ -151,9 +153,11 @@ display :
         }
      -> Unstyled.Svg msg
     )
-    -> Svg msg
-display icon =
+    -> UI.Icons.Common.Icon msg
+display icon { size, color } =
     i [ class "icon" ]
-        [ icon 32 { red = 0, green = 0, blue = 0, alpha = 0 }
+        [ icon
+            (UI.Rem.toPixelsFake size)
+            (UI.Color.toIonIconRgba color)
             |> Svg.fromUnstyled
         ]

@@ -1,6 +1,5 @@
 module Pages.Mob.Tabs.Home exposing (..)
 
-import UI.Footer
 import Html.Styled exposing (Html, div, li, span, text, ul)
 import Html.Styled.Attributes exposing (class, id)
 import Js.Commands
@@ -9,29 +8,31 @@ import Model.Mobber exposing (Mobber)
 import Model.Role exposing (Role)
 import Model.State exposing (State)
 import Pages.Mob.Tabs.Share
-import Url
+import Routing
 
 
 type Msg
-    = PutLinkInPasteBin Url.Url
+    = PutLinkInPasteBin String
 
 
 update : Msg -> Cmd Msg
 update msg =
     case msg of
         PutLinkInPasteBin url ->
-            Url.toString url
+            url
                 |> Js.Commands.CopyInPasteBin
                 |> Js.Commands.send
 
 
-view : MobName -> Url.Url -> State -> Html Msg
-view mobName url state =
+view : MobName -> State -> Html Msg
+view mobName state =
     div
         [ id "home", class "tab" ]
-        [ Pages.Mob.Tabs.Share.shareButton mobName <| PutLinkInPasteBin url
+        [ Pages.Mob.Tabs.Share.shareButton mobName <|
+            PutLinkInPasteBin <|
+                Routing.toUrl <|
+                    Routing.Mob mobName
         , roles state
-        , UI.Footer.view
         ]
 
 

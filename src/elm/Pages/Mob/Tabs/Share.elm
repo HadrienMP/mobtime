@@ -4,12 +4,14 @@ import Html.Styled as Html exposing (Html, button, div, span, strong, text)
 import Html.Styled.Attributes exposing (class, id, title)
 import Html.Styled.Events exposing (onClick)
 import Js.Commands
-import UI.Icons.Ion
 import Model.MobName exposing (MobName)
 import QRCode
+import Routing
 import Svg.Attributes as Svg
 import Svg.Styled exposing (fromUnstyled)
-import Url
+import UI.Icons.Ion
+import UI.Palettes
+import UI.Rem
 
 
 
@@ -17,14 +19,14 @@ import Url
 
 
 type Msg
-    = PutLinkInPasteBin Url.Url
+    = PutLinkInPasteBin String
 
 
 update : Msg -> Cmd Msg
 update msg =
     case msg of
         PutLinkInPasteBin url ->
-            Url.toString url
+            url
                 |> Js.Commands.CopyInPasteBin
                 |> Js.Commands.send
 
@@ -33,11 +35,15 @@ update msg =
 -- VIEW
 
 
-view : MobName -> Url.Url -> Html Msg
-view mob url =
+view : MobName -> Html Msg
+view mob =
+    let
+        url =
+            Routing.Mob mob |> Routing.toUrl
+    in
     div [ id "share", class "tab" ]
         [ shareButton mob <| PutLinkInPasteBin url
-        , QRCode.fromString (Url.toString url)
+        , QRCode.fromString url
             |> Result.map
                 (QRCode.toSvg
                     [ Svg.width "300px"
@@ -58,6 +64,9 @@ shareButton mob shareMsg =
         ]
         [ shareText mob
         , UI.Icons.Ion.share
+            { size = UI.Rem.Rem 1
+            , color = UI.Palettes.monochrome.on.background
+            }
         ]
 
 
