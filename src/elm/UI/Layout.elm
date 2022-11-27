@@ -25,6 +25,15 @@ limitWidth =
     ]
 
 
+center : List Css.Style
+center =
+    [ Css.position Css.absolute
+    , Css.top <| Css.vh 50
+    , Css.left <| Css.vw 50
+    , Css.transform <| Css.translate2 (Css.pct -50) (Css.pct -50)
+    ]
+
+
 wrap : Shared -> MobName -> Html msg -> Html (Spa.Msg msg)
 wrap shared mob child =
     div
@@ -36,13 +45,19 @@ wrap shared mob child =
         ]
         (([ navBar mob
           , div
-                [ css ((Css.flexGrow <| Css.num 1) :: limitWidth) ]
+                [ css
+                    ([ Css.flexGrow <| Css.num 1
+                     , Css.position Css.relative
+                     ]
+                        ++ limitWidth
+                    )
+                ]
                 [ div
                     [ css [ Css.padding sidePadding ] ]
                     [ child ]
+                , Socket.view shared.socket
                 ]
           , footer
-          , Socket.view shared.socket
           ]
             |> List.map (Html.map Spa.Regular)
          )
@@ -113,7 +128,7 @@ sidePadding =
 
 
 forHome : Shared -> Html msg -> Html msg
-forHome _ child =
+forHome shared child =
     div
         [ css
             [ Css.displayFlex
@@ -125,15 +140,15 @@ forHome _ child =
             [ css [ Css.flexGrow <| Css.num 1 ] ]
             [ div
                 [ css
-                    [ Css.position Css.absolute
-                    , Css.top <| Css.vh 50
-                    , Css.left <| Css.vw 50
-                    , Css.transform <| Css.translate2 (Css.pct -50) (Css.pct -50)
-                    ]
+                    (Css.padding sidePadding
+                        :: center
+                        ++ limitWidth
+                    )
                 ]
                 [ child ]
             ]
         , footer
+        , Socket.view shared.socket
         ]
 
 

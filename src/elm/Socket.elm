@@ -2,7 +2,7 @@ port module Socket exposing (..)
 
 import Css
 import Html.Styled as Html
-import Html.Styled.Attributes exposing (css)
+import Html.Styled.Attributes as Attr exposing (css)
 import Lib.Delay
 import Model.MobName exposing (MobName)
 import UI.Animations
@@ -122,22 +122,30 @@ view status =
     case status of
         SwitchOff ->
             Html.div
-                [ css (common ++ UI.Animations.fadeOut) ]
+                [ css (common ++ UI.Animations.fadeOut)
+                , Attr.title "Disconnected from server, reconnecting"
+                ]
                 [ UI.Elements.dot UI.Palettes.monochrome.success ]
 
         SwitchOn _ ->
             Html.div
-                [ css (common ++ UI.Animations.fadeOut) ]
+                [ css (common ++ UI.Animations.fadeOut)
+                , Attr.title "Connected"
+                ]
                 [ UI.Elements.dot UI.Palettes.monochrome.error ]
 
         On _ ->
             Html.div
-                [ css (common ++ UI.Animations.fadeIn) ]
+                [ css (common ++ UI.Animations.fadeIn)
+                , Attr.title "Connected"
+                ]
                 [ UI.Elements.dot UI.Palettes.monochrome.success ]
 
         Off ->
             Html.div
-                [ css (common ++ UI.Animations.blink) ]
+                [ css (common ++ UI.Animations.blink)
+                , Attr.title "Disconnected from server, reconnecting"
+                ]
                 [ UI.Elements.dot UI.Palettes.monochrome.error ]
 
 
@@ -146,4 +154,5 @@ common =
     [ Css.position Css.absolute
     , Css.top <| UI.Space.s
     , Css.right <| UI.Space.s
+    , Css.zIndex <| Css.int 1000
     ]
