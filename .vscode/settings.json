@@ -1,0 +1,4 @@
+{
+    "editor.formatOnSave": true,
+    "nixEnvSelector.nixFile": "${workspaceRoot}/flake.nix",
+}
