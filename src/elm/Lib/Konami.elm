@@ -1,33 +1,93 @@
-module Lib.Konami exposing (Konami, add, empty, isActivated)
+module Lib.Konami exposing
+    ( Konami
+    , Msg(..)
+    , init
+    , isOn
+    , subscriptions
+    , update
+    )
+
+import Browser.Events exposing (onKeyUp)
+import Json.Decode
+import Lib.Keyboard
 
 
 type Konami
-    = Konami (List String)
+    = Off (List String)
+    | On
 
 
-empty : Konami
-empty =
-    Konami []
-
-
-asList : Konami -> List String
-asList konami =
+isOn : Konami -> Bool
+isOn konami =
     case konami of
-        Konami keys ->
-            keys
+        On ->
+            True
+
+        _ ->
+            False
 
 
-add : String -> Konami -> Konami
-add key konami =
-    let
-        keys =
-            asList konami
-    in
-    key :: keys
-    |> List.take 10
-    |> Konami
+konamiSequence : List String
+konamiSequence =
+    List.reverse
+        [ "ArrowUp"
+        , "ArrowUp"
+        , "ArrowDown"
+        , "ArrowDown"
+        , "ArrowLeft"
+        , "ArrowRight"
+        , "ArrowLeft"
+        , "ArrowRight"
+        , "a"
+        , "b"
+        ]
 
 
-isActivated : Konami -> Bool
-isActivated konami =
-    List.reverse [ "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "a", "b" ] == asList konami
+
+-- Init
+
+
+init : Konami
+init =
+    Off []
+
+
+
+-- Update
+
+
+type Msg
+    = KeyPressed Lib.Keyboard.Keystroke
+
+
+update : Msg -> Konami -> ( Konami, Cmd Msg )
+update msg model =
+    case model of
+        Off keys ->
+            case msg of
+                KeyPressed { key } ->
+                    let
+                        updated =
+                            key :: keys |> List.take (List.length konamiSequence)
+                    in
+                    ( if updated == konamiSequence then
+                        On
+
+                      else
+                        Off updated
+                    , Cmd.none
+                    )
+
+        On ->
+            ( On, Cmd.none )
+
+
+
+-- Subscriptions
+
+
+subscriptions : Konami -> Sub Msg
+subscriptions _ =
+    onKeyUp <|
+        Json.Decode.map KeyPressed <|
+            Lib.Keyboard.decode

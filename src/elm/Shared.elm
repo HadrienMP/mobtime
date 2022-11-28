@@ -5,6 +5,7 @@ import Browser.Navigation as Nav
 import Js.Commands
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
+import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toasts)
 import Model.MobName exposing (MobName)
 import Socket
@@ -22,6 +23,8 @@ type alias Shared =
     , key : Nav.Key
     , preferences : UserPreferences.Model
     , mob : Maybe MobName
+    , devMode : Bool
+    , konami : Konami
     }
 
 
@@ -41,6 +44,8 @@ init { key, preferences, mob } =
       , key = key
       , preferences = preferences
       , mob = mob
+      , devMode = False
+      , konami = Lib.Konami.init
       }
     , Cmd.batch
         [ socketCmd
@@ -58,6 +63,7 @@ type Msg
     = Toast Lib.Toaster.Msg
     | SocketMsg Socket.Msg
     | LinkClicked Browser.UrlRequest
+    | KonamiMsg Lib.Konami.Msg
     | Batch (List Msg)
 
 
@@ -98,6 +104,18 @@ update_ msg shared =
                     (\toasts -> { shared | toasts = toasts })
                     (Cmd.map Toast)
 
+        KonamiMsg subMsg ->
+            let
+                ( updated, cmd ) =
+                    Lib.Konami.update subMsg shared.konami
+            in
+            ( { shared
+                | devMode = Lib.Konami.isOn updated
+                , konami = updated
+              }
+            , cmd |> Cmd.map KonamiMsg
+            )
+
         _ ->
             ( shared, Cmd.none )
 
@@ -125,6 +143,8 @@ subscriptions shared =
         [ Js.Events.events (dispatch jsEventsMapping)
         , Socket.subscriptions shared.socket
             |> Sub.map SocketMsg
+        , Lib.Konami.subscriptions shared.konami
+            |> Sub.map KonamiMsg
         ]
 
 

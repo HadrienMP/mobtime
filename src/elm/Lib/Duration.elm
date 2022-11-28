@@ -117,6 +117,11 @@ subtract a b =
         |> ofSeconds
 
 
+print : Duration -> String
+print duration =
+    toShortString duration |> String.join " "
+
+
 toShortString : Duration -> List String
 toShortString duration =
     let

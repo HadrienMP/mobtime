@@ -8,6 +8,7 @@ import Model.Clock as Clock
 import Model.Events
 import Model.MobName exposing (MobName)
 import Model.State
+import Shared exposing (Shared)
 import Time
 import UI.Icons.Custom
 import UI.Icons.Ion
@@ -44,8 +45,8 @@ update msg model mob =
             )
 
 
-view : Model -> Time.Posix -> Model.State.State -> Html Msg
-view model now shared =
+view : Shared -> Model -> Time.Posix -> Model.State.State -> Html Msg
+view shared model now state =
     div [ id "timer", class "tab" ]
         [ h3 []
             [ UI.Icons.Ion.people
@@ -77,8 +78,7 @@ view model now shared =
                 [ for "turn-length" ]
                 [ text <|
                     "Turn : "
-                        ++ (String.fromInt <| Duration.toMinutes shared.turnLength)
-                        ++ " min"
+                        ++ Duration.print state.turnLength
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Custom.rabbit
@@ -91,13 +91,13 @@ view model now shared =
                     , step "1"
                     , onInput <|
                         String.toInt
-                            >> Maybe.withDefault (Duration.toMinutes Model.State.defaultTurnLength)
-                            >> Duration.ofMinutes
+                            >> Maybe.withDefault (toValue shared Model.State.defaultTurnLength)
+                            >> toDuration shared
                             >> Model.Events.TurnLengthChanged
                             >> ShareEvent
                     , Attr.min "2"
                     , Attr.max "20"
-                    , value <| String.fromInt <| Duration.toMinutes shared.turnLength
+                    , value <| String.fromInt <| toValue shared state.turnLength
                     ]
                     []
                 , UI.Icons.Custom.elephant
@@ -123,7 +123,7 @@ view model now shared =
         , div
             [ class "form-field" ]
             [ p [] [ text "Time left" ]
-            , p [] [ text <| Clock.timeLeft now shared.pomodoro ]
+            , p [] [ text <| Clock.timeLeft now state.pomodoro ]
             ]
         , div
             [ id "pomodoro-length-field", class "form-field" ]
@@ -131,8 +131,7 @@ view model now shared =
                 [ for "pomodoro-length" ]
                 [ text <|
                     "Length : "
-                        ++ (String.fromInt <| Duration.toMinutes shared.pomodoroLength)
-                        ++ " min"
+                        ++ Duration.print state.pomodoroLength
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Ion.batteryFull
@@ -145,13 +144,13 @@ view model now shared =
                     , step "1"
                     , onInput <|
                         String.toInt
-                            >> Maybe.withDefault (Duration.toMinutes Model.State.defaultPomodoroLength)
-                            >> Duration.ofMinutes
+                            >> Maybe.withDefault (toValue shared Model.State.defaultPomodoroLength)
+                            >> toDuration shared
                             >> Model.Events.PomodoroLengthChanged
                             >> ShareEvent
                     , Attr.min "10"
                     , Attr.max "45"
-                    , value <| String.fromInt <| Duration.toMinutes shared.pomodoroLength
+                    , value <| String.fromInt <| toValue shared state.pomodoroLength
                     ]
                     []
                 , UI.Icons.Ion.batteryLow
@@ -161,3 +160,21 @@ view model now shared =
                 ]
             ]
         ]
+
+
+toDuration : Shared -> Int -> Duration.Duration
+toDuration shared =
+    if shared.devMode then
+        Duration.ofSeconds
+
+    else
+        Duration.ofMinutes
+
+
+toValue : Shared -> Duration.Duration -> Int
+toValue shared =
+    if shared.devMode then
+        Duration.toSeconds
+
+    else
+        Duration.toMinutes

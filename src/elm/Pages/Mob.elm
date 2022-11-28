@@ -1,6 +1,5 @@
 module Pages.Mob exposing (..)
 
-import Browser.Events exposing (onKeyUp)
 import Css
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
@@ -8,9 +7,7 @@ import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
-import Json.Decode
 import Lib.Duration as Duration exposing (DurationStringParts)
-import Lib.Konami as Konami exposing (Konami)
 import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
@@ -71,7 +68,7 @@ type Tab
 
 type alias Model =
     { name : MobName
-    , shared : Model.State.State
+    , state : Model.State.State
     , mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
     , clockSettings : Pages.Mob.Tabs.Clocks.Model
     , soundSettings : Pages.Mob.Tabs.Sound.Model
@@ -79,8 +76,6 @@ type alias Model =
     , alarm : AlarmState
     , now : Time.Posix
     , tab : Tab
-    , dev : Bool
-    , konami : Konami
     , peerId : Maybe PeerId
     }
 
@@ -92,7 +87,7 @@ init name preferences =
             Peers.Sync.Adapter.init name
     in
     ( { name = name
-      , shared = Model.State.init
+      , state = Model.State.init
       , mobbersSettings = Pages.Mob.Tabs.Mobbers.init
       , clockSettings = Pages.Mob.Tabs.Clocks.init
       , soundSettings = Pages.Mob.Tabs.Sound.init preferences.volume
@@ -100,8 +95,6 @@ init name preferences =
       , alarm = Standby
       , now = Time.millisToPosix 0
       , tab = Main
-      , dev = False
-      , konami = Konami.empty
       , peerId = Nothing
       }
     , Cmd.batch
@@ -132,7 +125,6 @@ type Msg
     | GotSoundSettingsMsg Pages.Mob.Tabs.Sound.Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
-    | KeyPressed Keystroke
     | GotSocketId PeerId
 
 
@@ -140,7 +132,7 @@ timePassed : Time.Posix -> Model -> ( Model, Cmd Msg )
 timePassed now model =
     let
         timePassedResult =
-            Model.State.timePassed now model.shared
+            Model.State.timePassed now model.state
 
         toto =
             case timePassedResult.turnEvent of
@@ -159,7 +151,7 @@ timePassed now model =
                 Clock.Continued ->
                     model.alarm
         , now = now
-        , shared = timePassedResult.updated
+        , state = timePassedResult.updated
       }
     , Cmd.batch
         [ toto
@@ -168,8 +160,8 @@ timePassed now model =
     )
 
 
-update : Msg -> Model -> UpdateResult Model Msg
-update msg model =
+update : Shared -> Msg -> Model -> UpdateResult Model Msg
+update _ msg model =
     case msg of
         ShareEvent event ->
             { model = model
@@ -179,12 +171,12 @@ update msg model =
 
         ReceivedEvent event ->
             let
-                ( shared, command ) =
-                    Model.State.evolve event model.shared
+                ( updated, command ) =
+                    Model.State.evolve event model.state
             in
             { model =
                 { model
-                    | shared = shared
+                    | state = updated
                     , alarm =
                         -- Handle alarm (command) as separate from the evolve method ?
                         case event of
@@ -200,10 +192,10 @@ update msg model =
 
         ReceivedHistory eventsResults ->
             let
-                ( shared, command ) =
-                    Model.State.evolveMany eventsResults model.shared
+                ( updated, command ) =
+                    Model.State.evolveMany eventsResults model.state
             in
-            { model = { model | shared = shared }
+            { model = { model | state = updated }
             , command = command
             , toasts = []
             }
@@ -213,7 +205,7 @@ update msg model =
             , command =
                 Time.now
                     |> Task.map
-                        (\now -> ( now, selectSound now model.shared.soundProfile ))
+                        (\now -> ( now, selectSound now model.state.soundProfile ))
                     |> Task.perform StartWith
             , toasts = []
             }
@@ -224,13 +216,7 @@ update msg model =
                 Model.Events.Started
                     { time = now
                     , alarm = sound
-                    , length =
-                        Duration.div model.shared.turnLength <|
-                            if model.dev then
-                                20
-
-                            else
-                                1
+                    , length = model.state.turnLength
                     }
                     |> Model.Events.Clock
                     |> Model.Events.MobEvent model.name
@@ -260,7 +246,7 @@ update msg model =
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
-                    Pages.Mob.Tabs.Mobbers.update subMsg model.shared.mobbers model.name model.mobbersSettings
+                    Pages.Mob.Tabs.Mobbers.update subMsg model.state.mobbers model.name model.mobbersSettings
             in
             { model =
                 { model
@@ -302,16 +288,6 @@ update msg model =
             , toasts = []
             }
 
-        KeyPressed { key } ->
-            { model =
-                { model
-                    | dev = xor model.dev <| Konami.isActivated model.konami
-                    , konami = Konami.add key model.konami
-                }
-            , command = Cmd.none
-            , toasts = []
-            }
-
         GotClockSyncMsg sub ->
             Peers.Sync.Adapter.update sub model.clockSync model.now
                 |> UpdateResult.map
@@ -346,14 +322,6 @@ selectSound now profile =
 -- SUBSCRIPTIONS
 
 
-type alias Keystroke =
-    { key : String
-    , ctrl : Bool
-    , alt : Bool
-    , shift : Bool
-    }
-
-
 turnRefreshRate : Duration.Duration
 turnRefreshRate =
     Duration.ofMillis 500
@@ -365,7 +333,7 @@ subscriptions model =
         [ Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
         , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
         , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
-        , case ( Clock.isOn model.shared.clock, Clock.isOn model.shared.pomodoro ) of
+        , case ( Clock.isOn model.state.clock, Clock.isOn model.state.pomodoro ) of
             ( True, _ ) ->
                 Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
 
@@ -374,13 +342,6 @@ subscriptions model =
 
             _ ->
                 Sub.none
-        , onKeyUp <|
-            Json.Decode.map KeyPressed <|
-                Json.Decode.map4 Keystroke
-                    (Json.Decode.field "key" Json.Decode.string)
-                    (Json.Decode.field "ctrlKey" Json.Decode.bool)
-                    (Json.Decode.field "altKey" Json.Decode.bool)
-                    (Json.Decode.field "shiftKey" Json.Decode.bool)
         ]
 
 
@@ -406,12 +367,12 @@ view shared model =
             detectAction model
     in
     { title = timeLeftTitle action.timeLeft
-    , body = [ UI.Layout.wrap shared model.name <| body model action ]
+    , body = [ UI.Layout.wrap shared model.name <| body shared model action ]
     }
 
 
-body : Model -> ActionDescription -> Html Msg
-body model action =
+body : Shared -> Model -> ActionDescription -> Html Msg
+body shared model action =
     div [ class "container" ]
         [ clockArea model action
         , nav []
@@ -466,7 +427,7 @@ body model action =
                     }
                 ]
              ]
-                ++ (if model.dev then
+                ++ (if shared.devMode then
                         [ button
                             [ onClick <| SwitchTab Dev
                             , classList [ ( "active", model.tab == Dev ) ]
@@ -485,19 +446,19 @@ body model action =
             )
         , case model.tab of
             Main ->
-                Pages.Mob.Tabs.Home.view model.name model.shared
+                Pages.Mob.Tabs.Home.view model.name model.state
                     |> Html.map GotMainTabMsg
 
             Clock ->
-                Pages.Mob.Tabs.Clocks.view model.clockSettings model.now model.shared
+                Pages.Mob.Tabs.Clocks.view shared model.clockSettings model.now model.state
                     |> Html.map GotClockSettingsMsg
 
             Mobbers ->
-                Pages.Mob.Tabs.Mobbers.view model.shared model.mobbersSettings
+                Pages.Mob.Tabs.Mobbers.view model.state model.mobbersSettings
                     |> Html.map GotMobbersSettingsMsg
 
             Sound ->
-                Pages.Mob.Tabs.Sound.view model.soundSettings model.name model.shared.soundProfile
+                Pages.Mob.Tabs.Sound.view model.soundSettings model.name model.state.soundProfile
                     |> Html.map GotSoundSettingsMsg
 
             Share ->
@@ -506,8 +467,8 @@ body model action =
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
-        , case model.shared.pomodoro of
-            Clock.On pomodoro ->
+        , case ( model.state.clock, model.state.pomodoro ) of
+            ( Off, Clock.On pomodoro ) ->
                 if Duration.secondsBetween model.now pomodoro.end <= 0 then
                     breakModal model.name
 
@@ -551,11 +512,11 @@ breakModal mobName =
         UI.Column.column
             [ css UI.Css.center ]
             [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-            [ UI.Icons.Tea.display
+            [ UI.Text.h2 "It's time for a break!"
+            , UI.Icons.Tea.display
                 { height = UI.Rem.Rem 10
                 , color = UI.Palettes.monochrome.on.background
                 }
-            , UI.Text.h2 "It's time for a break!"
             , Html.p
                 [ css [ Css.textAlign Css.justify ] ]
                 [ Html.text "Boost your productivity by taking a good break." ]
@@ -564,7 +525,7 @@ breakModal mobName =
                 , variant = UI.Buttons.Primary
                 , size = UI.Buttons.L
                 , action =
-                    Model.Events.Clock Model.Events.Stopped
+                    Model.Events.PomodoroStopped
                         |> Model.Events.MobEvent mobName
                         |> ShareEvent
                         |> Just
@@ -592,7 +553,7 @@ clockArea model action =
                         }
                     , strokeWidth = UI.Rem.Rem 0.3
                     , diameter = UI.Rem.Rem 8.7
-                    , progress = Clock.ratio model.now model.shared.pomodoro
+                    , progress = Clock.ratio model.now model.state.pomodoro
                     , refreshRate = turnRefreshRate |> Duration.multiply 2
                     }
                 , Html.div
@@ -610,7 +571,7 @@ clockArea model action =
                             }
                         , strokeWidth = UI.Rem.Rem 0.5
                         , diameter = UI.Rem.Rem 7.8
-                        , progress = Clock.ratio model.now model.shared.clock
+                        , progress = Clock.ratio model.now model.state.clock
                         , refreshRate = turnRefreshRate |> Duration.multiply 2
                         }
                     ]
@@ -689,7 +650,7 @@ detectAction model =
         timeLeft =
             timeLeftString model
     in
-    case ( model.alarm, model.shared.clock, model.shared.pomodoro ) of
+    case ( model.alarm, model.state.clock, model.state.pomodoro ) of
         ( Playing, _, _ ) ->
             { icon =
                 UI.Icons.Ion.mute
@@ -755,7 +716,7 @@ detectAction model =
 
 timeLeftString : Model -> DurationStringParts
 timeLeftString model =
-    case model.shared.clock of
+    case model.state.clock of
         On on ->
             Duration.between model.now on.end
                 |> (if model.clockSettings.displaySeconds then

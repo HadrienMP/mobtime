@@ -131,7 +131,7 @@ update msg model =
                 |> toModelCmd model
 
         ( GotMobMsg (Spa.Regular subMsg), Mob subModel ) ->
-            Pages.Mob.update subMsg subModel
+            Pages.Mob.update model.shared subMsg subModel
                 |> UpdateResult.map Mob (GotMobMsg << Spa.Regular)
                 |> toModelCmd model
 
