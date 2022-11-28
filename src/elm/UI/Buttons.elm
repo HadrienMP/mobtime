@@ -45,13 +45,24 @@ button :
         , action : Action msg
         }
     -> Html msg
-button attributes { content, action } =
+button attributes { content, action, size } =
     Html.button
         (Attr.css
             [ Css.borderRadius <| Css.rem 0.2
-            , Css.padding <| Css.rem 0.6
+            , Css.padding <|
+                Css.rem <|
+                    case size of
+                        S ->
+                            0.4
+
+                        M ->
+                            0.6
+
+                        L ->
+                            1.2
             , Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.black
             , Css.hover [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.black ]
+            , Css.display Css.block
             ]
             :: actionAttribute action
             :: attributes
@@ -69,6 +80,7 @@ button attributes { content, action } =
                         [ Css.displayFlex
                         , Css.alignItems Css.center
                         , Css.fontSize <| Css.rem 1.1
+                        , Css.justifyContent Css.center
                         ]
                     ]
                     [ icon { size = UI.Rem.Rem 1, color = UI.Palettes.monochrome.on.surface }

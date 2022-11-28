@@ -9,6 +9,7 @@ import Shared exposing (Shared)
 import Socket
 import Spa
 import UI.Color
+import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
@@ -22,15 +23,6 @@ limitWidth =
     [ Css.maxWidth <| Css.rem 22
     , Css.margin Css.auto
     , Css.width <| Css.pct 100
-    ]
-
-
-center : List Css.Style
-center =
-    [ Css.position Css.absolute
-    , Css.top <| Css.vh 50
-    , Css.left <| Css.vw 50
-    , Css.transform <| Css.translate2 (Css.pct -50) (Css.pct -50)
     ]
 
 
@@ -141,7 +133,7 @@ forHome shared child =
             [ div
                 [ css
                     (Css.padding sidePadding
-                        :: center
+                        :: UI.Css.center
                         ++ limitWidth
                     )
                 ]

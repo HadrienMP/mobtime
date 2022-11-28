@@ -1,7 +1,7 @@
 module Pages.Mob exposing (..)
 
 import Browser.Events exposing (onKeyUp)
-import Css exposing (absolute)
+import Css
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
@@ -32,13 +32,17 @@ import Spa
 import Svg.Styled exposing (Svg)
 import Task
 import Time
+import UI.Buttons
 import UI.CircularProgressBar
 import UI.Color
+import UI.Css
 import UI.Icons
 import UI.Icons.Ion
+import UI.Icons.Tape
 import UI.Layout
 import UI.Palettes
 import UI.Rem
+import UI.Text
 import UserPreferences
 import View exposing (View)
 
@@ -499,6 +503,47 @@ body model action =
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
+        , case model.alarm of
+            Playing ->
+                musicModal
+
+            _ ->
+                div [] []
+        ]
+
+
+musicModal : Html Msg
+musicModal =
+    div
+        [ css
+            (UI.Css.fullpage
+                ++ [ Css.backgroundColor <|
+                        UI.Color.toElmCss <|
+                            UI.Palettes.monochrome.background
+                   ]
+            )
+        ]
+        [ div
+            [ css
+                (UI.Css.center
+                    ++ [ Css.displayFlex
+                       , Css.flexDirection Css.column
+                       , Css.property "gap" "2rem"
+                       ]
+                )
+            ]
+            [ UI.Icons.Tape.display
+                { height = UI.Rem.Rem 10
+                , color = UI.Palettes.monochrome.on.background
+                }
+            , UI.Text.h2 "Turn ended !"
+            , UI.Buttons.button [ css [ Css.margin Css.auto ] ]
+                { content = UI.Buttons.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
+                , variant = UI.Buttons.Primary
+                , size = UI.Buttons.L
+                , action = UI.Buttons.OnPress <| Just StopSound
+                }
+            ]
         ]
 
 
@@ -602,18 +647,6 @@ actionButton action =
                     )
             )
         ]
-
-
-centerXY : List Css.Style
-centerXY =
-    [ Css.position absolute
-    , Css.top <| Css.pct 50
-    , Css.left <| Css.pct 50
-    , Css.transforms
-        [ Css.translateX <| Css.pct -50
-        , Css.translateY <| Css.pct -50
-        ]
-    ]
 
 
 type alias ActionDescription =
