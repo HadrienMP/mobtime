@@ -14,11 +14,11 @@ withContent : Html msg -> Html msg
 withContent content =
     div
         [ Attr.css
-            (UI.Css.fullpage
-                ++ [ Css.backgroundColor <|
-                        UI.Color.toElmCss <|
-                            UI.Palettes.monochrome.background
-                   ]
+            ((Css.backgroundColor <|
+                UI.Color.toElmCss <|
+                    UI.Palettes.monochrome.background
+             )
+                :: UI.Css.fullpage
                 ++ UI.Animations.fadeIn (Lib.Duration.ofMillis 400)
             )
         ]
