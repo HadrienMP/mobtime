@@ -39,7 +39,6 @@ import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
 import UI.Layout
-import UI.Modal
 import UI.Palettes
 import UI.Rem
 import UI.Text
@@ -367,6 +366,20 @@ view shared model =
             detectAction model
     in
     { title = timeLeftTitle action.timeLeft
+    , modal =
+        case ( model.alarm, model.state.clock, model.state.pomodoro ) of
+            ( Playing, _, _ ) ->
+                Just <| Html.map Spa.Regular musicModal
+
+            ( _, Clock.Off, Clock.On pomodoro ) ->
+                if Duration.secondsBetween model.now pomodoro.end <= 0 then
+                    Just <| Html.map Spa.Regular <| breakModal model.name
+
+                else
+                    Nothing
+
+            _ ->
+                Nothing
     , body = [ UI.Layout.wrap shared model.name <| body shared model action ]
     }
 
@@ -467,71 +480,53 @@ body shared model action =
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
-        , case ( model.state.clock, model.state.pomodoro ) of
-            ( Off, Clock.On pomodoro ) ->
-                if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                    breakModal model.name
-
-                else
-                    div [] []
-
-            _ ->
-                div [] []
-        , case model.alarm of
-            Playing ->
-                musicModal
-
-            _ ->
-                div [] []
         ]
 
 
 musicModal : Html Msg
 musicModal =
-    UI.Modal.withContent <|
-        UI.Column.column
-            [ css UI.Css.center ]
-            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-            [ UI.Icons.Tape.display
-                { height = UI.Rem.Rem 10
-                , color = UI.Palettes.monochrome.on.background
-                }
-            , UI.Text.h2 "Turn ended !"
-            , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
-                { content = UI.Buttons.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
-                , variant = UI.Buttons.Primary
-                , size = UI.Buttons.L
-                , action = UI.Buttons.OnPress <| Just StopSound
-                }
-            ]
+    UI.Column.column
+        [ css UI.Css.center ]
+        [ UI.Column.Gap <| UI.Rem.Rem 2 ]
+        [ UI.Icons.Tape.display
+            { height = UI.Rem.Rem 10
+            , color = UI.Palettes.monochrome.on.background
+            }
+        , UI.Text.h2 "Turn ended !"
+        , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
+            { content = UI.Buttons.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
+            , variant = UI.Buttons.Primary
+            , size = UI.Buttons.L
+            , action = UI.Buttons.OnPress <| Just StopSound
+            }
+        ]
 
 
 breakModal : MobName -> Html Msg
 breakModal mobName =
-    UI.Modal.withContent <|
-        UI.Column.column
-            [ css UI.Css.center ]
-            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-            [ UI.Text.h2 "It's time for a break!"
-            , UI.Icons.Tea.display
-                { height = UI.Rem.Rem 10
-                , color = UI.Palettes.monochrome.on.background
-                }
-            , Html.p
-                [ css [ Css.textAlign Css.justify ] ]
-                [ Html.text "Boost your productivity by taking a good break." ]
-            , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
-                { content = UI.Buttons.Both { icon = UI.Icons.Ion.check, text = "Break over" }
-                , variant = UI.Buttons.Primary
-                , size = UI.Buttons.L
-                , action =
-                    Model.Events.PomodoroStopped
-                        |> Model.Events.MobEvent mobName
-                        |> ShareEvent
-                        |> Just
-                        |> UI.Buttons.OnPress
-                }
-            ]
+    UI.Column.column
+        [ css UI.Css.center ]
+        [ UI.Column.Gap <| UI.Rem.Rem 2 ]
+        [ UI.Text.h2 "It's time for a break!"
+        , UI.Icons.Tea.display
+            { height = UI.Rem.Rem 10
+            , color = UI.Palettes.monochrome.on.background
+            }
+        , Html.p
+            [ css [ Css.textAlign Css.justify ] ]
+            [ Html.text "Boost your productivity by taking a good break." ]
+        , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
+            { content = UI.Buttons.Both { icon = UI.Icons.Ion.check, text = "Break over" }
+            , variant = UI.Buttons.Primary
+            , size = UI.Buttons.L
+            , action =
+                Model.Events.PomodoroStopped
+                    |> Model.Events.MobEvent mobName
+                    |> ShareEvent
+                    |> Just
+                    |> UI.Buttons.OnPress
+            }
+        ]
 
 
 clockArea : Model -> ActionDescription -> Html Msg
@@ -650,19 +645,8 @@ detectAction model =
         timeLeft =
             timeLeftString model
     in
-    case ( model.alarm, model.state.clock, model.state.pomodoro ) of
-        ( Playing, _, _ ) ->
-            { icon =
-                UI.Icons.Ion.mute
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
-                    }
-            , message = StopSound
-            , timeLeft = timeLeft
-            , class = ""
-            }
-
-        ( _, On _, _ ) ->
+    case model.state.clock of
+        On _ ->
             { icon =
                 UI.Icons.Ion.stop
                     { size = UI.Rem.Rem 1
@@ -676,33 +660,7 @@ detectAction model =
             , timeLeft = timeLeft
             }
 
-        ( _, Off, On pomodoro ) ->
-            if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                { icon =
-                    UI.Icons.Ion.coffee
-                        { size = UI.Rem.Rem 1
-                        , color = UI.Palettes.monochrome.on.background
-                        }
-                , message =
-                    Model.Events.PomodoroStopped
-                        |> Model.Events.MobEvent model.name
-                        |> ShareEvent
-                , class = ""
-                , timeLeft = timeLeft
-                }
-
-            else
-                { icon =
-                    UI.Icons.Ion.play
-                        { size = UI.Rem.Rem 1
-                        , color = UI.Palettes.monochrome.on.background
-                        }
-                , message = StartClicked
-                , class = ""
-                , timeLeft = timeLeft
-                }
-
-        ( _, Off, _ ) ->
+        Off ->
             { icon =
                 UI.Icons.Ion.play
                     { size = UI.Rem.Rem 1

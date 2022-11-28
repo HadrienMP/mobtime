@@ -14,7 +14,7 @@ center =
 
 fullpage : List Css.Style
 fullpage =
-    [ Css.position Css.absolute
+    [ Css.position Css.fixed
     , Css.top <| Css.zero
     , Css.bottom <| Css.pct 100
     , Css.left <| Css.zero

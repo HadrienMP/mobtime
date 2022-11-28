@@ -19,6 +19,7 @@ import Routing
 import Shared
 import Spa
 import UI.Icons.Ion
+import UI.Modal
 import UI.Palettes
 import UI.Rem
 import Url
@@ -240,6 +241,11 @@ view model =
                 [ Html.div [ css [ Css.height <| Css.pct 100 ] ]
                     (doc.body
                         ++ soundModal model
+                        ++ (doc.modal
+                                |> Maybe.map UI.Modal.withContent
+                                |> Maybe.map List.singleton
+                                |> Maybe.withDefault []
+                           )
                         ++ [ Toaster.view model.shared.toasts |> Html.map (SharedMsg << Shared.Toast) ]
                     )
                 ]

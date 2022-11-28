@@ -74,6 +74,7 @@ update shared model msg =
 view : Shared -> Model -> View Msg
 view shared model =
     { title = "Login | Mob Time"
+    , modal = Nothing
     , body =
         [ UI.Layout.forHome shared <|
             div
