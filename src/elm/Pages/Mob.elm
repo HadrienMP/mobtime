@@ -39,6 +39,7 @@ import UI.Css
 import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
+import UI.Icons.Tea
 import UI.Layout
 import UI.Palettes
 import UI.Rem
@@ -503,6 +504,16 @@ body model action =
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
+        , case model.shared.pomodoro of
+            Clock.On pomodoro ->
+                if Duration.secondsBetween model.now pomodoro.end <= 0 then
+                    breakModal model.name
+
+                else
+                    div [] []
+
+            _ ->
+                div [] []
         , case model.alarm of
             Playing ->
                 musicModal
@@ -542,6 +553,49 @@ musicModal =
                 , variant = UI.Buttons.Primary
                 , size = UI.Buttons.L
                 , action = UI.Buttons.OnPress <| Just StopSound
+                }
+            ]
+        ]
+
+
+breakModal : MobName -> Html Msg
+breakModal mobName =
+    div
+        [ css
+            (UI.Css.fullpage
+                ++ [ Css.backgroundColor <|
+                        UI.Color.toElmCss <|
+                            UI.Palettes.monochrome.background
+                   ]
+            )
+        ]
+        [ div
+            [ css
+                (UI.Css.center
+                    ++ [ Css.displayFlex
+                       , Css.flexDirection Css.column
+                       , Css.property "gap" "2rem"
+                       ]
+                )
+            ]
+            [ UI.Icons.Tea.display
+                { height = UI.Rem.Rem 10
+                , color = UI.Palettes.monochrome.on.background
+                }
+            , UI.Text.h2 "It's time for a break!"
+            , Html.p
+                [ css [ Css.textAlign Css.justify ] ]
+                [ Html.text "Boost your productivity by taking a good break." ]
+            , UI.Buttons.button [ css [ Css.margin Css.auto ] ]
+                { content = UI.Buttons.Both { icon = UI.Icons.Ion.check, text = "Break over" }
+                , variant = UI.Buttons.Primary
+                , size = UI.Buttons.L
+                , action =
+                    Model.Events.Clock Model.Events.Stopped
+                        |> Model.Events.MobEvent mobName
+                        |> ShareEvent
+                        |> Just
+                        |> UI.Buttons.OnPress
                 }
             ]
         ]

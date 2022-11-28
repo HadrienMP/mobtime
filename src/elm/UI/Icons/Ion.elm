@@ -18,6 +18,11 @@ code =
     display Ionicon.code
 
 
+check : Icon msg
+check =
+    display Ionicon.checkmark
+
+
 batteryLow : Icon msg
 batteryLow =
     display Ionicon.batteryLow
