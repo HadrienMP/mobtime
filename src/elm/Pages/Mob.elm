@@ -497,7 +497,7 @@ musicModal =
                 , color = UI.Palettes.monochrome.on.background
                 }
             , UI.Text.h2 "Turn ended !"
-            , UI.Buttons.button [ css [ Css.margin Css.auto ] ]
+            , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
                 { content = UI.Buttons.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
                 , variant = UI.Buttons.Primary
                 , size = UI.Buttons.L
@@ -520,7 +520,7 @@ breakModal mobName =
             , Html.p
                 [ css [ Css.textAlign Css.justify ] ]
                 [ Html.text "Boost your productivity by taking a good break." ]
-            , UI.Buttons.button [ css [ Css.margin Css.auto ] ]
+            , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
                 { content = UI.Buttons.Both { icon = UI.Icons.Ion.check, text = "Break over" }
                 , variant = UI.Buttons.Primary
                 , size = UI.Buttons.L
