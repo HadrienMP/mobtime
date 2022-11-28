@@ -16,6 +16,7 @@ import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Palettes
 import UI.Rem
+import UI.Space
 
 
 limitWidth : List Css.Style
@@ -47,8 +48,8 @@ wrap shared mob child =
                 [ div
                     [ css [ Css.padding sidePadding ] ]
                     [ child ]
-                , Socket.view shared.socket
                 ]
+          , Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
           , footer
           ]
             |> List.map (Html.map Spa.Regular)
@@ -140,7 +141,7 @@ forHome shared child =
                 [ child ]
             ]
         , footer
-        , Socket.view shared.socket
+        , Socket.view [] shared.socket
         ]
 
 

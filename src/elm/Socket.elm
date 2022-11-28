@@ -117,41 +117,49 @@ subscriptions _ =
 -- View
 
 
-view : Model -> Html.Html msg
-view status =
+view : List (Html.Attribute msg) -> Model -> Html.Html msg
+view attributes status =
     case status of
         SwitchOff ->
             Html.div
-                [ css (common ++ UI.Animations.fadeOut)
-                , Attr.title "Disconnected from server, reconnecting"
-                ]
+                (attributes
+                    ++ [ css (common ++ UI.Animations.fadeOut)
+                       , Attr.title "Disconnected from server, reconnecting"
+                       ]
+                )
                 [ UI.Elements.dot UI.Palettes.monochrome.success ]
 
         SwitchOn _ ->
             Html.div
-                [ css (common ++ UI.Animations.fadeOut)
-                , Attr.title "Connected"
-                ]
+                (attributes
+                    ++ [ css (common ++ UI.Animations.fadeOut)
+                       , Attr.title "Connected"
+                       ]
+                )
                 [ UI.Elements.dot UI.Palettes.monochrome.error ]
 
         On _ ->
             Html.div
-                [ css (common ++ UI.Animations.fadeIn)
-                , Attr.title "Connected"
-                ]
+                (attributes
+                    ++ [ css (common ++ UI.Animations.fadeIn)
+                       , Attr.title "Connected"
+                       ]
+                )
                 [ UI.Elements.dot UI.Palettes.monochrome.success ]
 
         Off ->
             Html.div
-                [ css (common ++ UI.Animations.blink)
-                , Attr.title "Disconnected from server, reconnecting"
-                ]
+                (attributes
+                    ++ [ css (common ++ UI.Animations.blink)
+                       , Attr.title "Disconnected from server, reconnecting"
+                       ]
+                )
                 [ UI.Elements.dot UI.Palettes.monochrome.error ]
 
 
 common : List Css.Style
 common =
-    [ Css.position Css.absolute
+    [ Css.position Css.fixed
     , Css.top <| UI.Space.s
     , Css.right <| UI.Space.s
     , Css.zIndex <| Css.int 1000
