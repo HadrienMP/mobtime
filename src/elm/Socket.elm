@@ -4,6 +4,7 @@ import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr exposing (css)
 import Lib.Delay
+import Lib.Duration
 import Model.MobName exposing (MobName)
 import UI.Animations
 import UI.Elements
@@ -68,13 +69,17 @@ type Msg
     | Finished
 
 
+animationDuration =
+    Lib.Duration.ofSeconds 1
+
+
 update : Maybe MobName -> Msg -> Model -> ( Model, Cmd Msg )
 update mob msg model =
     case msg of
         Connected id ->
             ( SwitchOn <| SocketId id
             , Cmd.batch
-                [ Lib.Delay.after UI.Animations.fadeDuration Finished
+                [ Lib.Delay.after animationDuration Finished
                 , case mob of
                     Just value ->
                         socketJoin <| Model.MobName.print value
@@ -85,7 +90,7 @@ update mob msg model =
             )
 
         Disconnected ->
-            ( SwitchOff, Lib.Delay.after UI.Animations.fadeDuration Finished )
+            ( SwitchOff, Lib.Delay.after animationDuration Finished )
 
         Finished ->
             ( case model of
@@ -123,7 +128,7 @@ view attributes status =
         SwitchOff ->
             Html.div
                 (attributes
-                    ++ [ css (common ++ UI.Animations.fadeOut)
+                    ++ [ css (common ++ UI.Animations.fadeOut animationDuration)
                        , Attr.title "Disconnected from server, reconnecting"
                        ]
                 )
@@ -132,7 +137,7 @@ view attributes status =
         SwitchOn _ ->
             Html.div
                 (attributes
-                    ++ [ css (common ++ UI.Animations.fadeOut)
+                    ++ [ css (common ++ UI.Animations.fadeOut animationDuration)
                        , Attr.title "Connected"
                        ]
                 )
@@ -141,7 +146,7 @@ view attributes status =
         On _ ->
             Html.div
                 (attributes
-                    ++ [ css (common ++ UI.Animations.fadeIn)
+                    ++ [ css (common ++ UI.Animations.fadeIn animationDuration)
                        , Attr.title "Connected"
                        ]
                 )

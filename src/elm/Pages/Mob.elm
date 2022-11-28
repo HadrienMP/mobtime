@@ -32,6 +32,7 @@ import Spa
 import Svg.Styled exposing (Svg)
 import Task
 import Time
+import UI.Animations
 import UI.Buttons
 import UI.CircularProgressBar
 import UI.Color
@@ -532,6 +533,7 @@ musicModal =
                         UI.Color.toElmCss <|
                             UI.Palettes.monochrome.background
                    ]
+                ++ UI.Animations.fadeIn (Duration.ofMillis 400)
             )
         ]
         [ div
@@ -567,6 +569,7 @@ breakModal mobName =
                         UI.Color.toElmCss <|
                             UI.Palettes.monochrome.background
                    ]
+                ++ UI.Animations.fadeIn (Duration.ofMillis 400)
             )
         ]
         [ div

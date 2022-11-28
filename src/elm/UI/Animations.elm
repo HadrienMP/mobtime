@@ -11,7 +11,7 @@ import Lib.Duration
 
 animationDuration : Lib.Duration.Duration -> Style
 animationDuration duration =
-    Css.animationDuration <| Css.sec <| toFloat <| Lib.Duration.toSeconds duration
+    Css.animationDuration <| Css.ms <| toFloat <| Lib.Duration.toMillis duration
 
 
 
@@ -36,29 +36,24 @@ blink =
     ]
 
 
-fadeDuration : Lib.Duration.Duration
-fadeDuration =
-    Lib.Duration.ofSeconds 1
-
-
-fadeIn : List Style
-fadeIn =
+fadeIn : Lib.Duration.Duration -> List Style
+fadeIn duration =
     [ Css.animationName <|
         Css.Animations.keyframes
             [ ( 0, [ Css.Animations.opacity <| Css.num 0 ] )
             , ( 100, [ Css.Animations.opacity <| Css.num 1 ] )
             ]
-    , animationDuration fadeDuration
+    , animationDuration duration
     ]
 
 
-fadeOut : List Style
-fadeOut =
+fadeOut : Lib.Duration.Duration -> List Style
+fadeOut duration =
     [ Css.animationName <|
         Css.Animations.keyframes
             [ ( 0, [ Css.Animations.opacity <| Css.num 1 ] )
             , ( 100, [ Css.Animations.opacity <| Css.num 0 ] )
             ]
-    , animationDuration fadeDuration
+    , animationDuration duration
     , opacity zero
     ]
