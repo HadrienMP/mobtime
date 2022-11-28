@@ -67,6 +67,7 @@ init preferences url key =
         ( shared, socketCommand ) =
             Shared.init
                 { key = key
+                , url = url
                 , preferences = preferences
                 , mob = getMob page
                 }
@@ -123,7 +124,13 @@ update msg model =
     case ( msg, model.page ) of
         ( UrlChanged url, _ ) ->
             loadPage url model.shared.preferences
-                |> Tuple.mapFirst (\page -> { model | page = page })
+                |> Tuple.mapFirst
+                    (\page ->
+                        { model
+                            | page = page
+                            , shared = Shared.withUrl url model.shared
+                        }
+                    )
 
         ( GotHomeMsg subMsg, Home subModel ) ->
             Pages.Home.update model.shared subModel subMsg

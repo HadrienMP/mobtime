@@ -21,6 +21,7 @@ type alias Shared =
     { socket : Socket.Model
     , toasts : Toasts
     , key : Nav.Key
+    , url : Url.Url
     , preferences : UserPreferences.Model
     , mob : Maybe MobName
     , devMode : Bool
@@ -28,13 +29,19 @@ type alias Shared =
     }
 
 
+withUrl : Url.Url -> Shared -> Shared
+withUrl url shared =
+    { shared | url = url }
+
+
 init :
     { key : Nav.Key
+    , url : Url.Url
     , preferences : UserPreferences.Model
     , mob : Maybe MobName
     }
     -> ( Shared, Cmd Msg )
-init { key, preferences, mob } =
+init { key, url, preferences, mob } =
     let
         ( socket, socketCmd ) =
             Socket.init |> Tuple.mapSecond (Cmd.map SocketMsg)
@@ -42,6 +49,7 @@ init { key, preferences, mob } =
     ( { socket = socket
       , toasts = Lib.Toaster.init
       , key = key
+      , url = url
       , preferences = preferences
       , mob = mob
       , devMode = False

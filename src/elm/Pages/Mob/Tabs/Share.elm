@@ -6,12 +6,13 @@ import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Model.MobName exposing (MobName)
 import QRCode
-import Routing
+import Shared exposing (Shared)
 import Svg.Attributes as Svg
 import Svg.Styled exposing (fromUnstyled)
 import UI.Icons.Ion
 import UI.Palettes
 import UI.Rem
+import Url
 
 
 
@@ -35,15 +36,13 @@ update msg =
 -- VIEW
 
 
-view : MobName -> Html Msg
-view mob =
-    let
-        url =
-            Routing.Mob mob |> Routing.toUrl
-    in
+view : Shared -> MobName -> Html Msg
+view shared mob =
     div [ id "share", class "tab" ]
-        [ shareButton mob <| PutLinkInPasteBin url
-        , QRCode.fromString url
+        [ shareButton mob <| PutLinkInPasteBin <| Url.toString shared.url
+        , shared.url
+            |> Url.toString
+            |> QRCode.fromString
             |> Result.map
                 (QRCode.toSvg
                     [ Svg.width "300px"

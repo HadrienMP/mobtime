@@ -462,7 +462,7 @@ body shared model action =
                     |> Html.map GotSoundSettingsMsg
 
             Share ->
-                Pages.Mob.Tabs.Share.view model.name
+                Pages.Mob.Tabs.Share.view shared model.name
                     |> Html.map GotShareTabMsg
 
             Dev ->
