@@ -32,16 +32,17 @@ import Spa
 import Svg.Styled exposing (Svg)
 import Task
 import Time
-import UI.Animations
 import UI.Buttons
 import UI.CircularProgressBar
 import UI.Color
+import UI.Column
 import UI.Css
 import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
 import UI.Layout
+import UI.Modal
 import UI.Palettes
 import UI.Rem
 import UI.Text
@@ -526,25 +527,10 @@ body model action =
 
 musicModal : Html Msg
 musicModal =
-    div
-        [ css
-            (UI.Css.fullpage
-                ++ [ Css.backgroundColor <|
-                        UI.Color.toElmCss <|
-                            UI.Palettes.monochrome.background
-                   ]
-                ++ UI.Animations.fadeIn (Duration.ofMillis 400)
-            )
-        ]
-        [ div
-            [ css
-                (UI.Css.center
-                    ++ [ Css.displayFlex
-                       , Css.flexDirection Css.column
-                       , Css.property "gap" "2rem"
-                       ]
-                )
-            ]
+    UI.Modal.withContent <|
+        UI.Column.column
+            [ css UI.Css.center ]
+            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
             [ UI.Icons.Tape.display
                 { height = UI.Rem.Rem 10
                 , color = UI.Palettes.monochrome.on.background
@@ -557,30 +543,14 @@ musicModal =
                 , action = UI.Buttons.OnPress <| Just StopSound
                 }
             ]
-        ]
 
 
 breakModal : MobName -> Html Msg
 breakModal mobName =
-    div
-        [ css
-            (UI.Css.fullpage
-                ++ [ Css.backgroundColor <|
-                        UI.Color.toElmCss <|
-                            UI.Palettes.monochrome.background
-                   ]
-                ++ UI.Animations.fadeIn (Duration.ofMillis 400)
-            )
-        ]
-        [ div
-            [ css
-                (UI.Css.center
-                    ++ [ Css.displayFlex
-                       , Css.flexDirection Css.column
-                       , Css.property "gap" "2rem"
-                       ]
-                )
-            ]
+    UI.Modal.withContent <|
+        UI.Column.column
+            [ css UI.Css.center ]
+            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
             [ UI.Icons.Tea.display
                 { height = UI.Rem.Rem 10
                 , color = UI.Palettes.monochrome.on.background
@@ -601,7 +571,6 @@ breakModal mobName =
                         |> UI.Buttons.OnPress
                 }
             ]
-        ]
 
 
 clockArea : Model -> ActionDescription -> Html Msg
