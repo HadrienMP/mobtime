@@ -22,6 +22,7 @@ type alias Palette =
         }
     }
 
+
 monochrome : Palette
 monochrome =
     { error = UI.Color.fromHex "#eb0000"
@@ -29,7 +30,7 @@ monochrome =
     , warn = UI.Color.fromHex "#eb8400"
     , info = UI.Color.fromHex "#00a9eb"
     , background = UI.Color.white
-    , surface = UI.Color.fromHex "#666666"
+    , surface = UI.Color.black
     , surfaceActive = UI.Color.fromHex "#999999"
     , on =
         { error = UI.Color.white

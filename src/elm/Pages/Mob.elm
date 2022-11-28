@@ -515,9 +515,9 @@ clockArea model action =
                 ]
                 [ UI.CircularProgressBar.draw
                     { colors =
-                        { main = UI.Palettes.monochrome.surface |> UI.Color.lighten 6
-                        , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
-                        , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
+                        { main = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.5
+                        , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.9
+                        , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.7
                         }
                     , strokeWidth = UI.Rem.Rem 0.3
                     , diameter = UI.Rem.Rem 8.7
@@ -534,8 +534,8 @@ clockArea model action =
                     [ UI.CircularProgressBar.draw
                         { colors =
                             { main = UI.Palettes.monochrome.surface
-                            , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 12
-                            , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 10
+                            , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.9
+                            , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.7
                             }
                         , strokeWidth = UI.Rem.Rem 0.5
                         , diameter = UI.Rem.Rem 7.8
