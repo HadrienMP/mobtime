@@ -8,7 +8,8 @@ import Model.Mobber exposing (Mobber)
 import Model.Role exposing (Role)
 import Model.State exposing (State)
 import Pages.Mob.Tabs.Share
-import Routing
+import Shared exposing (Shared)
+import Url
 
 
 type Msg
@@ -24,14 +25,13 @@ update msg =
                 |> Js.Commands.send
 
 
-view : MobName -> State -> Html Msg
-view mobName state =
+view : Shared -> MobName -> State -> Html Msg
+view shared mobName state =
     div
         [ id "home", class "tab" ]
         [ Pages.Mob.Tabs.Share.shareButton mobName <|
             PutLinkInPasteBin <|
-                Routing.toUrl <|
-                    Routing.Mob mobName
+                Url.toString shared.url
         , roles state
         ]
 

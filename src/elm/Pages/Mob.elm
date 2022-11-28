@@ -446,7 +446,7 @@ body shared model action =
             )
         , case model.tab of
             Main ->
-                Pages.Mob.Tabs.Home.view model.name model.state
+                Pages.Mob.Tabs.Home.view shared model.name model.state
                     |> Html.map GotMainTabMsg
 
             Clock ->
