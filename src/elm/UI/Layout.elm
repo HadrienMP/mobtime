@@ -39,18 +39,27 @@ wrap shared mob child =
         (([ navBar mob
           , div
                 [ css
-                    ([ Css.flexGrow <| Css.num 1
-                     , Css.position Css.relative
-                     ]
-                        ++ limitWidth
-                    )
+                    [ Css.flexGrow <| Css.num 1
+                    , Css.displayFlex
+                    , Css.overflow Css.auto
+                    , Css.flexDirection Css.column
+                    ]
                 ]
                 [ div
-                    [ css [ Css.padding sidePadding ] ]
-                    [ child ]
+                    [ css
+                        ([ Css.flexGrow <| Css.num 1
+                         , Css.position Css.relative
+                         ]
+                            ++ limitWidth
+                        )
+                    ]
+                    [ div
+                        [ css [ Css.padding sidePadding ] ]
+                        [ child ]
+                    ]
+                , Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
+                , footer
                 ]
-          , Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
-          , footer
           ]
             |> List.map (Html.map Spa.Regular)
          )
