@@ -9,6 +9,7 @@ import UI.Color
 import UI.Icons.Common
 import UI.Palettes
 import UI.Rem
+import UI.Row
 
 
 type Content msg
@@ -45,25 +46,15 @@ button :
         , action : Action msg
         }
     -> Html msg
-button attributes { content, action, size } =
+button attributes { content, action, size, variant } =
     Html.button
         (Attr.css
-            [ Css.borderRadius <| Css.rem 0.2
-            , Css.padding <|
-                Css.rem <|
-                    case size of
-                        S ->
-                            0.4
-
-                        M ->
-                            0.6
-
-                        L ->
-                            1.2
-            , Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.black
-            , Css.hover [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.black ]
-            , Css.display Css.block
-            ]
+            ([ Css.borderRadius <| Css.rem 0.2
+             , Css.display Css.block
+             ]
+                ++ sizeStyles size
+                ++ variantStyles variant
+            )
             :: actionAttribute action
             :: attributes
         )
@@ -75,24 +66,62 @@ button attributes { content, action, size } =
                 [ Html.text text ]
 
             Both { icon, text } ->
-                [ Html.div
+                [ UI.Row.row
                     [ Attr.css
-                        [ Css.displayFlex
+                        [ Css.justifyContent Css.center
                         , Css.alignItems Css.center
-                        , Css.fontSize <| Css.rem 1.1
-                        , Css.justifyContent Css.center
                         ]
                     ]
+                    [ UI.Row.Gap <| iconTextGap size ]
                     [ icon { size = UI.Rem.Rem 1, color = UI.Palettes.monochrome.on.surface }
-                    , Html.div
-                        [ Attr.css
-                            [ Css.paddingLeft <| Css.rem 0.6
-                            ]
-                        ]
-                        [ Html.text text ]
+                    , Html.text text
                     ]
                 ]
         )
+
+
+variantStyles : Variant -> List Css.Style
+variantStyles variant =
+    case variant of
+        Primary ->
+            [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
+            ]
+
+        Secondary ->
+            [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.fromHex "#555"
+            ]
+
+
+sizeStyles : Size -> List Css.Style
+sizeStyles size =
+    case size of
+        S ->
+            [ Css.padding <| Css.rem 0.4
+            , Css.fontSize <| Css.rem 0.8
+            ]
+
+        M ->
+            [ Css.padding <| Css.rem 0.6
+            , Css.fontSize <| Css.rem 1
+            ]
+
+        L ->
+            [ Css.padding <| Css.rem 1.2
+            , Css.fontSize <| Css.rem 1.2
+            ]
+
+
+iconTextGap : Size -> UI.Rem.Rem
+iconTextGap size =
+    case size of
+        S ->
+            UI.Rem.Rem 0.4
+
+        M ->
+            UI.Rem.Rem 0.6
+
+        L ->
+            UI.Rem.Rem 0.8
 
 
 actionAttribute : Action msg -> Html.Attribute msg

@@ -8,6 +8,7 @@
     { "count": 2, "filePath": "src/elm/Model/Clock.elm" },
     { "count": 2, "filePath": "src/elm/Spa.elm" },
     { "count": 2, "filePath": "src/elm/UI/Column.elm" },
+    { "count": 2, "filePath": "src/elm/UI/Row.elm" },
     { "count": 1, "filePath": "src/elm/Shared.elm" }
   ]
 }

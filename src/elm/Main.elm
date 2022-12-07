@@ -62,16 +62,16 @@ type alias Model =
 init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init preferences url key =
     let
-        ( page, pageCommand ) =
-            loadPage url preferences
-
         ( shared, socketCommand ) =
             Shared.init
                 { key = key
                 , url = url
                 , preferences = preferences
-                , mob = getMob page
+                , mob = getMob url
                 }
+
+        ( page, pageCommand ) =
+            loadPage shared
     in
     ( { page = page
       , displayModal =
@@ -91,17 +91,17 @@ init preferences url key =
     )
 
 
-loadPage : Url.Url -> UserPreferences.Model -> ( Page, Cmd Msg )
-loadPage url preferences =
-    case Routing.toPage url of
+loadPage : Shared.Shared -> ( Page, Cmd Msg )
+loadPage shared =
+    case Routing.toPage shared.url of
         Routing.Login ->
-            Pages.Home.init
+            Pages.Home.init shared
                 |> Tuple.mapBoth
                     Home
                     (Cmd.map GotHomeMsg)
 
         Routing.Mob mobName ->
-            Pages.Mob.init mobName preferences
+            Pages.Mob.init mobName shared.preferences
                 |> Tuple.mapBoth
                     Mob
                     (Cmd.map (GotMobMsg << Spa.Regular))
@@ -124,14 +124,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.page ) of
         ( UrlChanged url, _ ) ->
-            loadPage url model.shared.preferences
-                |> Tuple.mapFirst
-                    (\page ->
-                        { model
-                            | page = page
-                            , shared = Shared.withUrl url model.shared
-                        }
-                    )
+            let
+                shared =
+                    Shared.withUrl url model.shared
+
+                ( page, command ) =
+                    loadPage shared
+            in
+            ( { model | page = page, shared = shared }
+            , command
+            )
 
         ( GotHomeMsg subMsg, Home subModel ) ->
             Pages.Home.update model.shared subModel subMsg
@@ -165,14 +167,14 @@ update msg model =
             ( model, Cmd.none )
 
 
-getMob : Page -> Maybe MobName
-getMob page =
-    case page of
-        Mob mob ->
-            Just <| mob.name
-
-        _ ->
+getMob : Url.Url -> Maybe MobName
+getMob url =
+    case Routing.toPage url of
+        Routing.Login ->
             Nothing
+
+        Routing.Mob mobName ->
+            Just mobName
 
 
 toModelCmd : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )

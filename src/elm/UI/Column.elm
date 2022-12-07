@@ -1,7 +1,7 @@
 module UI.Column exposing (..)
 
 import Css
-import Html.Styled as Html
+import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import UI.Rem
 
@@ -27,6 +27,15 @@ column htmlAttr colAttr children =
             :: htmlAttr
         )
         children
+
+
+twoColumns : { left : Css.Pct, right : Css.Pct } -> ( Html msg, Html msg ) -> Html msg
+twoColumns size ( left, right ) =
+    column []
+        []
+        [ Html.div [ Attr.css [ Css.width size.left ] ] [ left ]
+        , Html.div [ Attr.css [ Css.width size.right ] ] [ right ]
+        ]
 
 
 toStyle : ColumnAttribute -> List Css.Style
