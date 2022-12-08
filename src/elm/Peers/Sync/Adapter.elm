@@ -1,14 +1,15 @@
 port module Peers.Sync.Adapter exposing (..)
 
+import Effect exposing (Effect)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Toaster
-import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
 import Model.MobName exposing (MobName)
 import Peers.Sync.Core exposing (Context, Model, PeerId)
 import Peers.Sync.Message as Message exposing (SyncMessage)
 import Random
+import Shared
 import Task
 import Time
 import Uuid exposing (Uuid)
@@ -28,12 +29,19 @@ type Msg
 
 
 type alias StartingModel =
-    { peerId : Maybe PeerId, syncId : Maybe Uuid, time : Maybe Time.Posix, mob : MobName }
+    { peerId : Maybe PeerId
+    , syncId : Maybe Uuid
+    , time : Maybe Time.Posix
+    , mob : MobName
+    }
 
 
 type Model
     = Starting StartingModel
-    | Started { model : Peers.Sync.Core.Model Uuid, mob : MobName }
+    | Started
+        { model : Peers.Sync.Core.Model Uuid
+        , mob : MobName
+        }
 
 
 init : MobName -> ( Model, Cmd Msg )
@@ -47,7 +55,7 @@ init mob =
     )
 
 
-update : Msg -> Model -> Time.Posix -> UpdateResult Model Msg
+update : Msg -> Model -> Time.Posix -> ( Model, Effect Shared.Msg Msg )
 update msg m now =
     case m of
         Starting starting ->
@@ -61,20 +69,29 @@ update msg m now =
                         Ok syncMessage ->
                             Peers.Sync.Core.handle syncMessage now model
                                 |> (\( subM, message ) ->
-                                        { model = Started { model = subM, mob = mob }
-                                        , command = message |> Maybe.map (Message.fromCore mob >> clockSyncOutMessage) |> Maybe.withDefault Cmd.none
-                                        , toasts = []
-                                        }
+                                        ( Started { model = subM, mob = mob }
+                                        , message
+                                            |> Maybe.map
+                                                (Message.fromCore mob
+                                                    >> clockSyncOutMessage
+                                                    >> Effect.fromCmd
+                                                )
+                                            |> Maybe.withDefault Effect.none
+                                        )
                                    )
 
                         Err error ->
-                            { model = m
-                            , command = Cmd.none
-                            , toasts = [ Lib.Toaster.error <| "Could not parse the clock sync message: " ++ error ]
-                            }
+                            ( m
+                            , Effect.fromShared <|
+                                Shared.Toast <|
+                                    Lib.Toaster.Add <|
+                                        Lib.Toaster.error <|
+                                            "Could not parse the clock sync message: "
+                                                ++ error
+                            )
 
                 _ ->
-                    UpdateResult.fromModel m
+                    ( m, Effect.none )
 
 
 adjust : Time.Posix -> PeerId -> Model -> Time.Posix
@@ -87,38 +104,36 @@ adjust time peer m =
             Peers.Sync.Core.adjustTimeFrom peer model time
 
 
-updateStarting : Msg -> StartingModel -> UpdateResult StartingModel Msg
+updateStarting : Msg -> StartingModel -> ( StartingModel, Effect Shared.Msg Msg )
 updateStarting msg starting =
     case msg of
         GotSocketId peerId ->
-            { starting | peerId = Just peerId } |> UpdateResult.fromModel
+            ( { starting | peerId = Just peerId }, Effect.none )
 
         SyncIdGenerated uuid ->
-            { starting | syncId = Just uuid } |> UpdateResult.fromModel
+            ( { starting | syncId = Just uuid }, Effect.none )
 
         GotTime now ->
-            { starting | time = Just now } |> UpdateResult.fromModel
+            ( { starting | time = Just now }, Effect.none )
 
         GotPeerMessage _ ->
-            UpdateResult.fromModel starting
+            ( starting, Effect.none )
 
 
-finish : UpdateResult StartingModel Msg -> UpdateResult Model Msg
-finish updateResult =
-    case ( updateResult.model.peerId, updateResult.model.syncId, updateResult.model.time ) of
+finish : ( StartingModel, Effect Shared.Msg Msg ) -> ( Model, Effect Shared.Msg Msg )
+finish ( model, effect ) =
+    case ( model.peerId, model.syncId, model.time ) of
         ( Just peerId, Just syncId, Just time ) ->
             let
-                ( model, message ) =
+                ( updated, message ) =
                     Peers.Sync.Core.start (Context peerId time syncId)
             in
-            { model = Started { model = model, mob = updateResult.model.mob }
-            , command = message |> Message.fromCore updateResult.model.mob |> clockSyncOutMessage
-            , toasts = []
-            }
+            ( Started { model = updated, mob = model.mob }
+            , message |> Message.fromCore model.mob |> clockSyncOutMessage |> Effect.fromCmd
+            )
 
         _ ->
-            updateResult
-                |> UpdateResult.map Starting identity
+            ( Starting model, effect )
 
 
 subscriptions : Sub Msg

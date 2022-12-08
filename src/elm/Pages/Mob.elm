@@ -9,7 +9,6 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Duration as Duration exposing (DurationStringParts)
-import Lib.Toaster
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.MobName exposing (MobName)
@@ -274,14 +273,11 @@ update _ msg model =
 
         GotClockSyncMsg sub ->
             let
-                result =
+                ( clockSync, command ) =
                     Peers.Sync.Adapter.update sub model.clockSync model.now
             in
-            ( { model | clockSync = result.model }
-            , Effect.batch
-                [ Effect.fromCmd <| Cmd.map GotClockSyncMsg result.command
-                , Effect.fromShared <| Shared.Toast <| Lib.Toaster.AddAll result.toasts
-                ]
+            ( { model | clockSync = clockSync }
+            , Effect.map GotClockSyncMsg command
             )
 
         GotSocketId peerId ->
