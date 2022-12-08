@@ -12,13 +12,13 @@ import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.BatchMsg
 import Lib.Toaster as Toaster
-import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
+import Lib.UpdateResult exposing (UpdateResult)
+import Model.Events
 import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
 import Routing
 import Shared
-import Spa
 import UI.Icons.Ion
 import UI.Modal
 import UI.Palettes
@@ -105,7 +105,7 @@ loadPage shared =
             Pages.Mob.init mobName shared.preferences
                 |> Tuple.mapBoth
                     Mob
-                    (Cmd.map (GotMobMsg << Spa.Regular))
+                    (Cmd.map GotMobMsg)
 
 
 
@@ -113,7 +113,7 @@ loadPage shared =
 
 
 type Msg
-    = GotMobMsg (Spa.Msg Pages.Mob.Msg)
+    = GotMobMsg Pages.Mob.Msg
     | GotHomeMsg Pages.Home.Msg
     | Batch (List Msg)
     | HideModal
@@ -143,15 +143,12 @@ update msg model =
                     (Effect.map GotHomeMsg)
                 |> handleEffect
 
-        ( GotMobMsg (Spa.Regular subMsg), Mob subModel ) ->
+        ( GotMobMsg subMsg, Mob subModel ) ->
             Pages.Mob.update model.shared subMsg subModel
-                |> UpdateResult.map Mob (GotMobMsg << Spa.Regular)
-                |> toModelCmd model
-
-        ( GotMobMsg (Spa.Shared subMsg), _ ) ->
-            Shared.update subMsg model.shared
-                |> Tuple.mapBoth (\updated -> { model | shared = updated })
-                    (Cmd.map SharedMsg)
+                |> Tuple.mapBoth
+                    (\updated -> { model | page = Mob updated })
+                    (Effect.map GotMobMsg)
+                |> handleEffect
 
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
@@ -214,6 +211,9 @@ handleAtomicEffect model effect =
         Effect.None ->
             ( model, Cmd.none )
 
+        Effect.MobEvent event ->
+            ( model, Model.Events.sendEvent <| Model.Events.mobEventToJson event )
+
 
 getMob : Url.Url -> Maybe MobName
 getMob url =
@@ -251,7 +251,7 @@ subscriptions model =
                 Sub.none
 
             Mob mobModel ->
-                Pages.Mob.subscriptions mobModel |> Sub.map (GotMobMsg << Spa.Regular)
+                Pages.Mob.subscriptions mobModel |> Sub.map GotMobMsg
         , Js.Events.events (dispatch jsEventsMapping)
         , Shared.subscriptions model.shared |> Sub.map SharedMsg
         ]
@@ -264,7 +264,7 @@ dispatch mapping event =
 
 jsEventsMapping : EventsMapping Msg
 jsEventsMapping =
-    EventsMapping.map (GotMobMsg << Spa.Regular) Pages.Mob.jsEventMapping
+    EventsMapping.map GotMobMsg Pages.Mob.jsEventMapping
 
 
 

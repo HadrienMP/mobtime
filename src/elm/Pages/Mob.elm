@@ -1,6 +1,7 @@
 module Pages.Mob exposing (..)
 
 import Css
+import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
@@ -8,7 +9,7 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Duration as Duration exposing (DurationStringParts)
-import Lib.UpdateResult as UpdateResult exposing (UpdateResult)
+import Lib.Toaster
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.MobName exposing (MobName)
@@ -25,7 +26,6 @@ import Random
 import Shared exposing (Shared)
 import Socket
 import Sounds
-import Spa
 import Svg.Styled exposing (Svg)
 import Task
 import Time
@@ -159,152 +159,147 @@ timePassed now model =
     )
 
 
-update : Shared -> Msg -> Model -> UpdateResult Model Msg
+update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
 update _ msg model =
     case msg of
         ShareEvent event ->
-            { model = model
-            , command = Model.Events.sendEvent <| Model.Events.mobEventToJson event
-            , toasts = []
-            }
+            ( model
+            , Effect.share event
+            )
 
         ReceivedEvent event ->
             let
                 ( updated, command ) =
                     Model.State.evolve event model.state
             in
-            { model =
-                { model
-                    | state = updated
-                    , alarm =
-                        -- Handle alarm (command) as separate from the evolve method ?
-                        case event of
-                            Model.Events.Clock (Model.Events.Started _) ->
-                                Stopped
+            ( { model
+                | state = updated
+                , alarm =
+                    -- Handle alarm (command) as separate from the evolve method ?
+                    case event of
+                        Model.Events.Clock (Model.Events.Started _) ->
+                            Stopped
 
-                            _ ->
-                                model.alarm
-                }
-            , command = command
-            , toasts = []
-            }
+                        _ ->
+                            model.alarm
+              }
+            , Effect.fromCmd command
+            )
 
         ReceivedHistory eventsResults ->
             let
                 ( updated, command ) =
                     Model.State.evolveMany eventsResults model.state
             in
-            { model = { model | state = updated }
-            , command = command
-            , toasts = []
-            }
+            ( { model | state = updated }
+            , Effect.fromCmd command
+            )
 
         StartClicked ->
-            { model = model
-            , command =
-                Time.now
-                    |> Task.map
-                        (\now -> ( now, selectSound now model.state.soundProfile ))
-                    |> Task.perform StartWith
-            , toasts = []
-            }
+            ( model
+            , Time.now
+                |> Task.map
+                    (\now -> ( now, selectSound now model.state.soundProfile ))
+                |> Task.perform StartWith
+                |> Effect.fromCmd
+            )
 
         StartWith ( now, sound ) ->
-            { model = { model | now = now }
-            , command =
-                Model.Events.Started
-                    { time = now
-                    , alarm = sound
-                    , length = model.state.turnLength
-                    }
-                    |> Model.Events.Clock
-                    |> Model.Events.MobEvent model.name
-                    |> Model.Events.mobEventToJson
-                    |> Model.Events.sendEvent
-            , toasts = []
-            }
+            ( { model | now = now }
+            , Model.Events.Started
+                { time = now
+                , alarm = sound
+                , length = model.state.turnLength
+                }
+                |> Model.Events.Clock
+                |> Model.Events.MobEvent model.name
+                |> Effect.share
+            )
 
         StopSound ->
-            { model = { model | alarm = Stopped }
-            , command = Js.Commands.send Js.Commands.StopAlarm
-            , toasts = []
-            }
+            ( { model | alarm = Stopped }
+            , Effect.js Js.Commands.StopAlarm
+            )
 
         AlarmEnded ->
-            { model = { model | alarm = Stopped }
-            , command = Cmd.none
-            , toasts = []
-            }
+            ( { model | alarm = Stopped }
+            , Effect.fromCmd <| Cmd.none
+            )
 
         GotMainTabMsg subMsg ->
-            { model = model
-            , command = Pages.Mob.Tabs.Home.update subMsg |> Cmd.map GotMainTabMsg
-            , toasts = []
-            }
+            ( model
+            , Pages.Mob.Tabs.Home.update subMsg
+                |> Cmd.map GotMainTabMsg
+                |> Effect.fromCmd
+            )
 
         GotMobbersSettingsMsg subMsg ->
             let
                 mobbersResult =
                     Pages.Mob.Tabs.Mobbers.update subMsg model.state.mobbers model.name model.mobbersSettings
             in
-            { model =
-                { model
-                    | mobbersSettings = mobbersResult.model
-                }
-            , command = Cmd.map GotMobbersSettingsMsg mobbersResult.command
-            , toasts = mobbersResult.toasts
-            }
+            ( { model
+                | mobbersSettings = mobbersResult.model
+              }
+            , Effect.batch
+                [ Effect.fromCmd <| Cmd.map GotMobbersSettingsMsg mobbersResult.command
+                , Effect.fromShared <| Shared.Toast <| Lib.Toaster.AddAll mobbersResult.toasts
+                ]
+            )
 
         SwitchTab tab ->
-            { model = { model | tab = tab }
-            , command = Cmd.none
-            , toasts = []
-            }
+            ( { model | tab = tab }
+            , Effect.none
+            )
 
         GotShareTabMsg subMsg ->
-            { model = model
-            , command = Pages.Mob.Tabs.Share.update subMsg |> Cmd.map GotShareTabMsg
-            , toasts = []
-            }
+            ( model
+            , Pages.Mob.Tabs.Share.update subMsg
+                |> Cmd.map GotShareTabMsg
+                |> Effect.fromCmd
+            )
 
         GotClockSettingsMsg subMsg ->
             let
                 ( clockSettings, command ) =
                     Pages.Mob.Tabs.Clocks.update subMsg model.clockSettings model.name
             in
-            { model = { model | clockSettings = clockSettings }
-            , command = Cmd.map GotClockSettingsMsg command
-            , toasts = []
-            }
+            ( { model | clockSettings = clockSettings }
+            , Effect.fromCmd <| Cmd.map GotClockSettingsMsg command
+            )
 
         GotSoundSettingsMsg subMsg ->
             let
                 ( soundSettings, command ) =
                     Pages.Mob.Tabs.Sound.update subMsg model.soundSettings
             in
-            { model = { model | soundSettings = soundSettings }
-            , command = Cmd.map GotSoundSettingsMsg command
-            , toasts = []
-            }
+            ( { model | soundSettings = soundSettings }
+            , Effect.fromCmd <| Cmd.map GotSoundSettingsMsg command
+            )
 
         GotClockSyncMsg sub ->
-            Peers.Sync.Adapter.update sub model.clockSync model.now
-                |> UpdateResult.map
-                    (\m -> { model | clockSync = m })
-                    GotClockSyncMsg
+            let
+                result =
+                    Peers.Sync.Adapter.update sub model.clockSync model.now
+            in
+            ( { model | clockSync = result.model }
+            , Effect.batch
+                [ Effect.fromCmd <| Cmd.map GotClockSyncMsg result.command
+                , Effect.fromShared <| Shared.Toast <| Lib.Toaster.AddAll result.toasts
+                ]
+            )
 
         GotSocketId peerId ->
-            UpdateResult.fromModel { model | peerId = Just peerId }
+            ( { model | peerId = Just peerId }, Effect.none )
 
         TimePassed now ->
             let
                 ( updated, command ) =
                     timePassed now model
             in
-            { model = updated
-            , toasts = []
-            , command = command
-            }
+            ( updated
+            , Effect.fromCmd command
+            )
 
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
@@ -359,7 +354,7 @@ jsEventMapping =
 -- VIEW
 
 
-view : Shared -> Model -> View (Spa.Msg Msg)
+view : Shared -> Model -> View Msg
 view shared model =
     let
         action =
@@ -369,11 +364,11 @@ view shared model =
     , modal =
         case ( model.alarm, model.state.clock, model.state.pomodoro ) of
             ( Playing, _, _ ) ->
-                Just <| Html.map Spa.Regular musicModal
+                Just musicModal
 
             ( _, Clock.Off, Clock.On pomodoro ) ->
                 if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                    Just <| Html.map Spa.Regular <| breakModal model.name
+                    Just <| breakModal model.name
 
                 else
                     Nothing

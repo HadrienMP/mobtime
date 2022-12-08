@@ -1,6 +1,7 @@
 module Effect exposing (..)
 
 import Js.Commands
+import Model.Events exposing (MobEvent)
 
 
 type Effect sharedMsg msg
@@ -12,6 +13,7 @@ type Atomic sharedMsg msg
     = Shared sharedMsg
     | Js Js.Commands.Command
     | Command (Cmd msg)
+    | MobEvent MobEvent
     | None
 
 
@@ -37,6 +39,9 @@ mapAtomic f atomic =
         Js command ->
             Js command
 
+        MobEvent it ->
+            MobEvent it
+
         None ->
             None
 
@@ -54,6 +59,11 @@ none =
 js : Js.Commands.Command -> Effect sharedMsg msg
 js =
     Atomic << Js
+
+
+share : MobEvent -> Effect sharedMsg msg
+share =
+    Atomic << MobEvent
 
 
 fromCmd : Cmd msg -> Effect sharedMsg msg

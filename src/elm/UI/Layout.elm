@@ -3,11 +3,9 @@ module UI.Layout exposing (..)
 import Css
 import Html.Styled as Html exposing (Html, a, div, h1, nav, text)
 import Html.Styled.Attributes as Attr exposing (css)
-import Lib.Toaster
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Socket
-import Spa
 import UI.Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
@@ -27,7 +25,7 @@ limitWidth =
     ]
 
 
-wrap : Shared -> MobName -> Html msg -> Html (Spa.Msg msg)
+wrap : Shared -> MobName -> Html msg -> Html msg
 wrap shared mob child =
     div
         [ css
@@ -36,35 +34,31 @@ wrap shared mob child =
             , Css.height <| Css.pct 100
             ]
         ]
-        (([ navBar mob
-          , div
+        [ navBar mob
+        , div
+            [ css
+                [ Css.flexGrow <| Css.num 1
+                , Css.displayFlex
+                , Css.overflow Css.auto
+                , Css.flexDirection Css.column
+                ]
+            ]
+            [ div
                 [ css
-                    [ Css.flexGrow <| Css.num 1
-                    , Css.displayFlex
-                    , Css.overflow Css.auto
-                    , Css.flexDirection Css.column
-                    ]
+                    ([ Css.flexGrow <| Css.num 1
+                     , Css.position Css.relative
+                     ]
+                        ++ limitWidth
+                    )
                 ]
                 [ div
-                    [ css
-                        ([ Css.flexGrow <| Css.num 1
-                         , Css.position Css.relative
-                         ]
-                            ++ limitWidth
-                        )
-                    ]
-                    [ div
-                        [ css [ Css.padding sidePadding ] ]
-                        [ child ]
-                    ]
-                , Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
-                , footer
+                    [ css [ Css.padding sidePadding ] ]
+                    [ child ]
                 ]
-          ]
-            |> List.map (Html.map Spa.Regular)
-         )
-            ++ [ Lib.Toaster.view shared.toasts |> Html.map (Shared.Toast >> Spa.Shared) ]
-        )
+            , Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
+            , footer
+            ]
+        ]
 
 
 navBar : MobName -> Html msg

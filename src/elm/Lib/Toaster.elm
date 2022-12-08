@@ -59,6 +59,7 @@ init =
 
 type Msg
     = Add Toast
+    | AddAll Toasts
     | Remove Toast
 
 
@@ -67,6 +68,10 @@ update msg toasts =
     case msg of
         Add toast ->
             add [ toast ] toasts
+                |> Tuple.mapSecond Cmd.batch
+
+        AddAll new ->
+            add new toasts
                 |> Tuple.mapSecond Cmd.batch
 
         Remove toast ->
