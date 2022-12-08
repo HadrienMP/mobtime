@@ -4,12 +4,12 @@ module Pages.Home exposing (..)
 
 import Browser.Navigation as Nav
 import Css
+import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Js.Commands
 import Lib.Toaster
-import Lib.UpdateResult exposing (UpdateResult)
 import Model.MobName
 import Routing
 import Shared exposing (Shared)
@@ -52,45 +52,43 @@ type Msg
     | JoinMob
 
 
-update : Shared -> Model -> Msg -> UpdateResult Model Msg
+update : Shared -> Model -> Msg -> ( Model, Effect Msg )
 update shared model msg =
     case msg of
         MobNameChanged name ->
-            { model = { model | mobName = name }
-            , command = Cmd.none
-            , toasts = []
-            }
+            ( { model | mobName = name }
+            , Effect.None
+            )
 
         ChangeVolume volume ->
-            { model = { model | volume = volume }
-            , command = Js.Commands.ChangeVolume volume |> Js.Commands.send
-            , toasts = []
-            }
+            ( { model | volume = volume }
+            , Js.Commands.ChangeVolume volume |> Effect.Js
+            )
 
         TestVolume ->
-            { model = model
-            , command = Js.Commands.TestTheSound |> Js.Commands.send
-            , toasts = []
-            }
+            ( model
+            , Js.Commands.TestTheSound |> Effect.Js
+            )
 
         JoinMob ->
             case Slug.generate model.mobName of
                 Just slug ->
-                    { model = model
-                    , command =
+                    ( model
+                    , Effect.Command <|
                         Nav.pushUrl shared.key <|
                             Routing.toUrl <|
                                 Routing.Mob <|
                                     Model.MobName.MobName <|
                                         Slug.toString slug
-                    , toasts = []
-                    }
+                    )
 
                 Nothing ->
-                    { model = model
-                    , command = Cmd.none
-                    , toasts = [ Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?" ]
-                    }
+                    ( model
+                    , Effect.Shared <|
+                        Shared.Toast <|
+                            Lib.Toaster.Add <|
+                                Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?"
+                    )
 
 
 

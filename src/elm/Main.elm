@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Css
+import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html, button, div, h2, text)
 import Html.Styled.Attributes exposing (class, css, id)
 import Html.Styled.Events exposing (onClick)
@@ -137,8 +138,10 @@ update msg model =
 
         ( GotHomeMsg subMsg, Home subModel ) ->
             Pages.Home.update model.shared subModel subMsg
-                |> UpdateResult.map Home GotHomeMsg
-                |> toModelCmd model
+                |> Tuple.mapBoth
+                    (\updated -> { model | page = Home updated })
+                    (Effect.map GotHomeMsg)
+                |> handleEffect
 
         ( GotMobMsg (Spa.Regular subMsg), Mob subModel ) ->
             Pages.Mob.update model.shared subMsg subModel
@@ -164,6 +167,25 @@ update msg model =
                     (Cmd.map SharedMsg)
 
         _ ->
+            ( model, Cmd.none )
+
+
+handleEffect : ( Model, Effect Msg ) -> ( Model, Cmd Msg )
+handleEffect ( model, effect ) =
+    case effect of
+        Effect.Shared msg ->
+            Shared.update msg model.shared
+                |> Tuple.mapBoth
+                    (\updated -> { model | shared = updated })
+                    (Cmd.map SharedMsg)
+
+        Effect.Js js ->
+            ( model, Js.Commands.send js )
+
+        Effect.Command command ->
+            ( model, command )
+
+        Effect.None ->
             ( model, Cmd.none )
 
 
