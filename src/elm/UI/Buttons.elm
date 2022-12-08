@@ -55,8 +55,8 @@ button attributes { content, action, size, variant } =
                 ++ sizeStyles size
                 ++ variantStyles variant
             )
-            :: actionAttribute action
             :: attributes
+            ++ actionAttributes action
         )
         (case content of
             Icon icon ->
@@ -124,11 +124,13 @@ iconTextGap size =
             UI.Rem.Rem 0.8
 
 
-actionAttribute : Action msg -> Html.Attribute msg
-actionAttribute action =
+actionAttributes : Action msg -> List (Html.Attribute msg)
+actionAttributes action =
     case action of
         OnPress onPress ->
-            onPress |> Maybe.map onClick |> Maybe.withDefault (Attr.property "" Json.Encode.null)
+            [ onPress |> Maybe.map onClick |> Maybe.withDefault (Attr.property "" Json.Encode.null)
+            , Attr.type_ "button"
+            ]
 
         Submit ->
-            Attr.type_ "submit"
+            [ Attr.type_ "submit" ]
