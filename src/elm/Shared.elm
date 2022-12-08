@@ -134,19 +134,6 @@ update_ msg shared =
             ( shared, Cmd.none )
 
 
-toastAll : Toasts -> Shared -> ( Shared, Cmd Msg )
-toastAll toasts shared =
-    let
-        ( allToasts, toastCommands ) =
-            Lib.Toaster.add toasts shared.toasts
-    in
-    ( { shared | toasts = allToasts }
-    , toastCommands
-        |> List.map (Cmd.map Toast)
-        |> Cmd.batch
-    )
-
-
 toast : Toast -> Effect Msg msg
 toast =
     Effect.fromShared << Toast << Lib.Toaster.Add
