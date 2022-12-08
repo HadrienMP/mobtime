@@ -73,6 +73,7 @@ type Msg
     | LinkClicked Browser.UrlRequest
     | KonamiMsg Lib.Konami.Msg
     | Batch (List Msg)
+    | VolumeChanged Int
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -123,6 +124,9 @@ update_ msg shared =
               }
             , cmd |> Cmd.map KonamiMsg
             )
+
+        VolumeChanged volume ->
+            ( { shared | preferences = { volume = volume } }, Cmd.none )
 
         _ ->
             ( shared, Cmd.none )

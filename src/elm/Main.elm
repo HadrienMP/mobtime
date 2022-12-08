@@ -96,7 +96,7 @@ loadPage : Shared.Shared -> ( Page, Cmd Msg )
 loadPage shared =
     case Routing.toPage shared.url of
         Routing.Login ->
-            Pages.Home.init shared
+            Pages.Home.init
                 |> Tuple.mapBoth
                     Home
                     (Cmd.map GotHomeMsg)
@@ -172,6 +172,26 @@ update msg model =
 
 handleEffect : ( Model, Effect Msg ) -> ( Model, Cmd Msg )
 handleEffect ( model, effect ) =
+    case effect of
+        Effect.Atomic atomic ->
+            handleAtomicEffect model atomic
+
+        Effect.Batch effects ->
+            handleBatchEffects effects ( model, Cmd.none )
+
+
+handleBatchEffects : List (Effect.Atomic Msg) -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+handleBatchEffects effects ( model, command ) =
+    case effects of
+        effect :: rest ->
+            handleBatchEffects rest (handleAtomicEffect model effect |> Tuple.mapSecond (\a -> Cmd.batch [ a, command ]))
+
+        [] ->
+            ( model, command )
+
+
+handleAtomicEffect : Model -> Effect.Atomic Msg -> ( Model, Cmd Msg )
+handleAtomicEffect model effect =
     case effect of
         Effect.Shared msg ->
             Shared.update msg model.shared

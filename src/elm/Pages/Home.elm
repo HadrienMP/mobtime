@@ -28,17 +28,12 @@ import View exposing (View)
 
 type alias Model =
     { mobName : String
-    , volume : Int
     }
 
 
-init : Shared -> ( Model, Cmd msg )
-init shared =
-    ( { mobName = ""
-      , volume = shared.preferences.volume
-      }
-    , Cmd.none
-    )
+init : ( Model, Cmd msg )
+init =
+    ( { mobName = "" }, Cmd.none )
 
 
 
@@ -57,24 +52,27 @@ update shared model msg =
     case msg of
         MobNameChanged name ->
             ( { model | mobName = name }
-            , Effect.None
+            , Effect.none
             )
 
         ChangeVolume volume ->
-            ( { model | volume = volume }
-            , Js.Commands.ChangeVolume volume |> Effect.Js
+            ( model
+            , Effect.batch
+                [ Effect.js <| Js.Commands.ChangeVolume volume
+                , Effect.fromShared <| Shared.VolumeChanged volume
+                ]
             )
 
         TestVolume ->
             ( model
-            , Js.Commands.TestTheSound |> Effect.Js
+            , Js.Commands.TestTheSound |> Effect.js
             )
 
         JoinMob ->
             case Slug.generate model.mobName of
                 Just slug ->
                     ( model
-                    , Effect.Command <|
+                    , Effect.fromCmd <|
                         Nav.pushUrl shared.key <|
                             Routing.toUrl <|
                                 Routing.Mob <|
@@ -84,7 +82,7 @@ update shared model msg =
 
                 Nothing ->
                     ( model
-                    , Effect.Shared <|
+                    , Effect.fromShared <|
                         Shared.Toast <|
                             Lib.Toaster.Add <|
                                 Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?"
@@ -137,7 +135,7 @@ view shared model =
                             ]
                             [ Html.text "Create a mob" ]
                         , mobField model
-                        , volumeField model
+                        , volumeField shared
                         , UI.Buttons.button
                             [ Attr.css
                                 [ Css.width <| Css.pct 100
@@ -194,8 +192,8 @@ labelWitdh =
     Css.width <| Css.pct 30
 
 
-volumeField : Model -> Html Msg
-volumeField model =
+volumeField : Shared -> Html Msg
+volumeField shared =
     formRow
         [ Html.label
             [ Attr.for "volume", Attr.css [ labelWitdh ] ]
@@ -213,11 +211,11 @@ volumeField model =
                     , Attr.type_ "range"
                     , Evts.onInput
                         (String.toInt
-                            >> Maybe.withDefault model.volume
+                            >> Maybe.withDefault shared.preferences.volume
                             >> ChangeVolume
                         )
                     , Attr.max "50"
-                    , Attr.value <| String.fromInt model.volume
+                    , Attr.value <| String.fromInt shared.preferences.volume
                     ]
                     []
                 , UI.Icons.Ion.volumeHigh

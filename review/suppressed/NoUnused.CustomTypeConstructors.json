@@ -5,11 +5,10 @@
   "suppressions": [
     { "count": 10, "filePath": "src/elm/UI/Buttons.elm" },
     { "count": 8, "filePath": "src/elm/Js/Commands.elm" },
-    { "count": 4, "filePath": "src/elm/Effect.elm" },
     { "count": 2, "filePath": "src/elm/Model/Clock.elm" },
+    { "count": 2, "filePath": "src/elm/Shared.elm" },
     { "count": 2, "filePath": "src/elm/Spa.elm" },
     { "count": 2, "filePath": "src/elm/UI/Column.elm" },
-    { "count": 2, "filePath": "src/elm/UI/Row.elm" },
-    { "count": 1, "filePath": "src/elm/Shared.elm" }
+    { "count": 2, "filePath": "src/elm/UI/Row.elm" }
   ]
 }
