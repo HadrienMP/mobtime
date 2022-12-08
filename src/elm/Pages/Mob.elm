@@ -235,16 +235,11 @@ update _ msg model =
 
         GotMobbersSettingsMsg subMsg ->
             let
-                mobbersResult =
+                ( updated, command ) =
                     Pages.Mob.Tabs.Mobbers.update subMsg model.state.mobbers model.name model.mobbersSettings
             in
-            ( { model
-                | mobbersSettings = mobbersResult.model
-              }
-            , Effect.batch
-                [ Effect.fromCmd <| Cmd.map GotMobbersSettingsMsg mobbersResult.command
-                , Effect.fromShared <| Shared.Toast <| Lib.Toaster.AddAll mobbersResult.toasts
-                ]
+            ( { model | mobbersSettings = updated }
+            , Effect.map GotMobbersSettingsMsg command
             )
 
         SwitchTab tab ->

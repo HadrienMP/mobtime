@@ -12,7 +12,6 @@ import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.BatchMsg
 import Lib.Toaster as Toaster
-import Lib.UpdateResult exposing (UpdateResult)
 import Model.Events
 import Model.MobName exposing (MobName)
 import Pages.Home
@@ -223,20 +222,6 @@ getMob url =
 
         Routing.Mob mobName ->
             Just mobName
-
-
-toModelCmd : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )
-toModelCmd model result =
-    let
-        ( shared, sharedCommand ) =
-            Shared.toastAll result.toasts model.shared
-    in
-    ( { model
-        | page = result.model
-        , shared = shared
-      }
-    , Cmd.batch [ Cmd.map SharedMsg sharedCommand, result.command ]
-    )
 
 
 

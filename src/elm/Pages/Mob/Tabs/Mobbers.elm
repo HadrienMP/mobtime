@@ -1,5 +1,6 @@
 module Pages.Mob.Tabs.Mobbers exposing (..)
 
+import Effect exposing (Effect)
 import Field
 import Field.String
 import Html as Unstyled
@@ -9,7 +10,6 @@ import Html.Styled exposing (Html, button, div, form, li, p, text, ul)
 import Html.Styled.Attributes exposing (class, disabled, id, type_)
 import Html.Styled.Events exposing (onClick, onSubmit)
 import Lib.Toaster as Toaster
-import Lib.UpdateResult exposing (UpdateResult)
 import Model.Events
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
@@ -17,6 +17,7 @@ import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Role exposing (Role)
 import Model.State exposing (State)
 import Random
+import Shared
 import UI.Icons.Ion as Icons
 import UI.Palettes
 import UI.Rem
@@ -44,14 +45,18 @@ type Msg
     | ShareEvent Model.Events.Event
 
 
-update : Msg -> Mobbers -> MobName -> Model -> UpdateResult Model Msg
+update : Msg -> Mobbers -> MobName -> Model -> ( Model, Effect Shared.Msg Msg )
 update msg mobbers mob model =
     case msg of
         NameChanged name ->
-            { model = { model | mobberName = name |> Field.resetValue model.mobberName |> Field.String.notEmpty }
-            , command = Cmd.none
-            , toasts = []
-            }
+            ( { model
+                | mobberName =
+                    name
+                        |> Field.resetValue model.mobberName
+                        |> Field.String.notEmpty
+              }
+            , Effect.none
+            )
 
         StartAdding ->
             let
@@ -60,8 +65,8 @@ update msg mobbers mob model =
             in
             case Field.toResult name of
                 Ok validMobberName ->
-                    { model = { model | mobberName = Field.init "" }
-                    , command =
+                    ( { model | mobberName = Field.init "" }
+                    , Effect.fromCmd <|
                         Random.generate
                             (\id ->
                                 Add
@@ -70,42 +75,35 @@ update msg mobbers mob model =
                                     }
                             )
                             Uuid.uuidGenerator
-                    , toasts = []
-                    }
+                    )
 
                 Err _ ->
-                    { model = { model | mobberName = name }
-                    , command = Cmd.none
-                    , toasts = [ Toaster.error "The mobber name cannot be empty" ]
-                    }
+                    ( { model | mobberName = name }
+                    , Shared.toast <| Toaster.error "The mobber name cannot be empty"
+                    )
 
         Add mobber ->
-            { model = model
-            , command =
-                mobber
-                    |> Model.Events.AddedMobber
-                    |> Model.Events.MobEvent mob
-                    |> Model.Events.mobEventToJson
-                    |> Model.Events.sendEvent
-            , toasts = []
-            }
+            ( model
+            , mobber
+                |> Model.Events.AddedMobber
+                |> Model.Events.MobEvent mob
+                |> Effect.share
+            )
 
         Shuffle ->
-            { model = model
-            , command = Random.generate (ShareEvent << Model.Events.ShuffledMobbers) <| Mobbers.shuffle mobbers
-            , toasts = []
-            }
+            ( model
+            , Effect.fromCmd <|
+                Random.generate (ShareEvent << Model.Events.ShuffledMobbers) <|
+                    Mobbers.shuffle mobbers
+            )
 
         ShareEvent event ->
             -- TODO duplicated code
-            { model = model
-            , command =
-                event
-                    |> Model.Events.MobEvent mob
-                    |> Model.Events.mobEventToJson
-                    |> Model.Events.sendEvent
-            , toasts = []
-            }
+            ( model
+            , event
+                |> Model.Events.MobEvent mob
+                |> Effect.share
+            )
 
 
 
