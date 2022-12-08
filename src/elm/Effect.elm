@@ -1,22 +1,21 @@
 module Effect exposing (..)
 
 import Js.Commands
-import Shared
 
 
-type Effect msg
-    = Atomic (Atomic msg)
-    | Batch (List (Atomic msg))
+type Effect sharedMsg msg
+    = Atomic (Atomic sharedMsg msg)
+    | Batch (List (Atomic sharedMsg msg))
 
 
-type Atomic msg
-    = Shared Shared.Msg
+type Atomic sharedMsg msg
+    = Shared sharedMsg
     | Js Js.Commands.Command
     | Command (Cmd msg)
     | None
 
 
-map : (a -> b) -> Effect a -> Effect b
+map : (a -> b) -> Effect sharedMsg a -> Effect sharedMsg b
 map f effect =
     case effect of
         Atomic atomic ->
@@ -26,7 +25,7 @@ map f effect =
             effects |> List.map (mapAtomic f) |> Batch
 
 
-mapAtomic : (a -> b) -> Atomic a -> Atomic b
+mapAtomic : (a -> b) -> Atomic sharedMsg a -> Atomic sharedMsg b
 mapAtomic f atomic =
     case atomic of
         Command cmd ->
@@ -42,27 +41,27 @@ mapAtomic f atomic =
             None
 
 
-fromShared : Shared.Msg -> Effect msg
+fromShared : sharedMsg -> Effect sharedMsg msg
 fromShared =
     Atomic << Shared
 
 
-none : Effect msg
+none : Effect sharedMsg msg
 none =
     Atomic None
 
 
-js : Js.Commands.Command -> Effect msg
+js : Js.Commands.Command -> Effect sharedMsg msg
 js =
     Atomic << Js
 
 
-fromCmd : Cmd msg -> Effect msg
+fromCmd : Cmd msg -> Effect sharedMsg msg
 fromCmd =
     Atomic << Command
 
 
-batch : List (Effect msg) -> Effect msg
+batch : List (Effect sharedMsg msg) -> Effect sharedMsg msg
 batch effects =
     effects
         |> List.map

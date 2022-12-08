@@ -2,7 +2,6 @@ module Pages.Home exposing (..)
 
 -- MODEL
 
-import Browser.Navigation as Nav
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html)
@@ -47,7 +46,7 @@ type Msg
     | JoinMob
 
 
-update : Shared -> Model -> Msg -> ( Model, Effect Msg )
+update : Shared -> Model -> Msg -> ( Model, Effect Shared.Msg Msg )
 update shared model msg =
     case msg of
         MobNameChanged name ->
@@ -75,16 +74,15 @@ update shared model msg =
                     , Slug.toString slug
                         |> Model.MobName.MobName
                         |> Routing.Mob
-                        |> Routing.toUrl
-                        |> Nav.pushUrl shared.key
-                        |> Effect.fromCmd
+                        |> Shared.pushUrl shared
                     )
 
                 Nothing ->
                     ( model
-                    , Effect.fromShared <|
-                        Shared.toast <|
-                            Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?"
+                    , Shared.toast <|
+                        Lib.Toaster.error <|
+                            "I was not able to create a url from your mob name. "
+                                ++ "Please try another one. Maybe with less symbols ?"
                     )
 
 

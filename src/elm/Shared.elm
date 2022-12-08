@@ -2,12 +2,14 @@ module Shared exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Effect exposing (Effect)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
 import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.MobName exposing (MobName)
+import Routing
 import Socket
 import Url
 import UserPreferences
@@ -145,9 +147,16 @@ toastAll toasts shared =
     )
 
 
-toast : Toast -> Msg
+toast : Toast -> Effect Msg msg
 toast =
-    Toast << Lib.Toaster.Add
+    Effect.fromShared << Toast << Lib.Toaster.Add
+
+
+pushUrl : Shared -> Routing.Page -> Effect Msg msg
+pushUrl shared =
+    Routing.toUrl
+        >> Nav.pushUrl shared.key
+        >> Effect.fromCmd
 
 
 

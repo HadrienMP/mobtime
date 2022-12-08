@@ -170,7 +170,7 @@ update msg model =
             ( model, Cmd.none )
 
 
-handleEffect : ( Model, Effect Msg ) -> ( Model, Cmd Msg )
+handleEffect : ( Model, Effect Shared.Msg Msg ) -> ( Model, Cmd Msg )
 handleEffect ( model, effect ) =
     case effect of
         Effect.Atomic atomic ->
@@ -180,17 +180,23 @@ handleEffect ( model, effect ) =
             handleBatchEffects effects ( model, Cmd.none )
 
 
-handleBatchEffects : List (Effect.Atomic Msg) -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+handleBatchEffects :
+    List (Effect.Atomic Shared.Msg Msg)
+    -> ( Model, Cmd Msg )
+    -> ( Model, Cmd Msg )
 handleBatchEffects effects ( model, command ) =
     case effects of
         effect :: rest ->
-            handleBatchEffects rest (handleAtomicEffect model effect |> Tuple.mapSecond (\a -> Cmd.batch [ a, command ]))
+            handleBatchEffects rest
+                (handleAtomicEffect model effect
+                    |> Tuple.mapSecond (\a -> Cmd.batch [ a, command ])
+                )
 
         [] ->
             ( model, command )
 
 
-handleAtomicEffect : Model -> Effect.Atomic Msg -> ( Model, Cmd Msg )
+handleAtomicEffect : Model -> Effect.Atomic Shared.Msg Msg -> ( Model, Cmd Msg )
 handleAtomicEffect model effect =
     case effect of
         Effect.Shared msg ->
