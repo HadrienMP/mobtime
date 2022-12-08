@@ -72,20 +72,19 @@ update shared model msg =
             case Slug.generate model.mobName of
                 Just slug ->
                     ( model
-                    , Effect.fromCmd <|
-                        Nav.pushUrl shared.key <|
-                            Routing.toUrl <|
-                                Routing.Mob <|
-                                    Model.MobName.MobName <|
-                                        Slug.toString slug
+                    , Slug.toString slug
+                        |> Model.MobName.MobName
+                        |> Routing.Mob
+                        |> Routing.toUrl
+                        |> Nav.pushUrl shared.key
+                        |> Effect.fromCmd
                     )
 
                 Nothing ->
                     ( model
                     , Effect.fromShared <|
-                        Shared.Toast <|
-                            Lib.Toaster.Add <|
-                                Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?"
+                        Shared.toast <|
+                            Lib.Toaster.error "I was not able to create a url from your mob name. Please try another one. Maybe with less symbols ?"
                     )
 
 

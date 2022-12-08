@@ -223,7 +223,7 @@ toModelCmd : Model -> UpdateResult Page Msg -> ( Model, Cmd Msg )
 toModelCmd model result =
     let
         ( shared, sharedCommand ) =
-            Shared.toast result.toasts model.shared
+            Shared.toastAll result.toasts model.shared
     in
     ( { model
         | page = result.model

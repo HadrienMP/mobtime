@@ -6,7 +6,7 @@ import Js.Commands
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
 import Lib.Konami exposing (Konami)
-import Lib.Toaster exposing (Toasts)
+import Lib.Toaster exposing (Toast, Toasts)
 import Model.MobName exposing (MobName)
 import Socket
 import Url
@@ -132,8 +132,8 @@ update_ msg shared =
             ( shared, Cmd.none )
 
 
-toast : Toasts -> Shared -> ( Shared, Cmd Msg )
-toast toasts shared =
+toastAll : Toasts -> Shared -> ( Shared, Cmd Msg )
+toastAll toasts shared =
     let
         ( allToasts, toastCommands ) =
             Lib.Toaster.add toasts shared.toasts
@@ -143,6 +143,11 @@ toast toasts shared =
         |> List.map (Cmd.map Toast)
         |> Cmd.batch
     )
+
+
+toast : Toast -> Msg
+toast =
+    Toast << Lib.Toaster.Add
 
 
 
