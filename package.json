@@ -2,7 +2,6 @@
 	"name": "mob-time-elm",
 	"version": "1.0.22",
 	"description": "",
-	"main": "index.js",
 	"scripts": {
 		"build": "webpack --mode production",
 		"start": "node server/app.js",
@@ -12,14 +11,17 @@
 		"test": "npx elm-test \"./src/elm/**/*Spec.elm\"",
 		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all",
 		"postinstall": "elm-tooling install ; husky install",
-		"review": "elm-review --fix-all"
+		"review": "elm-review --fix-all",
+		"build:doc": "parcel build doc/index.html"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@parcel/transformer-elm": "^2.8.1",
 		"concurrently": "^7.0.0",
 		"css-loader": "^6.5.1",
+		"elm-book": "^1.0.1",
 		"elm-live": "^3.4.1",
 		"elm-review": "^2.8.2",
 		"elm-test": "^0.19.1-revision6",
@@ -30,6 +32,7 @@
 		"https-local": "^1.0.0",
 		"husky": "^8.0.2",
 		"nodemon": "^2.0.7",
+		"parcel": "^2.8.1",
 		"sass": "^1.43.4",
 		"sass-loader": "^12.3.0",
 		"socket.io-client": "^4.3.2",
@@ -49,6 +52,7 @@
 			]
 		}
 	},
+	"source": "doc/index.html",
 	"dependencies": {
 		"elm": "^0.19.1-5",
 		"express": "^4.17.1",

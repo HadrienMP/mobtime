@@ -1,13 +1,16 @@
 {
     "type": "application",
     "source-directories": [
-        "src/elm"
+        "src/elm",
+        "doc"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
         "direct": {
             "avh4/elm-color": "1.0.0",
             "danyx23/elm-uuid": "2.1.2",
+            "dtwrks/elm-book": "1.4.2",
+            "dtwrks/elm-book-interop-elm-css": "1.0.1",
             "elm/browser": "1.0.2",
             "elm/core": "1.0.5",
             "elm/html": "1.0.0",
@@ -17,17 +20,18 @@
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
             "elm-community/random-extra": "3.2.0",
-            "elm-explorations/test": "2.0.1",
+            "elm-explorations/test": "2.1.0",
             "hecrj/elm-slug": "1.0.2",
             "j-panasiuk/elm-ionicons": "2.0.0",
             "jaredramirez/elm-field": "1.1.2",
             "noahzgordon/elm-color-extra": "1.0.2",
             "pablohirafuji/elm-qrcode": "4.0.2",
-            "rtfeldman/elm-css": "18.0.0",
+            "rtfeldman/elm-css": "17.1.1",
             "rtfeldman/elm-iso8601-date-strings": "1.1.4"
         },
         "indirect": {
             "danfishgold/base64-bytes": "1.1.0",
+            "dillonkearns/elm-markdown": "7.0.0",
             "elm/bytes": "1.0.8",
             "elm/parser": "1.1.0",
             "elm/regex": "1.0.0",
@@ -36,6 +40,7 @@
             "folkertdev/elm-flate": "2.0.5",
             "fredcy/elm-parseint": "2.0.1",
             "justgook/elm-image": "5.0.0",
+            "pablohirafuji/elm-syntax-highlight": "3.4.1",
             "robinheghan/murmur3": "1.0.0",
             "rtfeldman/elm-hex": "1.0.0"
         }
