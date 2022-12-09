@@ -28,6 +28,8 @@ buttonsChapter =
         |> renderComponentList
             [ ( "Primary", component props )
             , ( "Secondary", component { props | variant = Button.Secondary } )
+            , ( "Text only", component { props | content = Button.Text << sizeToString } )
+            , ( "Icon only", component { props | content = always <| Button.Icon UI.Icons.Ion.check } )
             ]
 
 
