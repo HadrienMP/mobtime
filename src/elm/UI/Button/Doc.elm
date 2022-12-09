@@ -73,13 +73,3 @@ component props =
                         }
                 )
         )
-
-
-content : String
-content =
-    """
-# Both Icon and Text
-## Primary
-<component />
-## Secondary
-"""
