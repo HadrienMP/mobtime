@@ -7,7 +7,6 @@ import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
-import Js.Commands
 import Lib.Toaster
 import Model.MobName
 import Routing
@@ -23,6 +22,7 @@ import UI.Palettes
 import UI.Rem
 import UI.Row
 import View exposing (View)
+import Volume
 
 
 type alias Model =
@@ -41,8 +41,7 @@ init =
 
 type Msg
     = MobNameChanged String
-    | ChangeVolume Int
-    | TestVolume
+    | VolumeMsg Volume.Msg
     | JoinMob
 
 
@@ -54,17 +53,16 @@ update shared model msg =
             , Effect.none
             )
 
-        ChangeVolume volume ->
+        VolumeMsg subMsg ->
+            let
+                ( volume, effect ) =
+                    Volume.update subMsg (Volume.Volume shared.preferences.volume)
+            in
             ( model
             , Effect.batch
-                [ Effect.js <| Js.Commands.ChangeVolume volume
-                , Effect.fromShared <| Shared.VolumeChanged volume
+                [ Effect.fromShared <| Shared.VolumeChanged <| Volume.open volume
+                , Effect.map VolumeMsg effect
                 ]
-            )
-
-        TestVolume ->
-            ( model
-            , Js.Commands.TestTheSound |> Effect.js
             )
 
         JoinMob ->
@@ -191,40 +189,4 @@ labelWitdh =
 
 volumeField : Shared -> Html Msg
 volumeField shared =
-    formRow
-        [ Html.label
-            [ Attr.for "volume", Attr.css [ labelWitdh ] ]
-            [ Html.text "Volume" ]
-        , UI.Column.column [ Attr.css [ Css.flexGrow <| Css.int 1 ] ]
-            [ UI.Column.Gap <| UI.Rem.Rem 0.4 ]
-            [ UI.Row.row []
-                []
-                [ UI.Icons.Ion.volumeLow
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
-                    }
-                , Html.input
-                    [ Attr.id "volume"
-                    , Attr.type_ "range"
-                    , Evts.onInput
-                        (String.toInt
-                            >> Maybe.withDefault shared.preferences.volume
-                            >> ChangeVolume
-                        )
-                    , Attr.max "50"
-                    , Attr.value <| String.fromInt shared.preferences.volume
-                    ]
-                    []
-                , UI.Icons.Ion.volumeHigh
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
-                    }
-                ]
-            , UI.Buttons.button []
-                { content = UI.Buttons.Both { icon = UI.Icons.Ion.musicNote, text = "Test the audio" }
-                , variant = UI.Buttons.Secondary
-                , size = UI.Buttons.S
-                , action = UI.Buttons.OnPress <| Just TestVolume
-                }
-            ]
-        ]
+    Volume.view (Volume.Volume shared.preferences.volume) { labelWidth = labelWitdh } |> Html.map VolumeMsg
