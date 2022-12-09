@@ -72,11 +72,12 @@ type alias Model =
     , now : Time.Posix
     , tab : Tab
     , peerId : Maybe PeerId
+    , displaySoundModal : Bool
     }
 
 
-init : MobName -> ( Model, Cmd Msg )
-init name =
+init : Shared -> MobName -> ( Model, Cmd Msg )
+init shared name =
     let
         ( clockSync, clockSyncCommand ) =
             Peers.Sync.Adapter.init name
@@ -89,6 +90,7 @@ init name =
       , now = Time.millisToPosix 0
       , tab = Main
       , peerId = Nothing
+      , displaySoundModal = not shared.soundOn
       }
     , Cmd.batch
         [ Socket.joinRoom <| Model.MobName.print name
@@ -119,6 +121,7 @@ type Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
     | GotSocketId PeerId
+    | HideSoundModal
 
 
 timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
@@ -280,6 +283,9 @@ update shared msg model =
             , Effect.fromCmd command
             )
 
+        HideSoundModal ->
+            ( { model | displaySoundModal = False }, Effect.none )
+
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
 selectSound now profile =
@@ -353,7 +359,11 @@ view shared model =
                     Nothing
 
             _ ->
-                Nothing
+                if model.displaySoundModal then
+                    Just soundModal
+
+                else
+                    Nothing
     , body = [ UI.Layout.wrap shared model.name <| body shared model action ]
     }
 
@@ -670,3 +680,22 @@ timeLeftTitle action =
 
         _ ->
             String.join " " action ++ " | " ++ "Mob Time"
+
+
+soundModal : Html Msg
+soundModal =
+    UI.Column.column
+        [ css UI.Css.center ]
+        [ UI.Column.Gap <| UI.Rem.Rem 2 ]
+        [ UI.Text.h2 "Welcome !"
+        , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
+            { content =
+                UI.Buttons.Both
+                    { icon = UI.Icons.Ion.paperAirplane
+                    , text = "Join the mob"
+                    }
+            , variant = UI.Buttons.Primary
+            , size = UI.Buttons.L
+            , action = UI.Buttons.OnPress <| Just HideSoundModal
+            }
+        ]

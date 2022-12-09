@@ -4,9 +4,8 @@ import Browser
 import Browser.Navigation as Nav
 import Css
 import Effect exposing (Effect)
-import Html.Styled as Html exposing (Html, button, div, h2, text)
-import Html.Styled.Attributes exposing (class, css, id)
-import Html.Styled.Events exposing (onClick)
+import Html.Styled as Html
+import Html.Styled.Attributes exposing (css)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
@@ -19,10 +18,7 @@ import Pages.Home
 import Pages.Mob
 import Routing
 import Shared
-import UI.Icons.Ion
 import UI.Modal
-import UI.Palettes
-import UI.Rem
 import Url
 import View
 
@@ -54,7 +50,6 @@ type Page
 
 type alias Model =
     { page : Page
-    , displayModal : Bool
     , shared : Shared.Shared
     }
 
@@ -74,13 +69,6 @@ init jsonPreferences url key =
             loadPage shared
     in
     ( { page = page
-      , displayModal =
-            case page of
-                Home _ ->
-                    False
-
-                Mob _ ->
-                    True
       , shared = shared
       }
     , Cmd.batch [ pageCommand, sharedCommand |> Cmd.map SharedMsg ]
@@ -97,7 +85,7 @@ loadPage shared =
                     (Cmd.map GotHomeMsg)
 
         Routing.Mob mobName ->
-            Pages.Mob.init mobName
+            Pages.Mob.init shared mobName
                 |> Tuple.mapBoth
                     Mob
                     (Cmd.map GotMobMsg)
@@ -111,7 +99,6 @@ type Msg
     = GotMobMsg Pages.Mob.Msg
     | GotHomeMsg Pages.Home.Msg
     | Batch (List Msg)
-    | HideModal
     | SharedMsg Shared.Msg
     | UrlChanged Url.Url
 
@@ -147,11 +134,6 @@ update msg model =
 
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
-
-        ( HideModal, _ ) ->
-            ( { model | displayModal = False }
-            , Cmd.none
-            )
 
         ( SharedMsg subMsg, _ ) ->
             Shared.update subMsg model.shared
@@ -271,7 +253,6 @@ view model =
             Html.div [ css [ Css.height <| Css.pct 100 ] ]
                 [ Html.div [ css [ Css.height <| Css.pct 100 ] ]
                     (doc.body
-                        ++ soundModal model
                         ++ (doc.modal
                                 |> Maybe.map UI.Modal.withContent
                                 |> Maybe.map List.singleton
@@ -282,28 +263,3 @@ view model =
                 ]
         ]
     }
-
-
-soundModal : Model -> List (Html Msg)
-soundModal model =
-    if model.displayModal then
-        [ div
-            [ id "modal-container", onClick HideModal ]
-            [ div [ id "modal" ]
-                [ h2 [] [ text "Welcome to Mobtime !" ]
-                , button
-                    [ class "labelled-icon-button"
-                    , onClick <| HideModal
-                    ]
-                    [ UI.Icons.Ion.paperAirplane
-                        { size = UI.Rem.Rem 1
-                        , color = UI.Palettes.monochrome.on.surface
-                        }
-                    , text "Let's go!"
-                    ]
-                ]
-            ]
-        ]
-
-    else
-        []

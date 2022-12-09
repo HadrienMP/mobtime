@@ -1,4 +1,4 @@
-module Shared exposing (..)
+port module Shared exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
@@ -15,6 +15,9 @@ import Url
 import UserPreferences
 
 
+port soundOn : (String -> msg) -> Sub msg
+
+
 
 -- Init
 
@@ -28,6 +31,7 @@ type alias Shared =
     , mob : Maybe MobName
     , devMode : Bool
     , konami : Konami
+    , soundOn : Bool
     }
 
 
@@ -59,6 +63,7 @@ init { key, url, jsonPreferences, mob } =
       , mob = mob
       , devMode = False
       , konami = Lib.Konami.init
+      , soundOn = False
       }
     , Cmd.batch
         [ socketCmd
@@ -78,6 +83,7 @@ type Msg
     | KonamiMsg Lib.Konami.Msg
     | Batch (List Msg)
     | PreferencesMsg UserPreferences.Msg
+    | SoundOn
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -135,8 +141,11 @@ update_ msg shared =
                     (\volume -> { shared | preferences = volume })
                     (Cmd.map PreferencesMsg)
 
-        _ ->
+        Batch _ ->
             ( shared, Cmd.none )
+
+        SoundOn ->
+            ( { shared | soundOn = True }, Cmd.none )
 
 
 toast : Toast -> Effect Msg msg
@@ -163,6 +172,7 @@ subscriptions shared =
             |> Sub.map SocketMsg
         , Lib.Konami.subscriptions shared.konami
             |> Sub.map KonamiMsg
+        , soundOn <| always SoundOn
         ]
 
 

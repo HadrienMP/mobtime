@@ -66,7 +66,16 @@ app.ports.commands.subscribe(command => {
 
 app.ports.changeVolume.subscribe(sound.volume)
 app.ports.testVolume.subscribe(() => sound.play("/sound/hello.mp3"));
-app.ports.savePreferences.subscribe(preferences => window.localStorage.setItem("preferences", JSON.stringify(preferences)))
+app.ports.savePreferences.subscribe(preferences =>
+    window.localStorage.setItem("preferences", JSON.stringify(preferences)));
+
+const soundOnInterval = setInterval(sound.play("/sound/silence.mp3", {
+    onError: console.debug,
+    onSuccess: () => {
+        app.ports.soundOn.send("");
+        clearInterval(soundOnInterval);
+    }
+}), 500)
 
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
