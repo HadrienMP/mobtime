@@ -6,22 +6,18 @@
   }
 
   .form-field {
-    & > *:first-child {
+    &>*:first-child {
       flex: 1 1;
       margin-right: $margin-space;
-      & + * {
+
+      &+* {
         flex: 2 2;
       }
     }
+
     .field-input {
       display: flex;
       align-items: center;
     }
   }
-}
-
-input[type="range"] {
-  flex: 1 1 0;
-  margin: 0 10px;
-  width: 25%;
 }

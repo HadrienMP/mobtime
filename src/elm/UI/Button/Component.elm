@@ -1,4 +1,4 @@
-module UI.Buttons exposing (..)
+module UI.Button.Component exposing (..)
 
 import Css
 import Html.Styled as Html exposing (Html)
@@ -51,6 +51,7 @@ button attributes { content, action, size, variant } =
         (Attr.css
             ([ Css.borderRadius <| Css.rem 0.2
              , Css.display Css.block
+             , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surface
              ]
                 ++ sizeStyles size
                 ++ variantStyles variant

@@ -28,7 +28,7 @@ import Sounds
 import Svg.Styled exposing (Svg)
 import Task
 import Time
-import UI.Buttons
+import UI.Button.Component as Button
 import UI.CircularProgressBar
 import UI.Color
 import UI.Column
@@ -477,11 +477,11 @@ musicModal =
             , color = UI.Palettes.monochrome.on.background
             }
         , UI.Text.h2 "Turn ended !"
-        , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
-            { content = UI.Buttons.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
-            , variant = UI.Buttons.Primary
-            , size = UI.Buttons.L
-            , action = UI.Buttons.OnPress <| Just StopSound
+        , Button.button [ css [ Css.width <| Css.pct 100 ] ]
+            { content = Button.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
+            , variant = Button.Primary
+            , size = Button.L
+            , action = Button.OnPress <| Just StopSound
             }
         ]
 
@@ -499,16 +499,16 @@ breakModal mobName =
         , Html.p
             [ css [ Css.textAlign Css.justify ] ]
             [ Html.text "Boost your productivity by taking a good break." ]
-        , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
-            { content = UI.Buttons.Both { icon = UI.Icons.Ion.check, text = "Break over" }
-            , variant = UI.Buttons.Primary
-            , size = UI.Buttons.L
+        , Button.button [ css [ Css.width <| Css.pct 100 ] ]
+            { content = Button.Both { icon = UI.Icons.Ion.check, text = "Break over" }
+            , variant = Button.Primary
+            , size = Button.L
             , action =
                 Model.Events.PomodoroStopped
                     |> Model.Events.MobEvent mobName
                     |> ShareEvent
                     |> Just
-                    |> UI.Buttons.OnPress
+                    |> Button.OnPress
             }
         ]
 
@@ -688,14 +688,14 @@ soundModal =
         [ css UI.Css.center ]
         [ UI.Column.Gap <| UI.Rem.Rem 2 ]
         [ UI.Text.h2 "Welcome !"
-        , UI.Buttons.button [ css [ Css.width <| Css.pct 100 ] ]
+        , Button.button [ css [ Css.width <| Css.pct 100 ] ]
             { content =
-                UI.Buttons.Both
+                Button.Both
                     { icon = UI.Icons.Ion.paperAirplane
                     , text = "Join the mob"
                     }
-            , variant = UI.Buttons.Primary
-            , size = UI.Buttons.L
-            , action = UI.Buttons.OnPress <| Just HideSoundModal
+            , variant = Button.Primary
+            , size = Button.L
+            , action = Button.OnPress <| Just HideSoundModal
             }
         ]

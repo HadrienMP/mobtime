@@ -11,34 +11,6 @@
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-html {
-  font-family: 'Oswald', sans-serif;
-  font-size: 15pt;
-  margin: 0;
-  line-height: 1em;
-  height: 100%;
-}
-
-body {
-  color: $color;
-  height: 100%;
-
-  @media (min-width: $width) {
-    //margin-top: $margin-space;
-  }
-}
-
-body * {
-  box-sizing: border-box;
-  font-family: 'Oswald', sans-serif;
-  line-height: 1em;
-}
-
-.container {
-  margin: auto;
-  // max-width: $width;
-}
-
 input[type="text"] {
   border: none;
   border-bottom: 1px solid;
@@ -48,11 +20,6 @@ input[type="text"] {
   &:focus {
     outline: none;
   }
-}
-
-a,
-button {
-  cursor: pointer;
 }
 
 @include icon(1.2em);

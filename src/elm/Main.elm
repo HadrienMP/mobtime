@@ -18,6 +18,7 @@ import Pages.Home
 import Pages.Mob
 import Routing
 import Shared
+import UI.GlobalStyle
 import UI.Modal
 import Url
 import View
@@ -251,7 +252,8 @@ view model =
     , body =
         [ Html.toUnstyled <|
             Html.div [ css [ Css.height <| Css.pct 100 ] ]
-                [ Html.div [ css [ Css.height <| Css.pct 100 ] ]
+                [ UI.GlobalStyle.globalStyle
+                , Html.div [ css [ Css.height <| Css.pct 100 ] ]
                     (doc.body
                         ++ (doc.modal
                                 |> Maybe.map UI.Modal.withContent

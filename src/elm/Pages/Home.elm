@@ -12,7 +12,7 @@ import Model.MobName
 import Routing
 import Shared exposing (Shared)
 import Slug
-import UI.Buttons
+import UI.Button.Component as Button
 import UI.Color
 import UI.Column
 import UI.Icons.Ion
@@ -123,16 +123,16 @@ view shared model =
                             [ Html.text "Create a mob" ]
                         , mobField model
                         , volumeField shared
-                        , UI.Buttons.button
+                        , Button.button
                             [ Attr.css
                                 [ Css.width <| Css.pct 100
                                 , Css.marginTop <| Css.rem 1
                                 ]
                             ]
-                            { content = UI.Buttons.Both { icon = UI.Icons.Ion.paperAirplane, text = "Create" }
-                            , variant = UI.Buttons.Primary
-                            , size = UI.Buttons.M
-                            , action = UI.Buttons.Submit
+                            { content = Button.Both { icon = UI.Icons.Ion.paperAirplane, text = "Create" }
+                            , variant = Button.Primary
+                            , size = Button.M
+                            , action = Button.Submit
                             }
                         ]
                     ]
