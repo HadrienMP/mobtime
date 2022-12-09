@@ -9,7 +9,7 @@ export const load = (sound, onend = () => { }) => {
 };
 export const volume = (value) => Howler.volume(parseInt(value) / 100.0);
 
-export const play = (sound, eventHandlers = { onError: console.error, onSuccess: {} }) => {
+export const play = (sound, eventHandlers = { onError: console.error, onSuccess: () => { } }) => {
     Howler.stop();
     new Howl({
         src: [sound],
