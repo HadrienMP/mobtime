@@ -67,7 +67,6 @@ type alias Model =
     { name : MobName
     , state : Model.State.State
     , mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
-    , clockSettings : Pages.Mob.Tabs.Clocks.Model
     , clockSync : Peers.Sync.Adapter.Model
     , alarm : AlarmState
     , now : Time.Posix
@@ -85,7 +84,6 @@ init name =
     ( { name = name
       , state = Model.State.init
       , mobbersSettings = Pages.Mob.Tabs.Mobbers.init
-      , clockSettings = Pages.Mob.Tabs.Clocks.init
       , clockSync = clockSync
       , alarm = Standby
       , now = Time.millisToPosix 0
@@ -123,8 +121,8 @@ type Msg
     | GotSocketId PeerId
 
 
-timePassed : Time.Posix -> Model -> ( Model, Cmd Msg )
-timePassed now model =
+timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
+timePassed now shared model =
     let
         timePassedResult =
             Model.State.timePassed now model.state
@@ -150,13 +148,13 @@ timePassed now model =
       }
     , Cmd.batch
         [ toto
-        , Js.Commands.send <| Js.Commands.ChangeTitle <| timeLeftTitle <| timeLeftString model
+        , Js.Commands.send <| Js.Commands.ChangeTitle <| timeLeftTitle <| timeLeftString shared model
         ]
     )
 
 
 update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
-update _ msg model =
+update shared msg model =
     case msg of
         ShareEvent event ->
             ( model
@@ -251,12 +249,9 @@ update _ msg model =
             )
 
         GotClockSettingsMsg subMsg ->
-            let
-                ( clockSettings, command ) =
-                    Pages.Mob.Tabs.Clocks.update subMsg model.clockSettings model.name
-            in
-            ( { model | clockSettings = clockSettings }
-            , Effect.fromCmd <| Cmd.map GotClockSettingsMsg command
+            ( model
+            , Pages.Mob.Tabs.Clocks.update subMsg model.name
+                |> Effect.map GotClockSettingsMsg
             )
 
         GotSoundSettingsMsg subMsg ->
@@ -279,7 +274,7 @@ update _ msg model =
         TimePassed now ->
             let
                 ( updated, command ) =
-                    timePassed now model
+                    timePassed now shared model
             in
             ( updated
             , Effect.fromCmd command
@@ -342,7 +337,7 @@ view : Shared -> Model -> View Msg
 view shared model =
     let
         action =
-            detectAction model
+            detectAction shared model
     in
     { title = timeLeftTitle action.timeLeft
     , modal =
@@ -442,7 +437,7 @@ body shared model action =
                     |> Html.map GotMainTabMsg
 
             Clock ->
-                Pages.Mob.Tabs.Clocks.view shared model.clockSettings model.now model.state
+                Pages.Mob.Tabs.Clocks.view shared model.now model.state
                     |> Html.map GotClockSettingsMsg
 
             Mobbers ->
@@ -618,11 +613,11 @@ type alias ActionDescription =
     }
 
 
-detectAction : Model -> ActionDescription
-detectAction model =
+detectAction : Shared -> Model -> ActionDescription
+detectAction shared model =
     let
         timeLeft =
-            timeLeftString model
+            timeLeftString shared model
     in
     case model.state.clock of
         On _ ->
@@ -651,12 +646,12 @@ detectAction model =
             }
 
 
-timeLeftString : Model -> DurationStringParts
-timeLeftString model =
+timeLeftString : Shared -> Model -> DurationStringParts
+timeLeftString shared model =
     case model.state.clock of
         On on ->
             Duration.between model.now on.end
-                |> (if model.clockSettings.displaySeconds then
+                |> (if shared.preferences.displaySeconds then
                         Duration.toLongString
 
                     else

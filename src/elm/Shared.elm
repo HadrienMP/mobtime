@@ -13,7 +13,6 @@ import Routing
 import Socket
 import Url
 import UserPreferences
-import Volume
 
 
 
@@ -78,7 +77,7 @@ type Msg
     | LinkClicked Browser.UrlRequest
     | KonamiMsg Lib.Konami.Msg
     | Batch (List Msg)
-    | VolumeMsg Volume.Msg
+    | PreferencesMsg UserPreferences.Msg
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -130,9 +129,11 @@ update_ msg shared =
             , cmd |> Cmd.map KonamiMsg
             )
 
-        VolumeMsg subMsg ->
-            Volume.update subMsg shared.preferences.volume
-                |> Tuple.mapFirst (\volume -> { shared | preferences = { volume = volume } })
+        PreferencesMsg subMsg ->
+            UserPreferences.update subMsg shared.preferences
+                |> Tuple.mapBoth
+                    (\volume -> { shared | preferences = volume })
+                    (Cmd.map PreferencesMsg)
 
         _ ->
             ( shared, Cmd.none )

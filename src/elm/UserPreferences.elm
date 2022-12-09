@@ -1,8 +1,11 @@
-module UserPreferences exposing (..)
+port module UserPreferences exposing (..)
 
 import Json.Decode as Decode
 import Json.Encode as Json
 import Volume
+
+
+port savePreferences : Json.Value -> Cmd msg
 
 
 
@@ -10,12 +13,16 @@ import Volume
 
 
 type alias Model =
-    { volume : Volume.Volume }
+    { volume : Volume.Volume
+    , displaySeconds : Bool
+    }
 
 
 default : Model
 default =
-    { volume = Volume.default }
+    { volume = Volume.default
+    , displaySeconds = False
+    }
 
 
 
@@ -38,7 +45,9 @@ init value =
 encode : Model -> Json.Value
 encode model =
     Json.object
-        [ ( "volume", Volume.encode model.volume ) ]
+        [ ( "volume", Volume.encode model.volume )
+        , ( "displaySeconds", Json.bool model.displaySeconds )
+        ]
 
 
 decode : Decode.Value -> Model
@@ -48,4 +57,32 @@ decode json =
 
 decoder : Decode.Decoder Model
 decoder =
-    Decode.field "volume" Volume.decoder |> Decode.map Model
+    Decode.map2 Model
+        (Decode.field "volume" Volume.decoder)
+        (Decode.field "displaySeconds" Decode.bool)
+
+
+
+-- Update
+
+
+type Msg
+    = VolumeMsg Volume.Msg
+    | DisplaySeconds Bool
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    let
+        ( updated, command ) =
+            case msg of
+                VolumeMsg subMsg ->
+                    Volume.update subMsg model.volume
+                        |> Tuple.mapBoth
+                            (\a -> { model | volume = a })
+                            (Cmd.map VolumeMsg)
+
+                DisplaySeconds displaySeconds ->
+                    ( { model | displaySeconds = displaySeconds }, Cmd.none )
+    in
+    ( updated, Cmd.batch [ command, updated |> encode |> savePreferences ] )

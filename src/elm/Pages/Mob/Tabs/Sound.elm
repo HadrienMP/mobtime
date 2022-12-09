@@ -10,6 +10,7 @@ import Model.Events
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Sounds as SoundLibrary
+import UserPreferences
 import Volume
 
 
@@ -30,7 +31,7 @@ update : Msg -> Effect Shared.Msg Msg
 update msg =
     case msg of
         VolumeMsg subMsg ->
-            Effect.fromShared <| Shared.VolumeMsg subMsg
+            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.VolumeMsg subMsg
 
         ShareEvent event ->
             Effect.share event

@@ -21,6 +21,7 @@ import UI.Layout
 import UI.Palettes
 import UI.Rem
 import UI.Row
+import UserPreferences
 import View exposing (View)
 import Volume
 
@@ -54,7 +55,7 @@ update shared model msg =
             )
 
         VolumeMsg subMsg ->
-            ( model, Effect.fromShared <| Shared.VolumeMsg subMsg )
+            ( model, Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.VolumeMsg subMsg )
 
         JoinMob ->
             case Slug.generate model.mobName of

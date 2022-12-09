@@ -64,11 +64,9 @@ app.ports.commands.subscribe(command => {
     }
 });
 
-app.ports.changeVolume.subscribe(volume => {
-    window.localStorage.setItem("preferences", JSON.stringify({ volume: volume }));
-    sound.volume(volume);
-})
+app.ports.changeVolume.subscribe(sound.volume)
 app.ports.testVolume.subscribe(() => sound.play("/sound/hello.mp3"));
+app.ports.savePreferences.subscribe(preferences => window.localStorage.setItem("preferences", JSON.stringify(preferences)))
 
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");

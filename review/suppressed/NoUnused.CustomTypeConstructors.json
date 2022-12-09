@@ -9,6 +9,7 @@
     { "count": 2, "filePath": "src/elm/Shared.elm" },
     { "count": 2, "filePath": "src/elm/UI/Column.elm" },
     { "count": 2, "filePath": "src/elm/UI/Row.elm" },
+    { "count": 2, "filePath": "src/elm/UserPreferences.elm" },
     { "count": 1, "filePath": "src/elm/Lib/Toaster.elm" }
   ]
 }

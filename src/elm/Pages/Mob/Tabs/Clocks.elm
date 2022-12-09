@@ -1,5 +1,6 @@
 module Pages.Mob.Tabs.Clocks exposing (..)
 
+import Effect exposing (Effect)
 import Html.Styled exposing (Html, button, div, h3, label, p, text)
 import Html.Styled.Attributes exposing (class, classList, for, id)
 import Html.Styled.Events exposing (onClick)
@@ -15,15 +16,7 @@ import UI.Icons.Ion
 import UI.Palettes
 import UI.Range.Component
 import UI.Rem
-
-
-type alias Model =
-    { displaySeconds : Bool }
-
-
-init : Model
-init =
-    { displaySeconds = False }
+import UserPreferences
 
 
 type Msg
@@ -31,23 +24,20 @@ type Msg
     | ShareEvent Model.Events.Event
 
 
-update : Msg -> Model -> MobName -> ( Model, Cmd Msg )
-update msg model mob =
+update : Msg -> MobName -> Effect Shared.Msg Msg
+update msg mob =
     case msg of
         DisplaySecondsChanged bool ->
-            ( { model | displaySeconds = bool }, Cmd.none )
+            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.DisplaySeconds bool
 
         ShareEvent event ->
-            ( model
-            , event
+            event
                 |> Model.Events.MobEvent mob
-                |> Model.Events.mobEventToJson
-                |> Model.Events.sendEvent
-            )
+                |> Effect.share
 
 
-view : Shared -> Model -> Time.Posix -> Model.State.State -> Html Msg
-view shared model now state =
+view : Shared -> Time.Posix -> Model.State.State -> Html Msg
+view shared now state =
     div [ id "timer", class "tab" ]
         [ h3 []
             [ UI.Icons.Ion.people
@@ -62,12 +52,12 @@ view shared model now state =
             , div
                 [ class "toggles" ]
                 [ button
-                    [ classList [ ( "active", not model.displaySeconds ) ]
+                    [ classList [ ( "active", not shared.preferences.displaySeconds ) ]
                     , onClick <| DisplaySecondsChanged False
                     ]
                     [ text "Hide" ]
                 , button
-                    [ classList [ ( "active", model.displaySeconds ) ]
+                    [ classList [ ( "active", shared.preferences.displaySeconds ) ]
                     , onClick <| DisplaySecondsChanged True
                     ]
                     [ text "Show" ]
