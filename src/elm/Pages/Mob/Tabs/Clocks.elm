@@ -1,8 +1,8 @@
 module Pages.Mob.Tabs.Clocks exposing (..)
 
-import Html.Styled exposing (Html, button, div, h3, input, label, p, text)
-import Html.Styled.Attributes as Attr exposing (class, classList, for, id, step, type_, value)
-import Html.Styled.Events exposing (onClick, onInput)
+import Html.Styled exposing (Html, button, div, h3, label, p, text)
+import Html.Styled.Attributes exposing (class, classList, for, id)
+import Html.Styled.Events exposing (onClick)
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Model.Events
@@ -13,6 +13,7 @@ import Time
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes
+import UI.Range.Component
 import UI.Rem
 
 
@@ -85,21 +86,17 @@ view shared model now state =
                     { size = UI.Rem.Rem 1
                     , color = UI.Palettes.monochrome.on.background
                     }
-                , input
-                    [ id "turn-length"
-                    , type_ "range"
-                    , step "1"
-                    , onInput <|
-                        String.toInt
-                            >> Maybe.withDefault (toValue shared Model.State.defaultTurnLength)
-                            >> toDuration shared
+                , UI.Range.Component.display
+                    { onChange =
+                        toDuration shared
                             >> Model.Events.TurnLengthChanged
                             >> ShareEvent
-                    , Attr.min "2"
-                    , Attr.max "20"
-                    , value <| String.fromInt <| toValue shared state.turnLength
-                    ]
-                    []
+                    , min = 2
+                    , max = 20
+                    , value =
+                        state.turnLength
+                            |> toValue shared
+                    }
                 , UI.Icons.Custom.elephant
                     { size = UI.Rem.Rem 1
                     , color = UI.Palettes.monochrome.on.background
@@ -138,21 +135,17 @@ view shared model now state =
                     { size = UI.Rem.Rem 1
                     , color = UI.Palettes.monochrome.on.background
                     }
-                , input
-                    [ id "pomodoro-length"
-                    , type_ "range"
-                    , step "1"
-                    , onInput <|
-                        String.toInt
-                            >> Maybe.withDefault (toValue shared Model.State.defaultPomodoroLength)
-                            >> toDuration shared
+                , UI.Range.Component.display
+                    { onChange =
+                        toDuration shared
                             >> Model.Events.PomodoroLengthChanged
                             >> ShareEvent
-                    , Attr.min "10"
-                    , Attr.max "45"
-                    , value <| String.fromInt <| toValue shared state.pomodoroLength
-                    ]
-                    []
+                    , min = 10
+                    , max = 45
+                    , value =
+                        state.pomodoroLength
+                            |> toValue shared
+                    }
                 , UI.Icons.Ion.batteryLow
                     { size = UI.Rem.Rem 1
                     , color = UI.Palettes.monochrome.on.background
