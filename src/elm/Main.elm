@@ -10,6 +10,7 @@ import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping as EventsMapping exposing (EventsMapping)
+import Json.Decode as Decode
 import Lib.BatchMsg
 import Lib.Toaster as Toaster
 import Model.Events
@@ -23,7 +24,6 @@ import UI.Modal
 import UI.Palettes
 import UI.Rem
 import Url
-import UserPreferences
 import View
 
 
@@ -31,7 +31,7 @@ import View
 -- MAIN
 
 
-main : Program UserPreferences.Model Model Msg
+main : Program Decode.Value Model Msg
 main =
     Browser.application
         { init = init
@@ -59,14 +59,14 @@ type alias Model =
     }
 
 
-init : UserPreferences.Model -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init preferences url key =
+init : Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init jsonPreferences url key =
     let
-        ( shared, socketCommand ) =
+        ( shared, sharedCommand ) =
             Shared.init
                 { key = key
                 , url = url
-                , preferences = preferences
+                , jsonPreferences = jsonPreferences
                 , mob = getMob url
                 }
 
@@ -83,11 +83,7 @@ init preferences url key =
                     True
       , shared = shared
       }
-    , Cmd.batch
-        [ Js.Commands.send <| Js.Commands.ChangeVolume preferences.volume
-        , pageCommand
-        , socketCommand |> Cmd.map SharedMsg
-        ]
+    , Cmd.batch [ pageCommand, sharedCommand |> Cmd.map SharedMsg ]
     )
 
 
@@ -101,7 +97,7 @@ loadPage shared =
                     (Cmd.map GotHomeMsg)
 
         Routing.Mob mobName ->
-            Pages.Mob.init mobName shared.preferences
+            Pages.Mob.init mobName
                 |> Tuple.mapBoth
                     Mob
                     (Cmd.map GotMobMsg)

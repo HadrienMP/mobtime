@@ -4,7 +4,7 @@
   "learn more": "elm-review suppress --help",
   "suppressions": [
     { "count": 10, "filePath": "src/elm/UI/Buttons.elm" },
-    { "count": 8, "filePath": "src/elm/Js/Commands.elm" },
+    { "count": 6, "filePath": "src/elm/Js/Commands.elm" },
     { "count": 2, "filePath": "src/elm/Model/Clock.elm" },
     { "count": 2, "filePath": "src/elm/Shared.elm" },
     { "count": 2, "filePath": "src/elm/UI/Column.elm" },

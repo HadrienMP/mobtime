@@ -1,16 +1,16 @@
 module Pages.Mob.Tabs.Sound exposing (..)
 
-import Html.Styled exposing (Html, button, div, img, input, label, p, text)
-import Html.Styled.Attributes as Attr exposing (class, classList, for, id, src, type_, value)
-import Html.Styled.Events exposing (onClick, onInput)
-import Js.Commands
+import Css
+import Effect exposing (Effect)
+import Html.Styled as Html exposing (Html, button, div, img, label, p, text)
+import Html.Styled.Attributes as Attr exposing (class, classList, id, src)
+import Html.Styled.Events exposing (onClick)
 import Json.Encode
 import Model.Events
 import Model.MobName exposing (MobName)
+import Shared exposing (Shared)
 import Sounds as SoundLibrary
-import UI.Icons.Ion exposing (musicNote)
-import UI.Palettes
-import UI.Rem
+import Volume
 
 
 type alias CommandPort =
@@ -21,80 +21,28 @@ type alias StorePort =
     Json.Encode.Value -> Cmd Msg
 
 
-type alias Model =
-    { volume : Int }
-
-
-init : Int -> Model
-init volume =
-    { volume = volume }
-
-
 type Msg
-    = VolumeChanged String
-    | ShareEvent Model.Events.MobEvent
-    | TestTheSound
+    = ShareEvent Model.Events.MobEvent
+    | VolumeMsg Volume.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Effect Shared.Msg Msg
+update msg =
     case msg of
-        VolumeChanged rawVolume ->
-            let
-                volume =
-                    String.toInt rawVolume |> Maybe.withDefault model.volume
-            in
-            ( { model | volume = volume }
-            , Js.Commands.send <| Js.Commands.ChangeVolume volume
-            )
+        VolumeMsg subMsg ->
+            Effect.fromShared <| Shared.VolumeMsg subMsg
 
         ShareEvent event ->
-            ( model
-            , event
-                |> Model.Events.mobEventToJson
-                |> Model.Events.sendEvent
-            )
-
-        TestTheSound ->
-            ( model
-            , Js.Commands.send <| Js.Commands.TestTheSound
-            )
+            Effect.share event
 
 
-view : Model -> MobName -> SoundLibrary.Profile -> Html Msg
-view model mob activeProfile =
+view : Shared -> MobName -> SoundLibrary.Profile -> Html Msg
+view shared mob activeProfile =
     div [ id "sound", class "tab" ]
-        [ div
-            [ id "volume-field", class "form-field" ]
-            [ label [ for "volume" ] [ text "Volume" ]
-            , UI.Icons.Ion.volumeLow
-                { size = UI.Rem.Rem 1
-                , color = UI.Palettes.monochrome.on.background
-                }
-            , input
-                [ id "volume"
-                , type_ "range"
-                , onInput VolumeChanged
-                , Attr.max "50"
-                , value <| String.fromInt model.volume
-                ]
-                []
-            , UI.Icons.Ion.volumeHigh
-                { size = UI.Rem.Rem 1
-                , color = UI.Palettes.monochrome.on.background
-                }
-            ]
-        , button
-            [ id "test-audio"
-            , class "labelled-icon-button"
-            , onClick TestTheSound
-            ]
-            [ musicNote
-                { size = UI.Rem.Rem 1
-                , color = UI.Palettes.monochrome.on.background
-                }
-            , text "Test the audio !"
-            ]
+        [ Volume.view
+            shared.preferences.volume
+            { labelWidth = Css.width <| Css.pct 30 }
+            |> Html.map VolumeMsg
         , div
             [ id "sounds-field", class "form-field" ]
             [ label [] [ text "Playlist" ]

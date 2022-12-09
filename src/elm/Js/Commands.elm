@@ -13,9 +13,7 @@ type Command
     | StopAlarm
     | ChangeTitle String
     | CopyInPasteBin String
-    | ChangeVolume Int
     | GetSocketId
-    | TestTheSound
 
 
 type alias OutCommand =
@@ -40,14 +38,8 @@ send command =
             StopAlarm ->
                 OutCommand "StopAlarm" Json.Encode.null
 
-            ChangeVolume volume ->
-                OutCommand "ChangeVolume" <| Json.Encode.string <| String.fromInt volume
-
             GetSocketId ->
                 OutCommand "GetSocketId" Json.Encode.null
-
-            TestTheSound ->
-                OutCommand "TestTheSound" Json.Encode.null
 
             ChangeTitle title ->
                 OutCommand "ChangeTitle" <| Json.Encode.string title

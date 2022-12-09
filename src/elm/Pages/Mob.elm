@@ -41,7 +41,6 @@ import UI.Layout
 import UI.Palettes
 import UI.Rem
 import UI.Text
-import UserPreferences
 import View exposing (View)
 
 
@@ -69,7 +68,6 @@ type alias Model =
     , state : Model.State.State
     , mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
     , clockSettings : Pages.Mob.Tabs.Clocks.Model
-    , soundSettings : Pages.Mob.Tabs.Sound.Model
     , clockSync : Peers.Sync.Adapter.Model
     , alarm : AlarmState
     , now : Time.Posix
@@ -78,8 +76,8 @@ type alias Model =
     }
 
 
-init : MobName -> UserPreferences.Model -> ( Model, Cmd Msg )
-init name preferences =
+init : MobName -> ( Model, Cmd Msg )
+init name =
     let
         ( clockSync, clockSyncCommand ) =
             Peers.Sync.Adapter.init name
@@ -88,7 +86,6 @@ init name preferences =
       , state = Model.State.init
       , mobbersSettings = Pages.Mob.Tabs.Mobbers.init
       , clockSettings = Pages.Mob.Tabs.Clocks.init
-      , soundSettings = Pages.Mob.Tabs.Sound.init preferences.volume
       , clockSync = clockSync
       , alarm = Standby
       , now = Time.millisToPosix 0
@@ -263,12 +260,8 @@ update _ msg model =
             )
 
         GotSoundSettingsMsg subMsg ->
-            let
-                ( soundSettings, command ) =
-                    Pages.Mob.Tabs.Sound.update subMsg model.soundSettings
-            in
-            ( { model | soundSettings = soundSettings }
-            , Effect.fromCmd <| Cmd.map GotSoundSettingsMsg command
+            ( model
+            , Effect.map GotSoundSettingsMsg <| Pages.Mob.Tabs.Sound.update subMsg
             )
 
         GotClockSyncMsg sub ->
@@ -457,7 +450,7 @@ body shared model action =
                     |> Html.map GotMobbersSettingsMsg
 
             Sound ->
-                Pages.Mob.Tabs.Sound.view model.soundSettings model.name model.state.soundProfile
+                Pages.Mob.Tabs.Sound.view shared model.name model.state.soundProfile
                     |> Html.map GotSoundSettingsMsg
 
             Share ->

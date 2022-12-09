@@ -3,9 +3,9 @@ module Shared exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Effect exposing (Effect)
-import Js.Commands
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
+import Json.Decode
 import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.MobName exposing (MobName)
@@ -13,6 +13,7 @@ import Routing
 import Socket
 import Url
 import UserPreferences
+import Volume
 
 
 
@@ -39,14 +40,17 @@ withUrl url shared =
 init :
     { key : Nav.Key
     , url : Url.Url
-    , preferences : UserPreferences.Model
+    , jsonPreferences : Json.Decode.Value
     , mob : Maybe MobName
     }
     -> ( Shared, Cmd Msg )
-init { key, url, preferences, mob } =
+init { key, url, jsonPreferences, mob } =
     let
         ( socket, socketCmd ) =
             Socket.init |> Tuple.mapSecond (Cmd.map SocketMsg)
+
+        ( preferences, preferencesCommand ) =
+            UserPreferences.init jsonPreferences
     in
     ( { socket = socket
       , toasts = Lib.Toaster.init
@@ -59,8 +63,7 @@ init { key, url, preferences, mob } =
       }
     , Cmd.batch
         [ socketCmd
-        , Js.Commands.ChangeVolume preferences.volume
-            |> Js.Commands.send
+        , preferencesCommand
         ]
     )
 
@@ -75,7 +78,7 @@ type Msg
     | LinkClicked Browser.UrlRequest
     | KonamiMsg Lib.Konami.Msg
     | Batch (List Msg)
-    | VolumeChanged Int
+    | VolumeMsg Volume.Msg
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -127,8 +130,9 @@ update_ msg shared =
             , cmd |> Cmd.map KonamiMsg
             )
 
-        VolumeChanged volume ->
-            ( { shared | preferences = { volume = volume } }, Cmd.none )
+        VolumeMsg subMsg ->
+            Volume.update subMsg shared.preferences.volume
+                |> Tuple.mapFirst (\volume -> { shared | preferences = { volume = volume } })
 
         _ ->
             ( shared, Cmd.none )

@@ -54,16 +54,7 @@ update shared model msg =
             )
 
         VolumeMsg subMsg ->
-            let
-                ( volume, effect ) =
-                    Volume.update subMsg (Volume.Volume shared.preferences.volume)
-            in
-            ( model
-            , Effect.batch
-                [ Effect.fromShared <| Shared.VolumeChanged <| Volume.open volume
-                , Effect.map VolumeMsg effect
-                ]
-            )
+            ( model, Effect.fromShared <| Shared.VolumeMsg subMsg )
 
         JoinMob ->
             case Slug.generate model.mobName of
@@ -189,4 +180,7 @@ labelWitdh =
 
 volumeField : Shared -> Html Msg
 volumeField shared =
-    Volume.view (Volume.Volume shared.preferences.volume) { labelWidth = labelWitdh } |> Html.map VolumeMsg
+    Volume.view
+        shared.preferences.volume
+        { labelWidth = labelWitdh }
+        |> Html.map VolumeMsg

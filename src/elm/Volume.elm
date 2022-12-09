@@ -1,13 +1,11 @@
 port module Volume exposing (..)
 
 import Css
-import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Json.Decode as Decode
 import Json.Encode as Json
-import Shared
 import UI.Buttons
 import UI.Column
 import UI.Icons.Ion
@@ -18,6 +16,11 @@ import UI.Row
 
 
 -- Ports
+
+
+change : Volume -> Cmd msg
+change =
+    open >> changeVolume
 
 
 port changeVolume : Int -> Cmd msg
@@ -67,14 +70,14 @@ type Msg
     | Test
 
 
-update : Msg -> Volume -> ( Volume, Effect Shared.Msg Msg )
+update : Msg -> Volume -> ( Volume, Cmd msg )
 update msg volume =
     case msg of
         Change it ->
-            ( it, Effect.fromCmd <| changeVolume <| open it )
+            ( it, changeVolume <| open it )
 
         Test ->
-            ( volume, Effect.fromCmd <| testVolume () )
+            ( volume, testVolume () )
 
 
 
