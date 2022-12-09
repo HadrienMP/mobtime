@@ -52,6 +52,8 @@ button attributes { content, action, size, variant } =
             ([ Css.borderRadius <| Css.rem 0.2
              , Css.display Css.block
              , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surface
+             , Css.cursor Css.pointer
+             , Css.border Css.zero
              ]
                 ++ sizeStyles size
                 ++ variantStyles variant
@@ -61,7 +63,7 @@ button attributes { content, action, size, variant } =
         )
         (case content of
             Icon icon ->
-                [ icon { size = UI.Rem.Rem 1, color = UI.Palettes.monochrome.on.surface } ]
+                [ icon { size = iconSize size, color = UI.Palettes.monochrome.on.surface } ]
 
             Text text ->
                 [ Html.text text ]
@@ -74,11 +76,25 @@ button attributes { content, action, size, variant } =
                         ]
                     ]
                     [ UI.Row.Gap <| iconTextGap size ]
-                    [ icon { size = UI.Rem.Rem 1, color = UI.Palettes.monochrome.on.surface }
+                    [ icon { size = iconSize size, color = UI.Palettes.monochrome.on.surface }
                     , Html.text text
                     ]
                 ]
         )
+
+
+iconSize : Size -> UI.Rem.Rem
+iconSize size =
+    UI.Rem.Rem <|
+        case size of
+            S ->
+                1.4
+
+            M ->
+                1.8
+
+            L ->
+                2.6
 
 
 variantStyles : Variant -> List Css.Style
@@ -103,12 +119,12 @@ sizeStyles size =
 
         M ->
             [ Css.padding <| Css.rem 0.6
-            , Css.fontSize <| Css.rem 1
+            , Css.fontSize <| Css.rem 1.2
             ]
 
         L ->
             [ Css.padding <| Css.rem 1.2
-            , Css.fontSize <| Css.rem 1.2
+            , Css.fontSize <| Css.rem 1.6
             ]
 
 
