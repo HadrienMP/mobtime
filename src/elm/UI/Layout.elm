@@ -96,12 +96,21 @@ navBar shared =
 
 rightNavBar : Shared -> Html msg
 rightNavBar shared =
-    UI.Row.row []
+    UI.Row.row [ Attr.css [ Css.alignItems Css.center ] ]
         [ UI.Row.Gap <| UI.Rem.Rem 1 ]
         [ Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
         , case shared.mob of
             Just it ->
-                Html.h2 [] [ Html.text <| (++) "Mob: " <| Model.MobName.print it ]
+                Html.h2
+                    [ Attr.css
+                        [ Css.maxWidth <| Css.rem 9
+                        , Css.textOverflow Css.ellipsis
+                        ]
+                    ]
+                    [ Html.text <|
+                        (++) "Mob: " <|
+                            Model.MobName.print it
+                    ]
 
             Nothing ->
                 Html.span [] []
