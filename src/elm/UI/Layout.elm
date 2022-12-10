@@ -5,7 +5,7 @@ import Html.Styled as Html exposing (Html, a, div, h1, nav, text)
 import Html.Styled.Attributes as Attr exposing (css)
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
-import Socket
+import Socket.Socket
 import UI.Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
@@ -55,7 +55,7 @@ wrap shared child =
                     [ css [ Css.padding sidePadding ] ]
                     [ child ]
                 ]
-            , Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
+            , Socket.Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
             , footer
             ]
         ]
@@ -149,7 +149,7 @@ forHome shared child =
                 [ child ]
             ]
         , footer
-        , Socket.view [] shared.socket
+        , Socket.Socket.view [] shared.socket
         ]
 
 

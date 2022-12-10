@@ -1,9 +1,8 @@
-port module Socket exposing (..)
+port module Socket.Socket exposing (..)
 
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr exposing (css)
-import Lib.Delay
 import Lib.Duration
 import Model.MobName exposing (MobName)
 import UI.Animations
@@ -37,8 +36,6 @@ type SocketId
 type Model
     = On SocketId
     | Off
-    | SwitchOff
-    | SwitchOn SocketId
 
 
 init : ( Model, Cmd Msg )
@@ -52,9 +49,6 @@ socketId model =
         On id ->
             Just id
 
-        SwitchOn id ->
-            Just id
-
         _ ->
             Nothing
 
@@ -66,7 +60,6 @@ socketId model =
 type Msg
     = Connected String
     | Disconnected
-    | Finished
 
 
 animationDuration =
@@ -74,36 +67,20 @@ animationDuration =
 
 
 update : Maybe MobName -> Msg -> Model -> ( Model, Cmd Msg )
-update mob msg model =
+update mob msg _ =
     case msg of
         Connected id ->
-            ( SwitchOn <| SocketId id
-            , Cmd.batch
-                [ Lib.Delay.after animationDuration Finished
-                , case mob of
-                    Just value ->
-                        socketJoin <| Model.MobName.print value
+            ( On <| SocketId id
+            , case mob of
+                Just value ->
+                    socketJoin <| Model.MobName.print value
 
-                    Nothing ->
-                        Cmd.none
-                ]
+                Nothing ->
+                    Cmd.none
             )
 
         Disconnected ->
-            ( SwitchOff, Lib.Delay.after animationDuration Finished )
-
-        Finished ->
-            ( case model of
-                SwitchOn id ->
-                    On id
-
-                SwitchOff ->
-                    Off
-
-                _ ->
-                    model
-            , Cmd.none
-            )
+            ( Off, Cmd.none )
 
 
 
@@ -125,24 +102,6 @@ subscriptions _ =
 view : List (Html.Attribute msg) -> Model -> Html.Html msg
 view attributes status =
     case status of
-        SwitchOff ->
-            Html.div
-                (attributes
-                    ++ [ css (common ++ UI.Animations.fadeOut animationDuration)
-                       , Attr.title "Disconnected from server, reconnecting"
-                       ]
-                )
-                [ UI.Elements.dot UI.Palettes.monochrome.success ]
-
-        SwitchOn _ ->
-            Html.div
-                (attributes
-                    ++ [ css (common ++ UI.Animations.fadeOut animationDuration)
-                       , Attr.title "Connected"
-                       ]
-                )
-                [ UI.Elements.dot UI.Palettes.monochrome.error ]
-
         On _ ->
             Html.div
                 (attributes

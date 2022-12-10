@@ -7,6 +7,7 @@ import ElmBook.ElmCSS exposing (..)
 import ElmBook.StatefulOptions
 import ElmBook.ThemeOptions exposing (globals)
 import Pages.Profile.Doc
+import Socket.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
 import UI.Range.Doc
@@ -46,7 +47,7 @@ main =
                 ]
             ]
         |> withChapterGroups
-            [ ( "Atomic"
+            [ ( "Building blocks"
               , [ UI.Range.Doc.theChapter
                 , UI.Button.Doc.theChapter
                 , UI.Toggle.Doc.theChapter
@@ -54,6 +55,7 @@ main =
               )
             , ( "Compound"
               , [ Volume.Doc.theChapter
+                , Socket.Doc.theChapter
                 ]
               )
             , ( "Pages", [ Pages.Profile.Doc.profileChapter ] )

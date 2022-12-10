@@ -24,7 +24,7 @@ import Peers.Sync.Core exposing (PeerId)
 import Random
 import Routing
 import Shared exposing (Shared)
-import Socket
+import Socket.Socket
 import Sounds
 import Svg.Styled exposing (Svg)
 import Task
@@ -98,7 +98,7 @@ init shared name =
       , peerId = Nothing
       }
     , Effect.batch
-        [ Effect.fromCmd <| Socket.joinRoom <| Model.MobName.print name
+        [ Effect.fromCmd <| Socket.Socket.joinRoom <| Model.MobName.print name
         , Time.now |> Task.perform TimePassed |> Effect.fromCmd
         , Effect.fromCmd <| Cmd.map GotClockSyncMsg clockSyncCommand
         , redirection

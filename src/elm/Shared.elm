@@ -10,7 +10,7 @@ import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.MobName exposing (MobName)
 import Routing
-import Socket
+import Socket.Socket as Socket
 import Url
 import UserPreferences
 
