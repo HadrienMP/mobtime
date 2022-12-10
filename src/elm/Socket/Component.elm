@@ -11,8 +11,8 @@ type alias Props =
     { socketConnected : Bool, color : RGBA255 }
 
 
-display : Props -> Html msg
-display props =
+display : List (Html.Attribute msg) -> Props -> Html msg
+display attributes props =
     let
         ( icon, title ) =
             if props.socketConnected then
@@ -21,9 +21,9 @@ display props =
             else
                 ( UI.Icons.Plugs.off, "Disconnected, attempting to reconnect" )
     in
-    Html.div [ Attr.title title ]
+    Html.div (Attr.title title :: attributes)
         [ icon
-            { height = Rem 1.5
+            { height = Rem 1.2
             , color = props.color
             }
         ]

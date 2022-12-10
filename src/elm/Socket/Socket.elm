@@ -2,12 +2,10 @@ port module Socket.Socket exposing (..)
 
 import Css
 import Html.Styled as Html
-import Html.Styled.Attributes as Attr exposing (css)
 import Lib.Duration
 import Model.MobName exposing (MobName)
-import UI.Animations
-import UI.Elements
-import UI.Palettes
+import Socket.Component
+import UI.Color exposing (RGBA255)
 import UI.Space
 
 
@@ -99,26 +97,12 @@ subscriptions _ =
 -- View
 
 
-view : List (Html.Attribute msg) -> Model -> Html.Html msg
-view attributes status =
-    case status of
-        On _ ->
-            Html.div
-                (attributes
-                    ++ [ css (common ++ UI.Animations.fadeIn animationDuration)
-                       , Attr.title "Connected"
-                       ]
-                )
-                [ UI.Elements.dot UI.Palettes.monochrome.success ]
-
-        Off ->
-            Html.div
-                (attributes
-                    ++ [ css (common ++ UI.Animations.blink)
-                       , Attr.title "Disconnected from server, reconnecting"
-                       ]
-                )
-                [ UI.Elements.dot UI.Palettes.monochrome.error ]
+view : List (Html.Attribute msg) -> RGBA255 -> Model -> Html.Html msg
+view attributes color status =
+    Socket.Component.display attributes
+        { socketConnected = status /= Off
+        , color = color
+        }
 
 
 common : List Css.Style

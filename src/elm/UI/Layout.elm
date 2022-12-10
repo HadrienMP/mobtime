@@ -3,7 +3,7 @@ module UI.Layout exposing (..)
 import Css
 import Html.Styled as Html exposing (Html, a, div, h1, nav, text)
 import Html.Styled.Attributes as Attr exposing (css)
-import Model.MobName exposing (MobName)
+import Model.MobName
 import Shared exposing (Shared)
 import Socket.Socket
 import UI.Color
@@ -14,7 +14,7 @@ import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Palettes
 import UI.Rem
-import UI.Space
+import UI.Row
 
 
 limitWidth : List Css.Style
@@ -34,7 +34,7 @@ wrap shared child =
             , Css.height <| Css.pct 100
             ]
         ]
-        [ navBar shared.mob
+        [ navBar shared
         , div
             [ css
                 [ Css.flexGrow <| Css.num 1
@@ -55,14 +55,13 @@ wrap shared child =
                     [ css [ Css.padding sidePadding ] ]
                     [ child ]
                 ]
-            , Socket.Socket.view [ Attr.css [ Css.important <| Css.top <| UI.Space.xxl ] ] shared.socket
             , footer
             ]
         ]
 
 
-navBar : Maybe MobName -> Html msg
-navBar mob =
+navBar : Shared -> Html msg
+navBar shared =
     nav
         [ css
             [ Css.position Css.sticky
@@ -89,36 +88,50 @@ navBar mob =
                        ]
                 )
             ]
-            [ a
-                [ css
-                    [ Css.displayFlex
-                    , Css.textDecoration Css.none
-                    , Css.color <|
-                        UI.Color.toElmCss <|
-                            UI.Palettes.monochrome.on.surface
-                    ]
-                , Attr.href "/"
-                ]
-                [ UI.Icons.Tape.display
-                    { height = UI.Rem.Rem 2
-                    , color = UI.Palettes.monochrome.on.surface
-                    }
-                , h1
-                    [ css
-                        [ Css.alignSelf <| Css.center
-                        , Css.paddingLeft <| Css.rem 0.5
-                        ]
-                    ]
-                    [ div [ css [ Css.fontWeight Css.bolder ] ] [ text "Mob" ]
-                    , div [ css [ Css.fontWeight Css.lighter ] ] [ text "Time" ]
-                    ]
-                ]
-            , case mob of
-                Just it ->
-                    Html.h2 [] [ Html.text <| (++) "Mob: " <| Model.MobName.print it ]
+            [ title
+            , rightNavBar shared
+            ]
+        ]
 
-                Nothing ->
-                    Html.span [] []
+
+rightNavBar : Shared -> Html msg
+rightNavBar shared =
+    UI.Row.row []
+        []
+        [ Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
+        , case shared.mob of
+            Just it ->
+                Html.h2 [] [ Html.text <| (++) "Mob: " <| Model.MobName.print it ]
+
+            Nothing ->
+                Html.span [] []
+        ]
+
+
+title : Html msg
+title =
+    a
+        [ css
+            [ Css.displayFlex
+            , Css.textDecoration Css.none
+            , Css.color <|
+                UI.Color.toElmCss <|
+                    UI.Palettes.monochrome.on.surface
+            ]
+        , Attr.href "/"
+        ]
+        [ UI.Icons.Tape.display
+            { height = UI.Rem.Rem 2
+            , color = UI.Palettes.monochrome.on.surface
+            }
+        , h1
+            [ css
+                [ Css.alignSelf <| Css.center
+                , Css.paddingLeft <| Css.rem 0.5
+                ]
+            ]
+            [ div [ css [ Css.fontWeight Css.bolder ] ] [ text "Mob" ]
+            , div [ css [ Css.fontWeight Css.lighter ] ] [ text "Time" ]
             ]
         ]
 
@@ -149,7 +162,15 @@ forHome shared child =
                 [ child ]
             ]
         , footer
-        , Socket.Socket.view [] shared.socket
+        , Socket.Socket.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.top <| Css.rem 1
+                , Css.right <| Css.rem 1
+                ]
+            ]
+            UI.Palettes.monochrome.on.background
+            shared.socket
         ]
 
 

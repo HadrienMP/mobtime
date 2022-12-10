@@ -11,13 +11,13 @@ theChapter =
     chapter "Socket"
         |> renderComponentList
             [ ( "Connected"
-              , Socket.Component.display
+              , Socket.Component.display []
                     { socketConnected = True
                     , color = UI.Palettes.monochrome.on.background
                     }
               )
             , ( "Disconnected"
-              , Socket.Component.display
+              , Socket.Component.display []
                     { socketConnected = False
                     , color = UI.Palettes.monochrome.on.background
                     }
