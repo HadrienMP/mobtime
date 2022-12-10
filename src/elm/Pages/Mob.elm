@@ -73,7 +73,6 @@ type alias Model =
     , now : Time.Posix
     , tab : Tab
     , peerId : Maybe PeerId
-    , displaySoundModal : Bool
     }
 
 
@@ -98,7 +97,6 @@ init shared name =
       , now = Time.millisToPosix 0
       , tab = Main
       , peerId = Nothing
-      , displaySoundModal = not shared.soundOn
       }
     , Effect.batch
         [ Effect.fromCmd <| Socket.joinRoom <| Model.MobName.print name
@@ -130,7 +128,6 @@ type Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
     | GotSocketId PeerId
-    | HideSoundModal
 
 
 timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
@@ -292,9 +289,6 @@ update shared msg model =
             , Effect.fromCmd command
             )
 
-        HideSoundModal ->
-            ( { model | displaySoundModal = False }, Effect.none )
-
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
 selectSound now profile =
@@ -368,11 +362,7 @@ view shared model =
                     Nothing
 
             _ ->
-                if model.displaySoundModal then
-                    Just soundModal
-
-                else
-                    Nothing
+                Nothing
     , body = [ UI.Layout.wrap shared <| body shared model action ]
     }
 
@@ -689,22 +679,3 @@ timeLeftTitle action =
 
         _ ->
             String.join " " action ++ " | " ++ "Mob Time"
-
-
-soundModal : Html Msg
-soundModal =
-    UI.Column.column
-        [ css UI.Css.center ]
-        [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-        [ UI.Text.h2 "Welcome !"
-        , Button.button [ css [ Css.width <| Css.pct 100 ] ]
-            { content =
-                Button.Both
-                    { icon = UI.Icons.Ion.paperAirplane
-                    , text = "Join the mob"
-                    }
-            , variant = Button.Primary
-            , size = Button.L
-            , action = Button.OnPress <| Just HideSoundModal
-            }
-        ]
