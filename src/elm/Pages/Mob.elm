@@ -38,7 +38,6 @@ import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
-import UI.Layout
 import UI.Palettes
 import UI.Rem
 import UI.Text
@@ -363,7 +362,7 @@ view shared model =
 
             _ ->
                 Nothing
-    , body = UI.Layout.wrap shared <| body shared model action
+    , body = body shared model action
     }
 
 

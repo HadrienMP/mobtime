@@ -20,6 +20,7 @@ import Pages.Profile.Page
 import Routing
 import Shared
 import UI.GlobalStyle
+import UI.Layout
 import UI.Modal
 import Url
 import View
@@ -270,13 +271,21 @@ view model =
                 Profile ->
                     Pages.Profile.Page.view model.shared
                         |> View.map ProfileMsg
+
+        layout =
+            case model.page of
+                Home _ ->
+                    UI.Layout.forHome
+
+                _ ->
+                    UI.Layout.wrap
     in
     { title = doc.title
     , body =
         [ Html.toUnstyled <|
             Html.div [ css [ Css.height <| Css.pct 100 ] ]
                 (UI.GlobalStyle.globalStyle
-                    :: doc.body
+                    :: layout model.shared doc.body
                     :: (doc.modal
                             |> Maybe.map UI.Modal.withContent
                             |> Maybe.map List.singleton

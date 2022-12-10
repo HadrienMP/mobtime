@@ -51,7 +51,7 @@ wrap shared child =
                         ++ limitWidth
                     )
                 ]
-                [ div
+                [ Html.main_
                     [ css [ Css.padding sidePadding ] ]
                     [ child ]
                 ]

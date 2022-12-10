@@ -17,7 +17,6 @@ import UI.Color
 import UI.Column
 import UI.Icons.Ion
 import UI.Icons.Tape
-import UI.Layout
 import UI.Palettes
 import UI.Rem
 import UI.Row
@@ -85,58 +84,57 @@ view shared model =
     { title = "Login | Mob Time"
     , modal = Nothing
     , body =
-        UI.Layout.forHome shared <|
-            UI.Column.column []
-                [ UI.Column.Gap <| UI.Rem.Rem 4 ]
-                [ Html.header
-                    [ Attr.css
-                        [ Css.displayFlex
-                        , Css.justifyContent Css.spaceAround
-                        ]
-                    ]
-                    [ UI.Icons.Tape.display
-                        { height = UI.Rem.Rem 8
-                        , color = UI.Palettes.monochrome.on.background
-                        }
-                    , Html.h1
-                        [ Attr.css
-                            [ Css.fontSize <| Css.rem 3.8
-                            , Css.paddingLeft <| Css.rem 1.3
-                            ]
-                        ]
-                        [ Html.div [ Attr.css [ Css.fontWeight <| Css.bolder ] ] [ Html.text "Mob" ]
-                        , Html.div [ Attr.css [ Css.fontWeight <| Css.lighter ] ] [ Html.text "Time" ]
-                        ]
-                    ]
-                , Html.form [ Evts.onSubmit JoinMob ]
-                    [ UI.Column.column []
-                        [ UI.Column.Gap <| UI.Rem.Rem 1 ]
-                        [ Html.h2
-                            [ Attr.css
-                                [ Css.borderBottom3 (Css.rem 0.1) Css.solid <|
-                                    UI.Color.toElmCss UI.Palettes.monochrome.surface
-                                , Css.paddingBottom <| Css.rem 0.4
-                                , Css.textAlign Css.left
-                                , Css.fontSize <| Css.rem 1.2
-                                ]
-                            ]
-                            [ Html.text "Create a mob" ]
-                        , mobField model
-                        , volumeField shared
-                        , Button.button
-                            [ Attr.css
-                                [ Css.width <| Css.pct 100
-                                , Css.marginTop <| Css.rem 1
-                                ]
-                            ]
-                            { content = Button.Both { icon = UI.Icons.Ion.paperAirplane, text = "Create" }
-                            , variant = Button.Primary
-                            , size = Button.M
-                            , action = Button.Submit
-                            }
-                        ]
+        UI.Column.column []
+            [ UI.Column.Gap <| UI.Rem.Rem 4 ]
+            [ Html.header
+                [ Attr.css
+                    [ Css.displayFlex
+                    , Css.justifyContent Css.spaceAround
                     ]
                 ]
+                [ UI.Icons.Tape.display
+                    { height = UI.Rem.Rem 8
+                    , color = UI.Palettes.monochrome.on.background
+                    }
+                , Html.h1
+                    [ Attr.css
+                        [ Css.fontSize <| Css.rem 3.8
+                        , Css.paddingLeft <| Css.rem 1.3
+                        ]
+                    ]
+                    [ Html.div [ Attr.css [ Css.fontWeight <| Css.bolder ] ] [ Html.text "Mob" ]
+                    , Html.div [ Attr.css [ Css.fontWeight <| Css.lighter ] ] [ Html.text "Time" ]
+                    ]
+                ]
+            , Html.form [ Evts.onSubmit JoinMob ]
+                [ UI.Column.column []
+                    [ UI.Column.Gap <| UI.Rem.Rem 1 ]
+                    [ Html.h2
+                        [ Attr.css
+                            [ Css.borderBottom3 (Css.rem 0.1) Css.solid <|
+                                UI.Color.toElmCss UI.Palettes.monochrome.surface
+                            , Css.paddingBottom <| Css.rem 0.4
+                            , Css.textAlign Css.left
+                            , Css.fontSize <| Css.rem 1.2
+                            ]
+                        ]
+                        [ Html.text "Create a mob" ]
+                    , mobField model
+                    , volumeField shared
+                    , Button.button
+                        [ Attr.css
+                            [ Css.width <| Css.pct 100
+                            , Css.marginTop <| Css.rem 1
+                            ]
+                        ]
+                        { content = Button.Both { icon = UI.Icons.Ion.paperAirplane, text = "Create" }
+                        , variant = Button.Primary
+                        , size = Button.M
+                        , action = Button.Submit
+                        }
+                    ]
+                ]
+            ]
     }
 
 
