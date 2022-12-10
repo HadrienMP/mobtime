@@ -84,6 +84,7 @@ type Msg
     | Batch (List Msg)
     | PreferencesMsg UserPreferences.Msg
     | SoundOn
+    | JoinMob MobName
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -146,6 +147,9 @@ update_ msg shared =
 
         SoundOn ->
             ( { shared | soundOn = True }, Cmd.none )
+
+        JoinMob mob ->
+            ( { shared | mob = Just mob }, Cmd.none )
 
 
 toast : Toast -> Effect Msg msg

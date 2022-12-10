@@ -97,7 +97,7 @@ navBar shared =
 rightNavBar : Shared -> Html msg
 rightNavBar shared =
     UI.Row.row []
-        []
+        [ UI.Row.Gap <| UI.Rem.Rem 1 ]
         [ Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
         , case shared.mob of
             Just it ->

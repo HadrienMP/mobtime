@@ -59,11 +59,17 @@ update shared model msg =
         JoinMob ->
             case Slug.generate model.mobName of
                 Just slug ->
+                    let
+                        mob =
+                            Slug.toString slug |> Model.MobName.MobName
+                    in
                     ( model
-                    , Slug.toString slug
-                        |> Model.MobName.MobName
-                        |> Routing.Mob
-                        |> Shared.pushUrl shared
+                    , Effect.batch
+                        [ mob
+                            |> Routing.Mob
+                            |> Shared.pushUrl shared
+                        , Effect.fromShared <| Shared.JoinMob mob
+                        ]
                     )
 
                 Nothing ->
@@ -81,7 +87,7 @@ update shared model msg =
 
 view : Shared -> Model -> View Msg
 view shared model =
-    { title = "Login | Mob Time"
+    { title = "Mob Time"
     , modal = Nothing
     , body =
         UI.Column.column []
