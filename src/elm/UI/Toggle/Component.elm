@@ -9,7 +9,7 @@ import UI.Palettes
 
 
 type alias Props msg =
-    { onToggle : Bool -> msg, value : Bool }
+    { onToggle : msg, value : Bool }
 
 
 display : Props msg -> Html msg
@@ -30,7 +30,7 @@ display props =
             , Css.cursor Css.pointer
             , Css.padding2 Css.zero <| Css.rem 0.1
             ]
-        , Evts.onCheck props.onToggle
+        , Evts.onClick props.onToggle
         ]
         [ Html.div
             [ Attr.css

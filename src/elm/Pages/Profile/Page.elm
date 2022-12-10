@@ -14,7 +14,7 @@ import Volume.Field
 
 
 type Msg
-    = ToggleSeconds Bool
+    = ToggleSeconds
     | VolumeMsg Volume.Field.Msg
     | Join
 
@@ -22,8 +22,8 @@ type Msg
 update : Msg -> Shared -> Effect Shared.Msg Msg
 update msg shared =
     case msg of
-        ToggleSeconds value ->
-            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds value
+        ToggleSeconds ->
+            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds
 
         VolumeMsg subMsg ->
             Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.VolumeMsg subMsg

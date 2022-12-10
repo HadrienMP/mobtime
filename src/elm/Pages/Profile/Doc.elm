@@ -1,6 +1,6 @@
 module Pages.Profile.Doc exposing (..)
 
-import ElmBook.Actions exposing (logAction, logActionWithBool)
+import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.MobName exposing (MobName(..))
@@ -21,7 +21,7 @@ component mob =
     Pages.Profile.Component.display
         { mob = mob
         , secondsToggle =
-            { onToggle = logActionWithBool "Display seconds"
+            { onToggle = logAction "Display seconds"
             , value = True
             }
         , onJoin = logAction "Join mob"

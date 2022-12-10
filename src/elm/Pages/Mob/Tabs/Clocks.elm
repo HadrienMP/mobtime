@@ -20,15 +20,15 @@ import UserPreferences
 
 
 type Msg
-    = DisplaySecondsChanged Bool
+    = ToggleSeconds
     | ShareEvent Model.Events.Event
 
 
 update : Msg -> MobName -> Effect Shared.Msg Msg
 update msg mob =
     case msg of
-        DisplaySecondsChanged bool ->
-            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds bool
+        ToggleSeconds ->
+            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds
 
         ShareEvent event ->
             event
@@ -53,12 +53,12 @@ view shared now state =
                 [ class "toggles" ]
                 [ button
                     [ classList [ ( "active", not shared.preferences.displaySeconds ) ]
-                    , onClick <| DisplaySecondsChanged False
+                    , onClick <| ToggleSeconds
                     ]
                     [ text "Hide" ]
                 , button
                     [ classList [ ( "active", shared.preferences.displaySeconds ) ]
-                    , onClick <| DisplaySecondsChanged True
+                    , onClick <| ToggleSeconds
                     ]
                     [ text "Show" ]
                 ]

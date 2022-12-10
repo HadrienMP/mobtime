@@ -49,19 +49,6 @@ display props =
         ]
 
 
-fields : Props msg -> Html msg
-fields props =
-    UI.Column.column []
-        [ UI.Column.Gap <| UI.Rem.Rem 1.4 ]
-        [ Volume.Component.display props.volume
-        , UI.Row.row [ Attr.css [ Css.justifyContent Css.spaceBetween ] ]
-            []
-            [ Html.text "Display seconds in clocks"
-            , UI.Toggle.Component.display props.secondsToggle
-            ]
-        ]
-
-
 head : Props msg -> Html msg
 head props =
     UI.Column.column []
@@ -94,4 +81,17 @@ head props =
 
             Nothing ->
                 Html.div [] []
+        ]
+
+
+fields : Props msg -> Html msg
+fields props =
+    UI.Column.column []
+        [ UI.Column.Gap <| UI.Rem.Rem 1.4 ]
+        [ Volume.Component.display props.volume
+        , UI.Row.row [ Attr.css [ Css.justifyContent Css.spaceBetween ] ]
+            []
+            [ Html.text "Display seconds in clocks"
+            , UI.Toggle.Component.display props.secondsToggle
+            ]
         ]

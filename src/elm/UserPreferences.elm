@@ -68,7 +68,7 @@ decoder =
 
 type Msg
     = VolumeMsg Volume.Msg
-    | ToggleSeconds Bool
+    | ToggleSeconds
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -82,7 +82,7 @@ update msg model =
                             (\a -> { model | volume = a })
                             (Cmd.map VolumeMsg)
 
-                ToggleSeconds displaySeconds ->
-                    ( { model | displaySeconds = displaySeconds }, Cmd.none )
+                ToggleSeconds ->
+                    ( { model | displaySeconds = not model.displaySeconds }, Cmd.none )
     in
     ( updated, Cmd.batch [ command, updated |> encode |> savePreferences ] )

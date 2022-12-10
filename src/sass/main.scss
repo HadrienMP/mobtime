@@ -36,7 +36,6 @@ button {
   display: inline-flex;
   align-items: center;
   padding: $padding-space;
-  justify-content: center;
 
   &:hover {
     background: $light-button-color;
@@ -50,6 +49,12 @@ button {
       background: $dark-button-color;
     }
   }
+}
+
+#timer button,
+#mobbers button,
+#action {
+  justify-content: center;
 }
 
 .labelled-icon-button {
