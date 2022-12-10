@@ -31,7 +31,10 @@ update msg shared =
         Join ->
             case shared.mob of
                 Just mob ->
-                    Shared.pushUrl shared <| Routing.Mob mob
+                    Effect.batch
+                        [ Shared.pushUrl shared <| Routing.Mob mob
+                        , Effect.fromShared <| Shared.SoundOn
+                        ]
 
                 Nothing ->
                     Shared.pushUrl shared <| Routing.Login
