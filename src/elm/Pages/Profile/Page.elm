@@ -45,7 +45,7 @@ view shared =
     { title = "Profile"
     , modal = Nothing
     , body =
-        [ UI.Layout.wrap shared <|
+        UI.Layout.wrap shared <|
             Html.div [ Attr.css [ Css.paddingTop <| Css.rem 1 ] ]
                 [ Pages.Profile.Component.display
                     { mob = shared.mob
@@ -61,5 +61,4 @@ view shared =
                     , onJoin = Join
                     }
                 ]
-        ]
     }

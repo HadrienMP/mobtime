@@ -363,7 +363,7 @@ view shared model =
 
             _ ->
                 Nothing
-    , body = [ UI.Layout.wrap shared <| body shared model action ]
+    , body = UI.Layout.wrap shared <| body shared model action
     }
 
 

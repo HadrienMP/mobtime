@@ -275,16 +275,14 @@ view model =
     , body =
         [ Html.toUnstyled <|
             Html.div [ css [ Css.height <| Css.pct 100 ] ]
-                [ UI.GlobalStyle.globalStyle
-                , Html.div [ css [ Css.height <| Css.pct 100 ] ]
-                    (doc.body
-                        ++ (doc.modal
-                                |> Maybe.map UI.Modal.withContent
-                                |> Maybe.map List.singleton
-                                |> Maybe.withDefault []
-                           )
-                        ++ [ Toaster.view model.shared.toasts |> Html.map (SharedMsg << Shared.Toast) ]
-                    )
-                ]
+                (UI.GlobalStyle.globalStyle
+                    :: doc.body
+                    :: (doc.modal
+                            |> Maybe.map UI.Modal.withContent
+                            |> Maybe.map List.singleton
+                            |> Maybe.withDefault []
+                       )
+                    ++ [ Toaster.view model.shared.toasts |> Html.map (SharedMsg << Shared.Toast) ]
+                )
         ]
     }

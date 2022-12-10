@@ -85,7 +85,7 @@ view shared model =
     { title = "Login | Mob Time"
     , modal = Nothing
     , body =
-        [ UI.Layout.forHome shared <|
+        UI.Layout.forHome shared <|
             UI.Column.column []
                 [ UI.Column.Gap <| UI.Rem.Rem 4 ]
                 [ Html.header
@@ -137,7 +137,6 @@ view shared model =
                         ]
                     ]
                 ]
-        ]
     }
 
 
