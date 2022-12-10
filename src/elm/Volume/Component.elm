@@ -13,7 +13,14 @@ import UI.Row
 import Volume.Type exposing (..)
 
 
-display : { onChange : Volume -> msg, onTest : msg, volume : Volume } -> Html msg
+type alias Props msg =
+    { onChange : Volume -> msg
+    , onTest : msg
+    , volume : Volume
+    }
+
+
+display : Props msg -> Html msg
 display { onChange, onTest, volume } =
     UI.Row.row
         [ Attr.css [ Css.width <| Css.pct 100 ] ]

@@ -24,8 +24,8 @@ updateSharedState state x =
     { x | range = state }
 
 
-rangeChapter : Chapter (SharedState x)
-rangeChapter =
+theChapter : Chapter (SharedState x)
+theChapter =
     chapter "Range"
         |> withStatefulComponent component
         |> render content

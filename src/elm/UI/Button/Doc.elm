@@ -11,8 +11,8 @@ import UI.Rem
 import UI.Row
 
 
-buttonsChapter : Chapter x
-buttonsChapter =
+theChapter : Chapter x
+theChapter =
     let
         props =
             { content =

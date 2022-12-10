@@ -25,8 +25,8 @@ updateSharedState volume x =
     { x | volume = volume }
 
 
-volumeChapter : Chapter (SharedState x)
-volumeChapter =
+theChapter : Chapter (SharedState x)
+theChapter =
     chapter "Volume field"
         |> withStatefulComponent component
         |> render content
