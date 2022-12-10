@@ -16,8 +16,8 @@ display : Props msg -> Html msg
 display props =
     Html.button
         [ Attr.css
-            [ Css.height <| Css.rem 1
-            , Css.width <| Css.rem 2
+            [ Css.height <| Css.rem 1.3
+            , Css.width <| Css.rem 2.8
             , Css.backgroundColor <|
                 UI.Color.toElmCss <|
                     if props.value then
@@ -34,8 +34,8 @@ display props =
         ]
         [ Html.div
             [ Attr.css
-                [ Css.height <| Css.rem 0.8
-                , Css.width <| Css.rem 0.8
+                [ Css.height <| Css.rem 1.1
+                , Css.width <| Css.rem 1.1
                 , Css.borderRadius <| Css.pct 50
                 , Css.backgroundColor <|
                     UI.Color.toElmCss <|

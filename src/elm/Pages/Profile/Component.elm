@@ -79,7 +79,7 @@ fields props =
     UI.Column.column []
         [ UI.Column.Gap <| UI.Rem.Rem 1.4 ]
         [ Volume.Component.display props.volume
-        , UI.Row.row [ Attr.css [ Css.justifyContent Css.spaceBetween ] ]
+        , UI.Row.row [ Attr.css [ Css.justifyContent Css.spaceBetween, Css.alignItems Css.center ] ]
             []
             [ Html.text "Display seconds in clocks"
             , UI.Toggle.Component.display props.secondsToggle
