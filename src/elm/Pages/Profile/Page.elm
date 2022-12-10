@@ -1,20 +1,20 @@
 module Pages.Profile.Page exposing (..)
 
+import Components.Volume.Field as Volume
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import Pages.Profile.Component
+import Pages.Profile.View
 import Routing
 import Shared exposing (Shared)
 import UserPreferences
 import View exposing (View)
-import Volume.Field
 
 
 type Msg
     = ToggleSeconds
-    | VolumeMsg Volume.Field.Msg
+    | VolumeMsg Volume.Msg
     | Join
 
 
@@ -45,15 +45,15 @@ view shared =
     , modal = Nothing
     , body =
         Html.div [ Attr.css [ Css.paddingTop <| Css.rem 1 ] ]
-            [ Pages.Profile.Component.display
+            [ Pages.Profile.View.view
                 { mob = shared.mob
                 , secondsToggle =
                     { value = shared.preferences.displaySeconds
                     , onToggle = ToggleSeconds
                     }
                 , volume =
-                    { onChange = VolumeMsg << Volume.Field.Change
-                    , onTest = VolumeMsg Volume.Field.Test
+                    { onChange = VolumeMsg << Volume.Change
+                    , onTest = VolumeMsg Volume.Test
                     , volume = shared.preferences.volume
                     }
                 , onJoin = Join

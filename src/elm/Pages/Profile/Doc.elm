@@ -1,11 +1,11 @@
 module Pages.Profile.Doc exposing (..)
 
+import Components.Volume.Type exposing (Volume(..))
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.MobName exposing (MobName(..))
-import Pages.Profile.Component
-import Volume.Type exposing (Volume(..))
+import Pages.Profile.View
 
 
 profileChapter : Chapter x
@@ -18,7 +18,7 @@ profileChapter =
 
 
 component mob =
-    Pages.Profile.Component.display
+    Pages.Profile.View.view
         { mob = mob
         , secondsToggle =
             { onToggle = logAction "Display seconds"

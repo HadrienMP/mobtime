@@ -1,8 +1,9 @@
 port module UserPreferences exposing (..)
 
+import Components.Volume.Field as Volume
+import Components.Volume.Type as Volume
 import Json.Decode as Decode
 import Json.Encode as Json
-import Volume
 
 
 port savePreferences : Json.Value -> Cmd msg

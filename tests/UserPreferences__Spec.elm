@@ -1,9 +1,9 @@
 module UserPreferences__Spec exposing (..)
 
+import Components.Volume.Type exposing (Volume(..))
 import Expect
 import Test exposing (Test, describe, test)
 import UserPreferences
-import Volume.Type exposing (Volume(..))
 
 
 suite : Test

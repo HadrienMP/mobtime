@@ -1,10 +1,11 @@
-module Pages.Profile.Component exposing (..)
+module Pages.Profile.View exposing (..)
 
+import Components.Volume.View as Volume
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Model.MobName exposing (MobName)
-import UI.Button.Component as Button
+import UI.Button.View as Button
 import UI.Color
 import UI.Column
 import UI.Icons.Ion
@@ -12,21 +13,20 @@ import UI.Palettes
 import UI.Rem
 import UI.Row
 import UI.Text
-import UI.Text.Component
-import UI.Toggle.Component
-import Volume.Component
+import UI.Text.View
+import UI.Toggle.View
 
 
 type alias Props msg =
     { mob : Maybe MobName
-    , secondsToggle : UI.Toggle.Component.Props msg
-    , volume : Volume.Component.Props msg
+    , secondsToggle : UI.Toggle.View.Props msg
+    , volume : Volume.Props msg
     , onJoin : msg
     }
 
 
-display : Props msg -> Html msg
-display props =
+view : Props msg -> Html msg
+view props =
     UI.Column.column []
         [ UI.Column.Gap <| UI.Rem.Rem 3 ]
         [ head props
@@ -67,7 +67,7 @@ head props =
             ]
         , case props.mob of
             Just _ ->
-                UI.Text.Component.light "Setup your personal preferences before joining your teammates"
+                UI.Text.View.light "Setup your personal preferences before joining your teammates"
 
             Nothing ->
                 Html.div [] []
@@ -78,10 +78,10 @@ fields : Props msg -> Html msg
 fields props =
     UI.Column.column []
         [ UI.Column.Gap <| UI.Rem.Rem 1.4 ]
-        [ Volume.Component.display props.volume
+        [ Volume.display props.volume
         , UI.Row.row [ Attr.css [ Css.justifyContent Css.spaceBetween, Css.alignItems Css.center ] ]
             []
             [ Html.text "Display seconds in clocks"
-            , UI.Toggle.Component.display props.secondsToggle
+            , UI.Toggle.View.view props.secondsToggle
             ]
         ]

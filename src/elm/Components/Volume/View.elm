@@ -1,16 +1,16 @@
-module Volume.Component exposing (..)
+module Components.Volume.View exposing (..)
 
+import Components.Volume.Type exposing (..)
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
-import UI.Button.Component as Button
+import UI.Button.View as Button
 import UI.Column
 import UI.Icons.Ion
 import UI.Palettes
-import UI.Range.Component
+import UI.Range.View
 import UI.Rem
 import UI.Row
-import Volume.Type exposing (..)
 
 
 type alias Props msg =
@@ -36,7 +36,7 @@ display { onChange, onTest, volume } =
                     { size = UI.Rem.Rem 2
                     , color = UI.Palettes.monochrome.on.background
                     }
-                , UI.Range.Component.display
+                , UI.Range.View.view
                     { onChange = onChange << Volume
                     , min = 0
                     , max = 50

@@ -1,10 +1,10 @@
-port module Socket.Socket exposing (..)
+port module Components.Socket.Socket exposing (..)
 
+import Components.Socket.View
 import Css
 import Html.Styled as Html
 import Lib.Duration
 import Model.MobName exposing (MobName)
-import Socket.Component
 import UI.Color exposing (RGBA255)
 import UI.Space
 
@@ -99,7 +99,7 @@ subscriptions _ =
 
 view : List (Html.Attribute msg) -> RGBA255 -> Model -> Html.Html msg
 view attributes color status =
-    Socket.Component.display attributes
+    Components.Socket.View.view attributes
         { socketConnected = status /= Off
         , color = color
         }

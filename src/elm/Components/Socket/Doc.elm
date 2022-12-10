@@ -1,8 +1,8 @@
-module Socket.Doc exposing (..)
+module Components.Socket.Doc exposing (..)
 
+import Components.Socket.View
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
-import Socket.Component
 import UI.Palettes
 
 
@@ -11,13 +11,13 @@ theChapter =
     chapter "Socket"
         |> renderComponentList
             [ ( "Connected"
-              , Socket.Component.display []
+              , Components.Socket.View.view []
                     { socketConnected = True
                     , color = UI.Palettes.monochrome.on.background
                     }
               )
             , ( "Disconnected"
-              , Socket.Component.display []
+              , Components.Socket.View.view []
                     { socketConnected = False
                     , color = UI.Palettes.monochrome.on.background
                     }

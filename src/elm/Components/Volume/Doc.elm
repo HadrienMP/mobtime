@@ -1,26 +1,26 @@
-module Volume.Doc exposing (..)
+module Components.Volume.Doc exposing (..)
 
+import Components.Volume.Type as Type
+import Components.Volume.View as View
 import ElmBook.Actions exposing (logAction, updateStateWith)
 import ElmBook.Chapter exposing (chapter, render, withStatefulComponent)
 import ElmBook.ElmCSS exposing (Chapter)
-import Volume.Component
-import Volume.Type
 
 
 type alias State =
-    Volume.Type.Volume
+    Type.Volume
 
 
 type alias SharedState x =
-    { x | volume : Volume.Type.Volume }
+    { x | volume : Type.Volume }
 
 
-initState : Volume.Type.Volume
+initState : Type.Volume
 initState =
-    Volume.Type.Volume 25
+    Type.Volume 25
 
 
-updateSharedState : Volume.Type.Volume -> SharedState x -> SharedState x
+updateSharedState : Type.Volume -> SharedState x -> SharedState x
 updateSharedState volume x =
     { x | volume = volume }
 
@@ -33,9 +33,9 @@ theChapter =
 
 
 component state =
-    Volume.Component.display
+    View.display
         { onChange = updateStateWith updateSharedState
-        , onTest = logAction <| "Tested Sound, volume at " ++ (state.volume |> Volume.Type.open |> String.fromInt)
+        , onTest = logAction <| "Tested Sound, volume at " ++ (state.volume |> Type.open |> String.fromInt)
         , volume = state.volume
         }
 

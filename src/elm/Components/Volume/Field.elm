@@ -1,9 +1,9 @@
-port module Volume.Field exposing (..)
+port module Components.Volume.Field exposing (..)
 
+import Components.Volume.Type as Type exposing (Volume, open)
+import Components.Volume.View as View
 import Css
 import Html.Styled exposing (Html)
-import Volume.Component
-import Volume.Type exposing (Volume, open)
 
 
 
@@ -44,6 +44,6 @@ update msg volume =
 -- View
 
 
-view : Volume.Type.Volume -> { labelWidth : Css.Style } -> Html Msg
+view : Type.Volume -> { labelWidth : Css.Style } -> Html Msg
 view volume _ =
-    Volume.Component.display { onChange = Change, onTest = Test, volume = volume }
+    View.display { onChange = Change, onTest = Test, volume = volume }

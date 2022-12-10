@@ -2,6 +2,7 @@ module Pages.Home exposing (..)
 
 -- MODEL
 
+import Components.Volume.Field as Volume
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html)
@@ -12,7 +13,7 @@ import Model.MobName
 import Routing
 import Shared exposing (Shared)
 import Slug
-import UI.Button.Component as Button
+import UI.Button.View as Button
 import UI.Color
 import UI.Column
 import UI.Icons.Ion
@@ -22,7 +23,6 @@ import UI.Rem
 import UI.Row
 import UserPreferences
 import View exposing (View)
-import Volume
 
 
 type alias Model =

@@ -3,7 +3,7 @@ module UI.Range.Doc exposing (..)
 import ElmBook.Actions exposing (updateStateWith)
 import ElmBook.Chapter exposing (chapter, render, withStatefulComponent)
 import ElmBook.ElmCSS exposing (Chapter)
-import UI.Range.Component
+import UI.Range.View
 
 
 type alias State =
@@ -32,7 +32,7 @@ theChapter =
 
 
 component { range } =
-    UI.Range.Component.display
+    UI.Range.View.view
         { onChange = updateStateWith updateSharedState
         , value = range
         , min = 0

@@ -3,7 +3,7 @@ module UI.Toggle.Doc exposing (..)
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
-import UI.Toggle.Component
+import UI.Toggle.View
 
 
 theChapter : Chapter x
@@ -16,6 +16,6 @@ theChapter =
     in
     chapter "Toggle"
         |> renderComponentList
-            [ ( "Active", UI.Toggle.Component.display props )
-            , ( "Inactive", UI.Toggle.Component.display { props | value = False } )
+            [ ( "Active", UI.Toggle.View.view props )
+            , ( "Inactive", UI.Toggle.View.view { props | value = False } )
             ]

@@ -14,7 +14,7 @@ import Time
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes
-import UI.Range.Component
+import UI.Range.View
 import UI.Rem
 import UserPreferences
 
@@ -76,7 +76,7 @@ view shared now state =
                     { size = UI.Rem.Rem 1
                     , color = UI.Palettes.monochrome.on.background
                     }
-                , UI.Range.Component.display
+                , UI.Range.View.view
                     { onChange =
                         toDuration shared
                             >> Model.Events.TurnLengthChanged
@@ -125,7 +125,7 @@ view shared now state =
                     { size = UI.Rem.Rem 1
                     , color = UI.Palettes.monochrome.on.background
                     }
-                , UI.Range.Component.display
+                , UI.Range.View.view
                     { onChange =
                         toDuration shared
                             >> Model.Events.PomodoroLengthChanged

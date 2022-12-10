@@ -1,11 +1,11 @@
 module UI.Layout exposing (..)
 
+import Components.Socket.Socket
 import Css
 import Html.Styled as Html exposing (Html, a, div, h1, nav, text)
 import Html.Styled.Attributes as Attr exposing (css)
 import Model.MobName
 import Shared exposing (Shared)
-import Socket.Socket
 import UI.Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
@@ -134,7 +134,7 @@ rightNavBar : Shared -> Html msg
 rightNavBar shared =
     UI.Row.row [ Attr.css [ Css.alignItems Css.center ] ]
         [ UI.Row.Gap <| UI.Rem.Rem 1 ]
-        [ Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
+        [ Components.Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
         ]
 
 
@@ -192,7 +192,7 @@ forHome shared child =
                 [ child ]
             ]
         , footer
-        , Socket.Socket.view
+        , Components.Socket.Socket.view
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.top <| Css.rem 1

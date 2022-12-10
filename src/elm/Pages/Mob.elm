@@ -1,5 +1,6 @@
 module Pages.Mob exposing (..)
 
+import Components.Socket.Socket
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
@@ -24,12 +25,11 @@ import Peers.Sync.Core exposing (PeerId)
 import Random
 import Routing
 import Shared exposing (Shared)
-import Socket.Socket
 import Sounds
 import Svg.Styled exposing (Svg)
 import Task
 import Time
-import UI.Button.Component as Button
+import UI.Button.View as Button
 import UI.CircularProgressBar
 import UI.Color
 import UI.Column
@@ -98,7 +98,7 @@ init shared name =
       , peerId = Nothing
       }
     , Effect.batch
-        [ Effect.fromCmd <| Socket.Socket.joinRoom <| Model.MobName.print name
+        [ Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print name
         , Time.now |> Task.perform TimePassed |> Effect.fromCmd
         , Effect.fromCmd <| Cmd.map GotClockSyncMsg clockSyncCommand
         , redirection

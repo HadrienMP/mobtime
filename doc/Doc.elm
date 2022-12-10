@@ -1,5 +1,7 @@
 module Doc exposing (..)
 
+import Components.Socket.Doc
+import Components.Volume.Doc
 import Css
 import Css.Global
 import ElmBook exposing (withChapterGroups, withStatefulOptions, withThemeOptions)
@@ -7,23 +9,21 @@ import ElmBook.ElmCSS exposing (..)
 import ElmBook.StatefulOptions
 import ElmBook.ThemeOptions exposing (globals)
 import Pages.Profile.Doc
-import Socket.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
 import UI.Range.Doc
 import UI.Toggle.Doc
-import Volume.Doc
 
 
 type alias SharedState =
-    { volume : Volume.Doc.State
+    { volume : Components.Volume.Doc.State
     , range : UI.Range.Doc.State
     }
 
 
 initialState : SharedState
 initialState =
-    { volume = Volume.Doc.initState
+    { volume = Components.Volume.Doc.initState
     , range = UI.Range.Doc.initState
     }
 
@@ -54,8 +54,8 @@ main =
                 ]
               )
             , ( "Compound"
-              , [ Volume.Doc.theChapter
-                , Socket.Doc.theChapter
+              , [ Components.Volume.Doc.theChapter
+                , Components.Socket.Doc.theChapter
                 ]
               )
             , ( "Pages", [ Pages.Profile.Doc.profileChapter ] )

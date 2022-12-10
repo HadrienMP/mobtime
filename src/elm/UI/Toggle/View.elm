@@ -1,4 +1,4 @@
-module UI.Toggle.Component exposing (..)
+module UI.Toggle.View exposing (..)
 
 import Css
 import Html.Styled as Html exposing (Html)
@@ -12,8 +12,8 @@ type alias Props msg =
     { onToggle : msg, value : Bool }
 
 
-display : Props msg -> Html msg
-display props =
+view : Props msg -> Html msg
+view props =
     Html.button
         [ Attr.css
             [ Css.height <| Css.rem 1.3

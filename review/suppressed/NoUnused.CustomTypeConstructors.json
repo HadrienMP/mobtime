@@ -3,7 +3,7 @@
   "automatically created by": "elm-review suppress",
   "learn more": "elm-review suppress --help",
   "suppressions": [
-    { "count": 10, "filePath": "src/elm/UI/Button/Component.elm" },
+    { "count": 10, "filePath": "src/elm/UI/Button/View.elm" },
     { "count": 6, "filePath": "src/elm/Js/Commands.elm" },
     { "count": 3, "filePath": "src/elm/Shared.elm" },
     { "count": 2, "filePath": "src/elm/Model/Clock.elm" },

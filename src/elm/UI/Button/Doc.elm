@@ -5,7 +5,7 @@ import ElmBook.Actions
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled.Attributes as Attr
-import UI.Button.Component as Button
+import UI.Button.View as Button
 import UI.Icons.Ion
 import UI.Rem
 import UI.Row

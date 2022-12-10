@@ -2,6 +2,7 @@ port module Shared exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Components.Socket.Socket as Socket
 import Effect exposing (Effect)
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
@@ -10,7 +11,6 @@ import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.MobName exposing (MobName)
 import Routing
-import Socket.Socket as Socket
 import Url
 import UserPreferences
 

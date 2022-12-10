@@ -1,4 +1,4 @@
-module UI.Button.Component exposing (..)
+module UI.Button.View exposing (..)
 
 import Css
 import Html.Styled as Html exposing (Html)

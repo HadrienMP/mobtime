@@ -1,5 +1,6 @@
 module Pages.Mob.Tabs.Sound exposing (..)
 
+import Components.Volume.Field as Volume
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html, button, div, img, label, p, text)
@@ -11,7 +12,6 @@ import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Sounds as SoundLibrary
 import UserPreferences
-import Volume
 
 
 type alias CommandPort =

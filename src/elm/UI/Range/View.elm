@@ -1,4 +1,4 @@
-module UI.Range.Component exposing (..)
+module UI.Range.View exposing (..)
 
 import Css
 import Html.Styled as Html exposing (Html)
@@ -8,14 +8,14 @@ import UI.Color
 import UI.Palettes
 
 
-display :
+view :
     { onChange : Int -> msg
     , value : Int
     , min : Int
     , max : Int
     }
     -> Html msg
-display { onChange, value, min, max } =
+view { onChange, value, min, max } =
     Html.input
         [ Attr.id "volume"
         , Attr.type_ "range"

@@ -1,4 +1,4 @@
-module Socket.Component exposing (..)
+module Components.Socket.View exposing (..)
 
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
@@ -11,8 +11,8 @@ type alias Props =
     { socketConnected : Bool, color : RGBA255 }
 
 
-display : List (Html.Attribute msg) -> Props -> Html msg
-display attributes props =
+view : List (Html.Attribute msg) -> Props -> Html msg
+view attributes props =
     let
         ( icon, title ) =
             if props.socketConnected then
