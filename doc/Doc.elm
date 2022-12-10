@@ -47,13 +47,13 @@ main =
                 ]
             ]
         |> withChapterGroups
-            [ ( "Building blocks"
+            [ ( "UI"
               , [ UI.Range.Doc.theChapter
                 , UI.Button.Doc.theChapter
                 , UI.Toggle.Doc.theChapter
                 ]
               )
-            , ( "Compound"
+            , ( "Components"
               , [ Components.Volume.Doc.theChapter
                 , Components.Socket.Doc.theChapter
                 ]
