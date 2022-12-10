@@ -25,8 +25,8 @@ limitWidth =
     ]
 
 
-wrap : Shared -> MobName -> Html msg -> Html msg
-wrap shared mob child =
+wrap : Shared -> Html msg -> Html msg
+wrap shared child =
     div
         [ css
             [ Css.displayFlex
@@ -34,7 +34,7 @@ wrap shared mob child =
             , Css.height <| Css.pct 100
             ]
         ]
-        [ navBar mob
+        [ navBar shared.mob
         , div
             [ css
                 [ Css.flexGrow <| Css.num 1
@@ -61,7 +61,7 @@ wrap shared mob child =
         ]
 
 
-navBar : MobName -> Html msg
+navBar : Maybe MobName -> Html msg
 navBar mob =
     nav
         [ css
@@ -113,7 +113,12 @@ navBar mob =
                     , div [ css [ Css.fontWeight Css.lighter ] ] [ text "Time" ]
                     ]
                 ]
-            , Html.h2 [] [ Html.text <| (++) "Mob: " <| Model.MobName.print mob ]
+            , case mob of
+                Just it ->
+                    Html.h2 [] [ Html.text <| (++) "Mob: " <| Model.MobName.print it ]
+
+                Nothing ->
+                    Html.span [] []
             ]
         ]
 

@@ -28,7 +28,7 @@ update : Msg -> MobName -> Effect Shared.Msg Msg
 update msg mob =
     case msg of
         DisplaySecondsChanged bool ->
-            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.DisplaySeconds bool
+            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds bool
 
         ShareEvent event ->
             event

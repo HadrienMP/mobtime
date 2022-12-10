@@ -18,6 +18,11 @@ code =
     display Ionicon.code
 
 
+back : Icon msg
+back =
+    display Ionicon.chevronLeft
+
+
 check : Icon msg
 check =
     display Ionicon.checkmark

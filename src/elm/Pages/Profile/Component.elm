@@ -18,7 +18,7 @@ import Volume.Component
 
 
 type alias Props msg =
-    { mob : MobName
+    { mob : Maybe MobName
     , secondsToggle : UI.Toggle.Component.Props msg
     , volume : Volume.Component.Props msg
     , onJoin : msg
@@ -33,10 +33,15 @@ display props =
         , fields props
         , Button.button []
             { content =
-                Button.Both
-                    { icon = UI.Icons.Ion.paperAirplane
-                    , text = "Join"
-                    }
+                Button.Both <|
+                    case props.mob of
+                        Just _ ->
+                            { icon = UI.Icons.Ion.paperAirplane
+                            , text = "Join"
+                            }
+
+                        Nothing ->
+                            { icon = UI.Icons.Ion.back, text = "Back" }
             , variant = Button.Primary
             , size = Button.M
             , action = Button.OnPress <| Just props.onJoin
@@ -72,11 +77,21 @@ head props =
             ]
             []
             [ UI.Text.h2 "Your Profile"
-            , UI.Row.row [ Attr.css [ Css.alignItems Css.flexEnd ] ]
-                [ UI.Row.Gap <| UI.Rem.Rem 1 ]
-                [ Html.text "Mob:"
-                , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print props.mob ]
-                ]
+            , case props.mob of
+                Just mob ->
+                    UI.Row.row [ Attr.css [ Css.alignItems Css.flexEnd ] ]
+                        [ UI.Row.Gap <| UI.Rem.Rem 1 ]
+                        [ Html.text "Mob:"
+                        , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print mob ]
+                        ]
+
+                Nothing ->
+                    Html.div [] []
             ]
-        , UI.Text.Component.light "Setup your personal preferences before joining your teammates"
+        , case props.mob of
+            Just _ ->
+                UI.Text.Component.light "Setup your personal preferences before joining your teammates"
+
+            Nothing ->
+                Html.div [] []
         ]

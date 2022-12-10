@@ -16,6 +16,7 @@ import Model.Events
 import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
+import Pages.Profile.Page
 import Routing
 import Shared
 import UI.GlobalStyle
@@ -47,6 +48,7 @@ main =
 type Page
     = Home Pages.Home.Model
     | Mob Pages.Mob.Model
+    | Profile
 
 
 type alias Model =
@@ -68,28 +70,33 @@ init jsonPreferences url key =
 
         ( page, pageCommand ) =
             loadPage shared
+
+        ( model, command ) =
+            ( { page = page, shared = shared }, pageCommand )
+                |> handleEffect
     in
-    ( { page = page
-      , shared = shared
-      }
-    , Cmd.batch [ pageCommand, sharedCommand |> Cmd.map SharedMsg ]
+    ( model
+    , Cmd.batch [ command, sharedCommand |> Cmd.map SharedMsg ]
     )
 
 
-loadPage : Shared.Shared -> ( Page, Cmd Msg )
+loadPage : Shared.Shared -> ( Page, Effect Shared.Msg Msg )
 loadPage shared =
     case Routing.toPage shared.url of
         Routing.Login ->
             Pages.Home.init
                 |> Tuple.mapBoth
                     Home
-                    (Cmd.map GotHomeMsg)
+                    (Effect.map GotHomeMsg)
 
         Routing.Mob mobName ->
             Pages.Mob.init shared mobName
                 |> Tuple.mapBoth
                     Mob
-                    (Cmd.map GotMobMsg)
+                    (Effect.map GotMobMsg)
+
+        Routing.Profile ->
+            ( Profile, Effect.none )
 
 
 
@@ -99,6 +106,7 @@ loadPage shared =
 type Msg
     = GotMobMsg Pages.Mob.Msg
     | GotHomeMsg Pages.Home.Msg
+    | ProfileMsg Pages.Profile.Page.Msg
     | Batch (List Msg)
     | SharedMsg Shared.Msg
     | UrlChanged Url.Url
@@ -118,6 +126,7 @@ update msg model =
             ( { model | page = page, shared = shared }
             , command
             )
+                |> handleEffect
 
         ( GotHomeMsg subMsg, Home subModel ) ->
             Pages.Home.update model.shared subModel subMsg
@@ -131,6 +140,13 @@ update msg model =
                 |> Tuple.mapBoth
                     (\updated -> { model | page = Mob updated })
                     (Effect.map GotMobMsg)
+                |> handleEffect
+
+        ( ProfileMsg subMsg, Profile ) ->
+            ( model
+            , Pages.Profile.Page.update subMsg model.shared
+                |> Effect.map ProfileMsg
+            )
                 |> handleEffect
 
         ( Batch messages, _ ) ->
@@ -196,11 +212,11 @@ handleAtomicEffect model effect =
 getMob : Url.Url -> Maybe MobName
 getMob url =
     case Routing.toPage url of
-        Routing.Login ->
-            Nothing
-
         Routing.Mob mobName ->
             Just mobName
+
+        _ ->
+            Nothing
 
 
 
@@ -216,6 +232,9 @@ subscriptions model =
 
             Mob mobModel ->
                 Pages.Mob.subscriptions mobModel |> Sub.map GotMobMsg
+
+            Profile ->
+                Sub.none
         , Js.Events.events (dispatch jsEventsMapping)
         , Shared.subscriptions model.shared |> Sub.map SharedMsg
         ]
@@ -247,6 +266,10 @@ view model =
                 Mob sub ->
                     Pages.Mob.view model.shared sub
                         |> View.map GotMobMsg
+
+                Profile ->
+                    Pages.Profile.Page.view model.shared
+                        |> View.map ProfileMsg
     in
     { title = doc.title
     , body =

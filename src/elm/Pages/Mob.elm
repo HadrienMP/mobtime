@@ -22,6 +22,7 @@ import Pages.Mob.Tabs.Sound
 import Peers.Sync.Adapter
 import Peers.Sync.Core exposing (PeerId)
 import Random
+import Routing
 import Shared exposing (Shared)
 import Socket
 import Sounds
@@ -76,11 +77,18 @@ type alias Model =
     }
 
 
-init : Shared -> MobName -> ( Model, Cmd Msg )
+init : Shared -> MobName -> ( Model, Effect Shared.Msg Msg )
 init shared name =
     let
         ( clockSync, clockSyncCommand ) =
             Peers.Sync.Adapter.init name
+
+        redirection =
+            if shared.soundOn then
+                Effect.none
+
+            else
+                Shared.pushUrl shared Routing.Profile
     in
     ( { name = name
       , state = Model.State.init
@@ -92,10 +100,11 @@ init shared name =
       , peerId = Nothing
       , displaySoundModal = not shared.soundOn
       }
-    , Cmd.batch
-        [ Socket.joinRoom <| Model.MobName.print name
-        , Time.now |> Task.perform TimePassed
-        , Cmd.map GotClockSyncMsg clockSyncCommand
+    , Effect.batch
+        [ Effect.fromCmd <| Socket.joinRoom <| Model.MobName.print name
+        , Time.now |> Task.perform TimePassed |> Effect.fromCmd
+        , Effect.fromCmd <| Cmd.map GotClockSyncMsg clockSyncCommand
+        , redirection
         ]
     )
 
@@ -364,7 +373,7 @@ view shared model =
 
                 else
                     Nothing
-    , body = [ UI.Layout.wrap shared model.name <| body shared model action ]
+    , body = [ UI.Layout.wrap shared <| body shared model action ]
     }
 
 

@@ -1,7 +1,7 @@
 module Pages.Profile.Doc exposing (..)
 
 import ElmBook.Actions exposing (logAction, logActionWithBool)
-import ElmBook.Chapter exposing (chapter, renderComponent)
+import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.MobName exposing (MobName(..))
 import Pages.Profile.Component
@@ -11,12 +11,15 @@ import Volume.Type exposing (Volume(..))
 profileChapter : Chapter x
 profileChapter =
     chapter "Profile page"
-        |> renderComponent component
+        |> renderComponentList
+            [ ( "With mob", component <| Just <| MobName "A Mob" )
+            , ( "Without mob", component Nothing )
+            ]
 
 
-component =
+component mob =
     Pages.Profile.Component.display
-        { mob = MobName "A mob"
+        { mob = mob
         , secondsToggle =
             { onToggle = logActionWithBool "Display seconds"
             , value = True

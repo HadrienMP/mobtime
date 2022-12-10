@@ -31,9 +31,9 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd msg )
+init : ( Model, Effect Shared.Msg msg )
 init =
-    ( { mobName = "" }, Cmd.none )
+    ( { mobName = "" }, Effect.none )
 
 
 
