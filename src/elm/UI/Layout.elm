@@ -35,6 +35,7 @@ wrap shared child =
             ]
         ]
         [ navBar shared
+        , subNav shared
         , div
             [ css
                 [ Css.flexGrow <| Css.num 1
@@ -60,6 +61,42 @@ wrap shared child =
         ]
 
 
+subNav : Shared -> Html msg
+subNav shared =
+    case shared.mob of
+        Just mob ->
+            Html.div
+                [ Attr.css
+                    [ Css.backgroundColor <|
+                        UI.Color.toElmCss <|
+                            UI.Color.lighten 0.3 <|
+                                UI.Palettes.monochrome.surface
+                    , Css.color <|
+                        UI.Color.toElmCss <|
+                            UI.Palettes.monochrome.on.surface
+                    , Css.boxShadow3 Css.zero Css.zero (Css.rem 0.2)
+                    ]
+                ]
+                [ UI.Row.row
+                    [ Attr.css ((Css.padding <| Css.rem 0.6) :: limitWidth) ]
+                    []
+                    [ Html.h2
+                        [ Attr.css
+                            [ Css.maxWidth <| Css.rem 9
+                            , Css.textOverflow Css.ellipsis
+                            ]
+                        ]
+                        [ Html.text <|
+                            (++) "Mob: " <|
+                                Model.MobName.print mob
+                        ]
+                    ]
+                ]
+
+        Nothing ->
+            Html.div [] []
+
+
 navBar : Shared -> Html msg
 navBar shared =
     nav
@@ -69,7 +106,6 @@ navBar shared =
             , Css.left Css.zero
             , Css.right Css.zero
             , Css.zIndex <| Css.int 100
-            , Css.boxShadow3 Css.zero Css.zero (Css.rem 0.2)
             , Css.backgroundColor <|
                 UI.Color.toElmCss <|
                     UI.Palettes.monochrome.surface
@@ -99,21 +135,6 @@ rightNavBar shared =
     UI.Row.row [ Attr.css [ Css.alignItems Css.center ] ]
         [ UI.Row.Gap <| UI.Rem.Rem 1 ]
         [ Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
-        , case shared.mob of
-            Just it ->
-                Html.h2
-                    [ Attr.css
-                        [ Css.maxWidth <| Css.rem 9
-                        , Css.textOverflow Css.ellipsis
-                        ]
-                    ]
-                    [ Html.text <|
-                        (++) "Mob: " <|
-                            Model.MobName.print it
-                    ]
-
-            Nothing ->
-                Html.span [] []
         ]
 
 
