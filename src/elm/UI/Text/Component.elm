@@ -11,6 +11,7 @@ light value =
         [ Attr.css
             [ Css.fontWeight Css.lighter
             , Css.margin Css.zero
+            , Css.textAlign Css.justify
             ]
         ]
         [ Html.text value ]

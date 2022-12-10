@@ -64,16 +64,6 @@ head props =
             ]
             []
             [ UI.Text.h2 "Your Profile"
-            , case props.mob of
-                Just mob ->
-                    UI.Row.row [ Attr.css [ Css.alignItems Css.flexEnd ] ]
-                        [ UI.Row.Gap <| UI.Rem.Rem 1 ]
-                        [ Html.text "Mob:"
-                        , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print mob ]
-                        ]
-
-                Nothing ->
-                    Html.div [] []
             ]
         , case props.mob of
             Just _ ->
