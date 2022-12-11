@@ -1,5 +1,6 @@
 module UI.Layout exposing (..)
 
+import Components.NavBar.Component
 import Components.Socket.Socket
 import Css
 import Html.Styled as Html exposing (Html, a, div, h1, nav, text)
@@ -34,7 +35,7 @@ wrap shared child =
             , Css.height <| Css.pct 100
             ]
         ]
-        [ navBar shared
+        [ Components.NavBar.Component.view (Css.padding sidePadding :: limitWidth) shared
         , subNav shared
         , div
             [ css

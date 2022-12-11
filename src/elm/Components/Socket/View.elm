@@ -23,7 +23,7 @@ view attributes props =
     in
     Html.div (Attr.title title :: attributes)
         [ icon
-            { height = Rem 1.2
+            { height = Rem 1
             , color = props.color
             }
         ]

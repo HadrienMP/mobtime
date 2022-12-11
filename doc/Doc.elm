@@ -1,5 +1,6 @@
 module Doc exposing (..)
 
+import Components.NavBar.Doc
 import Components.Share.Doc
 import Components.Socket.Doc
 import Components.Volume.Doc
@@ -39,7 +40,10 @@ main =
                 , Css.Global.global
                     [ Css.Global.class "elm-book__component-wrapper"
                         [ Css.Global.descendants
-                            [ Css.Global.h2
+                            [ Css.Global.h1
+                                [ Css.margin Css.zero
+                                ]
+                            , Css.Global.h2
                                 [ Css.margin Css.zero
                                 ]
                             ]
@@ -58,6 +62,7 @@ main =
               , [ Components.Volume.Doc.theChapter
                 , Components.Socket.Doc.theChapter
                 , Components.Share.Doc.theChapter
+                , Components.NavBar.Doc.theChapter
                 ]
               )
             , ( "Pages", [ Pages.Profile.Doc.profileChapter ] )
