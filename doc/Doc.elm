@@ -1,5 +1,6 @@
 module Doc exposing (..)
 
+import Components.Share.Doc
 import Components.Socket.Doc
 import Components.Volume.Doc
 import Css
@@ -56,6 +57,7 @@ main =
             , ( "Components"
               , [ Components.Volume.Doc.theChapter
                 , Components.Socket.Doc.theChapter
+                , Components.Share.Doc.theChapter
                 ]
               )
             , ( "Pages", [ Pages.Profile.Doc.profileChapter ] )

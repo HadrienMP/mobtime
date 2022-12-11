@@ -18,6 +18,11 @@ code =
     display Ionicon.code
 
 
+copy : Icon msg
+copy =
+    display Ionicon.clipboard
+
+
 back : Icon msg
 back =
     display Ionicon.chevronLeft

@@ -88,13 +88,13 @@ iconSize size =
     UI.Rem.Rem <|
         case size of
             S ->
-                1.4
-
-            M ->
                 1.8
 
+            M ->
+                2.5
+
             L ->
-                2.6
+                3.6
 
 
 variantStyles : Variant -> List Css.Style
