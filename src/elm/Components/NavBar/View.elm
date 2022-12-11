@@ -3,7 +3,7 @@ module Components.NavBar.View exposing (..)
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
-import Model.MobName exposing (MobName)
+import Model.MobName as MobName exposing (MobName)
 import UI.Color
 import UI.Icons.Tape
 import UI.Palettes
@@ -46,6 +46,19 @@ view props =
                 )
             ]
             [ title
+            , Html.span
+                [ Attr.css
+                    [ Css.textOverflow Css.ellipsis
+                    , Css.whiteSpace Css.noWrap
+                    , Css.overflow Css.hidden
+                    , Css.padding2 Css.zero <| Css.rem 1
+                    ]
+                ]
+                [ Html.text <|
+                    Maybe.withDefault "" <|
+                        Maybe.map MobName.print <|
+                            props.mob
+                ]
             , rightNavBar props
             ]
         ]

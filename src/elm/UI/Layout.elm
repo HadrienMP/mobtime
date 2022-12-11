@@ -36,7 +36,6 @@ wrap shared child =
             ]
         ]
         [ Components.NavBar.Component.view (Css.padding sidePadding :: limitWidth) shared
-        , subNav shared
         , div
             [ css
                 [ Css.flexGrow <| Css.num 1

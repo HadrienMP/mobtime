@@ -24,6 +24,11 @@ theChapter =
     chapter "Nav bar"
         |> renderComponentList
             [ ( "Default", Components.NavBar.View.view props )
-            , ( "With a name too long", Components.NavBar.View.view { props | mob = Just <| MobName "Awesome" } )
+            , ( "With a name too long"
+              , Components.NavBar.View.view
+                    { props
+                        | mob = Just <| MobName "That is a long name indeed, too long for the nav bar at least"
+                    }
+              )
             , ( "With a mob", Components.NavBar.View.view { props | mob = Nothing } )
             ]
