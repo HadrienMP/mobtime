@@ -1,9 +1,7 @@
 module Pages.Mob.Tabs.Sound exposing (..)
 
-import Components.Volume.Field as Volume
-import Css
 import Effect exposing (Effect)
-import Html.Styled as Html exposing (Html, button, div, img, label, p, text)
+import Html.Styled exposing (Html, button, div, img, p, text)
 import Html.Styled.Attributes as Attr exposing (class, classList, id, src)
 import Html.Styled.Events exposing (onClick)
 import Json.Encode
@@ -11,7 +9,6 @@ import Model.Events
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Sounds as SoundLibrary
-import UserPreferences
 
 
 type alias CommandPort =
@@ -24,30 +21,21 @@ type alias StorePort =
 
 type Msg
     = ShareEvent Model.Events.MobEvent
-    | VolumeMsg Volume.Msg
 
 
 update : Msg -> Effect Shared.Msg Msg
 update msg =
     case msg of
-        VolumeMsg subMsg ->
-            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.VolumeMsg subMsg
-
         ShareEvent event ->
             Effect.share event
 
 
 view : Shared -> MobName -> SoundLibrary.Profile -> Html Msg
-view shared mob activeProfile =
+view _ mob activeProfile =
     div [ id "sound", class "tab" ]
-        [ Volume.view
-            shared.preferences.volume
-            { labelWidth = Css.width <| Css.pct 30 }
-            |> Html.map VolumeMsg
-        , div
+        [ div
             [ id "sounds-field", class "form-field" ]
-            [ label [] [ text "Playlist" ]
-            , div
+            [ div
                 [ id "sound-cards" ]
                 (SoundLibrary.allProfiles
                     |> List.map (\profile -> viewProfile { active = activeProfile, current = profile } mob)

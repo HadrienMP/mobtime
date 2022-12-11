@@ -2,7 +2,7 @@ module Pages.Mob.Tabs.Clocks exposing (..)
 
 import Effect exposing (Effect)
 import Html.Styled exposing (Html, button, div, h3, label, p, text)
-import Html.Styled.Attributes exposing (class, classList, for, id)
+import Html.Styled.Attributes exposing (class, for, id)
 import Html.Styled.Events exposing (onClick)
 import Lib.Duration as Duration
 import Model.Clock as Clock
@@ -16,20 +16,15 @@ import UI.Icons.Ion
 import UI.Palettes
 import UI.Range.View
 import UI.Rem
-import UserPreferences
 
 
 type Msg
-    = ToggleSeconds
-    | ShareEvent Model.Events.Event
+    = ShareEvent Model.Events.Event
 
 
 update : Msg -> MobName -> Effect Shared.Msg Msg
 update msg mob =
     case msg of
-        ToggleSeconds ->
-            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds
-
         ShareEvent event ->
             event
                 |> Model.Events.MobEvent mob
@@ -45,23 +40,6 @@ view shared now state =
                 , color = UI.Palettes.monochrome.on.background
                 }
             , text "Turn"
-            ]
-        , div
-            [ id "seconds-field", class "form-field" ]
-            [ label [ for "seconds" ] [ text "Seconds" ]
-            , div
-                [ class "toggles" ]
-                [ button
-                    [ classList [ ( "active", not shared.preferences.displaySeconds ) ]
-                    , onClick <| ToggleSeconds
-                    ]
-                    [ text "Hide" ]
-                , button
-                    [ classList [ ( "active", shared.preferences.displaySeconds ) ]
-                    , onClick <| ToggleSeconds
-                    ]
-                    [ text "Show" ]
-                ]
             ]
         , div
             [ id "turn-length-field", class "form-field" ]
