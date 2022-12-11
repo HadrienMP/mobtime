@@ -18,6 +18,11 @@ code =
     display Ionicon.code
 
 
+user : Icon msg
+user =
+    display Ionicon.person
+
+
 copy : Icon msg
 copy =
     display Ionicon.clipboard

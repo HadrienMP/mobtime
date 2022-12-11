@@ -4,7 +4,9 @@ import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Model.MobName as MobName exposing (MobName)
+import Routing
 import UI.Color
+import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Palettes
 import UI.Rem
@@ -95,6 +97,21 @@ title =
 rightNavBar : Props msg -> Html msg
 rightNavBar props =
     UI.Row.row [ Attr.css [ Css.alignItems Css.center ] ]
-        [ UI.Row.Gap <| UI.Rem.Rem 1 ]
+        [ UI.Row.Gap <| UI.Rem.Rem 0.4 ]
         [ props.socket
+        , Html.a
+            [ Attr.css
+                [ Css.border3 (Css.px 2) Css.solid <|
+                    UI.Color.toElmCss <|
+                        UI.Palettes.monochrome.on.surface
+                , Css.borderRadius <| Css.pct 50
+                , Css.cursor Css.pointer
+                ]
+            , Attr.href <| Routing.toUrl <| Routing.Profile
+            ]
+            [ UI.Icons.Ion.user
+                { color = UI.Palettes.monochrome.on.surface
+                , size = UI.Rem.Rem 2
+                }
+            ]
         ]
