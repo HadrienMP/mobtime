@@ -1,6 +1,6 @@
 [![Awesome](https://awesome.re/badge.svg)](https://github.com/mobtimeapp/awesome-mobbing)
 
-# mob-time-elm
+# Mobtime
 A web timer to time mob or pair turns.
 
 ## Features
