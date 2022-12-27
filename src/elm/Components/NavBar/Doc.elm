@@ -30,5 +30,11 @@ theChapter =
                         | mob = Just <| MobName "That is a long name indeed, too long for the nav bar at least"
                     }
               )
+            , ( "With letter going down"
+              , Components.NavBar.View.view
+                    { props
+                        | mob = Just <| MobName "qpg"
+                    }
+              )
             , ( "Without a mob", Components.NavBar.View.view { props | mob = Nothing } )
             ]

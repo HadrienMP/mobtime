@@ -12,7 +12,8 @@
 		"elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all",
 		"postinstall": "elm-tooling install ; husky install",
 		"review": "elm-review --fix-all",
-		"build:doc": "parcel build doc/index.html"
+		"build:doc": "parcel build doc/index.html",
+		"start:doc": "parcel doc/index.html"
 	},
 	"keywords": [],
 	"author": "",

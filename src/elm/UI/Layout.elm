@@ -3,19 +3,16 @@ module UI.Layout exposing (..)
 import Components.NavBar.Component
 import Components.Socket.Socket
 import Css
-import Html.Styled as Html exposing (Html, a, div, h1, nav, text)
+import Html.Styled as Html exposing (Html, a, div, text)
 import Html.Styled.Attributes as Attr exposing (css)
-import Model.MobName
 import Shared exposing (Shared)
 import UI.Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
-import UI.Icons.Tape
 import UI.Palettes
 import UI.Rem
-import UI.Row
 
 
 limitWidth : List Css.Style
@@ -57,111 +54,6 @@ wrap shared child =
                     [ child ]
                 ]
             , footer
-            ]
-        ]
-
-
-subNav : Shared -> Html msg
-subNav shared =
-    case shared.mob of
-        Just mob ->
-            Html.div
-                [ Attr.css
-                    [ Css.backgroundColor <|
-                        UI.Color.toElmCss <|
-                            UI.Color.lighten 0.3 <|
-                                UI.Palettes.monochrome.surface
-                    , Css.color <|
-                        UI.Color.toElmCss <|
-                            UI.Palettes.monochrome.on.surface
-                    , Css.boxShadow3 Css.zero Css.zero (Css.rem 0.2)
-                    ]
-                ]
-                [ UI.Row.row
-                    [ Attr.css ((Css.padding <| Css.rem 0.6) :: limitWidth) ]
-                    []
-                    [ Html.h2
-                        [ Attr.css
-                            [ Css.maxWidth <| Css.rem 9
-                            , Css.textOverflow Css.ellipsis
-                            ]
-                        ]
-                        [ Html.text <|
-                            (++) "Mob: " <|
-                                Model.MobName.print mob
-                        ]
-                    ]
-                ]
-
-        Nothing ->
-            Html.div [] []
-
-
-navBar : Shared -> Html msg
-navBar shared =
-    nav
-        [ css
-            [ Css.position Css.sticky
-            , Css.top Css.zero
-            , Css.left Css.zero
-            , Css.right Css.zero
-            , Css.zIndex <| Css.int 100
-            , Css.backgroundColor <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.surface
-            , Css.color <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.on.surface
-            ]
-        ]
-        [ div
-            [ css
-                (limitWidth
-                    ++ [ Css.displayFlex
-                       , Css.alignItems Css.center
-                       , Css.justifyContent Css.spaceBetween
-                       , Css.padding sidePadding
-                       ]
-                )
-            ]
-            [ title
-            , rightNavBar shared
-            ]
-        ]
-
-
-rightNavBar : Shared -> Html msg
-rightNavBar shared =
-    UI.Row.row [ Attr.css [ Css.alignItems Css.center ] ]
-        [ UI.Row.Gap <| UI.Rem.Rem 1 ]
-        [ Components.Socket.Socket.view [] UI.Palettes.monochrome.on.surface shared.socket
-        ]
-
-
-title : Html msg
-title =
-    a
-        [ css
-            [ Css.displayFlex
-            , Css.textDecoration Css.none
-            , Css.color <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.on.surface
-            ]
-        , Attr.href "/"
-        ]
-        [ UI.Icons.Tape.display
-            { height = UI.Rem.Rem 2
-            , color = UI.Palettes.monochrome.on.surface
-            }
-        , h1
-            [ css
-                [ Css.alignSelf <| Css.center
-                , Css.paddingLeft <| Css.rem 0.5
-                ]
-            ]
-            [ div [ css [ Css.fontWeight Css.bolder ] ] [ text "Mob" ]
-            , div [ css [ Css.fontWeight Css.lighter ] ] [ text "Time" ]
             ]
         ]
 

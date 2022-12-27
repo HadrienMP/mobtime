@@ -54,6 +54,7 @@ view props =
                     , Css.whiteSpace Css.noWrap
                     , Css.overflow Css.hidden
                     , Css.padding2 Css.zero <| Css.rem 1
+                    , Css.lineHeight <| Css.em 1.4
                     ]
                 ]
                 [ Html.text <|
