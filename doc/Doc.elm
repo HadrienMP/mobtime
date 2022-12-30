@@ -13,6 +13,7 @@ import ElmBook.ThemeOptions exposing (globals)
 import Pages.Profile.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
+import UI.Modal.Doc
 import UI.Range.Doc
 import UI.Toggle.Doc
 
@@ -56,6 +57,7 @@ main =
               , [ UI.Range.Doc.theChapter
                 , UI.Button.Doc.theChapter
                 , UI.Toggle.Doc.theChapter
+                , UI.Modal.Doc.theChapter
                 ]
               )
             , ( "Components"

@@ -1,5 +1,6 @@
 module Pages.Mob exposing (..)
 
+import Components.Share.Component
 import Components.Socket.Socket
 import Css
 import Effect exposing (Effect)
@@ -38,6 +39,7 @@ import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
+import UI.Modal.View
 import UI.Palettes
 import UI.Rem
 import UI.Text
@@ -72,6 +74,7 @@ type alias Model =
     , now : Time.Posix
     , tab : Tab
     , peerId : Maybe PeerId
+    , share : Components.Share.Component.Model
     }
 
 
@@ -96,6 +99,7 @@ init shared name =
       , now = Time.millisToPosix 0
       , tab = Main
       , peerId = Nothing
+      , share = Components.Share.Component.init
       }
     , Effect.batch
         [ Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print name
@@ -127,6 +131,7 @@ type Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
     | GotSocketId PeerId
+    | ShareMsg Components.Share.Component.Msg
 
 
 timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
@@ -288,6 +293,12 @@ update shared msg model =
             , Effect.fromCmd command
             )
 
+        ShareMsg subMsg ->
+            Components.Share.Component.update shared subMsg model.share
+                |> Tuple.mapBoth
+                    (\updated -> { model | share = updated })
+                    (Effect.map ShareMsg)
+
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
 selectSound now profile =
@@ -314,6 +325,7 @@ subscriptions model =
         [ Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
         , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
         , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
+        , Sub.map ShareMsg <| Components.Share.Component.subscriptions model.share
         , case ( Clock.isOn model.state.clock, Clock.isOn model.state.pomodoro ) of
             ( True, _ ) ->
                 Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
@@ -370,6 +382,7 @@ body : Shared -> Model -> ActionDescription -> Html Msg
 body shared model action =
     div [ class "container" ]
         [ clockArea model action
+        , Components.Share.Component.view shared model.share |> Html.map ShareMsg
         , nav []
             ([ button
                 [ onClick <| SwitchTab Main
@@ -465,50 +478,57 @@ body shared model action =
         ]
 
 
-musicModal : Html Msg
+musicModal : UI.Modal.View.Modal Msg
 musicModal =
-    UI.Column.column
-        [ css UI.Css.center ]
-        [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-        [ UI.Icons.Tape.display
-            { height = UI.Rem.Rem 10
-            , color = UI.Palettes.monochrome.on.background
-            }
-        , UI.Text.h2 "Turn ended !"
-        , Button.button [ css [ Css.width <| Css.pct 100 ] ]
-            { content = Button.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
-            , variant = Button.Primary
-            , size = Button.L
-            , action = Button.OnPress <| Just StopSound
-            }
-        ]
+    { onClose = StopSound
+    , content =
+        UI.Column.column
+            [ css UI.Css.center ]
+            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
+            [ UI.Icons.Tape.display
+                { height = UI.Rem.Rem 10
+                , color = UI.Palettes.monochrome.on.background
+                }
+            , UI.Text.h2 "Turn ended !"
+            , Button.button [ css [ Css.width <| Css.pct 100 ] ]
+                { content = Button.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
+                , variant = Button.Primary
+                , size = Button.L
+                , action = Button.OnPress <| Just StopSound
+                }
+            ]
+    }
 
 
-breakModal : MobName -> Html Msg
+breakModal : MobName -> UI.Modal.View.Modal Msg
 breakModal mobName =
-    UI.Column.column
-        [ css UI.Css.center ]
-        [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-        [ UI.Text.h2 "It's time for a break!"
-        , UI.Icons.Tea.display
-            { height = UI.Rem.Rem 10
-            , color = UI.Palettes.monochrome.on.background
-            }
-        , Html.p
-            [ css [ Css.textAlign Css.justify ] ]
-            [ Html.text "Boost your productivity by taking a good break." ]
-        , Button.button [ css [ Css.width <| Css.pct 100 ] ]
-            { content = Button.Both { icon = UI.Icons.Ion.check, text = "Break over" }
-            , variant = Button.Primary
-            , size = Button.L
-            , action =
-                Model.Events.PomodoroStopped
-                    |> Model.Events.MobEvent mobName
-                    |> ShareEvent
-                    |> Just
-                    |> Button.OnPress
-            }
-        ]
+    let
+        action =
+            Model.Events.PomodoroStopped
+                |> Model.Events.MobEvent mobName
+                |> ShareEvent
+    in
+    { onClose = action
+    , content =
+        UI.Column.column
+            [ css UI.Css.center ]
+            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
+            [ UI.Text.h2 "It's time for a break!"
+            , UI.Icons.Tea.display
+                { height = UI.Rem.Rem 10
+                , color = UI.Palettes.monochrome.on.background
+                }
+            , Html.p
+                [ css [ Css.textAlign Css.justify ] ]
+                [ Html.text "Boost your productivity by taking a good break." ]
+            , Button.button [ css [ Css.width <| Css.pct 100 ] ]
+                { content = Button.Both { icon = UI.Icons.Ion.check, text = "Break over" }
+                , variant = Button.Primary
+                , size = Button.L
+                , action = Button.OnPress <| Just action
+                }
+            ]
+    }
 
 
 clockArea : Model -> ActionDescription -> Html Msg

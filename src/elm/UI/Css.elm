@@ -14,11 +14,14 @@ center =
 
 fullpage : List Css.Style
 fullpage =
-    [ Css.position Css.fixed
-    , Css.top <| Css.zero
-    , Css.bottom <| Css.pct 100
-    , Css.left <| Css.zero
-    , Css.right <| Css.pct 100
-    , Css.height <| Css.pct 100
-    , Css.width <| Css.pct 100
+    [ Css.position Css.absolute
+    , Css.top Css.zero
+    , Css.bottom Css.zero
+    , Css.left Css.zero
+    , Css.right Css.zero
     ]
+
+
+roundBorder : Css.Style
+roundBorder =
+    Css.borderRadius <| Css.rem 0.2

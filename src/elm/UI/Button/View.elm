@@ -6,6 +6,7 @@ import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onClick)
 import Json.Encode
 import UI.Color
+import UI.Css
 import UI.Icons.Common
 import UI.Palettes
 import UI.Rem
@@ -49,7 +50,7 @@ button :
 button attributes { content, action, size, variant } =
     Html.button
         (Attr.css
-            ([ Css.borderRadius <| Css.rem 0.2
+            ([ UI.Css.roundBorder
              , Css.display Css.block
              , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surface
              , Css.cursor Css.pointer

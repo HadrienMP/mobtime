@@ -68,6 +68,19 @@ app.ports.changeVolume.subscribe(sound.volume)
 app.ports.testVolume.subscribe(() => sound.play("/sound/hello.mp3"));
 app.ports.savePreferences.subscribe(preferences =>
     window.localStorage.setItem("preferences", JSON.stringify(preferences)));
+app.ports.copyShareLink.subscribe(text => {
+    if (navigator.clipboard) {
+        navigator.clipboard
+            .writeText(text)
+            .finally(() => app.ports.events.send({ name: 'Copied', value: "" }))
+    } else {
+        if (fallbackCopyTextToClipboard(text))
+            app.ports.shareLinkCopied.send("");
+        else {
+            alert('wut')
+        }
+    }
+})
 
 const soundOnInterval = setInterval(sound.play("/sound/silence.mp3", {
     onError: console.debug,

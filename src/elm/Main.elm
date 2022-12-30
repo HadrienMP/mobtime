@@ -21,7 +21,7 @@ import Routing
 import Shared
 import UI.GlobalStyle
 import UI.Layout
-import UI.Modal
+import UI.Modal.View
 import Url
 import View
 
@@ -283,11 +283,17 @@ view model =
     { title = doc.title
     , body =
         [ Html.toUnstyled <|
-            Html.div [ css [ Css.height <| Css.pct 100 ] ]
+            Html.div
+                [ css
+                    [ Css.displayFlex
+                    , Css.flexDirection Css.column
+                    , Css.height <| Css.pct 100
+                    ]
+                ]
                 (UI.GlobalStyle.globalStyle
                     :: layout model.shared doc.body
-                    :: (doc.modal
-                            |> Maybe.map UI.Modal.withContent
+                    ++ (doc.modal
+                            |> Maybe.map UI.Modal.View.view
                             |> Maybe.map List.singleton
                             |> Maybe.withDefault []
                        )

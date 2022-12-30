@@ -18,44 +18,30 @@ import UI.Rem
 limitWidth : List Css.Style
 limitWidth =
     [ Css.maxWidth <| Css.rem 22
-    , Css.margin Css.auto
+    , Css.margin2 Css.zero Css.auto
     , Css.width <| Css.pct 100
     ]
 
 
-wrap : Shared -> Html msg -> Html msg
+wrap : Shared -> Html msg -> List (Html msg)
 wrap shared child =
-    div
+    [ Components.NavBar.Component.view (Css.padding sidePadding :: limitWidth) shared
+    , Html.main_
         [ css
-            [ Css.displayFlex
+            [ Css.flexGrow <| Css.num 1
+            , Css.displayFlex
             , Css.flexDirection Css.column
-            , Css.height <| Css.pct 100
+            , Css.padding sidePadding
             ]
         ]
-        [ Components.NavBar.Component.view (Css.padding sidePadding :: limitWidth) shared
-        , div
-            [ css
-                [ Css.flexGrow <| Css.num 1
-                , Css.displayFlex
-                , Css.overflow Css.auto
-                , Css.flexDirection Css.column
-                ]
+        [ div
+            [ Attr.css (Css.padding sidePadding :: limitWidth)
             ]
-            [ div
-                [ css
-                    ([ Css.flexGrow <| Css.num 1
-                     , Css.position Css.relative
-                     ]
-                        ++ limitWidth
-                    )
-                ]
-                [ Html.main_
-                    [ css [ Css.padding sidePadding ] ]
-                    [ child ]
-                ]
-            , footer
+            [ child
             ]
         ]
+    , footer
+    ]
 
 
 sidePadding : Css.Rem
@@ -63,37 +49,30 @@ sidePadding =
     Css.rem 0.5
 
 
-forHome : Shared -> Html msg -> Html msg
+forHome : Shared -> Html msg -> List (Html msg)
 forHome shared child =
-    div
-        [ css
-            [ Css.displayFlex
-            , Css.flexDirection Css.column
-            , Css.height <| Css.pct 100
-            ]
-        ]
+    [ div
+        [ css [ Css.flexGrow <| Css.num 1 ] ]
         [ div
-            [ css [ Css.flexGrow <| Css.num 1 ] ]
-            [ div
-                [ css
-                    (Css.padding sidePadding
-                        :: UI.Css.center
-                        ++ limitWidth
-                    )
-                ]
-                [ child ]
+            [ css
+                (Css.padding sidePadding
+                    :: UI.Css.center
+                    ++ limitWidth
+                )
             ]
-        , footer
-        , Components.Socket.Socket.view
-            [ Attr.css
-                [ Css.position Css.absolute
-                , Css.top <| Css.rem 1
-                , Css.right <| Css.rem 1
-                ]
-            ]
-            UI.Palettes.monochrome.on.background
-            shared.socket
+            [ child ]
         ]
+    , footer
+    , Components.Socket.Socket.view
+        [ Attr.css
+            [ Css.position Css.absolute
+            , Css.top <| Css.rem 1
+            , Css.right <| Css.rem 1
+            ]
+        ]
+        UI.Palettes.monochrome.on.background
+        shared.socket
+    ]
 
 
 footer : Html msg
@@ -101,7 +80,6 @@ footer =
     Html.footer
         [ css
             [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.background
-            , Css.marginTop <| Css.rem 1
             , Css.borderTop3 (Css.px 1) Css.solid <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.background
             ]
         ]

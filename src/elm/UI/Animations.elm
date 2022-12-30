@@ -57,3 +57,14 @@ fadeOut duration =
     , animationDuration duration
     , opacity zero
     ]
+
+
+bottomSlide : Lib.Duration.Duration -> List Style
+bottomSlide duration =
+    [ Css.animationName <|
+        Css.Animations.keyframes
+            [ ( 0, [ Css.Animations.custom "top" "100vh" ] )
+            , ( 100, [ Css.Animations.custom "top" "0" ] )
+            ]
+    , animationDuration duration
+    ]
