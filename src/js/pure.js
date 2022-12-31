@@ -82,13 +82,18 @@ app.ports.copyShareLink.subscribe(text => {
     }
 })
 
-const soundOnInterval = setInterval(sound.play("/sound/silence.mp3", {
-    onError: console.debug,
-    onSuccess: () => {
-        app.ports.soundOn.send("");
-        clearInterval(soundOnInterval);
-    }
-}), 500)
+testSound();
+const soundOnInterval = setInterval(testSound(), 100)
+
+function testSound() {
+    return sound.play("/sound/silence.mp3", {
+        onError: console.debug,
+        onSuccess: () => {
+            app.ports.soundOn.send("");
+            clearInterval(soundOnInterval);
+        }
+    });
+}
 
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");

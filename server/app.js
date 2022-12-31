@@ -35,6 +35,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(publicDirPath, "index.html"))
 }).get('/mob/:mob', (req, res) => {
     res.sendFile(path.join(publicDirPath, "index.html"))
+}).get('/mob/:mob/*', (req, res) => {
+    res.sendFile(path.join(publicDirPath, "index.html"))
 }).get('/me', (req, res) => {
     res.sendFile(path.join(publicDirPath, "index.html"))
 })

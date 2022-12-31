@@ -1,12 +1,12 @@
 @import "theme";
 
-$header-padding: 60px;
+$header-padding: 90px;
 
 header {
   section {
     position: relative;
     margin: 0 auto;
-    padding: $header-padding 0;
+    padding: 30px 0 120px;
 
     &::before {
       content: "";
@@ -84,8 +84,6 @@ header {
 }
 
 h2 {
-  text-align: center;
-
   #share-link {
     position: relative;
     display: inline-block;

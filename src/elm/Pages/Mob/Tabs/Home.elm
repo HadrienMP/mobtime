@@ -2,36 +2,27 @@ module Pages.Mob.Tabs.Home exposing (..)
 
 import Html.Styled exposing (Html, div, li, span, text, ul)
 import Html.Styled.Attributes exposing (class, id)
-import Js.Commands
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Role exposing (Role)
 import Model.State exposing (State)
-import Pages.Mob.Tabs.Share
 import Shared exposing (Shared)
-import Url
 
 
 type Msg
-    = PutLinkInPasteBin String
+    = Noop
 
 
 update : Msg -> Cmd Msg
-update msg =
-    case msg of
-        PutLinkInPasteBin url ->
-            url
-                |> Js.Commands.CopyInPasteBin
-                |> Js.Commands.send
+update _ =
+    Cmd.none
 
 
 view : Shared -> MobName -> State -> Html Msg
-view shared mobName state =
+view _ mob state =
     div
         [ id "home", class "tab" ]
-        [ Pages.Mob.Tabs.Share.shareButton mobName <|
-            PutLinkInPasteBin <|
-                Url.toString shared.url
+        [ text <| "You are in the mob: " ++ Model.MobName.print mob
         , roles state
         ]
 

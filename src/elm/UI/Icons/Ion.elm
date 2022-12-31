@@ -1,7 +1,5 @@
 module UI.Icons.Ion exposing (..)
 
-import Html.Styled exposing (i)
-import Html.Styled.Attributes exposing (class)
 import Ionicon
 import Ionicon.Android
 import Ionicon.Ios
@@ -175,9 +173,7 @@ display :
     )
     -> UI.Icons.Common.Icon msg
 display icon { size, color } =
-    i [ class "icon" ]
-        [ icon
-            (UI.Rem.toPixelsFake size)
-            (UI.Color.toIonIconRgba color)
-            |> Svg.fromUnstyled
-        ]
+    icon
+        (UI.Rem.toPixelsFake size)
+        (UI.Color.toIonIconRgba color)
+        |> Svg.fromUnstyled

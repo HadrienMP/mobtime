@@ -63,7 +63,7 @@ head props =
                 ]
             ]
             []
-            [ UI.Text.h2 "Your Profile"
+            [ UI.Text.h2 [] "Your Profile"
             ]
         , case props.mob of
             Just _ ->

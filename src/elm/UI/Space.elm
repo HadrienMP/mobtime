@@ -1,6 +1,12 @@
 module UI.Space exposing (..)
 
 import Css
+import Html.Styled as Html
+
+
+spacer : Html.Html msg
+spacer =
+    Html.div [] []
 
 
 scale : Int -> Float

@@ -1,10 +1,11 @@
-module Components.Share.Doc exposing (..)
+module Pages.Mob.Share.Doc exposing (..)
 
-import Components.Share.Button
-import Components.Share.Modal
 import ElmBook.Actions exposing (logAction, logActionWithString)
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
+import Model.MobName exposing (MobName(..))
+import Pages.Mob.Share.Button
+import Pages.Mob.Share.PageView
 import UI.Palettes
 
 
@@ -13,15 +14,17 @@ theChapter =
     chapter "Share"
         |> renderComponentList
             [ ( "Button"
-              , Components.Share.Button.view
-                    { onClick = logAction "Open Modal"
+              , Pages.Mob.Share.Button.view []
+                    { sharePage = "https://mob.cassette.tools/awesome/share"
                     , color = UI.Palettes.monochrome.on.background
                     }
               )
-            , ( "Modal"
-              , Components.Share.Modal.view
-                    { url = "https://mobtime.hadrienmp.fr/mob/my-fabulous-mob-yeah"
+            , ( "Page"
+              , Pages.Mob.Share.PageView.view
+                    { url = "https://mobtime.hadrienmp.fr/mob/awesome"
                     , copy = logActionWithString "Copied"
+                    , mob = MobName "Awesome"
+                    , onBack = logAction "Back"
                     }
               )
             ]

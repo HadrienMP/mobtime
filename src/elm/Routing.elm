@@ -9,6 +9,7 @@ import Url.Parser as UrlParser exposing ((</>), Parser, map, oneOf, s, top)
 type Page
     = Login
     | Mob MobName
+    | Share MobName
     | Profile
 
 
@@ -23,6 +24,7 @@ route =
     oneOf
         [ map Login top
         , map (MobName >> Mob) (s "mob" </> UrlParser.string)
+        , map (MobName >> Share) (s "mob" </> UrlParser.string </> s "share")
         , map Profile (s "me")
         ]
 
@@ -35,6 +37,9 @@ toUrl page =
 
         Mob mobname ->
             Url.Builder.absolute [ "mob", Model.MobName.print mobname ] []
+
+        Share mobname ->
+            Url.Builder.absolute [ "mob", Model.MobName.print mobname, "share" ] []
 
         Profile ->
             Url.Builder.absolute [ "me" ] []

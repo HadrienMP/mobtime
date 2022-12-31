@@ -16,6 +16,7 @@ import Model.Events
 import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
+import Pages.Mob.Share.Page
 import Pages.Profile.Page
 import Routing
 import Shared
@@ -49,6 +50,7 @@ main =
 type Page
     = Home Pages.Home.Model
     | Mob Pages.Mob.Model
+    | MobShare MobName
     | Profile
 
 
@@ -96,6 +98,11 @@ loadPage shared =
                     Mob
                     (Effect.map GotMobMsg)
 
+        Routing.Share mobName ->
+            ( MobShare mobName
+            , Effect.none
+            )
+
         Routing.Profile ->
             ( Profile, Effect.none )
 
@@ -107,6 +114,7 @@ loadPage shared =
 type Msg
     = GotMobMsg Pages.Mob.Msg
     | GotHomeMsg Pages.Home.Msg
+    | MobShareMsg Pages.Mob.Share.Page.Msg
     | ProfileMsg Pages.Profile.Page.Msg
     | Batch (List Msg)
     | SharedMsg Shared.Msg
@@ -141,6 +149,12 @@ update msg model =
                 |> Tuple.mapBoth
                     (\updated -> { model | page = Mob updated })
                     (Effect.map GotMobMsg)
+                |> handleEffect
+
+        ( MobShareMsg subMsg, MobShare mob ) ->
+            Pages.Mob.Share.Page.update model.shared subMsg mob
+                |> Effect.map MobShareMsg
+                |> Tuple.pair model
                 |> handleEffect
 
         ( ProfileMsg subMsg, Profile ) ->
@@ -216,6 +230,9 @@ getMob url =
         Routing.Mob mobName ->
             Just mobName
 
+        Routing.Share mob ->
+            Just mob
+
         _ ->
             Nothing
 
@@ -233,6 +250,9 @@ subscriptions model =
 
             Mob mobModel ->
                 Pages.Mob.subscriptions mobModel |> Sub.map GotMobMsg
+
+            MobShare _ ->
+                Pages.Mob.Share.Page.subscriptions |> Sub.map MobShareMsg
 
             Profile ->
                 Sub.none
@@ -268,6 +288,10 @@ view model =
                     Pages.Mob.view model.shared sub
                         |> View.map GotMobMsg
 
+                MobShare mob ->
+                    Pages.Mob.Share.Page.view model.shared mob
+                        |> View.map MobShareMsg
+
                 Profile ->
                     Pages.Profile.Page.view model.shared
                         |> View.map ProfileMsg
@@ -280,7 +304,7 @@ view model =
                 _ ->
                     UI.Layout.wrap
     in
-    { title = doc.title
+    { title = doc.title ++ " | Mob Time"
     , body =
         [ Html.toUnstyled <|
             Html.div

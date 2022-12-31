@@ -1,7 +1,7 @@
 module Doc exposing (..)
 
 import Components.NavBar.Doc
-import Components.Share.Doc
+import Components.SecondaryPage.Doc
 import Components.Socket.Doc
 import Components.Volume.Doc
 import Css
@@ -10,6 +10,7 @@ import ElmBook exposing (withChapterGroups, withStatefulOptions, withThemeOption
 import ElmBook.ElmCSS exposing (..)
 import ElmBook.StatefulOptions
 import ElmBook.ThemeOptions exposing (globals)
+import Pages.Mob.Share.Doc
 import Pages.Profile.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
@@ -63,9 +64,13 @@ main =
             , ( "Components"
               , [ Components.Volume.Doc.theChapter
                 , Components.Socket.Doc.theChapter
-                , Components.Share.Doc.theChapter
                 , Components.NavBar.Doc.theChapter
+                , Components.SecondaryPage.Doc.theChapter
                 ]
               )
-            , ( "Pages", [ Pages.Profile.Doc.profileChapter ] )
+            , ( "Pages"
+              , [ Pages.Profile.Doc.profileChapter
+                , Pages.Mob.Share.Doc.theChapter
+                ]
+              )
             ]

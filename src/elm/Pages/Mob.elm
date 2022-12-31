@@ -1,11 +1,10 @@
 module Pages.Mob exposing (..)
 
-import Components.Share.Component
 import Components.Socket.Socket
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
-import Html.Styled.Attributes exposing (class, classList, css, id, title)
+import Html.Styled.Attributes as Attr exposing (class, classList, css, id, title)
 import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
@@ -15,11 +14,11 @@ import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.MobName exposing (MobName)
 import Model.State
+import Pages.Mob.Share.Button
 import Pages.Mob.Tabs.Clocks
 import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Mobbers
-import Pages.Mob.Tabs.Share
 import Pages.Mob.Tabs.Sound
 import Peers.Sync.Adapter
 import Peers.Sync.Core exposing (PeerId)
@@ -61,7 +60,6 @@ type Tab
     | Mobbers
     | Clock
     | Sound
-    | Share
     | Dev
 
 
@@ -74,7 +72,6 @@ type alias Model =
     , now : Time.Posix
     , tab : Tab
     , peerId : Maybe PeerId
-    , share : Components.Share.Component.Model
     }
 
 
@@ -99,7 +96,6 @@ init shared name =
       , now = Time.millisToPosix 0
       , tab = Main
       , peerId = Nothing
-      , share = Components.Share.Component.init
       }
     , Effect.batch
         [ Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print name
@@ -125,13 +121,11 @@ type Msg
     | TimePassed Time.Posix
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Tabs.Clocks.Msg
-    | GotShareTabMsg Pages.Mob.Tabs.Share.Msg
     | GotMobbersSettingsMsg Pages.Mob.Tabs.Mobbers.Msg
     | GotSoundSettingsMsg Pages.Mob.Tabs.Sound.Msg
     | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
     | GotSocketId PeerId
-    | ShareMsg Components.Share.Component.Msg
 
 
 timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
@@ -254,13 +248,6 @@ update shared msg model =
             , Effect.none
             )
 
-        GotShareTabMsg subMsg ->
-            ( model
-            , Pages.Mob.Tabs.Share.update subMsg
-                |> Cmd.map GotShareTabMsg
-                |> Effect.fromCmd
-            )
-
         GotClockSettingsMsg subMsg ->
             ( model
             , Pages.Mob.Tabs.Clocks.update subMsg model.name
@@ -293,12 +280,6 @@ update shared msg model =
             , Effect.fromCmd command
             )
 
-        ShareMsg subMsg ->
-            Components.Share.Component.update shared subMsg model.share
-                |> Tuple.mapBoth
-                    (\updated -> { model | share = updated })
-                    (Effect.map ShareMsg)
-
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
 selectSound now profile =
@@ -325,7 +306,6 @@ subscriptions model =
         [ Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
         , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
         , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
-        , Sub.map ShareMsg <| Components.Share.Component.subscriptions model.share
         , case ( Clock.isOn model.state.clock, Clock.isOn model.state.pomodoro ) of
             ( True, _ ) ->
                 Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
@@ -359,7 +339,7 @@ view shared model =
         action =
             detectAction shared model
     in
-    { title = timeLeftTitle action.timeLeft
+    { title = timeLeftTitle action.timeLeft ++ Model.MobName.print model.name
     , modal =
         case ( model.alarm, model.state.clock, model.state.pomodoro ) of
             ( Playing, _, _ ) ->
@@ -382,7 +362,16 @@ body : Shared -> Model -> ActionDescription -> Html Msg
 body shared model action =
     div [ class "container" ]
         [ clockArea model action
-        , Components.Share.Component.view shared model.share |> Html.map ShareMsg
+        , Pages.Mob.Share.Button.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.top <| Css.rem 15
+                , Css.left <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
+                ]
+            ]
+            { sharePage = Routing.toUrl <| Routing.Share model.name
+            , color = UI.Palettes.monochrome.on.background
+            }
         , nav []
             ([ button
                 [ onClick <| SwitchTab Main
@@ -390,8 +379,8 @@ body shared model action =
                 , title "Home"
                 ]
                 [ UI.Icons.Ion.home
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = UI.Rem.Rem 3
+                    , color = UI.Palettes.monochrome.on.surface
                     }
                 ]
              , button
@@ -400,8 +389,8 @@ body shared model action =
                 , title "Clock Settings"
                 ]
                 [ UI.Icons.Ion.clock
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = UI.Rem.Rem 3
+                    , color = UI.Palettes.monochrome.on.surface
                     }
                 ]
              , button
@@ -410,8 +399,8 @@ body shared model action =
                 , title "Mobbers"
                 ]
                 [ UI.Icons.Ion.people
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = UI.Rem.Rem 3
+                    , color = UI.Palettes.monochrome.on.surface
                     }
                 ]
              , button
@@ -420,18 +409,8 @@ body shared model action =
                 , title "Sound Settings"
                 ]
                 [ UI.Icons.Ion.sound
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
-                    }
-                ]
-             , button
-                [ onClick <| SwitchTab Share
-                , classList [ ( "active", model.tab == Share ) ]
-                , title "Share"
-                ]
-                [ UI.Icons.Ion.share
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = UI.Rem.Rem 3
+                    , color = UI.Palettes.monochrome.on.surface
                     }
                 ]
              ]
@@ -469,10 +448,6 @@ body shared model action =
                 Pages.Mob.Tabs.Sound.view shared model.name model.state.soundProfile
                     |> Html.map GotSoundSettingsMsg
 
-            Share ->
-                Pages.Mob.Tabs.Share.view shared model.name
-                    |> Html.map GotShareTabMsg
-
             Dev ->
                 Pages.Mob.Tabs.Dev.view model.clockSync
         ]
@@ -489,7 +464,7 @@ musicModal =
                 { height = UI.Rem.Rem 10
                 , color = UI.Palettes.monochrome.on.background
                 }
-            , UI.Text.h2 "Turn ended !"
+            , UI.Text.h2 [] "Turn ended !"
             , Button.button [ css [ Css.width <| Css.pct 100 ] ]
                 { content = Button.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
                 , variant = Button.Primary
@@ -513,7 +488,7 @@ breakModal mobName =
         UI.Column.column
             [ css UI.Css.center ]
             [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-            [ UI.Text.h2 "It's time for a break!"
+            [ UI.Text.h2 [] "It's time for a break!"
             , UI.Icons.Tea.display
                 { height = UI.Rem.Rem 10
                 , color = UI.Palettes.monochrome.on.background
@@ -694,7 +669,7 @@ timeLeftTitle : DurationStringParts -> String
 timeLeftTitle action =
     case action of
         [] ->
-            "Mob Time"
+            ""
 
         _ ->
-            String.join " " action ++ " | " ++ "Mob Time"
+            String.join " " action ++ " | "

@@ -1,8 +1,9 @@
 module Pages.Mob.Tabs.Clocks exposing (..)
 
+import Css
 import Effect exposing (Effect)
 import Html.Styled exposing (Html, button, div, h3, label, p, text)
-import Html.Styled.Attributes exposing (class, for, id)
+import Html.Styled.Attributes as Attr exposing (class, for, id)
 import Html.Styled.Events exposing (onClick)
 import Lib.Duration as Duration
 import Model.Clock as Clock
@@ -11,6 +12,7 @@ import Model.MobName exposing (MobName)
 import Model.State
 import Shared exposing (Shared)
 import Time
+import UI.Css
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes
@@ -34,9 +36,15 @@ update msg mob =
 view : Shared -> Time.Posix -> Model.State.State -> Html Msg
 view shared now state =
     div [ id "timer", class "tab" ]
-        [ h3 []
+        [ h3
+            [ Attr.css
+                [ Css.displayFlex
+                , Css.alignItems Css.center
+                , UI.Css.gap <| UI.Rem.Rem 0.4
+                ]
+            ]
             [ UI.Icons.Ion.people
-                { size = UI.Rem.Rem 1
+                { size = UI.Rem.Rem 3
                 , color = UI.Palettes.monochrome.on.background
                 }
             , text "Turn"
@@ -100,7 +108,7 @@ view shared now state =
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Ion.batteryFull
-                    { size = UI.Rem.Rem 1
+                    { size = UI.Rem.Rem 3
                     , color = UI.Palettes.monochrome.on.background
                     }
                 , UI.Range.View.view
@@ -115,7 +123,7 @@ view shared now state =
                             |> toValue shared
                     }
                 , UI.Icons.Ion.batteryLow
-                    { size = UI.Rem.Rem 1
+                    { size = UI.Rem.Rem 3
                     , color = UI.Palettes.monochrome.on.background
                     }
                 ]

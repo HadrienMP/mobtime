@@ -1,13 +1,14 @@
 module Pages.Mob.Tabs.Mobbers exposing (..)
 
+import Css
 import Effect exposing (Effect)
 import Field
 import Field.String
 import Html as Unstyled
 import Html.Attributes as UnstyledAttr
 import Html.Events as UnstyledEvts
-import Html.Styled exposing (Html, button, div, form, li, p, text, ul)
-import Html.Styled.Attributes exposing (class, disabled, id, type_)
+import Html.Styled as Html exposing (Html, button, div, form, li, p, text, ul)
+import Html.Styled.Attributes as Attr exposing (class, id, type_)
 import Html.Styled.Events exposing (onClick, onSubmit)
 import Lib.Toaster as Toaster
 import Model.Events
@@ -18,6 +19,8 @@ import Model.Role exposing (Role)
 import Model.State exposing (State)
 import Random
 import Shared
+import UI.Button.View
+import UI.Css
 import UI.Icons.Ion as Icons
 import UI.Palettes
 import UI.Rem
@@ -113,43 +116,64 @@ update msg mobbers mob model =
 view : State -> Model -> Html Msg
 view { mobbers, roles } model =
     div
-        [ id "mobbers", class "tab" ]
+        [ id "mobbers"
+        , class "tab"
+        , Attr.css
+            [ Css.displayFlex
+            , Css.flexDirection Css.column
+            , UI.Css.gap <| UI.Rem.Rem 1
+            ]
+        ]
         [ form
             [ id "add", onSubmit StartAdding ]
             [ Field.view (textFieldConfig "Mobber to be added" NameChanged) model.mobberName
-                |> Html.Styled.fromUnstyled
+                |> Html.fromUnstyled
             , button [ type_ "submit" ]
                 [ Icons.plus
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = UI.Rem.Rem 2
+                    , color = UI.Palettes.monochrome.on.surface
                     }
                 ]
             ]
-        , div [ class "button-row" ]
-            [ button
-                [ class "labelled-icon-button"
-                , disabled (not <| Mobbers.rotatable mobbers)
-                , onClick <| ShareEvent <| Model.Events.RotatedMobbers
-                ]
-                [ Icons.rotate
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
-                    }
-                , text "Rotate"
-                ]
-            , button
-                [ class "labelled-icon-button"
-                , disabled (not <| Mobbers.shufflable mobbers)
-                , onClick Shuffle
-                ]
-                [ Icons.shuffle
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
-                    }
-                , text "Shuffle"
+        , div
+            [ Attr.css
+                [ Css.displayFlex
+                , Css.width <| Css.pct 100
+                , UI.Css.gap <| UI.Rem.Rem 0.4
                 ]
             ]
-        , ul []
+            [ UI.Button.View.button [ Attr.css [ Css.flexGrow <| Css.int 1 ] ]
+                { content = UI.Button.View.Both { icon = Icons.rotate, text = "Rotate" }
+                , action =
+                    UI.Button.View.OnPress <|
+                        if Mobbers.rotatable mobbers then
+                            Just <| ShareEvent <| Model.Events.RotatedMobbers
+
+                        else
+                            Nothing
+                , variant = UI.Button.View.Primary
+                , size = UI.Button.View.S
+                }
+            , UI.Button.View.button [ Attr.css [ Css.flexGrow <| Css.int 1 ] ]
+                { content = UI.Button.View.Both { icon = Icons.shuffle, text = "Shuffle" }
+                , action =
+                    UI.Button.View.OnPress <|
+                        if Mobbers.shufflable mobbers then
+                            Just <| Shuffle
+
+                        else
+                            Nothing
+                , variant = UI.Button.View.Primary
+                , size = UI.Button.View.S
+                }
+            ]
+        , ul
+            [ Attr.css
+                [ Css.displayFlex
+                , Css.flexDirection Css.column
+                , UI.Css.gap <| UI.Rem.Rem 1
+                ]
+            ]
             (Mobbers.assignRoles roles mobbers
                 |> List.map mobberView
             )
