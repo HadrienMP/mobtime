@@ -142,7 +142,7 @@ footerLink attributes { url, icon, label } =
                 , Css.margin Css.auto
                 ]
             ]
-            [ icon { size = UI.Rem.Rem 1, color = UI.Palettes.monochrome.on.background }
+            [ icon { size = UI.Rem.Rem 2, color = UI.Palettes.monochrome.on.background }
             , Html.span [ Attr.css [ Css.padding <| Css.rem 0.2 ] ] []
             , div [ Attr.css [ Css.position Css.relative, Css.top <| Css.px -1 ] ] [ text label ]
             ]
