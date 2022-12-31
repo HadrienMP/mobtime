@@ -1,15 +1,16 @@
 module UI.Icons.Tape exposing (..)
 
-import Svg.Styled as Svg exposing (Svg, path, svg)
+import Svg.Styled as Svg exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttr
-import UI.Color exposing (RGBA255)
-import UI.Rem exposing (Rem)
+import UI.Color
+import UI.Icons.Common exposing (Icon)
+import UI.Rem
 
 
-display : { height : Rem, color : RGBA255 } -> Svg msg
-display { height, color } =
+display : Icon msg
+display { size, color } =
     svg
-        [ SvgAttr.height <| UI.Rem.toCssString height
+        [ SvgAttr.height <| UI.Rem.toCssString size
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 109 78"
         ]

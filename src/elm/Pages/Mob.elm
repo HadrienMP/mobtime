@@ -461,7 +461,7 @@ musicModal =
             [ css UI.Css.center ]
             [ UI.Column.Gap <| UI.Rem.Rem 2 ]
             [ UI.Icons.Tape.display
-                { height = UI.Rem.Rem 10
+                { size = UI.Rem.Rem 10
                 , color = UI.Palettes.monochrome.on.background
                 }
             , UI.Text.h2 [] "Turn ended !"

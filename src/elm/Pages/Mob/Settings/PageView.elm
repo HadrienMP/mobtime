@@ -12,6 +12,7 @@ import UI.Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
+import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Palettes
 import UI.Range.View
@@ -41,63 +42,89 @@ view props =
                 [ Attr.css
                     [ Css.displayFlex
                     , Css.flexDirection Css.column
-                    , UI.Css.gap <| UI.Rem.Rem 2
+                    , UI.Css.gap <| UI.Rem.Rem 3
                     ]
                 ]
                 [ Html.text "The settings are shared with the whole team"
-                , lengthRange
-                    { title = "Turn"
-                    , icon = UI.Icons.Custom.hourGlass
-                    , length = props.turnLength
-                    , onChange = props.onTurnLengthChange
-                    , min = Lib.Duration.ofMinutes 2
-                    , max = Lib.Duration.ofMinutes 15
-                    }
-                , lengthRange
-                    { title = "Pomodoro"
-                    , icon = UI.Icons.Custom.tomato
-                    , length = props.pomodoro
-                    , onChange = props.onPomodoroChange
-                    , min = Lib.Duration.ofMinutes 10
-                    , max = Lib.Duration.ofMinutes 45
-                    }
-                , Html.h3
-                    [ Attr.css
-                        [ Css.displayFlex
-                        , UI.Css.gap <| UI.Rem.Rem 1
-                        , Css.borderBottom3 (Css.px 1) Css.solid <|
-                            UI.Color.toElmCss <|
-                                UI.Palettes.monochrome.on.background
-                        , Css.paddingBottom <| Css.rem 0.4
-                        , Css.alignItems Css.center
-                        , Css.margin Css.zero
-                        ]
-                    ]
-                    [ UI.Icons.Tape.display
-                        { height = UI.Rem.Rem 1.4
-                        , color = UI.Palettes.monochrome.on.background
-                        }
-                    , Html.text "Playlist"
-                    ]
-                , Html.div
-                    [ Attr.css
-                        [ Css.displayFlex
-                        , Css.flexWrap Css.wrap
-                        , Css.justifyContent Css.spaceBetween
-                        ]
-                    ]
-                    (Sounds.allProfiles
-                        |> List.map
-                            (\profile ->
-                                viewProfile
-                                    { active = props.currentPlaylist
-                                    , current = profile
-                                    , onChange = props.onPlaylistChange
-                                    }
-                            )
-                    )
+                , clockLengths props
+                , playlist props
                 ]
         }
+
+
+playlist : Props msg -> Html msg
+playlist props =
+    Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| UI.Rem.Rem 0.8 ] ]
+        [ sectionTitle UI.Icons.Tape.display "Playlist"
+        , Html.div
+            [ Attr.css
+                [ Css.displayFlex
+                , Css.flexWrap Css.wrap
+                , Css.justifyContent Css.spaceBetween
+                ]
+            ]
+            (Sounds.allProfiles
+                |> List.map
+                    (\profile ->
+                        viewProfile
+                            { active = props.currentPlaylist
+                            , current = profile
+                            , onChange = props.onPlaylistChange
+                            }
+                    )
+            )
+        ]
+
+
+sectionTitle : Icon msg -> String -> Html msg
+sectionTitle icon title =
+    Html.h3
+        [ Attr.css
+            [ Css.displayFlex
+            , UI.Css.gap <| UI.Rem.Rem 1
+            , Css.borderBottom3 (Css.px 1) Css.solid <|
+                UI.Color.toElmCss <|
+                    UI.Palettes.monochrome.on.background
+            , Css.paddingBottom <| Css.rem 0.4
+            , Css.alignItems Css.center
+            , Css.margin Css.zero
+            ]
+        ]
+        [ icon
+            { size = UI.Rem.Rem 2
+            , color = UI.Palettes.monochrome.on.background
+            }
+        , Html.text title
+        ]
+
+
+clockLengths : Props msg -> Html msg
+clockLengths props =
+    Html.div
+        [ Attr.css
+            [ Css.displayFlex
+            , Css.flexDirection Css.column
+            , UI.Css.gap <| UI.Rem.Rem 0.6
+            ]
+        ]
+        [ sectionTitle UI.Icons.Ion.clock "Clocks"
+        , lengthRange
+            { title = "Turn"
+            , icon = UI.Icons.Custom.hourGlass
+            , length = props.turnLength
+            , onChange = props.onTurnLengthChange
+            , min = Lib.Duration.ofMinutes 2
+            , max = Lib.Duration.ofMinutes 15
+            }
+        , lengthRange
+            { title = "Pomodoro"
+            , icon = UI.Icons.Custom.tomato
+            , length = props.pomodoro
+            , onChange = props.onPomodoroChange
+            , min = Lib.Duration.ofMinutes 10
+            , max = Lib.Duration.ofMinutes 45
+            }
+        ]
 
 
 lengthRange :

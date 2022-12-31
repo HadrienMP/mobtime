@@ -99,7 +99,7 @@ view shared model =
                     ]
                 ]
                 [ UI.Icons.Tape.display
-                    { height = UI.Rem.Rem 8
+                    { size = UI.Rem.Rem 8
                     , color = UI.Palettes.monochrome.on.background
                     }
                 , Html.h1

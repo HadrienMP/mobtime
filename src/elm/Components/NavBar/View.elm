@@ -80,7 +80,7 @@ title =
         , Attr.href "/"
         ]
         [ UI.Icons.Tape.display
-            { height = UI.Rem.Rem 2
+            { size = UI.Rem.Rem 2
             , color = UI.Palettes.monochrome.on.surface
             }
         , Html.h1
