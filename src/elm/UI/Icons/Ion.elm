@@ -16,6 +16,11 @@ code =
     display Ionicon.code
 
 
+settings : Icon msg
+settings =
+    display Ionicon.gearB
+
+
 user : Icon msg
 user =
     display Ionicon.person

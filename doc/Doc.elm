@@ -10,6 +10,7 @@ import ElmBook exposing (withChapterGroups, withStatefulOptions, withThemeOption
 import ElmBook.ElmCSS exposing (..)
 import ElmBook.StatefulOptions
 import ElmBook.ThemeOptions exposing (globals)
+import Pages.Mob.Settings.Doc
 import Pages.Mob.Share.Doc
 import Pages.Profile.Doc
 import UI.Button.Doc
@@ -71,6 +72,7 @@ main =
             , ( "Pages"
               , [ Pages.Profile.Doc.profileChapter
                 , Pages.Mob.Share.Doc.theChapter
+                , Pages.Mob.Settings.Doc.theChapter
                 ]
               )
             ]
