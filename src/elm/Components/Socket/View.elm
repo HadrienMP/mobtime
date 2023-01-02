@@ -1,5 +1,6 @@
 module Components.Socket.View exposing (..)
 
+import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import UI.Color exposing (RGBA255)
@@ -16,14 +17,19 @@ view attributes props =
     let
         ( icon, title ) =
             if props.socketConnected then
-                ( UI.Icons.Plugs.on, "Connected to the server" )
+                ( Nothing, "Connected to the server" )
 
             else
-                ( UI.Icons.Plugs.off, "Disconnected, attempting to reconnect" )
+                ( Just UI.Icons.Plugs.off, "Disconnected, attempting to reconnect" )
     in
-    Html.div (Attr.title title :: attributes)
-        [ icon
-            { height = Rem 1
-            , color = props.color
-            }
-        ]
+    icon
+        |> Maybe.map
+            (\it ->
+                it
+                    { height = Rem 1
+                    , color = props.color
+                    }
+            )
+        |> Maybe.withDefault (Html.div [ Attr.css [ Css.width <| Css.rem 1 ] ] [])
+        |> List.singleton
+        |> Html.div (Attr.title title :: attributes)
