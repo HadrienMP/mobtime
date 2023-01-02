@@ -38,7 +38,6 @@ view attributes props =
                 [ Css.border3 (Css.px 2) Css.solid (UI.Color.toElmCss UI.Palettes.monochrome.on.background)
                 , Css.borderRadius <| Css.pct 50
                 , Css.padding <| Css.rem 0.5
-                , Css.paddingRight <| Css.rem 0.6
                 , Css.maxWidth Css.fitContent
                 , Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.background
                 ]
