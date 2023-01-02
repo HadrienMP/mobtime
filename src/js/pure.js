@@ -3,6 +3,7 @@ import '../sass/main.scss';
 import * as tooltips from "./tooltips";
 import * as sockets from "./sockets";
 import * as sound from "./sound";
+import * as copy from "./copy";
 const Elm = require('../elm/Main.elm').Elm;
 
 const app = Elm.Main.init({
@@ -10,6 +11,7 @@ const app = Elm.Main.init({
     flags: JSON.parse(window.localStorage.getItem("preferences")) || { volume: 30 }
 });
 
+copy.setup(app);
 tooltips.setup();
 
 let alarm = sound.load('/sound/silence.mp3');
@@ -33,19 +35,6 @@ app.ports.commands.subscribe(command => {
         case "StopAlarm":
             alarm.stop();
             break;
-        case 'CopyInPasteBin':
-            if (navigator.clipboard) {
-                navigator.clipboard
-                    .writeText(command.value)
-                    .finally(() => app.ports.events.send({ name: 'Copied', value: "" }))
-            } else {
-                if (fallbackCopyTextToClipboard(command.value))
-                    app.ports.events.send({ name: 'Copied', value: "" });
-                else {
-                    alert('wut')
-                }
-            }
-            break;
         case 'ChangeVolume':
             window.localStorage.setItem("preferences", JSON.stringify({ volume: parseInt(command.value) }));
             sound.volume(command.value);
@@ -55,33 +44,18 @@ app.ports.commands.subscribe(command => {
             if (socket.id)
                 app.ports.events.send({ name: "GotSocketId", value: socket.id });
             break;
-        case 'TestTheSound':
-            sound.play("/sound/hello.mp3");
-            break;
         case 'ChangeTitle':
             document.title = command.value;
             break;
     }
 });
 
-app.ports.changeVolume.subscribe(sound.volume)
-app.ports.testVolume.subscribe(() => sound.play("/sound/hello.mp3"));
+
 app.ports.savePreferences.subscribe(preferences =>
     window.localStorage.setItem("preferences", JSON.stringify(preferences)));
-app.ports.copyShareLink.subscribe(text => {
-    if (navigator.clipboard) {
-        navigator.clipboard
-            .writeText(text)
-            .finally(() => app.ports.events.send({ name: 'Copied', value: "" }))
-    } else {
-        if (fallbackCopyTextToClipboard(text))
-            app.ports.shareLinkCopied.send("");
-        else {
-            alert('wut')
-        }
-    }
-})
 
+app.ports.changeVolume.subscribe(sound.volume)
+app.ports.testVolume.subscribe(() => sound.play("/sound/hello.mp3"));
 testSound();
 const soundOnInterval = setInterval(testSound(), 100)
 
@@ -93,27 +67,4 @@ function testSound() {
             clearInterval(soundOnInterval);
         }
     });
-}
-
-function fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement("textarea");
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-        return document.execCommand('copy');
-    } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
-        return false;
-    } finally {
-        document.body.removeChild(textArea);
-    }
 }

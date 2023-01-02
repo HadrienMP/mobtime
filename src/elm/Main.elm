@@ -304,7 +304,7 @@ view model =
                 _ ->
                     UI.Layout.wrap
     in
-    { title = doc.title ++ " | Mob Time"
+    { title = doc.title
     , body =
         [ Html.toUnstyled <|
             Html.div

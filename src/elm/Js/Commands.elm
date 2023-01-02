@@ -12,7 +12,6 @@ type Command
     | SetAlarm Sounds.Sound
     | StopAlarm
     | ChangeTitle String
-    | CopyInPasteBin String
     | GetSocketId
 
 
@@ -26,9 +25,6 @@ send : Command -> Cmd msg
 send command =
     commands <|
         case command of
-            CopyInPasteBin toCopy ->
-                OutCommand "CopyInPasteBin" <| Json.Encode.string toCopy
-
             SoundAlarm ->
                 OutCommand "SoundAlarm" Json.Encode.null
 

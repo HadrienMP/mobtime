@@ -134,7 +134,7 @@ timePassed now shared model =
         timePassedResult =
             Model.State.timePassed now model.state
 
-        toto =
+        alarmCommand =
             case timePassedResult.turnEvent of
                 Clock.Ended ->
                     Js.Commands.send Js.Commands.SoundAlarm
@@ -154,8 +154,11 @@ timePassed now shared model =
         , state = timePassedResult.updated
       }
     , Cmd.batch
-        [ toto
-        , Js.Commands.send <| Js.Commands.ChangeTitle <| timeLeftTitle <| timeLeftString shared model
+        [ alarmCommand
+        , Js.Commands.send <|
+            Js.Commands.ChangeTitle <|
+                timeLeftTitle model.name <|
+                    timeLeftString shared model
         ]
     )
 
@@ -339,7 +342,7 @@ view shared model =
         action =
             detectAction shared model
     in
-    { title = timeLeftTitle action.timeLeft ++ Model.MobName.print model.name
+    { title = timeLeftTitle model.name action.timeLeft
     , modal =
         case ( model.alarm, model.state.clock, model.state.pomodoro ) of
             ( Playing, _, _ ) ->
@@ -665,11 +668,14 @@ timeLeftString shared model =
             []
 
 
-timeLeftTitle : DurationStringParts -> String
-timeLeftTitle action =
-    case action of
+timeLeftTitle : MobName -> DurationStringParts -> String
+timeLeftTitle mob action =
+    (case action of
         [] ->
             ""
 
         _ ->
             String.join " " action ++ " | "
+    )
+        ++ Model.MobName.print mob
+        ++ " | Mob Time"
