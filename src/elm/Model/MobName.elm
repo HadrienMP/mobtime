@@ -9,13 +9,18 @@ type MobName
 
 
 print : MobName -> String
-print (MobName it) =
-    it
+print (MobName value) =
+    case String.toList value of
+        [] ->
+            ""
+
+        first :: tail ->
+            Char.toUpper first :: tail |> String.fromList
 
 
 encode : MobName -> Json.Value
-encode (MobName it) =
-    Json.string it
+encode (MobName value) =
+    Json.string value
 
 
 decoder : Decode.Decoder MobName
