@@ -1,0 +1,128 @@
+// -------------------------------------------
+// HEADER
+// -------------------------------------------
+
+@use '../theme' as *;
+
+$header-padding: 90px;
+
+header {
+    section {
+        margin: 0 auto;
+        padding: 30px 0 120px;
+        position: relative;
+
+        &::before {
+            @include mob-header-background();
+
+            bottom: 0;
+            content: '';
+            left: 0;
+            opacity: 0.2;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: -1;
+        }
+
+        #circles {
+            background: rgb(255 255 255 / 70%);
+            border-radius: 100%;
+            display: block;
+            margin: auto;
+            transform: rotateZ(-90deg);
+
+            circle {
+                transition: stroke-dashoffset 1s linear;
+            }
+        }
+    }
+}
+
+#action {
+    .icon {
+        display: block;
+        margin: auto;
+    }
+
+    #time-left {
+        display: none;
+
+        span {
+            display: block;
+        }
+    }
+
+    &.on {
+        .icon {
+            display: none;
+        }
+
+        #time-left {
+            display: block;
+        }
+
+        &:hover {
+            #time-left {
+                display: none;
+            }
+
+            .icon {
+                display: block;
+            }
+        }
+    }
+}
+
+#share-link {
+    cursor: pointer;
+
+    strong {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    i {
+        font-size: 1.1em;
+    }
+}
+
+h2 {
+    #share-link {
+        border-bottom: 1px solid;
+        border-radius: 20px 20px 0 0;
+        display: inline-block;
+        margin-top: 20px;
+        padding: 5px 20px;
+        position: relative;
+
+        i {
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+    }
+}
+
+// Nav
+
+nav {
+    background: #666;
+    display: flex;
+
+    button {
+        @include icon(2.1em);
+        @include icon-color(#fff);
+
+        border-right: 1px solid $border-color;
+        color: #fff;
+        display: inline-block;
+        flex: 1 1;
+        padding: 0.5em 0;
+        text-align: center;
+        text-shadow: 1px 1px 1px #666;
+
+        &:first-child {
+            border-left: 1px solid $border-color;
+        }
+    }
+}

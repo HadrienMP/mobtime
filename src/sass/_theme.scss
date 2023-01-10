@@ -1,34 +1,83 @@
-$width: 433px;
-$light-bg-color: #ffffff;
+// -------------------------------------------
+// THEME
+// -------------------------------------------
+
+// Fonts
+
+@import url('https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Oswald:wght@200;400;500;600;700;800;900&display=swap');
+
+// Colors
+
+$light-bg-color: #fff;
 $dark-bg-color: #c9c9c9;
 $dark-button-color: #666;
 $light-button-color: #999;
-$color: black;
-$shadow-shade: 120;
-$shadow-color: rgba($shadow-shade, $shadow-shade, $shadow-shade, .4);
-$border-shade: 250;
-$border-color: rgba($border-shade, $border-shade, $border-shade, .6);
-$margin-space: 1em;
-$padding-space: .5em;
+$color: #000;
 
 $success-color: #35c135;
 $info-color: #00a9eb;
 $error-color: #eb0000;
 
-@mixin mob-header-background() {
-  background: url("/public/images/k7.jpg") top no-repeat;
-  background-size: cover;
+// Shadows
+
+$shadow-shade: 120;
+$shadow-color: rgba($shadow-shade, $shadow-shade, $shadow-shade, 40%);
+
+// Borders
+
+$border-shade: 250;
+$border-color: rgba($border-shade, $border-shade, $border-shade, 60%);
+
+// Content boxes
+
+$margin-space: 1em;
+$padding-space: 0.5em;
+
+// Widths
+
+$width: 433px;
+
+// Mixins
+
+@mixin gradient-background {
+    background: $dark-bg-color;
+
+    /* fallback for old browsers */
+    background: linear-gradient(to right, $light-bg-color, $dark-bg-color);
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-@mixin iconColor($icon-color) {
-  .icon svg * {
-    fill: $icon-color;
-  }
+@mixin mob-header-background() {
+    background: url('/public/images/k7.jpg') top no-repeat;
+    background-size: cover;
+}
+
+@mixin icon-color($icon-color) {
+    .icon svg * {
+        fill: $icon-color;
+    }
 }
 
 @mixin icon($size) {
-  .icon svg {
-    width: $size;
-    height: $size;
-  }
+    .icon svg {
+        height: $size;
+        width: $size;
+    }
+}
+
+// Animations
+
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }

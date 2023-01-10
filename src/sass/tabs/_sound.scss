@@ -1,43 +1,48 @@
+// -------------------------------------------
+// SOUND
+// -------------------------------------------
+
+@use '../theme' as *;
+
 #test-audio {
-  width: 100%;
+    width: 100%;
 }
 
 #sounds-field {
-  display: block;
+    display: block;
+}
 
-  #sound-cards {
-    padding: $margin-space 0;
+#sound-cards {
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-flow: row wrap;
     gap: $padding-space;
+    justify-content: space-around;
+    padding: $margin-space 0;
 
     button {
-      min-width: 170px;
-      max-width: 300px;
-      width: 130px;
-      text-align: center;
-      padding: 0;
-      display: block;
-      flex-grow: 1;
-      border: 1px solid $light-button-color;
+        border: 1px solid $light-button-color;
+        display: block;
+        flex-grow: 1;
+        max-width: 300px;
+        min-width: 170px;
+        padding: 0;
+        text-align: center;
+        width: 130px;
 
-      p {
-        padding: $padding-space;
-      }
-
-      img {
-        width: 100%;
-        opacity: .6;
-      }
-
-      &.active,
-      &:hover {
-        img {
-          opacity: 1;
+        p {
+            padding: $padding-space;
         }
-      }
+
+        img {
+            opacity: 0.6;
+            width: 100%;
+        }
+
+        &.active,
+        &:hover {
+            img {
+                opacity: 1;
+            }
+        }
     }
-  }
 }
