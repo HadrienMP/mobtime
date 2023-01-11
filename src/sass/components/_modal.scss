@@ -1,0 +1,33 @@
+// -------------------------------------------
+// MODAL
+// -------------------------------------------
+
+@use '../theme' as *;
+
+#modal-container {
+    background: rgb(100 100 100 / 40%);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+#modal {
+    background: #fff;
+    left: 50%;
+    margin: auto;
+    padding: $padding-space;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    h2 {
+        font-size: 1.3em;
+    }
+
+    button {
+        margin-top: $margin-space;
+        width: 100%;
+    }
+}

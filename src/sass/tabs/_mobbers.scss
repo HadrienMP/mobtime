@@ -1,90 +1,90 @@
-@import "../theme";
+// -------------------------------------------
+// MOBBERS
+// -------------------------------------------
 
-#mobbers {
+@use '../theme' as *;
 
-  #add {
-    display: flex;
+#add {
     align-items: end;
+    display: flex;
 
     .form-field {
-      flex: 1 1;
-      width: 50%;
-      margin: 0;
-      position: relative;
+        flex: 1 1;
+        margin: 0;
+        position: relative;
+        width: 50%;
 
-      input {
-        width: 100%;
-      }
+        input {
+            width: 100%;
+        }
     }
 
     button {
-      flex: 0 0;
+        @include icon(1.1em);
+        @include icon-color(#fff);
 
-      @include icon(1.1em);
-      @include iconColor(white);
+        flex: 0 0;
     }
-  }
+}
 
-  .actions {
-    display: flex;
-    margin: 10px 0;
-
-    button {
-      flex: 1 1;
-      padding: 8px;
-      margin-left: 2px;
-
-      &:first-child {
-        margin-left: 0;
-      }
-    }
-  }
-
-  ul {
+#mobbers {
     li {
+        .role {
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
 
-      p.role {
-        font-size: .8em;
-        margin-bottom: 5px;
-      }
+        div {
+            align-items: end;
+            display: flex;
+            width: 100%;
 
-      div {
+            > i {
+                flex-grow: 0;
+                flex-shrink: 0;
+                padding-right: 10px;
+            }
+
+            .name {
+                flex-grow: 1;
+                flex-shrink: 1;
+                font-size: 1.1em;
+                font-weight: bold;
+                padding-bottom: 5px;
+                text-transform: capitalize;
+                width: 50%;
+            }
+
+            button {
+                @include icon(1em);
+                @include icon-color(#000);
+
+                background: none;
+                border: 0;
+                color: #999;
+                flex-shrink: 0;
+                font-size: 1em;
+                padding: 0 0 0 20px;
+
+                &:hover {
+                    color: #000;
+                }
+            }
+        }
+    }
+
+    .actions {
         display: flex;
-        align-items: bottom;
-        width: 100%;
-
-        &>i {
-          padding-right: 10px;
-          flex-shrink: 0;
-          flex-grow: 0;
-        }
-
-        p.name {
-          width: 50%;
-          flex-grow: 1;
-          flex-shrink: 1;
-          font-size: 1.1em;
-          text-transform: capitalize;
-          font-weight: bold;
-          padding-bottom: 5px;
-        }
+        margin: 10px 0;
 
         button {
-          flex-shrink: 0;
-          border: none;
-          background: none;
-          font-size: 1em;
-          color: #999;
-          padding: 0 0 0 20px;
+            flex: 1 1;
+            margin-left: 2px;
+            padding: 8px;
 
-          @include icon(1em);
-          @include iconColor(black);
-
-          &:hover {
-            color: black;
-          }
+            &:first-child {
+                margin-left: 0;
+            }
         }
-      }
     }
-  }
 }

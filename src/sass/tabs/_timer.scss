@@ -1,23 +1,27 @@
-@import "../theme";
+// -------------------------------------------
+// TIMER
+// -------------------------------------------
+
+@use '../theme' as *;
 
 #timer {
-  label {
-    flex: 0 0 138px;
-  }
-
-  .form-field {
-    &>*:first-child {
-      flex: 1 1;
-      margin-right: $margin-space;
-
-      &+* {
-        flex: 2 2;
-      }
+    label {
+        flex: 0 0 138px;
     }
 
-    .field-input {
-      display: flex;
-      align-items: center;
+    .form-field {
+        > *:first-child {
+            flex: 1 1;
+            margin-right: $margin-space;
+
+            + * {
+                flex: 2 2;
+            }
+        }
+
+        .field-input {
+            align-items: center;
+            display: flex;
+        }
     }
-  }
 }

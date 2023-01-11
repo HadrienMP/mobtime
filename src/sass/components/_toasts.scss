@@ -1,0 +1,51 @@
+// -------------------------------------------
+// TOASTS
+// -------------------------------------------
+
+@use '../theme' as *;
+
+#toasts {
+    left: 0;
+    margin: 0 10px;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    .toast {
+        @include icon(1.4em);
+        @include icon-color(#fff);
+
+        align-items: center;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgb(0 0 0 / 60%);
+        box-sizing: border-box;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        margin: 10px 0 10px auto;
+        max-width: 400px;
+        padding: 15px;
+        position: relative;
+        width: 100%;
+
+        &.success {
+            background: $success-color;
+        }
+
+        &.info {
+            background: $info-color;
+        }
+
+        &.error {
+            background: $error-color;
+        }
+
+        .level-icon {
+            font-size: 1.5em;
+        }
+
+        .content {
+            padding: 0 15px;
+        }
+    }
+}

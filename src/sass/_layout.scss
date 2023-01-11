@@ -1,0 +1,208 @@
+/**
+ * LAYOUT
+ *
+ * BASE
+ * Utils................Utilitary classes.
+ *
+ * OBJECTS
+ * Forms................Forms and inputs.
+ * Buttons..............Buttons and icons.
+ *
+ * WRAPPERS
+ * Tabs.................Tabs and home tabs.
+ *
+ * OTHERS
+ * Misc..............Buttons and icons.
+ */
+
+@use 'theme' as *;
+
+// Utils
+
+hr {
+    color: $light-button-color;
+    margin: 20px 0;
+}
+
+.active {
+    background: #999;
+}
+
+// Forms
+
+input[type='text'] {
+    border: 0;
+    border-bottom: 1px solid;
+    font-size: 1.1em;
+    font-weight: bold;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+@include icon(1.2em);
+// @include icon-color(#000);
+
+// Buttons
+
+button {
+    align-items: center;
+    background: $dark-button-color;
+    border: 0;
+    border-radius: 0;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.9em;
+    outline: none;
+    padding: $padding-space;
+
+    &:hover {
+        background: $light-button-color;
+    }
+
+    &[disabled] {
+        cursor: auto;
+        opacity: 0.6;
+
+        &:hover {
+            background: $dark-button-color;
+        }
+    }
+}
+
+.form-field {
+    align-items: center;
+    display: flex;
+    margin: $margin-space 0;
+
+    label {
+        margin-right: 20px;
+    }
+}
+
+.labelled-icon-button {
+    @include icon-color(#fff);
+
+    flex: auto;
+
+    .icon {
+        border-right: 1px solid;
+        margin-right: 0.4em;
+        padding-right: 0.4em;
+    }
+}
+
+.toggles {
+    align-items: center;
+    display: flex;
+
+    button {
+        flex: 1 1;
+        justify-content: center;
+        padding: 6px;
+    }
+}
+
+.button-row {
+    display: flex;
+    margin: $margin-space 0;
+
+    button {
+        margin-left: 0.2em;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
+
+#timer button,
+#mobbers button,
+#action {
+    justify-content: center;
+}
+
+// Tabs
+
+.tab {
+    background: rgb(255 255 255 / 80%);
+    padding: $margin-space 0;
+
+    #share-link {
+        @include icon(1.4em);
+        @include icon-color(#000);
+
+        align-items: center;
+        background: none;
+        color: #000;
+        display: flex;
+        font-size: 1em;
+        padding: 0;
+        text-align: left;
+        width: 100%;
+
+        span {
+            flex: 1 1;
+        }
+
+        i {
+            flex: 0 0;
+        }
+    }
+
+    h3 {
+        border-bottom: 1px solid;
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-top: 2 * $margin-space;
+        padding-bottom: $padding-space;
+
+        .icon {
+            padding-right: $padding-space;
+            vertical-align: middle;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+}
+
+#home.tab {
+    .mobber-roles {
+        border-top: 1px solid $dark-button-color;
+        margin: $margin-space 0;
+        padding-top: $margin-space;
+
+        .mobber-role {
+            align-items: center;
+            display: flex;
+
+            .role {
+                flex: 1 1;
+            }
+
+            .mobber {
+                flex: 2 2;
+                font-size: 1.2em;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+// Misc
+
+#connectionLost {
+    animation: blink 2s infinite;
+    background: #f00;
+    border-radius: 100%;
+    box-shadow: 1px 1px 4px #f00;
+    height: 8px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 8px;
+}

@@ -1,0 +1,21 @@
+{
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-sass-guidelines"
+    ],
+    "plugins": ["stylelint-scss"],
+    "rules": {
+        "indentation": 4,
+        "import-notation": null,
+        "max-nesting-depth": 4,
+        "selector-max-compound-selectors": 4,
+        "selector-max-id": 2,
+        "selector-no-qualifying-type": [
+            true,
+            {
+                "ignore": ["attribute"]
+            }
+        ]
+    },
+    "syntax": "scss"
+}

@@ -1,29 +1,37 @@
-@import "../theme";
+// -------------------------------------------
+// DEV
+// -------------------------------------------
+
+@use '../theme' as *;
 
 #dev.tab {
-  strong {
-    font-weight: bold;
-  }
-  table {
-    margin: $margin-space 0;
-    padding: $padding-space 0;
-    width: 100%;
-
-    tr:first-child {
-      border-bottom: 1px solid;
-
-      th {
+    strong {
         font-weight: bold;
-      }
     }
 
-    td, th {
-      text-align: right;
-      padding: $padding-space 0;
+    table {
+        margin: $margin-space 0;
+        padding: $padding-space 0;
+        width: 100%;
+
+        td,
+        th {
+            padding: $padding-space 0;
+            text-align: right;
+        }
+
+        td:first-child,
+        th:first-child {
+            text-align: left;
+            width: 75%;
+        }
+
+        tr:first-child {
+            border-bottom: 1px solid;
+
+            th {
+                font-weight: bold;
+            }
+        }
     }
-    td:first-child, th:first-child {
-      width: 75%;
-      text-align: left;
-    }
-  }
 }
