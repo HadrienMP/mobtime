@@ -2,5 +2,6 @@
     "recommendations": [
         "elmtooling.elm-ls-vscode",
         "pinage404.nix-extension-pack",
+        "pinage404.bash-extension-pack",
     ]
 }
