@@ -25,11 +25,5 @@ export function setup(app) {
         }
     });
 
-    app.ports.clockSyncOutMessage.subscribe(message => {
-        socket.emit("sync", message.mob, message);
-    });
-    socket.on("sync", data => {
-        return app.ports.clockSyncInMessage.send(data);
-    });
     return socket;
 }
