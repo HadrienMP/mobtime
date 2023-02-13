@@ -316,7 +316,7 @@ view model =
                 ]
                 (UI.GlobalStyle.globalStyle
                     :: layout model.shared doc.body
-                    ++ (doc.modal
+                    :: (doc.modal
                             |> Maybe.map UI.Modal.View.view
                             |> Maybe.map List.singleton
                             |> Maybe.withDefault []

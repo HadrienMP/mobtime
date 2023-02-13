@@ -336,12 +336,17 @@ view shared model =
 
 body : Shared -> Model -> ActionDescription -> Html Msg
 body shared model action =
-    div [ class "container" ]
+    div
+        [ class "container"
+        , Attr.css
+            [ Css.position Css.relative
+            ]
+        ]
         [ clockArea model action
         , Pages.Mob.Share.Button.view
             [ Attr.css
                 [ Css.position Css.absolute
-                , Css.top <| Css.rem 15
+                , Css.top <| Css.rem 10
                 , Css.left <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
                 ]
             ]
