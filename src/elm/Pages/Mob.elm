@@ -20,8 +20,6 @@ import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Mobbers
 import Pages.Mob.Tabs.Sound
-import Peers.Sync.Adapter
-import Peers.Sync.Core exposing (PeerId)
 import Random
 import Routing
 import Shared exposing (Shared)
@@ -67,20 +65,15 @@ type alias Model =
     { name : MobName
     , state : Model.State.State
     , mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
-    , clockSync : Peers.Sync.Adapter.Model
     , alarm : AlarmState
     , now : Time.Posix
     , tab : Tab
-    , peerId : Maybe PeerId
     }
 
 
 init : Shared -> MobName -> ( Model, Effect Shared.Msg Msg )
 init shared name =
     let
-        ( clockSync, clockSyncCommand ) =
-            Peers.Sync.Adapter.init name
-
         redirection =
             if shared.soundOn then
                 Effect.none
@@ -91,16 +84,13 @@ init shared name =
     ( { name = name
       , state = Model.State.init
       , mobbersSettings = Pages.Mob.Tabs.Mobbers.init
-      , clockSync = clockSync
       , alarm = Standby
       , now = Time.millisToPosix 0
       , tab = Main
-      , peerId = Nothing
       }
     , Effect.batch
         [ Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print name
         , Time.now |> Task.perform TimePassed |> Effect.fromCmd
-        , Effect.fromCmd <| Cmd.map GotClockSyncMsg clockSyncCommand
         , redirection
         ]
     )
@@ -123,9 +113,7 @@ type Msg
     | GotClockSettingsMsg Pages.Mob.Tabs.Clocks.Msg
     | GotMobbersSettingsMsg Pages.Mob.Tabs.Mobbers.Msg
     | GotSoundSettingsMsg Pages.Mob.Tabs.Sound.Msg
-    | GotClockSyncMsg Peers.Sync.Adapter.Msg
     | SwitchTab Tab
-    | GotSocketId PeerId
 
 
 timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
@@ -262,18 +250,6 @@ update shared msg model =
             , Effect.map GotSoundSettingsMsg <| Pages.Mob.Tabs.Sound.update subMsg
             )
 
-        GotClockSyncMsg sub ->
-            let
-                ( clockSync, command ) =
-                    Peers.Sync.Adapter.update sub model.clockSync model.now
-            in
-            ( { model | clockSync = clockSync }
-            , Effect.map GotClockSyncMsg command
-            )
-
-        GotSocketId peerId ->
-            ( { model | peerId = Just peerId }, Effect.none )
-
         TimePassed now ->
             let
                 ( updated, command ) =
@@ -308,7 +284,6 @@ subscriptions model =
     Sub.batch
         [ Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
         , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
-        , Sub.map GotClockSyncMsg Peers.Sync.Adapter.subscriptions
         , case ( Clock.isOn model.state.clock, Clock.isOn model.state.pomodoro ) of
             ( True, _ ) ->
                 Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
@@ -326,9 +301,7 @@ jsEventMapping =
     EventsMapping.batch
         [ EventsMapping.create <|
             [ Js.Events.EventMessage "AlarmEnded" (always AlarmEnded)
-            , Js.Events.EventMessage "GotSocketId" GotSocketId
             ]
-        , EventsMapping.map GotClockSyncMsg Peers.Sync.Adapter.jsEventMapping
         ]
 
 
@@ -452,7 +425,7 @@ body shared model action =
                     |> Html.map GotSoundSettingsMsg
 
             Dev ->
-                Pages.Mob.Tabs.Dev.view model.clockSync
+                Pages.Mob.Tabs.Dev.view
         ]
 
 
