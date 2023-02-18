@@ -44,4 +44,13 @@ content : String
 content =
     """
 <component />
+```elm
+type Volume = Volume Int
+
+Components.Volume.View.display: 
+    { onChange : Volume -> msg
+    , onTest : msg
+    , volume : Volume
+    } -> Html msg
+```
 """

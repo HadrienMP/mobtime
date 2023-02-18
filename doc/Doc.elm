@@ -51,6 +51,10 @@ main =
                                 ]
                             ]
                         ]
+                    , Css.Global.selector ".elmsh:is(code)"
+                        [ Css.width <| Css.pct 100
+                        , Css.overflow Css.hidden
+                        ]
                     ]
                 ]
             ]
