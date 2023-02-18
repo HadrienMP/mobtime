@@ -44,4 +44,12 @@ content : String
 content =
     """
 <component />
+```elm
+UI.Range.View.view 
+    { onChange = UpdateValue
+    , value = 50
+    , min = 0
+    , max = 100
+    }
+```
 """
