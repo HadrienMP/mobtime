@@ -50,8 +50,8 @@ view { onChange, value, min, max } =
 thumbStyle : List Css.Style
 thumbStyle =
     [ Css.property "appearance" "none"
-    , Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
-    , Css.border Css.zero
+    , Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surface
+    , Css.border3 (Css.px 2) Css.solid <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
     , Css.height <| Css.rem 1
     , Css.width <| Css.rem 1
     , Css.borderRadius <| Css.pct 100
