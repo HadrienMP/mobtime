@@ -17,13 +17,13 @@
             yarn
             nodePackages.gitmoji-cli
             lame
-            audacity
             imageworsener
             elmPackages.elm
             elmPackages.elm-test
             elmPackages.elm-json
             elmPackages.elm-format
             elmPackages.elm-review
+            elmPackages.elm-language-server
           ];
           shellHook = ''
             yarn install

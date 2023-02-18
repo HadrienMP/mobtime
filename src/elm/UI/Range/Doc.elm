@@ -1,8 +1,10 @@
 module UI.Range.Doc exposing (..)
 
+import ElmBook
 import ElmBook.Actions exposing (updateStateWith)
 import ElmBook.Chapter exposing (chapter, render, withStatefulComponent)
 import ElmBook.ElmCSS exposing (Chapter)
+import Html.Styled exposing (Html)
 import UI.Range.View
 
 
@@ -31,6 +33,7 @@ theChapter =
         |> render content
 
 
+component : { a | range : Int } -> Html (ElmBook.Msg (SharedState x))
 component { range } =
     UI.Range.View.view
         { onChange = updateStateWith updateSharedState
