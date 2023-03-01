@@ -48,6 +48,10 @@ content =
     """
 <component />
 ```elm
+type Msg
+  = UpdateValue Int
+  | ...
+
 UI.Range.View.view 
     { onChange = UpdateValue
     , value = 50

@@ -2,7 +2,7 @@ module UI.Button.Doc exposing (..)
 
 import Css
 import ElmBook.Actions
-import ElmBook.Chapter exposing (chapter, renderComponentList)
+import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled.Attributes as Attr
 import UI.Button.View as Button
@@ -25,12 +25,57 @@ theChapter =
             }
     in
     chapter "Buttons"
-        |> renderComponentList
+        |> withComponentList
             [ ( "Primary", component props )
             , ( "Secondary", component { props | variant = Button.Secondary } )
             , ( "Text only", component { props | content = Button.Text << sizeToString } )
             , ( "Icon only", component { props | content = always <| Button.Icon UI.Icons.Ion.check } )
             ]
+        |> render """
+## With icon
+```elm
+type Msg
+  = ClickedButton
+  | ...
+  
+Button.button []
+  { content = 
+      Button.Both
+        { icon = UI.Icons.Ion.paperAirplane
+        , text = "Size S"
+        }
+  , variant = Button.Primary
+  , size = Button.S
+  , action = Button.OnPress <| Just ClickedButton
+  }
+```
+
+<component with-label="Primary" />
+<component with-label="Secondary" />
+
+## Text only
+```elm
+Button.button []
+  { content = Button.Text "Size S"
+  , variant = Button.Primary
+  , size = Button.S
+  , action = Button.OnPress <| Just ClickedButton
+  }
+```
+<component with-label="Text only"/>
+
+## Icon only
+```elm
+Button.button []
+  { content = Button.Icon UI.Icons.Ion.check
+  , variant = Button.Primary
+  , size = Button.S
+  , action = Button.OnPress <| Just ClickedButton
+  }
+```
+<component with-label="Icon only"/>
+
+"""
 
 
 variants =
