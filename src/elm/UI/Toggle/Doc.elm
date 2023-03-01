@@ -1,7 +1,7 @@
 module UI.Toggle.Doc exposing (..)
 
 import ElmBook.Actions exposing (logAction)
-import ElmBook.Chapter exposing (chapter, renderComponentList)
+import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import UI.Toggle.View
 
@@ -15,7 +15,21 @@ theChapter =
             }
     in
     chapter "Toggle"
-        |> renderComponentList
+        |> withComponentList
             [ ( "Active", UI.Toggle.View.view props )
             , ( "Inactive", UI.Toggle.View.view { props | value = False } )
             ]
+        |> render """
+```elm
+type Msg
+  = Toggled
+  | ...
+
+UI.Toggle.View.view 
+  { onToggle = Toggled 
+  , value = True
+  }
+```
+<component with-label="Active" />
+<component with-label="Inactive" />
+"""
