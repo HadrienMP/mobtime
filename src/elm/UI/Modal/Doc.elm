@@ -2,7 +2,7 @@ module UI.Modal.Doc exposing (..)
 
 import Css
 import ElmBook.Actions
-import ElmBook.Chapter exposing (chapter, renderComponent)
+import ElmBook.Chapter exposing (chapter, render, withComponent)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
@@ -13,7 +13,7 @@ import UI.Modal.View
 theChapter : Chapter x
 theChapter =
     chapter "Modal"
-        |> renderComponent
+        |> withComponent
             (Html.div [ Attr.css [ Css.position Css.relative, Css.height <| Css.vh 50 ] ]
                 [ UI.Modal.View.view
                     { onClose = ElmBook.Actions.logAction "Close modal"
@@ -32,3 +32,13 @@ theChapter =
                     }
                 ]
             )
+        |> render """
+```elm
+UI.Modal.View.view
+  { onClose = Closed
+  , content = 
+      Html.text "Content"
+  }
+```
+<component />
+"""
