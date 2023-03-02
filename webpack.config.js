@@ -1,7 +1,7 @@
 module.exports = {
-    entry: './src/js/pure.js',
+    entry: './src/js/main.js',
     output: {
-        filename: "main.js",
+        filename: 'main.js',
         path: __dirname + '/public/js',
     },
     module: {
@@ -11,21 +11,17 @@ module.exports = {
                 exclude: [/elm-stuff/, /node_modules/],
                 use: {
                     loader: 'elm-webpack-loader',
-                    options: {}
-                }
+                    options: {},
+                },
             },
             {
                 test: /\.s[ac]ss$/i,
-                use: [
-                    "style-loader",
-                    "css-loader",
-                    "sass-loader",
-                ],
+                use: ['style-loader', 'css-loader', 'sass-loader'],
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
-            }
-        ]
-    }
+                use: ['style-loader', 'css-loader'],
+            },
+        ],
+    },
 };
