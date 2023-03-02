@@ -1,6 +1,6 @@
-module Components.Volume.View exposing (..)
+module Components.Form.Volume.View exposing (..)
 
-import Components.Volume.Type exposing (..)
+import Components.Form.Volume.Type exposing (..)
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr

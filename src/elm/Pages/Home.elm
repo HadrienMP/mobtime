@@ -2,7 +2,8 @@ module Pages.Home exposing (..)
 
 -- MODEL
 
-import Components.Volume.Field as Volume
+import Components.Form.Toggle.View
+import Components.Form.Volume.Field as Volume
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (Html)
@@ -27,12 +28,17 @@ import View exposing (View)
 
 type alias Model =
     { mobName : String
+    , p2p : Bool
     }
 
 
 init : ( Model, Effect Shared.Msg msg )
 init =
-    ( { mobName = "" }, Effect.none )
+    ( { mobName = ""
+      , p2p = False
+      }
+    , Effect.none
+    )
 
 
 
@@ -43,6 +49,7 @@ type Msg
     = MobNameChanged String
     | VolumeMsg Volume.Msg
     | JoinMob
+    | ToggleP2P
 
 
 update : Shared -> Model -> Msg -> ( Model, Effect Shared.Msg Msg )
@@ -79,6 +86,9 @@ update shared model msg =
                             "I was not able to create a url from your mob name. "
                                 ++ "Please try another one. Maybe with less symbols ?"
                     )
+
+        ToggleP2P ->
+            ( { model | p2p = not model.p2p }, Effect.none )
 
 
 
@@ -127,6 +137,8 @@ view shared model =
                         [ Html.text "Create a mob" ]
                     , mobField model
                     , volumeField shared
+
+                    -- , p2pField model
                     , Button.button
                         [ Attr.css
                             [ Css.width <| Css.pct 100
@@ -168,6 +180,18 @@ mobField model =
             ]
             []
         ]
+
+
+p2pField : Model -> Html Msg
+p2pField model =
+    Components.Form.Toggle.View.view
+        { id = "p2p"
+        , onToggle = ToggleP2P
+        , label = "Try the p2p version?"
+        , labelOff = Just "Better safe than sorry"
+        , labelOn = Just "Yes"
+        , value = model.p2p
+        }
 
 
 formRow : List (Html msg) -> Html msg

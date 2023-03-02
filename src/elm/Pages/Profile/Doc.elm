@@ -1,6 +1,6 @@
 module Pages.Profile.Doc exposing (..)
 
-import Components.Volume.Type exposing (Volume(..))
+import Components.Form.Volume.Type exposing (Volume(..))
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)

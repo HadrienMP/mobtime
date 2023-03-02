@@ -1,6 +1,6 @@
 module Pages.Profile.Page exposing (..)
 
-import Components.Volume.Field as Volume
+import Components.Form.Volume.Field as Volume
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html

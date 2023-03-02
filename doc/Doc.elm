@@ -1,9 +1,10 @@
 module Doc exposing (..)
 
+import Components.Form.Toggle.Doc
+import Components.Form.Volume.Doc
 import Components.NavBar.Doc
 import Components.SecondaryPage.Doc
 import Components.Socket.Doc
-import Components.Volume.Doc
 import Css
 import Css.Global
 import ElmBook exposing (withChapterGroups, withStatefulOptions, withThemeOptions)
@@ -21,14 +22,14 @@ import UI.Toggle.Doc
 
 
 type alias SharedState =
-    { volume : Components.Volume.Doc.State
+    { volume : Components.Form.Volume.Doc.State
     , range : UI.Range.Doc.State
     }
 
 
 initialState : SharedState
 initialState =
-    { volume = Components.Volume.Doc.initState
+    { volume = Components.Form.Volume.Doc.initState
     , range = UI.Range.Doc.initState
     }
 
@@ -67,10 +68,14 @@ main =
                 ]
               )
             , ( "Components"
-              , [ Components.Volume.Doc.theChapter
-                , Components.Socket.Doc.theChapter
+              , [ Components.Socket.Doc.theChapter
                 , Components.NavBar.Doc.theChapter
                 , Components.SecondaryPage.Doc.theChapter
+                ]
+              )
+            , ( "Form"
+              , [ Components.Form.Volume.Doc.doc
+                , Components.Form.Toggle.Doc.doc
                 ]
               )
             , ( "Pages"

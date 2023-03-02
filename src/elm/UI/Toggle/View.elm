@@ -29,7 +29,17 @@ view props =
             , Css.borderRadius <| Css.rem 2
             , Css.cursor Css.pointer
             , Css.padding2 Css.zero <| Css.rem 0.1
+            , Css.hover
+                [ Css.backgroundColor <|
+                    UI.Color.toElmCss <|
+                        if props.value then
+                            UI.Palettes.monochrome.surface
+
+                        else
+                            UI.Palettes.monochrome.surfaceActive
+                ]
             ]
+        , Attr.class "toggle"
         , Evts.onClick props.onToggle
         ]
         [ Html.div

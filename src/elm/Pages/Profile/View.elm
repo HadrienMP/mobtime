@@ -1,6 +1,6 @@
 module Pages.Profile.View exposing (..)
 
-import Components.Volume.View as Volume
+import Components.Form.Volume.View as Volume
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr

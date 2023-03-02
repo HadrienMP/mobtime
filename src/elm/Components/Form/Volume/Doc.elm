@@ -1,7 +1,7 @@
-module Components.Volume.Doc exposing (..)
+module Components.Form.Volume.Doc exposing (..)
 
-import Components.Volume.Type as Type
-import Components.Volume.View as View
+import Components.Form.Volume.Type as Type
+import Components.Form.Volume.View as View
 import ElmBook.Actions exposing (logAction, updateStateWith)
 import ElmBook.Chapter exposing (chapter, render, withStatefulComponent)
 import ElmBook.ElmCSS exposing (Chapter)
@@ -25,9 +25,9 @@ updateSharedState volume x =
     { x | volume = volume }
 
 
-theChapter : Chapter (SharedState x)
-theChapter =
-    chapter "Volume field"
+doc : Chapter (SharedState x)
+doc =
+    chapter "Volume"
         |> withStatefulComponent component
         |> render content
 
@@ -45,7 +45,7 @@ content =
     """
 <component />
 ```elm
-Components.Volume.View.display 
+Components.Form.Volume.View.display 
     { onChange = ChangeVolume
     , onTest = TestVolume
     , volume = Volume 25

@@ -1,7 +1,7 @@
 port module UserPreferences exposing (..)
 
-import Components.Volume.Field as Volume
-import Components.Volume.Type as Volume
+import Components.Form.Volume.Field as Volume
+import Components.Form.Volume.Type as Volume
 import Json.Decode as Decode
 import Json.Encode as Json
 
