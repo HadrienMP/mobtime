@@ -12,12 +12,15 @@ suite =
         [ test "should serialize and deserialize to the same object" <|
             \_ ->
                 let
+                    preferences : UserPreferences.Model
                     preferences =
-                        { volume = Volume 12, displaySeconds = True }
+                        { volume = Volume 12
+                        , displaySeconds = True
+                        , useP2P = True
+                        }
                 in
                 preferences
                     |> UserPreferences.encode
                     |> UserPreferences.decode
-                    |> Expect.equal
-                        preferences
+                    |> Expect.equal preferences
         ]
