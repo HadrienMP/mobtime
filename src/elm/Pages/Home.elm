@@ -28,14 +28,12 @@ import View exposing (View)
 
 type alias Model =
     { mobName : String
-    , p2p : Bool
     }
 
 
 init : ( Model, Effect Shared.Msg msg )
 init =
     ( { mobName = ""
-      , p2p = False
       }
     , Effect.none
     )
@@ -88,7 +86,7 @@ update shared model msg =
                     )
 
         ToggleP2P ->
-            ( { model | p2p = not model.p2p }, Effect.none )
+            ( model, Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleP2P )
 
 
 
@@ -138,7 +136,7 @@ view shared model =
                     , mobField model
                     , volumeField shared
 
-                    -- , p2pField model
+                    -- , p2pField shared
                     , Button.button
                         [ Attr.css
                             [ Css.width <| Css.pct 100
@@ -182,15 +180,15 @@ mobField model =
         ]
 
 
-p2pField : Model -> Html Msg
-p2pField model =
+p2pField : Shared -> Html Msg
+p2pField shared =
     Components.Form.Toggle.View.view
         { id = "p2p"
         , onToggle = ToggleP2P
         , label = "Try the p2p version?"
         , labelOff = Just "Better safe than sorry"
         , labelOn = Just "Yes"
-        , value = model.p2p
+        , value = shared.preferences.useP2P
         }
 
 
