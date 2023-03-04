@@ -1,4 +1,4 @@
-module Components.Form.Toggle.View exposing (..)
+module Components.Form.Toggle.View exposing (Props, view)
 
 import Css
 import Html.Styled as Html exposing (Html, label, text)

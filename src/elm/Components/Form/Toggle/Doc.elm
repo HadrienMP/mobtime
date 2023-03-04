@@ -1,4 +1,4 @@
-module Components.Form.Toggle.Doc exposing (..)
+module Components.Form.Toggle.Doc exposing (doc)
 
 import Components.Form.Toggle.View
 import ElmBook.Actions exposing (logAction)

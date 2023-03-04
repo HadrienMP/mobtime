@@ -1,6 +1,6 @@
-port module Js.Commands exposing (..)
+port module Js.Commands exposing (Command(..), OutCommand, send)
 
-import Json.Encode
+import Json.Encode as Json
 import Sounds
 
 
@@ -17,7 +17,7 @@ type Command
 
 type alias OutCommand =
     { name : String
-    , value : Json.Encode.Value
+    , value : Json.Value
     }
 
 
@@ -26,16 +26,16 @@ send command =
     commands <|
         case command of
             SoundAlarm ->
-                OutCommand "SoundAlarm" Json.Encode.null
+                OutCommand "SoundAlarm" Json.null
 
             SetAlarm sound ->
-                OutCommand "SetAlarm" <| Json.Encode.string sound
+                OutCommand "SetAlarm" <| Json.string sound
 
             StopAlarm ->
-                OutCommand "StopAlarm" Json.Encode.null
+                OutCommand "StopAlarm" Json.null
 
             GetSocketId ->
-                OutCommand "GetSocketId" Json.Encode.null
+                OutCommand "GetSocketId" Json.null
 
             ChangeTitle title ->
-                OutCommand "ChangeTitle" <| Json.Encode.string title
+                OutCommand "ChangeTitle" <| Json.string title

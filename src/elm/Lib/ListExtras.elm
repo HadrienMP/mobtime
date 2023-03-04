@@ -1,9 +1,4 @@
-module Lib.ListExtras exposing (..)
-
-
-from : a -> List a
-from a =
-    [ a ]
+module Lib.ListExtras exposing (rotate, uncons, zip)
 
 
 rotate : List a -> List a

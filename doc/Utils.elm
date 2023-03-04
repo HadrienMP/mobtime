@@ -1,4 +1,4 @@
-module Utils exposing (..)
+module Utils exposing (placeholder)
 
 import Css
 import Html.Styled as Html

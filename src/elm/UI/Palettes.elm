@@ -1,4 +1,4 @@
-module UI.Palettes exposing (..)
+module UI.Palettes exposing (Palette, monochrome)
 
 import UI.Color exposing (RGBA255)
 

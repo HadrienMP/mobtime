@@ -1,4 +1,4 @@
-module UI.Icons.Tea exposing (..)
+module UI.Icons.Tea exposing (display)
 
 import Svg.Styled as Svg exposing (Svg, path, svg)
 import Svg.Styled.Attributes as SvgAttr

@@ -1,4 +1,4 @@
-module UI.Layout exposing (..)
+module UI.Layout exposing (forHome, wrap)
 
 import Components.NavBar.Component
 import Components.Socket.Socket

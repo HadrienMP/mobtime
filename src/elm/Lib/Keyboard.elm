@@ -1,6 +1,6 @@
-module Lib.Keyboard exposing (..)
+module Lib.Keyboard exposing (Keystroke, decode)
 
-import Json.Decode
+import Json.Decode as Decode
 
 
 type alias Keystroke =
@@ -11,10 +11,10 @@ type alias Keystroke =
     }
 
 
-decode : Json.Decode.Decoder Keystroke
+decode : Decode.Decoder Keystroke
 decode =
-    Json.Decode.map4 Keystroke
-        (Json.Decode.field "key" Json.Decode.string)
-        (Json.Decode.field "ctrlKey" Json.Decode.bool)
-        (Json.Decode.field "altKey" Json.Decode.bool)
-        (Json.Decode.field "shiftKey" Json.Decode.bool)
+    Decode.map4 Keystroke
+        (Decode.field "key" Decode.string)
+        (Decode.field "ctrlKey" Decode.bool)
+        (Decode.field "altKey" Decode.bool)
+        (Decode.field "shiftKey" Decode.bool)

@@ -1,4 +1,4 @@
-module UI.Range.View exposing (..)
+module UI.Range.View exposing (view)
 
 import Css
 import Html.Styled as Html exposing (Html)

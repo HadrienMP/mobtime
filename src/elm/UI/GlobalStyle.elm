@@ -1,4 +1,4 @@
-module UI.GlobalStyle exposing (..)
+module UI.GlobalStyle exposing (globalStyle)
 
 import Css
 import Css.Global

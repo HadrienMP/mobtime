@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "automatically created by": "elm-review suppress",
+  "learn more": "elm-review suppress --help",
+  "suppressions": [
+    { "count": 1, "filePath": "doc/Doc.elm" },
+    { "count": 1, "filePath": "src/elm/Components/Form/Volume/View.elm" },
+    { "count": 1, "filePath": "src/elm/Pages/Mob.elm" },
+    { "count": 1, "filePath": "src/elm/UI/Modal/View.elm" }
+  ]
+}

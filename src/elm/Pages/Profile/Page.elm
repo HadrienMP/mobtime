@@ -1,4 +1,4 @@
-module Pages.Profile.Page exposing (..)
+module Pages.Profile.Page exposing (Msg(..), update, view)
 
 import Components.Form.Volume.Field as Volume
 import Css

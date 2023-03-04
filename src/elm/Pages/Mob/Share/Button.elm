@@ -1,4 +1,4 @@
-module Pages.Mob.Share.Button exposing (..)
+module Pages.Mob.Share.Button exposing (Props, view)
 
 import Css
 import Html.Styled as Html exposing (Html)

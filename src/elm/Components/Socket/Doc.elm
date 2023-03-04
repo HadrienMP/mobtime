@@ -1,4 +1,4 @@
-module Components.Socket.Doc exposing (..)
+module Components.Socket.Doc exposing (theChapter)
 
 import Components.Socket.View
 import ElmBook.Chapter exposing (chapter, renderComponentList)

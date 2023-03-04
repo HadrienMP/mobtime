@@ -1,22 +1,13 @@
-module Pages.Mob.Tabs.Sound exposing (..)
+module Pages.Mob.Tabs.Sound exposing (Msg(..), update, view)
 
 import Effect exposing (Effect)
 import Html.Styled exposing (Html, button, div, img, p, text)
 import Html.Styled.Attributes as Attr exposing (class, classList, id, src)
 import Html.Styled.Events exposing (onClick)
-import Json.Encode
 import Model.Events
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Sounds as SoundLibrary
-
-
-type alias CommandPort =
-    Json.Encode.Value -> Cmd Msg
-
-
-type alias StorePort =
-    Json.Encode.Value -> Cmd Msg
 
 
 type Msg

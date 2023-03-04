@@ -1,4 +1,4 @@
-port module Shared exposing (..)
+port module Shared exposing (Msg(..), Shared, init, pushUrl, subscriptions, toast, update, withUrl)
 
 import Browser
 import Browser.Navigation as Nav
@@ -6,7 +6,7 @@ import Components.Socket.Socket as Socket
 import Effect exposing (Effect)
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
-import Json.Decode
+import Json.Decode as Decode
 import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.MobName exposing (MobName)
@@ -43,7 +43,7 @@ withUrl url shared =
 init :
     { key : Nav.Key
     , url : Url.Url
-    , jsonPreferences : Json.Decode.Value
+    , jsonPreferences : Decode.Value
     , mob : Maybe MobName
     }
     -> ( Shared, Cmd Msg )

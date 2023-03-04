@@ -1,4 +1,4 @@
-module UI.Toggle.Doc exposing (..)
+module UI.Toggle.Doc exposing (theChapter)
 
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)

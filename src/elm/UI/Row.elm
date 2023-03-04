@@ -1,4 +1,4 @@
-module UI.Row exposing (..)
+module UI.Row exposing (RowAttribute(..), row)
 
 import Css
 import Html.Styled as Html

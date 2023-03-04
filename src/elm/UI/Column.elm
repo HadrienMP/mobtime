@@ -1,4 +1,4 @@
-module UI.Column exposing (..)
+module UI.Column exposing (ColumnAttribute(..), column)
 
 import Css
 import Html.Styled as Html exposing (Html)
@@ -14,8 +14,8 @@ type ColumnAttribute
 column :
     List (Html.Attribute msg)
     -> List ColumnAttribute
-    -> List (Html.Html msg)
-    -> Html.Html msg
+    -> List (Html msg)
+    -> Html msg
 column htmlAttr colAttr children =
     Html.div
         ((Attr.css <|
@@ -27,15 +27,6 @@ column htmlAttr colAttr children =
             :: htmlAttr
         )
         children
-
-
-twoColumns : { left : Css.Pct, right : Css.Pct } -> ( Html msg, Html msg ) -> Html msg
-twoColumns size ( left, right ) =
-    column []
-        []
-        [ Html.div [ Attr.css [ Css.width size.left ] ] [ left ]
-        , Html.div [ Attr.css [ Css.width size.right ] ] [ right ]
-        ]
 
 
 toStyle : ColumnAttribute -> List Css.Style

@@ -1,4 +1,4 @@
-module UI.Icons.Tape exposing (..)
+module UI.Icons.Tape exposing (display)
 
 import Svg.Styled as Svg exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttr

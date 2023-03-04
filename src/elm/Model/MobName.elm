@@ -1,6 +1,5 @@
-module Model.MobName exposing (..)
+module Model.MobName exposing (MobName(..), encode, print)
 
-import Json.Decode as Decode
 import Json.Encode as Json
 
 
@@ -21,8 +20,3 @@ print (MobName value) =
 encode : MobName -> Json.Value
 encode (MobName value) =
     Json.string value
-
-
-decoder : Decode.Decoder MobName
-decoder =
-    Decode.string |> Decode.map MobName

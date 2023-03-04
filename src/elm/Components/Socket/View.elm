@@ -1,4 +1,4 @@
-module Components.Socket.View exposing (..)
+module Components.Socket.View exposing (Props, view)
 
 import Css
 import Html.Styled as Html exposing (Html)

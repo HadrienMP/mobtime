@@ -1,4 +1,4 @@
-module UI.Rem exposing (..)
+module UI.Rem exposing (Rem(..), add, divideBy, multiplyBy, multiplyRatio, subtract, toCssString, toElmCss, toPixelsFake)
 
 import Css
 import Lib.Ratio

@@ -1,4 +1,4 @@
-port module Pages.Mob.Share.Page exposing (..)
+port module Pages.Mob.Share.Page exposing (Msg(..), subscriptions, update, view)
 
 import Effect exposing (Effect)
 import Lib.Toaster

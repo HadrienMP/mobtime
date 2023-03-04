@@ -1,4 +1,4 @@
-module Components.Form.Volume.Type exposing (..)
+module Components.Form.Volume.Type exposing (Volume(..), decoder, default, encode, open)
 
 import Json.Decode as Decode
 import Json.Encode as Json

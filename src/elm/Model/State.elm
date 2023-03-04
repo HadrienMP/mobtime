@@ -1,4 +1,4 @@
-module Model.State exposing (..)
+module Model.State exposing (State, TimePassedResult, assignRoles, assignSpecialRoles, evolve, evolveMany, evolve_, init, timePassed)
 
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)

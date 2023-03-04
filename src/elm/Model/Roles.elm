@@ -1,4 +1,4 @@
-module Model.Roles exposing (..)
+module Model.Roles exposing (Roles, decoder, default, encode)
 
 import Json.Decode as Decode
 import Json.Encode as Json
@@ -14,13 +14,6 @@ type alias Roles =
 default : Roles
 default =
     { special = [ "Driver", "Navigator", "Next Up" ] |> List.map Model.Role.fromString
-    , default = Model.Role.fromString "Mobber"
-    }
-
-
-inverse : Roles
-inverse =
-    { special = [ "Navigator", "Driver", "Next" ] |> List.map Model.Role.fromString
     , default = Model.Role.fromString "Mobber"
     }
 

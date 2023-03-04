@@ -1,4 +1,4 @@
-module Pages.Mob.Tabs.Dev exposing (..)
+module Pages.Mob.Tabs.Dev exposing (view)
 
 import Html.Styled exposing (Html, h2, text)
 import Html.Styled.Attributes exposing (class, id)

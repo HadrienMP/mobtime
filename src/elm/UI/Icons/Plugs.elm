@@ -1,4 +1,4 @@
-module UI.Icons.Plugs exposing (..)
+module UI.Icons.Plugs exposing (off)
 
 import Svg.Styled as Svg exposing (Svg, path, svg)
 import Svg.Styled.Attributes as SvgAttr
@@ -52,60 +52,6 @@ off { height, color } =
                 ]
             , Svg.g
                 [ SvgAttr.transform "rotate(45 38.11 142.81)"
-                ]
-                [ path
-                    [ SvgAttr.d "m95.988 117.54h-34.11c-0.38449 0-0.69403-0.21886-0.69403-0.49072v-0.0682c0-0.27186 0.30954-0.49073 0.69403-0.49073h34.11c0.38449 0 0.69403 0.21887 0.69403 0.49073v0.0682c0 0.27186-0.30954 0.49072-0.69403 0.49072z"
-                    , SvgAttr.strokeWidth "4.152"
-                    ]
-                    []
-                , path
-                    [ SvgAttr.d "m79.569 136.87v8.9898c0 0.10134-0.20966 0.18291-0.47008 0.18291h-0.0654c-0.26042 0-0.47008-0.0816-0.47008-0.18291v-8.9898c0-0.10134 0.20966-0.18291 0.47008-0.18291h0.0654c0.26042 0 0.47008 0.0816 0.47008 0.18291z"
-                    , SvgAttr.strokeWidth "4.2134"
-                    ]
-                    []
-                , path
-                    [ SvgAttr.d "m92.46 116.49v4.4989c0 7.4203-5.9738 13.394-13.394 13.394-7.4203 0-13.394-5.9738-13.394-13.394l1e-5 -4.4989"
-                    , SvgAttr.fill "none"
-                    , SvgAttr.strokeWidth "5.1"
-                    ]
-                    []
-                ]
-            ]
-        ]
-
-
-on : { height : Rem, color : RGBA255 } -> Svg msg
-on { height, color } =
-    svg
-        [ SvgAttr.height <| UI.Rem.toCssString height
-        , SvgAttr.version "1.1"
-        , SvgAttr.viewBox "-5 -5 60 60"
-        ]
-        [ Svg.g
-            [ SvgAttr.stroke <| UI.Color.toCss color
-            ]
-            [ Svg.g
-                [ SvgAttr.transform "rotate(45 137.53 -7.7394)"
-                ]
-                [ path
-                    [ SvgAttr.d "m61.909 94.534h34.11c0.38449 0 0.69403 0.21886 0.69403 0.49073v0.06823c0 0.27186-0.30954 0.49073-0.69403 0.49073h-34.11c-0.38449 0-0.69403-0.21887-0.69403-0.49073v-0.06823c0-0.27187 0.30954-0.49073 0.69403-0.49073z"
-                    , SvgAttr.strokeWidth "4.152"
-                    ]
-                    []
-                , path
-                    [ SvgAttr.d "m78.328 75.195v-8.9898c0-0.10134 0.20965-0.18291 0.47008-0.18291h0.06536c0.26042 0 0.47008 0.08157 0.47008 0.18291v8.9898c0 0.10134-0.20966 0.18291-0.47008 0.18291h-0.06536c-0.26043 0-0.47008-0.08159-0.47008-0.18291z"
-                    , SvgAttr.strokeWidth "4.2134"
-                    ]
-                    []
-                , path
-                    [ SvgAttr.d "m65.437 95.583v-4.4989c0-7.4203 5.9738-13.394 13.394-13.394s13.394 5.9738 13.394 13.394l-3e-6 4.4989"
-                    , SvgAttr.fill "none"
-                    , SvgAttr.strokeWidth "5.1"
-                    ]
-                    []
-                ]
-            , Svg.g
-                [ SvgAttr.transform "rotate(45 163.72 3.1086)"
                 ]
                 [ path
                     [ SvgAttr.d "m95.988 117.54h-34.11c-0.38449 0-0.69403-0.21886-0.69403-0.49072v-0.0682c0-0.27186 0.30954-0.49073 0.69403-0.49073h34.11c0.38449 0 0.69403 0.21887 0.69403 0.49073v0.0682c0 0.27186-0.30954 0.49072-0.69403 0.49072z"

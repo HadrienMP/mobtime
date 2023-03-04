@@ -1,4 +1,4 @@
-module Components.Form.Volume.Doc exposing (..)
+module Components.Form.Volume.Doc exposing (SharedState, State, doc, initState)
 
 import Components.Form.Volume.Type as Type
 import Components.Form.Volume.View as View

@@ -1,4 +1,4 @@
-module Components.NavBar.Doc exposing (..)
+module Components.NavBar.Doc exposing (theChapter)
 
 import Components.NavBar.View
 import Components.Socket.View

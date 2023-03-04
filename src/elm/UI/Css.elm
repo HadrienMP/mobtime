@@ -1,4 +1,4 @@
-module UI.Css exposing (..)
+module UI.Css exposing (center, fullpage, gap, roundBorder)
 
 import Css
 import UI.Rem

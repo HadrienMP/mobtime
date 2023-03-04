@@ -1,4 +1,4 @@
-module UI.Icons exposing (..)
+module UI.Icons exposing (style)
 
 import Css
 import Css.Global

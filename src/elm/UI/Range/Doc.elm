@@ -1,4 +1,4 @@
-module UI.Range.Doc exposing (..)
+module UI.Range.Doc exposing (SharedState, State, initState, theChapter)
 
 import ElmBook
 import ElmBook.Actions exposing (updateStateWith)

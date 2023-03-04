@@ -1,4 +1,4 @@
-module Pages.Mob exposing (..)
+module Pages.Mob exposing (ActionDescription, AlarmState(..), Model, Msg(..), Tab(..), init, jsEventMapping, subscriptions, update, view)
 
 import Components.Socket.Socket
 import Css

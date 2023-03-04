@@ -1,4 +1,4 @@
-module Pages.Mob.Settings.PageView exposing (..)
+module Pages.Mob.Settings.PageView exposing (Props, view)
 
 import Components.SecondaryPage.View
 import Css

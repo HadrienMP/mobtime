@@ -1,4 +1,4 @@
-module UI.TransitionExtra exposing (..)
+module UI.TransitionExtra exposing (dashoffset)
 
 import Css
 import Lib.Duration

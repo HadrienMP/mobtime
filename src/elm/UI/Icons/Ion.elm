@@ -1,4 +1,4 @@
-module UI.Icons.Ion exposing (..)
+module UI.Icons.Ion exposing (back, batteryFull, batteryLow, check, clock, close, code, copy, delete, error, github, home, musicNote, mute, paperAirplane, people, play, plus, rotate, settings, share, shuffle, sound, stop, success, user, volumeHigh, volumeLow)
 
 import Ionicon
 import Ionicon.Android
@@ -51,11 +51,6 @@ batteryFull =
     display Ionicon.batteryHalf
 
 
-coffee : Icon msg
-coffee =
-    display Ionicon.coffee
-
-
 paperAirplane : Icon msg
 paperAirplane =
     display Ionicon.paperAirplane
@@ -76,11 +71,6 @@ github =
     display Ionicon.Social.github
 
 
-info : Icon msg
-info =
-    display Ionicon.informationCircled
-
-
 musicNote : Icon msg
 musicNote =
     display Ionicon.Ios.musicalNote
@@ -89,11 +79,6 @@ musicNote =
 error : Icon msg
 error =
     display Ionicon.closeCircled
-
-
-warning : Icon msg
-warning =
-    display Ionicon.alertCircled
 
 
 success : Icon msg
@@ -176,7 +161,7 @@ display :
         }
      -> Unstyled.Svg msg
     )
-    -> UI.Icons.Common.Icon msg
+    -> Icon msg
 display icon { size, color } =
     icon
         (UI.Rem.toPixelsFake size)

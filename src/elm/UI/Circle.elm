@@ -1,11 +1,20 @@
-module UI.Circle exposing (..)
+module UI.Circle exposing
+    ( Circle
+    , CircleBorder
+    , ConcentricCircles
+    , addBackground
+    , addBorders
+    , buildFragment
+    , draw
+    , withAttributes
+    )
 
 import Html.Styled as Html
 import Lib.Ratio
 import Svg.Styled as Svg exposing (Svg)
 import Svg.Styled.Attributes as SvgAttr
 import UI.Color
-import UI.Rem exposing (..)
+import UI.Rem as Rem exposing (Rem)
 
 
 
@@ -98,8 +107,8 @@ addInnerBorder border builder =
                 , strokeWidth = border.width
                 , radiant =
                     builder.main.radiant
-                        |> subtract (builder.main.strokeWidth |> divideBy 2)
-                        |> subtract (border.width |> divideBy 2)
+                        |> Rem.subtract (builder.main.strokeWidth |> Rem.divideBy 2)
+                        |> Rem.subtract (border.width |> Rem.divideBy 2)
                 , attributes = []
                 }
     }
@@ -114,12 +123,12 @@ addOuterBorder border builder =
                 , strokeWidth = border.width
                 , radiant =
                     builder.main.radiant
-                        |> add (builder.main.strokeWidth |> divideBy 2)
-                        |> add (border.width |> divideBy 2)
+                        |> Rem.add (builder.main.strokeWidth |> Rem.divideBy 2)
+                        |> Rem.add (border.width |> Rem.divideBy 2)
                 , attributes = []
                 }
-        , size = builder.size |> add (border.width |> multiplyBy 2)
-        , center = builder.center |> add border.width
+        , size = builder.size |> Rem.add (border.width |> Rem.multiplyBy 2)
+        , center = builder.center |> Rem.add border.width
     }
 
 
@@ -135,8 +144,8 @@ draw :
     -> Svg msg
 draw attributes builder =
     Svg.svg
-        ([ SvgAttr.width <| toCssString builder.size
-         , SvgAttr.height <| toCssString builder.size
+        ([ SvgAttr.width <| Rem.toCssString builder.size
+         , SvgAttr.height <| Rem.toCssString builder.size
          ]
             ++ attributes
         )
@@ -169,20 +178,20 @@ drawCircle { fragment, center } circle =
     let
         perimeter =
             circle.radiant
-                |> multiplyBy 2
-                |> multiplyBy pi
+                |> Rem.multiplyBy 2
+                |> Rem.multiplyBy pi
     in
     Svg.circle
-        ([ SvgAttr.cx <| UI.Rem.toCssString center
-         , SvgAttr.cy <| UI.Rem.toCssString center
-         , SvgAttr.r <| UI.Rem.toCssString circle.radiant
+        ([ SvgAttr.cx <| Rem.toCssString center
+         , SvgAttr.cy <| Rem.toCssString center
+         , SvgAttr.r <| Rem.toCssString circle.radiant
          , SvgAttr.stroke <| UI.Color.toCss circle.color
-         , SvgAttr.strokeWidth <| UI.Rem.toCssString circle.strokeWidth
+         , SvgAttr.strokeWidth <| Rem.toCssString circle.strokeWidth
          , SvgAttr.fillOpacity "0"
-         , SvgAttr.strokeDasharray <| UI.Rem.toCssString perimeter
+         , SvgAttr.strokeDasharray <| Rem.toCssString perimeter
          , SvgAttr.strokeDashoffset <|
-            UI.Rem.toCssString <|
-                UI.Rem.multiplyRatio
+            Rem.toCssString <|
+                Rem.multiplyRatio
                     fragment
                     perimeter
          ]
@@ -196,12 +205,12 @@ drawingDimensions circle =
     let
         radiant =
             circle.diameter
-                |> divideBy 2
+                |> Rem.divideBy 2
                 -- force the diameter to be the outside width
-                |> subtract (circle.strokeWidth |> divideBy 2)
+                |> Rem.subtract (circle.strokeWidth |> Rem.divideBy 2)
 
         -- The stroke spans both sides of the circle, hence the center
         center =
-            circle.diameter |> divideBy 2
+            circle.diameter |> Rem.divideBy 2
     in
     { radiant = radiant, center = center }

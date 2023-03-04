@@ -1,4 +1,4 @@
-module Components.SecondaryPage.Doc exposing (..)
+module Components.SecondaryPage.Doc exposing (theChapter)
 
 import Components.SecondaryPage.View
 import ElmBook.Actions exposing (logAction)

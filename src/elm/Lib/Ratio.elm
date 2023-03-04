@@ -1,4 +1,4 @@
-module Lib.Ratio exposing (..)
+module Lib.Ratio exposing (Ratio(..), apply, from, full)
 
 
 type Ratio
@@ -18,13 +18,3 @@ from value =
 apply : Ratio -> Float -> Float
 apply (Ratio r) float =
     r * float
-
-
-limitTo2 : Ratio -> Ratio
-limitTo2 (Ratio ratio) =
-    Ratio <|
-        if ratio > 2 then
-            ratio - (toFloat <| floor ratio) + 1
-
-        else
-            ratio

@@ -1,13 +1,13 @@
-module UI.CircularProgressBar exposing (..)
+module UI.CircularProgressBar exposing (draw)
 
 import Css
 import Html.Styled exposing (Html)
 import Html.Styled.Attributes exposing (css)
 import Lib.Duration
 import Lib.Ratio
-import UI.Color
 import UI.Circle
-import UI.Rem exposing (..)
+import UI.Color
+import UI.Rem as Rem exposing (Rem)
 import UI.TransitionExtra
 
 
@@ -34,6 +34,6 @@ draw { colors, strokeWidth, diameter, progress, refreshRate } =
         |> UI.Circle.addBackground colors.background
         |> UI.Circle.addBorders
             { color = colors.border
-            , width = strokeWidth |> divideBy 6
+            , width = strokeWidth |> Rem.divideBy 6
             }
         |> UI.Circle.draw [ css [ Css.transform <| Css.rotate <| Css.deg -90 ] ]

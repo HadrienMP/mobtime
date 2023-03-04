@@ -1,4 +1,4 @@
-module Components.Form.Volume.View exposing (..)
+module Components.Form.Volume.View exposing (Props, display)
 
 import Components.Form.Volume.Type exposing (..)
 import Css

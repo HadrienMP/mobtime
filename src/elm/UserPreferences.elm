@@ -1,4 +1,4 @@
-port module UserPreferences exposing (..)
+port module UserPreferences exposing (Model, Msg(..), decode, encode, init, update)
 
 import Components.Form.Volume.Field as Volume
 import Components.Form.Volume.Type as Volume

@@ -1,7 +1,7 @@
 module Model.Mobber exposing (Mobber, MobberId, idFromString, jsonDecoder, toJson)
 
-import Json.Decode
-import Json.Encode
+import Json.Decode as Decode
+import Json.Encode as Json
 
 
 type MobberId
@@ -30,16 +30,16 @@ type alias Mobber =
 -- JSON
 
 
-jsonDecoder : Json.Decode.Decoder Mobber
+jsonDecoder : Decode.Decoder Mobber
 jsonDecoder =
-    Json.Decode.map2 Mobber
-        (Json.Decode.field "id" (Json.Decode.string |> Json.Decode.map MobberId))
-        (Json.Decode.field "name" Json.Decode.string)
+    Decode.map2 Mobber
+        (Decode.field "id" (Decode.string |> Decode.map MobberId))
+        (Decode.field "name" Decode.string)
 
 
-toJson : Mobber -> Json.Encode.Value
+toJson : Mobber -> Json.Value
 toJson mobber =
-    Json.Encode.object
-        [ ( "id", mobber.id |> idAsString |> Json.Encode.string )
-        , ( "name", Json.Encode.string mobber.name )
+    Json.object
+        [ ( "id", mobber.id |> idAsString |> Json.string )
+        , ( "name", Json.string mobber.name )
         ]

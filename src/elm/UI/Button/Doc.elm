@@ -1,4 +1,4 @@
-module UI.Button.Doc exposing (..)
+module UI.Button.Doc exposing (theChapter)
 
 import Css
 import ElmBook.Actions
@@ -78,10 +78,6 @@ Button.button []
 """
 
 
-variants =
-    [ Button.Primary, Button.Secondary ]
-
-
 sizes =
     [ Button.S, Button.M, Button.L ]
 
@@ -97,13 +93,6 @@ sizeToString size =
 
         Button.L ->
             "Size L"
-
-
-contents =
-    [ \text -> Button.Both { icon = UI.Icons.Ion.paperAirplane, text = text }
-    , always <| Button.Icon UI.Icons.Ion.check
-    , Button.Text
-    ]
 
 
 component props =

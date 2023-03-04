@@ -1,4 +1,4 @@
-module UI.Toggle.View exposing (..)
+module UI.Toggle.View exposing (Props, view)
 
 import Css
 import Html.Styled as Html exposing (Html)

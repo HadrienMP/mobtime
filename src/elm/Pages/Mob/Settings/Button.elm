@@ -1,4 +1,4 @@
-module Pages.Mob.Settings.Button exposing (..)
+module Pages.Mob.Settings.Button exposing (Props, view)
 
 import Css
 import Html.Styled as Html exposing (Html)

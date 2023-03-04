@@ -1,4 +1,4 @@
-module UI.Text exposing (..)
+module UI.Text exposing (h2)
 
 import Css
 import Html.Styled as Html

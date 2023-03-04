@@ -8,7 +8,7 @@ module Lib.Konami exposing
     )
 
 import Browser.Events exposing (onKeyUp)
-import Json.Decode
+import Json.Decode as Decode
 import Lib.Keyboard
 
 
@@ -89,5 +89,5 @@ update msg model =
 subscriptions : Konami -> Sub Msg
 subscriptions _ =
     onKeyUp <|
-        Json.Decode.map KeyPressed <|
+        Decode.map KeyPressed <|
             Lib.Keyboard.decode

@@ -1,4 +1,4 @@
-module Effect exposing (..)
+module Effect exposing (Atomic(..), Effect(..), batch, fromCmd, fromShared, js, map, none, share)
 
 import Js.Commands
 import Model.Events exposing (MobEvent)

@@ -1,10 +1,10 @@
-module UI.Button.View exposing (..)
+module UI.Button.View exposing (Action(..), Content(..), Size(..), Variant(..), button)
 
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onClick)
-import Json.Encode
+import Json.Encode as Json
 import UI.Color
 import UI.Css
 import UI.Icons.Common
@@ -146,7 +146,7 @@ actionAttributes : Action msg -> List (Html.Attribute msg)
 actionAttributes action =
     case action of
         OnPress onPress ->
-            [ onPress |> Maybe.map onClick |> Maybe.withDefault (Attr.property "" Json.Encode.null)
+            [ onPress |> Maybe.map onClick |> Maybe.withDefault (Attr.property "" Json.null)
             , Attr.type_ "button"
             ]
 

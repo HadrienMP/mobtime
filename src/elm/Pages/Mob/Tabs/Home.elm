@@ -1,4 +1,4 @@
-module Pages.Mob.Tabs.Home exposing (..)
+module Pages.Mob.Tabs.Home exposing (Msg(..), update, view)
 
 import Html.Styled exposing (Html, div, li, span, text, ul)
 import Html.Styled.Attributes exposing (class, id)

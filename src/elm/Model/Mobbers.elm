@@ -1,7 +1,7 @@
-module Model.Mobbers exposing (..)
+module Model.Mobbers exposing (Mobbers(..), add, assignRoles, assignSpecialRoles, decoder, delete, empty, merge, rotatable, rotate, shufflable, shuffle, toJson)
 
-import Json.Decode
-import Json.Encode
+import Json.Decode as Decode
+import Json.Encode as Json
 import Lib.ListExtras as ListExtras
 import Model.Mobber as Mobber exposing (Mobber)
 import Model.Role exposing (Role)
@@ -101,14 +101,14 @@ shuffle mobbers =
     toList mobbers |> Random.List.shuffle |> Random.map Mobbers
 
 
-decoder : Json.Decode.Decoder Mobbers
+decoder : Decode.Decoder Mobbers
 decoder =
-    Json.Decode.list Mobber.jsonDecoder
-        |> Json.Decode.map Mobbers
+    Decode.list Mobber.jsonDecoder
+        |> Decode.map Mobbers
 
 
-toJson : Mobbers -> Json.Encode.Value
+toJson : Mobbers -> Json.Value
 toJson mobbers =
     case mobbers of
         Mobbers list ->
-            Json.Encode.list Mobber.toJson list
+            Json.list Mobber.toJson list

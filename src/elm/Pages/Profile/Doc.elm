@@ -1,4 +1,4 @@
-module Pages.Profile.Doc exposing (..)
+module Pages.Profile.Doc exposing (profileChapter)
 
 import Components.Form.Volume.Type exposing (Volume(..))
 import ElmBook.Actions exposing (logAction)

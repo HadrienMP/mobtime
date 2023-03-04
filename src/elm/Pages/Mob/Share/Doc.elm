@@ -1,4 +1,4 @@
-module Pages.Mob.Share.Doc exposing (..)
+module Pages.Mob.Share.Doc exposing (theChapter)
 
 import ElmBook.Actions exposing (logAction, logActionWithString)
 import ElmBook.Chapter exposing (chapter, renderComponentList)

@@ -1,4 +1,4 @@
-module UI.Modal.View exposing (..)
+module UI.Modal.View exposing (Modal, map, view)
 
 import Css
 import Html.Styled as Html exposing (..)

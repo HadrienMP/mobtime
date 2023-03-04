@@ -1,12 +1,9 @@
-port module Components.Socket.Socket exposing (..)
+port module Components.Socket.Socket exposing (Model(..), Msg(..), SocketId(..), init, joinRoom, subscriptions, update, view)
 
 import Components.Socket.View
-import Css
 import Html.Styled as Html
-import Lib.Duration
 import Model.MobName exposing (MobName)
 import UI.Color exposing (RGBA255)
-import UI.Space
 
 
 port socketConnected : (String -> msg) -> Sub msg
@@ -41,16 +38,6 @@ init =
     ( Off, Cmd.none )
 
 
-socketId : Model -> Maybe SocketId
-socketId model =
-    case model of
-        On id ->
-            Just id
-
-        _ ->
-            Nothing
-
-
 
 -- Update
 
@@ -58,10 +45,6 @@ socketId model =
 type Msg
     = Connected String
     | Disconnected
-
-
-animationDuration =
-    Lib.Duration.ofSeconds 1
 
 
 update : Maybe MobName -> Msg -> Model -> ( Model, Cmd Msg )
@@ -103,12 +86,3 @@ view attributes color status =
         { socketConnected = status /= Off
         , color = color
         }
-
-
-common : List Css.Style
-common =
-    [ Css.position Css.fixed
-    , Css.top <| UI.Space.s
-    , Css.right <| UI.Space.s
-    , Css.zIndex <| Css.int 1000
-    ]

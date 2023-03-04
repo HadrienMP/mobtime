@@ -1,4 +1,4 @@
-module Pages.Mob.Tabs.Mobbers exposing (..)
+module Pages.Mob.Tabs.Mobbers exposing (Model, Msg(..), init, update, view)
 
 import Css
 import Effect exposing (Effect)

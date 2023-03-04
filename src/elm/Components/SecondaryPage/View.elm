@@ -1,4 +1,4 @@
-module Components.SecondaryPage.View exposing (..)
+module Components.SecondaryPage.View exposing (Props, view)
 
 import Css
 import Html.Styled as Html

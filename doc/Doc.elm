@@ -1,4 +1,4 @@
-module Doc exposing (..)
+module Doc exposing (SharedState, main)
 
 import Components.Form.Toggle.Doc
 import Components.Form.Volume.Doc

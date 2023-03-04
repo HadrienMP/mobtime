@@ -1,8 +1,7 @@
-module Pages.Home exposing (..)
+module Pages.Home exposing (Model, Msg(..), init, update, view)
 
 -- MODEL
 
-import Components.Form.Toggle.View
 import Components.Form.Volume.Field as Volume
 import Css
 import Effect exposing (Effect)
@@ -47,7 +46,6 @@ type Msg
     = MobNameChanged String
     | VolumeMsg Volume.Msg
     | JoinMob
-    | ToggleP2P
 
 
 update : Shared -> Model -> Msg -> ( Model, Effect Shared.Msg Msg )
@@ -84,9 +82,6 @@ update shared model msg =
                             "I was not able to create a url from your mob name. "
                                 ++ "Please try another one. Maybe with less symbols ?"
                     )
-
-        ToggleP2P ->
-            ( model, Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleP2P )
 
 
 
@@ -178,18 +173,6 @@ mobField model =
             ]
             []
         ]
-
-
-p2pField : Shared -> Html Msg
-p2pField shared =
-    Components.Form.Toggle.View.view
-        { id = "p2p"
-        , onToggle = ToggleP2P
-        , label = "Try the p2p version?"
-        , labelOff = Just "Better safe than sorry"
-        , labelOn = Just "Yes"
-        , value = shared.preferences.useP2P
-        }
 
 
 formRow : List (Html msg) -> Html msg

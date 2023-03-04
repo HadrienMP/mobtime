@@ -1,6 +1,6 @@
-port module Components.Form.Volume.Field exposing (..)
+port module Components.Form.Volume.Field exposing (Msg(..), change, update, view)
 
-import Components.Form.Volume.Type as Type exposing (Volume, open)
+import Components.Form.Volume.Type exposing (Volume, open)
 import Components.Form.Volume.View as View
 import Css
 import Html.Styled exposing (Html)
@@ -44,6 +44,6 @@ update msg volume =
 -- View
 
 
-view : Type.Volume -> { labelWidth : Css.Style } -> Html Msg
+view : Volume -> { labelWidth : Css.Style } -> Html Msg
 view volume _ =
     View.display { onChange = Change, onTest = Test, volume = volume }

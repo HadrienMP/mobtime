@@ -1,7 +1,7 @@
-module Lib.Duration exposing (..)
+module Lib.Duration exposing (Duration(..), DurationStringParts, addToTime, between, jsonDecoder, minus, multiply, ofMillis, ofMinutes, ofSeconds, print, ratio, secondsBetween, toJson, toLongString, toMillis, toMinutes, toSeconds, toShortString)
 
-import Json.Decode
-import Json.Encode
+import Json.Decode as Decode
+import Json.Encode as Json
 import Lib.ListExtras exposing (uncons)
 import Time
 
@@ -35,15 +35,15 @@ multiply multiplier duration =
         |> ofMillis
 
 
-toJson : Duration -> Json.Encode.Value
+toJson : Duration -> Json.Value
 toJson duration =
-    Json.Encode.int <| toMillis duration
+    Json.int <| toMillis duration
 
 
-jsonDecoder : Json.Decode.Decoder Duration
+jsonDecoder : Decode.Decoder Duration
 jsonDecoder =
-    Json.Decode.int
-        |> Json.Decode.map ofMillis
+    Decode.int
+        |> Decode.map ofMillis
 
 
 secondsBetween : Time.Posix -> Time.Posix -> Int

@@ -1,7 +1,7 @@
-module Lib.LibExtras_Spec exposing (..)
+module Lib.LibExtras_Spec exposing (suite)
 
 import Expect
-import Lib.ListExtras exposing (zip, rotate)
+import Lib.ListExtras exposing (rotate, zip)
 import Test exposing (Test, describe, test)
 
 
@@ -22,7 +22,7 @@ suite =
             [ test "pairs values at the same indexes of two lists" <|
                 \_ ->
                     zip [ 1, 2 ] [ "a", "b" ]
-                        |> Expect.equalLists [ ( 1, "a" ),( 2, "b" ) ]
+                        |> Expect.equalLists [ ( 1, "a" ), ( 2, "b" ) ]
             , test "ignores values that can't be paired" <|
                 \_ ->
                     zip [ 1, 2 ] [ "a" ]

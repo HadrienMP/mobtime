@@ -1,4 +1,4 @@
-module Pages.Mob.Tabs.Clocks exposing (..)
+module Pages.Mob.Tabs.Clocks exposing (Msg(..), update, view)
 
 import Css
 import Effect exposing (Effect)

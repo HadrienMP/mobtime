@@ -1,4 +1,4 @@
-module UI.Modal.Doc exposing (..)
+module UI.Modal.Doc exposing (theChapter)
 
 import Css
 import ElmBook.Actions
