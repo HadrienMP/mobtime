@@ -9,9 +9,8 @@
     "dev:build-front": "webpack --mode development --watch",
     "dev:server": "nodemon server/app.js",
     "test": "npx elm-test \"./src/elm/**/*Spec.elm\"",
-    "elm:remove-dead-code": "npx elm-review --template jfmengels/elm-review-unused/example --fix-all",
     "postinstall": "elm-tooling install ; husky install",
-    "review": "elm-review --fix-all",
+    "review": "elm-review",
     "build:doc": "parcel build doc/index.html",
     "start:doc": "parcel doc/index.html",
     "stylelint": "stylelint **/*.scss"

@@ -1,9 +1,16 @@
+const webpack = require('webpack');
+
 module.exports = {
     entry: './src/js/main.js',
     output: {
         filename: 'main.js',
         path: __dirname + '/public/js',
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            __TALK_MODE__: `'${process.env.TALK_MODE}'`,
+        }),
+    ],
     module: {
         rules: [
             {
