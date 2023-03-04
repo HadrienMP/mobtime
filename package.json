@@ -8,6 +8,7 @@
         "start": "node server/app.js",
         "start:dev": "concurrently --kill-others \"yarn dev:build-front\" \"yarn dev:server\"",
         "dev:build-front": "parcel watch",
+        "start:dev:front": "parcel",
         "dev:server": "nodemon server/app.js",
         "test": "npx elm-test \"./src/elm/**/*Spec.elm\"",
         "postinstall": "elm-tooling install ; husky install",

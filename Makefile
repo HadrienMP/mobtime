@@ -15,7 +15,7 @@ build-with-p2p:
 	TALK_MODE=p2p yarn build
 
 dev-with-p2p:
-	TALK_MODE=p2p yarn start:dev
+	TALK_MODE=p2p yarn start:dev:front
 
 # ------------------------------------
 install : 
