@@ -17,13 +17,30 @@ export const setup = (app) => {
         ydoc = new Y.Doc();
         messages = ydoc.getArray('messages');
         context = ydoc.getMap('context');
+        provider = new WebrtcProvider('mobtime/' + room, ydoc, {
+            signaling: ['wss://hadrienmp-signaling-server.onrender.com'],
+        });
+        const awareness = provider.awareness;
+
+        console.log('I am', awareness.clientID);
+        awareness.on('change', (changes) => {
+            console.log(
+                'peers',
+                Array.from(awareness.getStates().keys()).filter(
+                    (it) => it !== awareness.clientID
+                )
+            );
+        });
+        awareness.setLocalStateField('user', {
+            name: Math.round(Math.random() * 10000),
+        });
         new IndexeddbPersistence('persistence/' + room, ydoc);
-        provider = new WebrtcProvider('mobtime/' + room, ydoc);
 
         messages.observe((event) => {
             const changes = event.changes.delta
                 .filter((it) => !!it.insert)
                 .flatMap((it) => it.insert);
+            console.log({ changes });
 
             if (changes.length === 1) {
                 app.ports.receiveOne.send(changes[0]);

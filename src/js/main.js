@@ -5,7 +5,7 @@ import * as sockets from './sockets';
 import * as p2p from './p2p';
 import * as sound from './sound';
 import * as copy from './copy';
-const Elm = require('../elm/Main.elm').Elm;
+import { Elm } from '../elm/Main.elm';
 
 const app = Elm.Main.init({
     node: document.getElementById('elm'),
@@ -20,7 +20,7 @@ tooltips.setup();
 let alarm = sound.load('/sound/silence.mp3');
 alarm.play();
 
-const talkMode = __TALK_MODE__;
+const talkMode = process.env.TALK_MODE;
 if (talkMode === 'p2p') {
     alert('p2p mode is not stable, prefer https://mobtime.hadrienmp.fr');
     p2p.setup(app);
