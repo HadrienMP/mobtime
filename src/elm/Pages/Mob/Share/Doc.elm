@@ -6,7 +6,7 @@ import ElmBook.ElmCSS exposing (Chapter)
 import Model.MobName exposing (MobName(..))
 import Pages.Mob.Share.Button
 import Pages.Mob.Share.PageView
-import UI.Palettes
+import UI.Palettes as Palettes
 
 
 theChapter : Chapter x
@@ -16,7 +16,7 @@ theChapter =
             [ ( "Button"
               , Pages.Mob.Share.Button.view []
                     { sharePage = "https://mob.cassette.tools/awesome/share"
-                    , color = UI.Palettes.monochrome.on.background
+                    , color = Palettes.monochrome.on.background
                     }
               )
             , ( "Page"

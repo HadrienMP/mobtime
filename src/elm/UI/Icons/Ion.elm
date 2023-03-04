@@ -6,9 +6,9 @@ import Ionicon.Ios
 import Ionicon.Social
 import Svg as Unstyled
 import Svg.Styled as Svg
-import UI.Color
+import UI.Color as Color
 import UI.Icons.Common exposing (Icon)
-import UI.Rem
+import UI.Rem as Rem
 
 
 code : Icon msg
@@ -164,6 +164,6 @@ display :
     -> Icon msg
 display icon { size, color } =
     icon
-        (UI.Rem.toPixelsFake size)
-        (UI.Color.toIonIconRgba color)
+        (Rem.toPixelsFake size)
+        (Color.toIonIconRgba color)
         |> Svg.fromUnstyled

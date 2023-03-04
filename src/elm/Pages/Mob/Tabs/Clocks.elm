@@ -15,9 +15,9 @@ import Time
 import UI.Css
 import UI.Icons.Custom
 import UI.Icons.Ion
-import UI.Palettes
+import UI.Palettes as Palettes
 import UI.Range.View
-import UI.Rem
+import UI.Rem as Rem
 
 
 type Msg
@@ -40,12 +40,12 @@ view shared now state =
             [ Attr.css
                 [ Css.displayFlex
                 , Css.alignItems Css.center
-                , UI.Css.gap <| UI.Rem.Rem 0.4
+                , UI.Css.gap <| Rem.Rem 0.4
                 ]
             ]
             [ UI.Icons.Ion.people
-                { size = UI.Rem.Rem 3
-                , color = UI.Palettes.monochrome.on.background
+                { size = Rem.Rem 3
+                , color = Palettes.monochrome.on.background
                 }
             , text "Turn"
             ]
@@ -59,8 +59,8 @@ view shared now state =
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Custom.rabbit
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 1
+                    , color = Palettes.monochrome.on.background
                     }
                 , UI.Range.View.view
                     { onChange =
@@ -74,15 +74,15 @@ view shared now state =
                             |> toValue shared
                     }
                 , UI.Icons.Custom.elephant
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 1
+                    , color = Palettes.monochrome.on.background
                     }
                 ]
             ]
         , h3 []
             [ UI.Icons.Custom.tomato
-                { size = UI.Rem.Rem 1
-                , color = UI.Palettes.monochrome.on.background
+                { size = Rem.Rem 1
+                , color = Palettes.monochrome.on.background
                 }
             , text "Pomodoro"
             ]
@@ -108,8 +108,8 @@ view shared now state =
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Ion.batteryFull
-                    { size = UI.Rem.Rem 3
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 3
+                    , color = Palettes.monochrome.on.background
                     }
                 , UI.Range.View.view
                     { onChange =
@@ -123,8 +123,8 @@ view shared now state =
                             |> toValue shared
                     }
                 , UI.Icons.Ion.batteryLow
-                    { size = UI.Rem.Rem 3
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 3
+                    , color = Palettes.monochrome.on.background
                     }
                 ]
             ]

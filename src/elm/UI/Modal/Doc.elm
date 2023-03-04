@@ -6,7 +6,7 @@ import ElmBook.Chapter exposing (chapter, render, withComponent)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import UI.Color
+import UI.Color as Color
 import UI.Modal.View
 
 
@@ -22,7 +22,7 @@ theChapter =
                             [ Attr.css
                                 [ Css.height <| Css.pct 100
                                 , Css.width <| Css.pct 100
-                                , Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.fromHex "#2aaae7"
+                                , Css.backgroundColor <| Color.toElmCss <| Color.fromHex "#2aaae7"
                                 , Css.displayFlex
                                 , Css.alignItems Css.center
                                 , Css.justifyContent Css.center

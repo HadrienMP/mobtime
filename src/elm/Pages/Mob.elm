@@ -29,17 +29,17 @@ import Task
 import Time
 import UI.Button.View as Button
 import UI.CircularProgressBar
-import UI.Color
-import UI.Column
+import UI.Color as Color
+import UI.Column as Column
 import UI.Css
 import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
 import UI.Modal.View
-import UI.Palettes
-import UI.Rem
-import UI.Text
+import UI.Palettes as Palettes
+import UI.Rem as Rem
+import UI.Text as Text
 import View exposing (View)
 
 
@@ -351,7 +351,7 @@ body shared model action =
                 ]
             ]
             { sharePage = Routing.toUrl <| Routing.Share model.name
-            , color = UI.Palettes.monochrome.on.background
+            , color = Palettes.monochrome.on.background
             }
         , nav []
             ([ button
@@ -360,8 +360,8 @@ body shared model action =
                 , title "Home"
                 ]
                 [ UI.Icons.Ion.home
-                    { size = UI.Rem.Rem 3
-                    , color = UI.Palettes.monochrome.on.surface
+                    { size = Rem.Rem 3
+                    , color = Palettes.monochrome.on.surface
                     }
                 ]
              , button
@@ -370,8 +370,8 @@ body shared model action =
                 , title "Clock Settings"
                 ]
                 [ UI.Icons.Ion.clock
-                    { size = UI.Rem.Rem 3
-                    , color = UI.Palettes.monochrome.on.surface
+                    { size = Rem.Rem 3
+                    , color = Palettes.monochrome.on.surface
                     }
                 ]
              , button
@@ -380,8 +380,8 @@ body shared model action =
                 , title "Mobbers"
                 ]
                 [ UI.Icons.Ion.people
-                    { size = UI.Rem.Rem 3
-                    , color = UI.Palettes.monochrome.on.surface
+                    { size = Rem.Rem 3
+                    , color = Palettes.monochrome.on.surface
                     }
                 ]
              , button
@@ -390,8 +390,8 @@ body shared model action =
                 , title "Sound Settings"
                 ]
                 [ UI.Icons.Ion.sound
-                    { size = UI.Rem.Rem 3
-                    , color = UI.Palettes.monochrome.on.surface
+                    { size = Rem.Rem 3
+                    , color = Palettes.monochrome.on.surface
                     }
                 ]
              ]
@@ -402,8 +402,8 @@ body shared model action =
                             , title "Dev"
                             ]
                             [ UI.Icons.Ion.code
-                                { size = UI.Rem.Rem 1
-                                , color = UI.Palettes.monochrome.on.background
+                                { size = Rem.Rem 1
+                                , color = Palettes.monochrome.on.background
                                 }
                             ]
                         ]
@@ -438,14 +438,14 @@ musicModal : UI.Modal.View.Modal Msg
 musicModal =
     { onClose = StopSound
     , content =
-        UI.Column.column
+        Column.column
             [ css UI.Css.center ]
-            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
+            [ Column.Gap <| Rem.Rem 2 ]
             [ UI.Icons.Tape.display
-                { size = UI.Rem.Rem 10
-                , color = UI.Palettes.monochrome.on.background
+                { size = Rem.Rem 10
+                , color = Palettes.monochrome.on.background
                 }
-            , UI.Text.h2 [] "Turn ended !"
+            , Text.h2 [] "Turn ended !"
             , Button.button [ css [ Css.width <| Css.pct 100 ] ]
                 { content = Button.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
                 , variant = Button.Primary
@@ -466,13 +466,13 @@ breakModal mobName =
     in
     { onClose = action
     , content =
-        UI.Column.column
+        Column.column
             [ css UI.Css.center ]
-            [ UI.Column.Gap <| UI.Rem.Rem 2 ]
-            [ UI.Text.h2 [] "It's time for a break!"
+            [ Column.Gap <| Rem.Rem 2 ]
+            [ Text.h2 [] "It's time for a break!"
             , UI.Icons.Tea.display
-                { height = UI.Rem.Rem 10
-                , color = UI.Palettes.monochrome.on.background
+                { height = Rem.Rem 10
+                , color = Palettes.monochrome.on.background
                 }
             , Html.p
                 [ css [ Css.textAlign Css.justify ] ]
@@ -500,12 +500,12 @@ clockArea model action =
                 ]
                 [ UI.CircularProgressBar.draw
                     { colors =
-                        { main = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.5
-                        , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.9
-                        , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.7
+                        { main = Palettes.monochrome.surface |> Color.lighten 0.5
+                        , background = Palettes.monochrome.surface |> Color.lighten 0.9
+                        , border = Palettes.monochrome.surface |> Color.lighten 0.7
                         }
-                    , strokeWidth = UI.Rem.Rem 0.3
-                    , diameter = UI.Rem.Rem 8.7
+                    , strokeWidth = Rem.Rem 0.3
+                    , diameter = Rem.Rem 8.7
                     , progress = Clock.ratio model.now model.state.pomodoro
                     , refreshRate = turnRefreshRate |> Duration.multiply 2
                     }
@@ -518,22 +518,22 @@ clockArea model action =
                     ]
                     [ UI.CircularProgressBar.draw
                         { colors =
-                            { main = UI.Palettes.monochrome.surface
-                            , background = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.9
-                            , border = UI.Palettes.monochrome.surface |> UI.Color.lighten 0.7
+                            { main = Palettes.monochrome.surface
+                            , background = Palettes.monochrome.surface |> Color.lighten 0.9
+                            , border = Palettes.monochrome.surface |> Color.lighten 0.7
                             }
-                        , strokeWidth = UI.Rem.Rem 0.5
-                        , diameter = UI.Rem.Rem 7.8
+                        , strokeWidth = Rem.Rem 0.5
+                        , diameter = Rem.Rem 7.8
                         , progress = Clock.ratio model.now model.state.clock
                         , refreshRate = turnRefreshRate |> Duration.multiply 2
                         }
                     ]
                 , UI.Icons.style
                     { class = "action"
-                    , size = UI.Rem.Rem 3
+                    , size = Rem.Rem 3
                     , colors =
-                        { normal = UI.Palettes.monochrome.surface
-                        , hover = UI.Palettes.monochrome.surface
+                        { normal = Palettes.monochrome.surface
+                        , hover = Palettes.monochrome.surface
                         }
                     }
                   <|
@@ -558,15 +558,15 @@ actionButton action =
             , Css.left <| Css.rem 1.1
             , Css.flexDirection Css.column
             , Css.backgroundColor <|
-                UI.Color.toElmCss <|
-                    UI.Color.opactity 0.5 <|
-                        UI.Palettes.monochrome.background
-            , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
+                Color.toElmCss <|
+                    Color.opactity 0.5 <|
+                        Palettes.monochrome.background
+            , Css.color <| Color.toElmCss <| Palettes.monochrome.surface
             , Css.hover
                 [ Css.backgroundColor <|
-                    UI.Color.toElmCss <|
-                        UI.Color.opactity 0.8 <|
-                            UI.Palettes.monochrome.background
+                    Color.toElmCss <|
+                        Color.opactity 0.8 <|
+                            Palettes.monochrome.background
                 ]
             ]
         ]
@@ -607,8 +607,8 @@ detectAction shared model =
         On _ ->
             { icon =
                 UI.Icons.Ion.stop
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 1
+                    , color = Palettes.monochrome.on.background
                     }
             , message =
                 Model.Events.Clock Model.Events.Stopped
@@ -621,8 +621,8 @@ detectAction shared model =
         Off ->
             { icon =
                 UI.Icons.Ion.play
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 1
+                    , color = Palettes.monochrome.on.background
                     }
             , message = StartClicked
             , class = ""

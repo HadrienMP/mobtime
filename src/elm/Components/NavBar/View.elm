@@ -5,12 +5,12 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Model.MobName as MobName exposing (MobName)
 import Routing
-import UI.Color
+import UI.Color as Color
 import UI.Icons.Ion
 import UI.Icons.Tape
-import UI.Palettes
-import UI.Rem
-import UI.Row
+import UI.Palettes as Palettes
+import UI.Rem as Rem
+import UI.Row as Row
 
 
 type alias Props msg =
@@ -30,11 +30,11 @@ view props =
             , Css.right Css.zero
             , Css.zIndex <| Css.int 100
             , Css.backgroundColor <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.surface
+                Color.toElmCss <|
+                    Palettes.monochrome.surface
             , Css.color <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.on.surface
+                Color.toElmCss <|
+                    Palettes.monochrome.on.surface
             ]
         ]
         [ Html.div
@@ -73,14 +73,14 @@ title =
             [ Css.displayFlex
             , Css.textDecoration Css.none
             , Css.color <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.on.surface
+                Color.toElmCss <|
+                    Palettes.monochrome.on.surface
             ]
         , Attr.href "/"
         ]
         [ UI.Icons.Tape.display
-            { size = UI.Rem.Rem 2
-            , color = UI.Palettes.monochrome.on.surface
+            { size = Rem.Rem 2
+            , color = Palettes.monochrome.on.surface
             }
         , Html.h1
             [ Attr.css
@@ -96,22 +96,22 @@ title =
 
 rightNavBar : Props msg -> Html msg
 rightNavBar props =
-    UI.Row.row [ Attr.css [ Css.alignItems Css.center ] ]
-        [ UI.Row.Gap <| UI.Rem.Rem 0.4 ]
+    Row.row [ Attr.css [ Css.alignItems Css.center ] ]
+        [ Row.Gap <| Rem.Rem 0.4 ]
         [ props.socket
         , Html.a
             [ Attr.css
                 [ Css.border3 (Css.px 2) Css.solid <|
-                    UI.Color.toElmCss <|
-                        UI.Palettes.monochrome.on.surface
+                    Color.toElmCss <|
+                        Palettes.monochrome.on.surface
                 , Css.borderRadius <| Css.pct 50
                 , Css.cursor Css.pointer
                 ]
             , Attr.href <| Routing.toUrl <| Routing.Profile props.mob
             ]
             [ UI.Icons.Ion.user
-                { color = UI.Palettes.monochrome.on.surface
-                , size = UI.Rem.Rem 2
+                { color = Palettes.monochrome.on.surface
+                , size = Rem.Rem 2
                 }
             ]
         ]

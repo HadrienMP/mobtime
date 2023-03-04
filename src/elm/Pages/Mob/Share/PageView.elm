@@ -8,7 +8,7 @@ import Model.MobName exposing (MobName)
 import QRCode
 import Svg.Attributes as SvgAttr
 import UI.Button.View as Button
-import UI.Column
+import UI.Column as Column
 import UI.Icons.Ion
 
 
@@ -27,7 +27,7 @@ view props =
         , mob = props.mob
         , title = "Invite your team"
         , content =
-            UI.Column.column
+            Column.column
                 [ Attr.css
                     [ Css.alignItems Css.center
                     , Css.padding <| Css.rem 2

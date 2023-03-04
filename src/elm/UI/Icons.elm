@@ -4,8 +4,8 @@ import Css
 import Css.Global
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
-import UI.Color exposing (RGBA255)
-import UI.Rem exposing (Rem)
+import UI.Color as Color exposing (RGBA255)
+import UI.Rem as Rem exposing (Rem)
 
 
 style :
@@ -18,17 +18,17 @@ style { class, size, colors } child =
             [ Css.Global.class class
                 [ Css.Global.descendants
                     [ Css.Global.selector "svg"
-                        [ Css.height <| UI.Rem.toElmCss size
-                        , Css.width <| UI.Rem.toElmCss size
+                        [ Css.height <| Rem.toElmCss size
+                        , Css.width <| Rem.toElmCss size
                         , Css.Global.descendants
-                            [ Css.Global.everything [ Css.fill <| UI.Color.toElmCss colors.normal ]
+                            [ Css.Global.everything [ Css.fill <| Color.toElmCss colors.normal ]
                             ]
                         ]
                     ]
                 , Css.hover
                     [ Css.Global.descendants
                         [ Css.Global.selector "svg *"
-                            [ Css.fill <| UI.Color.toElmCss colors.hover
+                            [ Css.fill <| Color.toElmCss colors.hover
                             ]
                         ]
                     ]

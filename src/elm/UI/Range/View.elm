@@ -4,8 +4,8 @@ import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
-import UI.Color
-import UI.Palettes
+import UI.Color as Color
+import UI.Palettes as Palettes
 
 
 view :
@@ -50,8 +50,8 @@ view { onChange, value, min, max } =
 thumbStyle : List Css.Style
 thumbStyle =
     [ Css.property "appearance" "none"
-    , Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surface
-    , Css.border3 (Css.px 2) Css.solid <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
+    , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.on.surface
+    , Css.border3 (Css.px 2) Css.solid <| Color.toElmCss <| Palettes.monochrome.surface
     , Css.height <| Css.rem 1
     , Css.width <| Css.rem 1
     , Css.borderRadius <| Css.pct 100
@@ -60,13 +60,13 @@ thumbStyle =
 
 progressStyle : List Css.Style
 progressStyle =
-    [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
+    [ Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.surface
     , Css.height <| Css.rem 0.3
     ]
 
 
 trackStyle : List Css.Style
 trackStyle =
-    [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.surfaceActive
+    [ Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.surfaceActive
     , Css.height <| Css.rem 0.2
     ]

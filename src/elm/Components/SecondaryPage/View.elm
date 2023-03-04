@@ -5,14 +5,14 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Model.MobName exposing (MobName)
 import UI.Button.View
-import UI.Color
-import UI.Column
+import UI.Color as Color
+import UI.Column as Column
 import UI.Icons.Ion
-import UI.Palettes
-import UI.Rem
-import UI.Row
-import UI.Space
-import UI.Text
+import UI.Palettes as Palettes
+import UI.Rem as Rem
+import UI.Row as Row
+import UI.Space as Space
+import UI.Text as Text
 
 
 type alias Props msg =
@@ -25,9 +25,9 @@ type alias Props msg =
 
 view : Props msg -> Html.Html msg
 view { onBack, title, mob, content } =
-    UI.Column.column
+    Column.column
         []
-        [ UI.Column.Gap <| UI.Rem.Rem 1 ]
+        [ Column.Gap <| Rem.Rem 1 ]
         [ UI.Button.View.button [ Attr.css [ Css.maxWidth Css.fitContent ] ]
             { content =
                 UI.Button.View.Both
@@ -38,18 +38,18 @@ view { onBack, title, mob, content } =
             , size = UI.Button.View.S
             , action = UI.Button.View.OnPress <| Just onBack
             }
-        , UI.Space.spacer
-        , UI.Row.row
+        , Space.spacer
+        , Row.row
             [ Attr.css
                 [ Css.alignItems Css.end
                 , Css.paddingBottom <| Css.rem 0.8
                 , Css.borderBottom3 (Css.rem 0.1) Css.solid <|
-                    UI.Color.toElmCss <|
-                        UI.Palettes.monochrome.on.background
+                    Color.toElmCss <|
+                        Palettes.monochrome.on.background
                 ]
             ]
-            [ UI.Row.Gap <| UI.Rem.Rem 1 ]
-            [ UI.Text.h2 [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] title
+            [ Row.Gap <| Rem.Rem 1 ]
+            [ Text.h2 [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] title
             , Html.div [] [ Html.text "Mob" ]
             , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print mob ]
             ]

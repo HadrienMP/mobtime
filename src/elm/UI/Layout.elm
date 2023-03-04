@@ -6,13 +6,13 @@ import Css
 import Html.Styled as Html exposing (Html, a, div, text)
 import Html.Styled.Attributes as Attr exposing (css)
 import Shared exposing (Shared)
-import UI.Color
+import UI.Color as Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
-import UI.Palettes
-import UI.Rem
+import UI.Palettes as Palettes
+import UI.Rem as Rem
 
 
 limitWidth : List Css.Style
@@ -98,7 +98,7 @@ forHome shared child =
                 , Css.right <| Css.rem 1
                 ]
             ]
-            UI.Palettes.monochrome.on.background
+            Palettes.monochrome.on.background
             shared.socket
         ]
 
@@ -107,8 +107,8 @@ footer : Html msg
 footer =
     Html.footer
         [ css
-            [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.background
-            , Css.borderTop3 (Css.px 1) Css.solid <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.background
+            [ Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.background
+            , Css.borderTop3 (Css.px 1) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
             ]
         ]
         [ div
@@ -152,12 +152,12 @@ footerLink attributes { url, icon, label } =
             [ Css.padding2 (Css.rem 0.4) Css.zero
             , Css.fontSize (Css.rem 0.9)
             , Css.color <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.on.background
+                Color.toElmCss <|
+                    Palettes.monochrome.on.background
             , Css.visited
                 [ Css.color <|
-                    UI.Color.toElmCss <|
-                        UI.Palettes.monochrome.on.background
+                    Color.toElmCss <|
+                        Palettes.monochrome.on.background
                 ]
             ]
          ]
@@ -170,7 +170,7 @@ footerLink attributes { url, icon, label } =
                 , Css.margin Css.auto
                 ]
             ]
-            [ icon { size = UI.Rem.Rem 2, color = UI.Palettes.monochrome.on.background }
+            [ icon { size = Rem.Rem 2, color = Palettes.monochrome.on.background }
             , Html.span [ Attr.css [ Css.padding <| Css.rem 0.2 ] ] []
             , div [ Attr.css [ Css.position Css.relative, Css.top <| Css.px -1 ] ] [ text label ]
             ]

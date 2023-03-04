@@ -5,12 +5,12 @@ import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import UI.Button.View as Button
-import UI.Column
+import UI.Column as Column
 import UI.Icons.Ion
-import UI.Palettes
+import UI.Palettes as Palettes
 import UI.Range.View
-import UI.Rem
-import UI.Row
+import UI.Rem as Rem
+import UI.Row as Row
 
 
 type alias Props msg =
@@ -22,19 +22,19 @@ type alias Props msg =
 
 display : Props msg -> Html msg
 display { onChange, onTest, volume } =
-    UI.Row.row
+    Row.row
         [ Attr.css [ Css.width <| Css.pct 100 ] ]
         []
         [ Html.label
             [ Attr.for "volume", Attr.css [ Css.width <| Css.pct 30 ] ]
             [ Html.text "Volume" ]
-        , UI.Column.column [ Attr.css [ Css.flexGrow <| Css.int 1 ] ]
-            [ UI.Column.Gap <| UI.Rem.Rem 0.4 ]
-            [ UI.Row.row []
-                [ UI.Row.Gap <| UI.Rem.Rem 0.4 ]
+        , Column.column [ Attr.css [ Css.flexGrow <| Css.int 1 ] ]
+            [ Column.Gap <| Rem.Rem 0.4 ]
+            [ Row.row []
+                [ Row.Gap <| Rem.Rem 0.4 ]
                 [ UI.Icons.Ion.volumeLow
-                    { size = UI.Rem.Rem 2
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 2
+                    , color = Palettes.monochrome.on.background
                     }
                 , UI.Range.View.view
                     { onChange = onChange << Volume
@@ -43,8 +43,8 @@ display { onChange, onTest, volume } =
                     , value = open volume
                     }
                 , UI.Icons.Ion.volumeHigh
-                    { size = UI.Rem.Rem 2
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 2
+                    , color = Palettes.monochrome.on.background
                     }
                 ]
             , Button.button []

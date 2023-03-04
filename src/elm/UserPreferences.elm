@@ -74,7 +74,6 @@ decoder =
 type Msg
     = VolumeMsg Volume.Msg
     | ToggleSeconds
-    | ToggleP2P
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,8 +89,5 @@ update msg model =
 
                 ToggleSeconds ->
                     ( { model | displaySeconds = not model.displaySeconds }, Cmd.none )
-
-                ToggleP2P ->
-                    ( { model | useP2P = not model.useP2P }, Cmd.none )
     in
     ( updated, Cmd.batch [ command, updated |> encode |> savePreferences ] )

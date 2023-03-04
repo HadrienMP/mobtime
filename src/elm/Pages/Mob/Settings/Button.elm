@@ -3,11 +3,11 @@ module Pages.Mob.Settings.Button exposing (Props, view)
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
-import UI.Color exposing (RGBA255)
+import UI.Color as Color exposing (RGBA255)
 import UI.Css
 import UI.Icons.Ion
-import UI.Palettes
-import UI.Rem
+import UI.Palettes as Palettes
+import UI.Rem as Rem
 
 
 type alias Props =
@@ -25,7 +25,7 @@ view attributes props =
             , Css.flexDirection Css.column
             , Css.alignItems Css.center
             , Css.maxWidth Css.fitContent
-            , UI.Css.gap <| UI.Rem.Rem 0.2
+            , UI.Css.gap <| Rem.Rem 0.2
             , Css.textDecoration Css.none
             , Css.hover [ Css.textDecoration Css.underline ]
             ]
@@ -35,15 +35,15 @@ view attributes props =
         )
         [ Html.div
             [ Attr.css
-                [ Css.border3 (Css.px 2) Css.solid (UI.Color.toElmCss UI.Palettes.monochrome.on.background)
+                [ Css.border3 (Css.px 2) Css.solid (Color.toElmCss Palettes.monochrome.on.background)
                 , Css.borderRadius <| Css.pct 50
                 , Css.padding <| Css.rem 0.5
                 , Css.maxWidth Css.fitContent
-                , Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.background
+                , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.background
                 ]
             ]
             [ UI.Icons.Ion.settings
-                { size = UI.Rem.Rem 2.4
+                { size = Rem.Rem 2.4
                 , color = props.color
                 }
             ]
@@ -51,7 +51,7 @@ view attributes props =
             [ Attr.css
                 [ Css.fontSize <| Css.rem 0.9
                 , Css.fontWeight Css.lighter
-                , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.background
+                , Css.color <| Color.toElmCss <| Palettes.monochrome.on.background
                 ]
             ]
             [ Html.text "Settings" ]

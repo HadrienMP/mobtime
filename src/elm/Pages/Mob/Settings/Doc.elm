@@ -8,7 +8,7 @@ import Model.MobName exposing (MobName(..))
 import Pages.Mob.Settings.Button as Button
 import Pages.Mob.Settings.PageView as Page
 import Sounds
-import UI.Palettes
+import UI.Palettes as Palettes
 
 
 theChapter : Chapter x
@@ -18,7 +18,7 @@ theChapter =
             [ ( "Button"
               , Button.view []
                     { target = "#settings"
-                    , color = UI.Palettes.monochrome.on.background
+                    , color = Palettes.monochrome.on.background
                     }
               )
             , ( "Page"

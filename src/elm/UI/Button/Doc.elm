@@ -7,8 +7,8 @@ import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled.Attributes as Attr
 import UI.Button.View as Button
 import UI.Icons.Ion
-import UI.Rem
-import UI.Row
+import UI.Rem as Rem
+import UI.Row as Row
 
 
 theChapter : Chapter x
@@ -96,8 +96,8 @@ sizeToString size =
 
 
 component props =
-    UI.Row.row [ Attr.css [ Css.alignItems Css.flexStart ] ]
-        [ UI.Row.Gap <| UI.Rem.Rem 0.6 ]
+    Row.row [ Attr.css [ Css.alignItems Css.flexStart ] ]
+        [ Row.Gap <| Rem.Rem 0.6 ]
         (sizes
             |> List.map
                 (\size ->

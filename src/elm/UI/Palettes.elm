@@ -1,6 +1,6 @@
 module UI.Palettes exposing (Palette, monochrome)
 
-import UI.Color exposing (RGBA255)
+import UI.Color as Color exposing (RGBA255)
 
 
 type alias Palette =
@@ -25,20 +25,20 @@ type alias Palette =
 
 monochrome : Palette
 monochrome =
-    { error = UI.Color.fromHex "#eb0000"
-    , success = UI.Color.fromHex "#35c135"
-    , warn = UI.Color.fromHex "#eb8400"
-    , info = UI.Color.fromHex "#00a9eb"
-    , background = UI.Color.white
-    , surface = UI.Color.black
-    , surfaceActive = UI.Color.fromHex "#999999"
+    { error = Color.fromHex "#eb0000"
+    , success = Color.fromHex "#35c135"
+    , warn = Color.fromHex "#eb8400"
+    , info = Color.fromHex "#00a9eb"
+    , background = Color.white
+    , surface = Color.black
+    , surfaceActive = Color.fromHex "#999999"
     , on =
-        { error = UI.Color.white
-        , success = UI.Color.white
-        , warn = UI.Color.white
-        , info = UI.Color.white
-        , background = UI.Color.black
-        , surface = UI.Color.white
-        , surfaceActive = UI.Color.white
+        { error = Color.white
+        , success = Color.white
+        , warn = Color.white
+        , info = Color.white
+        , background = Color.black
+        , surface = Color.white
+        , surfaceActive = Color.white
         }
     }

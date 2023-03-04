@@ -2,20 +2,20 @@ module UI.Icons.Plugs exposing (off)
 
 import Svg.Styled as Svg exposing (Svg, path, svg)
 import Svg.Styled.Attributes as SvgAttr
-import UI.Color exposing (RGBA255)
-import UI.Rem exposing (Rem)
+import UI.Color as Color exposing (RGBA255)
+import UI.Rem as Rem exposing (Rem)
 
 
 off : { height : Rem, color : RGBA255 } -> Svg msg
 off { height, color } =
     svg
-        [ SvgAttr.height <| UI.Rem.toCssString height
+        [ SvgAttr.height <| Rem.toCssString height
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 60 60"
         ]
         [ Svg.g
             [ SvgAttr.transform "translate(-62.424 -116.07)"
-            , SvgAttr.stroke <| UI.Color.toCss color
+            , SvgAttr.stroke <| Color.toCss color
             ]
             [ Svg.g
                 [ SvgAttr.transform "rotate(45 92.429 146.24)"

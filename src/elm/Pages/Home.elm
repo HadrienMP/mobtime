@@ -14,13 +14,13 @@ import Routing
 import Shared exposing (Shared)
 import Slug
 import UI.Button.View as Button
-import UI.Color
-import UI.Column
+import UI.Color as Color
+import UI.Column as Column
 import UI.Icons.Ion
 import UI.Icons.Tape
-import UI.Palettes
-import UI.Rem
-import UI.Row
+import UI.Palettes as Palettes
+import UI.Rem as Rem
+import UI.Row as Row
 import UserPreferences
 import View exposing (View)
 
@@ -93,8 +93,8 @@ view shared model =
     { title = "Mob Time"
     , modal = Nothing
     , body =
-        UI.Column.column []
-            [ UI.Column.Gap <| UI.Rem.Rem 4 ]
+        Column.column []
+            [ Column.Gap <| Rem.Rem 4 ]
             [ Html.header
                 [ Attr.css
                     [ Css.displayFlex
@@ -102,8 +102,8 @@ view shared model =
                     ]
                 ]
                 [ UI.Icons.Tape.display
-                    { size = UI.Rem.Rem 8
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 8
+                    , color = Palettes.monochrome.on.background
                     }
                 , Html.h1
                     [ Attr.css
@@ -116,12 +116,12 @@ view shared model =
                     ]
                 ]
             , Html.form [ Evts.onSubmit JoinMob ]
-                [ UI.Column.column []
-                    [ UI.Column.Gap <| UI.Rem.Rem 1 ]
+                [ Column.column []
+                    [ Column.Gap <| Rem.Rem 1 ]
                     [ Html.h2
                         [ Attr.css
                             [ Css.borderBottom3 (Css.rem 0.1) Css.solid <|
-                                UI.Color.toElmCss UI.Palettes.monochrome.surface
+                                Color.toElmCss Palettes.monochrome.surface
                             , Css.paddingBottom <| Css.rem 0.4
                             , Css.textAlign Css.left
                             , Css.fontSize <| Css.rem 1.2
@@ -177,7 +177,7 @@ mobField model =
 
 formRow : List (Html msg) -> Html msg
 formRow =
-    UI.Row.row
+    Row.row
         [ Attr.css [ Css.width <| Css.pct 100 ] ]
         []
 

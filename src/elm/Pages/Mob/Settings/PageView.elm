@@ -8,15 +8,15 @@ import Html.Styled.Events as Evts
 import Lib.Duration exposing (Duration)
 import Model.MobName exposing (MobName)
 import Sounds
-import UI.Color
+import UI.Color as Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Icons.Tape
-import UI.Palettes
+import UI.Palettes as Palettes
 import UI.Range.View
-import UI.Rem
+import UI.Rem as Rem
 
 
 type alias Props msg =
@@ -42,7 +42,7 @@ view props =
                 [ Attr.css
                     [ Css.displayFlex
                     , Css.flexDirection Css.column
-                    , UI.Css.gap <| UI.Rem.Rem 3
+                    , UI.Css.gap <| Rem.Rem 3
                     ]
                 ]
                 [ Html.text "The settings are shared with the whole team"
@@ -54,7 +54,7 @@ view props =
 
 playlist : Props msg -> Html msg
 playlist props =
-    Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| UI.Rem.Rem 0.8 ] ]
+    Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| Rem.Rem 0.8 ] ]
         [ sectionTitle UI.Icons.Tape.display "Playlist"
         , Html.div
             [ Attr.css
@@ -81,18 +81,18 @@ sectionTitle icon title =
     Html.h3
         [ Attr.css
             [ Css.displayFlex
-            , UI.Css.gap <| UI.Rem.Rem 1
+            , UI.Css.gap <| Rem.Rem 1
             , Css.borderBottom3 (Css.px 1) Css.solid <|
-                UI.Color.toElmCss <|
-                    UI.Palettes.monochrome.on.background
+                Color.toElmCss <|
+                    Palettes.monochrome.on.background
             , Css.paddingBottom <| Css.rem 0.4
             , Css.alignItems Css.center
             , Css.margin Css.zero
             ]
         ]
         [ icon
-            { size = UI.Rem.Rem 2
-            , color = UI.Palettes.monochrome.on.background
+            { size = Rem.Rem 2
+            , color = Palettes.monochrome.on.background
             }
         , Html.text title
         ]
@@ -104,7 +104,7 @@ clockLengths props =
         [ Attr.css
             [ Css.displayFlex
             , Css.flexDirection Css.column
-            , UI.Css.gap <| UI.Rem.Rem 0.6
+            , UI.Css.gap <| Rem.Rem 0.6
             ]
         ]
         [ sectionTitle UI.Icons.Ion.clock "Clocks"
@@ -140,13 +140,13 @@ lengthRange props =
     Html.div
         [ Attr.css
             [ Css.displayFlex
-            , UI.Css.gap <| UI.Rem.Rem 2
+            , UI.Css.gap <| Rem.Rem 2
             , Css.alignItems Css.center
             ]
         ]
         [ props.icon
-            { size = UI.Rem.Rem 2
-            , color = UI.Palettes.monochrome.on.background
+            { size = Rem.Rem 2
+            , color = Palettes.monochrome.on.background
             }
         , Html.span
             [ Attr.css [ Css.width <| Css.rem 18 ] ]
@@ -173,7 +173,7 @@ viewProfile { active, current, onChange } =
             , Css.marginBottom <| Css.rem 0.4
             , Css.displayFlex
             , Css.flexDirection Css.column
-            , UI.Css.gap <| UI.Rem.Rem 0.1
+            , UI.Css.gap <| Rem.Rem 0.1
             ]
         , Evts.onClick (onChange current)
         ]
@@ -185,19 +185,19 @@ viewProfile { active, current, onChange } =
                 , Css.fontSize <| Css.rem 1
                 , UI.Css.roundBorder
                 , Css.backgroundColor <|
-                    UI.Color.toElmCss <|
+                    Color.toElmCss <|
                         if active == current then
-                            UI.Palettes.monochrome.surfaceActive
+                            Palettes.monochrome.surfaceActive
 
                         else
-                            UI.Palettes.monochrome.surface
+                            Palettes.monochrome.surface
                 , Css.color <|
-                    UI.Color.toElmCss <|
+                    Color.toElmCss <|
                         if active == current then
-                            UI.Palettes.monochrome.on.surfaceActive
+                            Palettes.monochrome.on.surfaceActive
 
                         else
-                            UI.Palettes.monochrome.on.surface
+                            Palettes.monochrome.on.surface
                 ]
             ]
             [ Html.text <| Sounds.title current ]
@@ -209,8 +209,8 @@ viewProfile { active, current, onChange } =
                     , Css.left <| Css.rem 1
                     , UI.Css.roundBorder
                     , Css.padding2 (Css.rem 0.4) (Css.rem 1)
-                    , Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.surfaceActive
-                    , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surfaceActive
+                    , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.surfaceActive
+                    , Css.color <| Color.toElmCss <| Palettes.monochrome.on.surfaceActive
                     ]
                 ]
                 [ Html.text "Selected" ]
@@ -227,7 +227,7 @@ viewPoster { url, alt } =
         , Attr.alt alt
         , Attr.css
             [ Css.width <| Css.pct 100
-            , Css.border3 (Css.px 1) Css.solid <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.background
+            , Css.border3 (Css.px 1) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
             , UI.Css.roundBorder
             , Css.property "aspect-ratio" "3/2"
             ]

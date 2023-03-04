@@ -22,8 +22,8 @@ import Shared
 import UI.Button.View
 import UI.Css
 import UI.Icons.Ion as Icons
-import UI.Palettes
-import UI.Rem
+import UI.Palettes as Palettes
+import UI.Rem as Rem
 import Uuid
 
 
@@ -121,7 +121,7 @@ view { mobbers, roles } model =
         , Attr.css
             [ Css.displayFlex
             , Css.flexDirection Css.column
-            , UI.Css.gap <| UI.Rem.Rem 1
+            , UI.Css.gap <| Rem.Rem 1
             ]
         ]
         [ form
@@ -130,8 +130,8 @@ view { mobbers, roles } model =
                 |> Html.fromUnstyled
             , button [ type_ "submit" ]
                 [ Icons.plus
-                    { size = UI.Rem.Rem 2
-                    , color = UI.Palettes.monochrome.on.surface
+                    { size = Rem.Rem 2
+                    , color = Palettes.monochrome.on.surface
                     }
                 ]
             ]
@@ -139,7 +139,7 @@ view { mobbers, roles } model =
             [ Attr.css
                 [ Css.displayFlex
                 , Css.width <| Css.pct 100
-                , UI.Css.gap <| UI.Rem.Rem 0.4
+                , UI.Css.gap <| Rem.Rem 0.4
                 ]
             ]
             [ UI.Button.View.button [ Attr.css [ Css.flexGrow <| Css.int 1 ] ]
@@ -171,7 +171,7 @@ view { mobbers, roles } model =
             [ Attr.css
                 [ Css.displayFlex
                 , Css.flexDirection Css.column
-                , UI.Css.gap <| UI.Rem.Rem 1
+                , UI.Css.gap <| Rem.Rem 1
                 ]
             ]
             (Mobbers.assignRoles roles mobbers
@@ -216,8 +216,8 @@ mobberView ( role, mobber ) =
             , button
                 [ onClick <| ShareEvent <| Model.Events.DeletedMobber mobber ]
                 [ Icons.delete
-                    { size = UI.Rem.Rem 1
-                    , color = UI.Palettes.monochrome.on.background
+                    { size = Rem.Rem 1
+                    , color = Palettes.monochrome.on.background
                     }
                 ]
             ]

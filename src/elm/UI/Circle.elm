@@ -13,7 +13,7 @@ import Html.Styled as Html
 import Lib.Ratio
 import Svg.Styled as Svg exposing (Svg)
 import Svg.Styled.Attributes as SvgAttr
-import UI.Color
+import UI.Color as Color
 import UI.Rem as Rem exposing (Rem)
 
 
@@ -24,7 +24,7 @@ import UI.Rem as Rem exposing (Rem)
 
 
 type alias Circle msg =
-    { color : UI.Color.RGBA255
+    { color : Color.RGBA255
     , strokeWidth : Rem
     , radiant : Rem
     , attributes : List (Html.Attribute msg)
@@ -32,7 +32,7 @@ type alias Circle msg =
 
 
 type alias CircleBorder =
-    { color : UI.Color.RGBA255
+    { color : Color.RGBA255
     , width : Rem
     }
 
@@ -49,7 +49,7 @@ type alias ConcentricCircles msg =
 
 
 buildFragment :
-    { color : UI.Color.RGBA255
+    { color : Color.RGBA255
     , strokeWidth : Rem
     , diameter : Rem
     , fragment : Lib.Ratio.Ratio
@@ -84,7 +84,7 @@ withAttributes attributes builder =
     { builder | main = { main | attributes = attributes } }
 
 
-addBackground : UI.Color.RGBA255 -> ConcentricCircles msg -> ConcentricCircles msg
+addBackground : Color.RGBA255 -> ConcentricCircles msg -> ConcentricCircles msg
 addBackground color builder =
     let
         main =
@@ -185,7 +185,7 @@ drawCircle { fragment, center } circle =
         ([ SvgAttr.cx <| Rem.toCssString center
          , SvgAttr.cy <| Rem.toCssString center
          , SvgAttr.r <| Rem.toCssString circle.radiant
-         , SvgAttr.stroke <| UI.Color.toCss circle.color
+         , SvgAttr.stroke <| Color.toCss circle.color
          , SvgAttr.strokeWidth <| Rem.toCssString circle.strokeWidth
          , SvgAttr.fillOpacity "0"
          , SvgAttr.strokeDasharray <| Rem.toCssString perimeter

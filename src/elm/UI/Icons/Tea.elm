@@ -2,19 +2,19 @@ module UI.Icons.Tea exposing (display)
 
 import Svg.Styled as Svg exposing (Svg, path, svg)
 import Svg.Styled.Attributes as SvgAttr
-import UI.Color exposing (RGBA255)
-import UI.Rem exposing (Rem)
+import UI.Color as Color exposing (RGBA255)
+import UI.Rem as Rem exposing (Rem)
 
 
 display : { height : Rem, color : RGBA255 } -> Svg msg
 display { height, color } =
     svg
-        [ SvgAttr.height <| UI.Rem.toCssString height
+        [ SvgAttr.height <| Rem.toCssString height
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 1269.754 1708.2892"
         ]
         [ Svg.g
-            [ SvgAttr.stroke <| UI.Color.toCss color
+            [ SvgAttr.stroke <| Color.toCss color
             ]
             [ path
                 [ SvgAttr.d "m43.104 1092.8l985.16-14.377c5.26 208.34-128.61 446.76-226.91 491.33-46.882 21.253-360.06 23.754-433.19 6.8761-211.86-48.891-312.74-226.25-325.05-483.83z"

@@ -2,20 +2,20 @@ module UI.Icons.Tape exposing (display)
 
 import Svg.Styled as Svg exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttr
-import UI.Color
+import UI.Color as Color
 import UI.Icons.Common exposing (Icon)
-import UI.Rem
+import UI.Rem as Rem
 
 
 display : Icon msg
 display { size, color } =
     svg
-        [ SvgAttr.height <| UI.Rem.toCssString size
+        [ SvgAttr.height <| Rem.toCssString size
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 109 78"
         ]
         [ Svg.g
-            [ SvgAttr.stroke <| UI.Color.toCss color
+            [ SvgAttr.stroke <| Color.toCss color
             ]
             [ path
                 [ SvgAttr.d "m30.639 60.301 47.045-0.0881 8.1914 15.502h-63.427zm-25.328-58.166h97.696c1.7601 0 3.177 1.6378 3.177 3.6722v66.196c0 2.0344-1.4169 3.6721-3.177 3.6721h-97.696c-1.7601 0-3.177-1.6378-3.177-3.6721v-66.196c0-2.0344 1.4169-3.6722 3.177-3.6722z"

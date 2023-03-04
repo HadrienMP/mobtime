@@ -3,12 +3,11 @@ module UI.Row exposing (RowAttribute(..), row)
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import UI.Rem
+import UI.Rem as Rem
 
 
 type RowAttribute
-    = Gap UI.Rem.Rem
-    | Padding UI.Rem.Rem
+    = Gap Rem.Rem
 
 
 row :
@@ -31,7 +30,4 @@ toStyle : RowAttribute -> List Css.Style
 toStyle attr =
     case attr of
         Gap rem ->
-            [ Css.property "gap" <| UI.Rem.toCssString rem ]
-
-        Padding rem ->
-            [ Css.padding <| UI.Rem.toElmCss rem ]
+            [ Css.property "gap" <| Rem.toCssString rem ]

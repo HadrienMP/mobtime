@@ -59,6 +59,13 @@ config =
                 , ( "Element.Border", "Border" )
                 , ( "Element.Background", "Background" )
                 , ( "Element.Input", "Input" )
+                , ( "UI.Rem", "Rem")
+                , ( "UI.Space", "Space")
+                , ( "UI.Row", "Row")
+                , ( "UI.Column", "Column")
+                , ( "UI.Text", "Text")
+                , ( "UI.Color", "Color")
+                , ( "UI.Palettes", "Palettes")
                 ]
                 |> NoInconsistentAliases.noMissingAliases
                 |> NoInconsistentAliases.rule

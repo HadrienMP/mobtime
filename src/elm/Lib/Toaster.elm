@@ -9,8 +9,8 @@ import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Lib.Delay
 import Lib.Duration
 import UI.Icons.Ion
-import UI.Palettes
-import UI.Rem
+import UI.Palettes as Palettes
+import UI.Rem as Rem
 
 
 
@@ -59,7 +59,6 @@ init =
 
 type Msg
     = Add Toast
-    | AddAll Toasts
     | Remove Toast
 
 
@@ -68,10 +67,6 @@ update msg toasts =
     case msg of
         Add toast ->
             add [ toast ] toasts
-                |> Tuple.mapSecond Cmd.batch
-
-        AddAll new ->
-            add new toasts
                 |> Tuple.mapSecond Cmd.batch
 
         Remove toast ->
@@ -146,12 +141,12 @@ icon level =
     case level of
         Error ->
             UI.Icons.Ion.error
-                { size = UI.Rem.Rem 1
-                , color = UI.Palettes.monochrome.on.error
+                { size = Rem.Rem 1
+                , color = Palettes.monochrome.on.error
                 }
 
         Success ->
             UI.Icons.Ion.success
-                { size = UI.Rem.Rem 1
-                , color = UI.Palettes.monochrome.on.success
+                { size = Rem.Rem 1
+                , color = Palettes.monochrome.on.success
                 }

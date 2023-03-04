@@ -6,16 +6,16 @@ import Html.Styled.Attributes exposing (css)
 import Lib.Duration
 import Lib.Ratio
 import UI.Circle
-import UI.Color
+import UI.Color as Color
 import UI.Rem as Rem exposing (Rem)
 import UI.TransitionExtra
 
 
 draw :
     { colors :
-        { main : UI.Color.RGBA255
-        , background : UI.Color.RGBA255
-        , border : UI.Color.RGBA255
+        { main : Color.RGBA255
+        , background : Color.RGBA255
+        , border : Color.RGBA255
         }
     , strokeWidth : Rem
     , diameter : Rem

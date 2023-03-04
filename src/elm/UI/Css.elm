@@ -1,7 +1,7 @@
 module UI.Css exposing (center, fullpage, gap, roundBorder)
 
 import Css
-import UI.Rem
+import UI.Rem as Rem
 
 
 center : List Css.Style
@@ -28,6 +28,6 @@ roundBorder =
     Css.borderRadius <| Css.rem 0.2
 
 
-gap : UI.Rem.Rem -> Css.Style
+gap : Rem.Rem -> Css.Style
 gap value =
-    Css.property "gap" <| UI.Rem.toCssString value
+    Css.property "gap" <| Rem.toCssString value

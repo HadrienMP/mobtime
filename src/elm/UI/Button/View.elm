@@ -5,12 +5,12 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events exposing (onClick)
 import Json.Encode as Json
-import UI.Color
+import UI.Color as Color
 import UI.Css
 import UI.Icons.Common
-import UI.Palettes
-import UI.Rem
-import UI.Row
+import UI.Palettes as Palettes
+import UI.Rem as Rem
+import UI.Row as Row
 
 
 type Content msg
@@ -52,7 +52,7 @@ button attributes { content, action, size, variant } =
         (Attr.css
             ([ UI.Css.roundBorder
              , Css.display Css.block
-             , Css.color <| UI.Color.toElmCss <| UI.Palettes.monochrome.on.surface
+             , Css.color <| Color.toElmCss <| Palettes.monochrome.on.surface
              , Css.cursor Css.pointer
              , Css.border Css.zero
              ]
@@ -64,29 +64,29 @@ button attributes { content, action, size, variant } =
         )
         (case content of
             Icon icon ->
-                [ icon { size = iconSize size, color = UI.Palettes.monochrome.on.surface } ]
+                [ icon { size = iconSize size, color = Palettes.monochrome.on.surface } ]
 
             Text text ->
                 [ Html.text text ]
 
             Both { icon, text } ->
-                [ UI.Row.row
+                [ Row.row
                     [ Attr.css
                         [ Css.justifyContent Css.center
                         , Css.alignItems Css.center
                         ]
                     ]
-                    [ UI.Row.Gap <| iconTextGap size ]
-                    [ icon { size = iconSize size, color = UI.Palettes.monochrome.on.surface }
+                    [ Row.Gap <| iconTextGap size ]
+                    [ icon { size = iconSize size, color = Palettes.monochrome.on.surface }
                     , Html.text text
                     ]
                 ]
         )
 
 
-iconSize : Size -> UI.Rem.Rem
+iconSize : Size -> Rem.Rem
 iconSize size =
-    UI.Rem.Rem <|
+    Rem.Rem <|
         case size of
             S ->
                 1.8
@@ -102,11 +102,11 @@ variantStyles : Variant -> List Css.Style
 variantStyles variant =
     case variant of
         Primary ->
-            [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Palettes.monochrome.surface
+            [ Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.surface
             ]
 
         Secondary ->
-            [ Css.backgroundColor <| UI.Color.toElmCss <| UI.Color.fromHex "#555"
+            [ Css.backgroundColor <| Color.toElmCss <| Color.fromHex "#555"
             ]
 
 
@@ -129,17 +129,17 @@ sizeStyles size =
             ]
 
 
-iconTextGap : Size -> UI.Rem.Rem
+iconTextGap : Size -> Rem.Rem
 iconTextGap size =
     case size of
         S ->
-            UI.Rem.Rem 0.4
+            Rem.Rem 0.4
 
         M ->
-            UI.Rem.Rem 0.6
+            Rem.Rem 0.6
 
         L ->
-            UI.Rem.Rem 0.8
+            Rem.Rem 0.8
 
 
 actionAttributes : Action msg -> List (Html.Attribute msg)
