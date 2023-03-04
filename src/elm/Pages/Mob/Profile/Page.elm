@@ -1,4 +1,4 @@
-module Pages.Profile.Page exposing (Msg(..), update, view)
+module Pages.Mob.Profile.Page exposing (Msg(..), update, view)
 
 import Components.Form.Volume.Field as Volume
 import Css
@@ -6,7 +6,7 @@ import Effect exposing (Effect)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Model.MobName exposing (MobName)
-import Pages.Profile.View
+import Pages.Mob.Profile.View
 import Routing
 import Shared exposing (Shared)
 import UserPreferences
@@ -41,7 +41,7 @@ view shared mob =
     , modal = Nothing
     , body =
         Html.div [ Attr.css [ Css.paddingTop <| Css.rem 1 ] ]
-            [ Pages.Profile.View.view
+            [ Pages.Mob.Profile.View.view
                 { mob = mob
                 , secondsToggle =
                     { value = shared.preferences.displaySeconds

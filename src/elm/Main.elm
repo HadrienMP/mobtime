@@ -16,8 +16,8 @@ import Model.Events
 import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
+import Pages.Mob.Profile.Page
 import Pages.Mob.Share.Page
-import Pages.Profile.Page
 import Routing
 import Shared
 import UI.GlobalStyle
@@ -115,7 +115,7 @@ type Msg
     = GotMobMsg Pages.Mob.Msg
     | GotHomeMsg Pages.Home.Msg
     | MobShareMsg Pages.Mob.Share.Page.Msg
-    | ProfileMsg Pages.Profile.Page.Msg
+    | ProfileMsg Pages.Mob.Profile.Page.Msg
     | Batch (List Msg)
     | SharedMsg Shared.Msg
     | UrlChanged Url.Url
@@ -159,7 +159,7 @@ update msg model =
 
         ( ProfileMsg subMsg, Profile mob ) ->
             ( model
-            , Pages.Profile.Page.update subMsg model.shared mob
+            , Pages.Mob.Profile.Page.update subMsg model.shared mob
                 |> Effect.map ProfileMsg
             )
                 |> handleEffect
@@ -293,7 +293,7 @@ view model =
                         |> View.map MobShareMsg
 
                 Profile mob ->
-                    Pages.Profile.Page.view model.shared mob
+                    Pages.Mob.Profile.Page.view model.shared mob
                         |> View.map ProfileMsg
 
         layout =

@@ -1,4 +1,4 @@
-module Pages.Profile.View exposing (Props, view)
+module Pages.Mob.Profile.View exposing (Props, view)
 
 import Components.Form.Volume.View as Volume
 import Css

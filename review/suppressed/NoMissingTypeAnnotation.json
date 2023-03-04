@@ -4,7 +4,6 @@
   "learn more": "elm-review suppress --help",
   "suppressions": [
     { "count": 2, "filePath": "src/elm/UI/Button/Doc.elm" },
-    { "count": 1, "filePath": "src/elm/Components/Form/Volume/Doc.elm" },
-    { "count": 1, "filePath": "src/elm/Pages/Profile/Doc.elm" }
+    { "count": 1, "filePath": "src/elm/Components/Form/Volume/Doc.elm" }
   ]
 }
