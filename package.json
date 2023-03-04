@@ -13,8 +13,8 @@
         "test": "npx elm-test \"./src/elm/**/*Spec.elm\"",
         "postinstall": "elm-tooling install ; husky install",
         "review": "elm-review",
-        "build:doc": "parcel build doc/index.html",
-        "start:doc": "parcel doc/index.html",
+        "build:doc": "parcel build doc/index.html --dist-dir=doc/dist",
+        "start:doc": "parcel doc/index.html --dist-dir=doc/dist --port=4321",
         "stylelint": "stylelint **/*.scss"
     },
     "keywords": [],
@@ -25,6 +25,7 @@
         "@parcel/transformer-elm": "^2.8.3",
         "@parcel/transformer-sass": "^2.8.3",
         "@parcel/transformer-webmanifest": "^2.8.3",
+        "buffer": "^5.7.1",
         "concurrently": "^7.0.0",
         "css-loader": "^6.5.1",
         "elm-book": "^1.0.1",

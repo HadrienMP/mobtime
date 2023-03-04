@@ -22,7 +22,6 @@ alarm.play();
 
 const talkMode = process.env.TALK_MODE;
 if (talkMode === 'p2p') {
-    alert('p2p mode is not stable, prefer https://mobtime.hadrienmp.fr');
     p2p.setup(app);
 } else {
     const socket = sockets.setup(app);
