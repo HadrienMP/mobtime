@@ -2,6 +2,7 @@
 import '../sass/main.scss';
 import * as tooltips from './tooltips';
 import * as sockets from './sockets';
+import * as p2p from './p2p';
 import * as sound from './sound';
 import * as copy from './copy';
 const Elm = require('../elm/Main.elm').Elm;
@@ -22,6 +23,7 @@ alarm.play();
 const talkMode = __TALK_MODE__;
 if (talkMode === 'p2p') {
     alert('p2p mode is not stable, prefer https://mobtime.hadrienmp.fr');
+    p2p.setup(app);
 } else {
     const socket = sockets.setup(app);
     app.ports.commands.subscribe((command) => {
