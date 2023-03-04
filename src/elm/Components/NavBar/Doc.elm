@@ -12,7 +12,7 @@ theChapter : Chapter x
 theChapter =
     let
         props =
-            { mob = Just <| MobName "Awesome"
+            { mob = MobName "Awesome"
             , socket =
                 Components.Socket.View.view []
                     { socketConnected = False
@@ -27,14 +27,13 @@ theChapter =
             , ( "With a name too long"
               , Components.NavBar.View.view
                     { props
-                        | mob = Just <| MobName "That is a long name indeed, too long for the nav bar at least"
+                        | mob = MobName "That is a long name indeed, too long for the nav bar at least"
                     }
               )
             , ( "With letter going down"
               , Components.NavBar.View.view
                     { props
-                        | mob = Just <| MobName "qpg"
+                        | mob = MobName "qpg"
                     }
               )
-            , ( "Without a mob", Components.NavBar.View.view { props | mob = Nothing } )
             ]

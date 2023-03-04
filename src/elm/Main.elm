@@ -51,7 +51,7 @@ type Page
     = Home Pages.Home.Model
     | Mob Pages.Mob.Model
     | MobShare MobName
-    | Profile
+    | Profile MobName
 
 
 type alias Model =
@@ -103,8 +103,8 @@ loadPage shared =
             , Effect.none
             )
 
-        Routing.Profile ->
-            ( Profile, Effect.none )
+        Routing.Profile mobName ->
+            ( Profile mobName, Effect.none )
 
 
 
@@ -157,9 +157,9 @@ update msg model =
                 |> Tuple.pair model
                 |> handleEffect
 
-        ( ProfileMsg subMsg, Profile ) ->
+        ( ProfileMsg subMsg, Profile mob ) ->
             ( model
-            , Pages.Profile.Page.update subMsg model.shared
+            , Pages.Profile.Page.update subMsg model.shared mob
                 |> Effect.map ProfileMsg
             )
                 |> handleEffect
@@ -254,7 +254,7 @@ subscriptions model =
             MobShare _ ->
                 Pages.Mob.Share.Page.subscriptions |> Sub.map MobShareMsg
 
-            Profile ->
+            Profile _ ->
                 Sub.none
         , Js.Events.events (dispatch jsEventsMapping)
         , Shared.subscriptions model.shared |> Sub.map SharedMsg
@@ -292,8 +292,8 @@ view model =
                     Pages.Mob.Share.Page.view model.shared mob
                         |> View.map MobShareMsg
 
-                Profile ->
-                    Pages.Profile.Page.view model.shared
+                Profile mob ->
+                    Pages.Profile.Page.view model.shared mob
                         |> View.map ProfileMsg
 
         layout =

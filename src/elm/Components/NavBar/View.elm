@@ -14,7 +14,7 @@ import UI.Row
 
 
 type alias Props msg =
-    { mob : Maybe MobName
+    { mob : MobName
     , socket : Html msg
     , addedStyle : List Css.Style
     }
@@ -58,9 +58,8 @@ view props =
                     ]
                 ]
                 [ Html.text <|
-                    Maybe.withDefault "" <|
-                        Maybe.map MobName.print <|
-                            props.mob
+                    MobName.print <|
+                        props.mob
                 ]
             , rightNavBar props
             ]
@@ -108,7 +107,7 @@ rightNavBar props =
                 , Css.borderRadius <| Css.pct 50
                 , Css.cursor Css.pointer
                 ]
-            , Attr.href <| Routing.toUrl <| Routing.Profile
+            , Attr.href <| Routing.toUrl <| Routing.Profile props.mob
             ]
             [ UI.Icons.Ion.user
                 { color = UI.Palettes.monochrome.on.surface

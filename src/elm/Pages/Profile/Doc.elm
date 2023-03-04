@@ -12,8 +12,7 @@ profileChapter : Chapter x
 profileChapter =
     chapter "Profile page"
         |> renderComponentList
-            [ ( "With mob", component <| Just <| MobName "A Mob" )
-            , ( "Without mob", component Nothing )
+            [ ( "With mob", component <| MobName "A Mob" )
             ]
 
 

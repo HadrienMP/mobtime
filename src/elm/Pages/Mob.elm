@@ -79,7 +79,7 @@ init shared name =
                 Effect.none
 
             else
-                Shared.pushUrl shared Routing.Profile
+                Shared.pushUrl shared <| Routing.Profile name
     in
     ( { name = name
       , state = Model.State.init

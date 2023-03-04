@@ -5,6 +5,7 @@ import Css
 import Effect exposing (Effect)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Model.MobName exposing (MobName)
 import Pages.Profile.View
 import Routing
 import Shared exposing (Shared)
@@ -18,8 +19,8 @@ type Msg
     | Join
 
 
-update : Msg -> Shared -> Effect Shared.Msg Msg
-update msg shared =
+update : Msg -> Shared -> MobName -> Effect Shared.Msg Msg
+update msg shared mob =
     case msg of
         ToggleSeconds ->
             Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds
@@ -28,25 +29,20 @@ update msg shared =
             Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.VolumeMsg subMsg
 
         Join ->
-            case shared.mob of
-                Just mob ->
-                    Effect.batch
-                        [ Shared.pushUrl shared <| Routing.Mob mob
-                        , Effect.fromShared <| Shared.SoundOn
-                        ]
-
-                Nothing ->
-                    Shared.pushUrl shared <| Routing.Login
+            Effect.batch
+                [ Shared.pushUrl shared <| Routing.Mob mob
+                , Effect.fromShared <| Shared.SoundOn
+                ]
 
 
-view : Shared -> View Msg
-view shared =
+view : Shared -> MobName -> View Msg
+view shared mob =
     { title = "Profile"
     , modal = Nothing
     , body =
         Html.div [ Attr.css [ Css.paddingTop <| Css.rem 1 ] ]
             [ Pages.Profile.View.view
-                { mob = shared.mob
+                { mob = mob
                 , secondsToggle =
                     { value = shared.preferences.displaySeconds
                     , onToggle = ToggleSeconds

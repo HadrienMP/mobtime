@@ -18,7 +18,7 @@ import UI.Toggle.View
 
 
 type alias Props msg =
-    { mob : Maybe MobName
+    { mob : MobName
     , secondsToggle : UI.Toggle.View.Props msg
     , volume : Volume.Props msg
     , onJoin : msg
@@ -34,14 +34,9 @@ view props =
         , Button.button []
             { content =
                 Button.Both <|
-                    case props.mob of
-                        Just _ ->
-                            { icon = UI.Icons.Ion.paperAirplane
-                            , text = "Join"
-                            }
-
-                        Nothing ->
-                            { icon = UI.Icons.Ion.back, text = "Back" }
+                    { icon = UI.Icons.Ion.paperAirplane
+                    , text = "Join"
+                    }
             , variant = Button.Primary
             , size = Button.M
             , action = Button.OnPress <| Just props.onJoin
@@ -50,7 +45,7 @@ view props =
 
 
 head : Props msg -> Html msg
-head props =
+head _ =
     UI.Column.column []
         [ UI.Column.Gap <| UI.Rem.Rem 0.4 ]
         [ UI.Row.row
@@ -65,12 +60,7 @@ head props =
             []
             [ UI.Text.h2 [] "Your Profile"
             ]
-        , case props.mob of
-            Just _ ->
-                UI.Text.View.light "Setup your personal preferences before joining your teammates"
-
-            Nothing ->
-                Html.div [] []
+        , UI.Text.View.light "Setup your personal preferences before joining your teammates"
         ]
 
 
