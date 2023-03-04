@@ -30,7 +30,7 @@ theChapter =
                     , onPomodoroChange = logActionWith Lib.Duration.print "Pomodoro changed"
                     , pomodoro = Lib.Duration.ofMinutes 25
                     , currentPlaylist = Sounds.ClassicWeird
-                    , onPlaylistChange = logActionWith Debug.toString "Playlist changed"
+                    , onPlaylistChange = logActionWith Sounds.title "Playlist changed"
                     }
               )
             ]
