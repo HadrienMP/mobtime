@@ -2,8 +2,6 @@ dist
 node_modules
 package-lock.json
 elm-stuff
-public/js/
-public/css/main.css
 .sass-cache
 .idea
 server/elm-server.js
