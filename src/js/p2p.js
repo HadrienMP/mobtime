@@ -18,9 +18,7 @@ export const setup = (app) => {
         messages = ydoc.getArray('messages');
         context = ydoc.getMap('context');
         new IndexeddbPersistence('persistence/' + room, ydoc);
-        provider = new WebrtcProvider('mobtime/' + room, ydoc, {
-            signaling: ['wss://hadrienmp-signaling-server.onrender.com'],
-        });
+        provider = new WebrtcProvider('mobtime/' + room, ydoc);
 
         messages.observe((event) => {
             const changes = event.changes.delta
