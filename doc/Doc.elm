@@ -19,6 +19,7 @@ import UI.GlobalStyle
 import UI.Modal.Doc
 import UI.Range.Doc
 import UI.Toggle.Doc
+import UI.Typography.Doc
 
 
 type alias SharedState =
@@ -65,6 +66,7 @@ main =
                 , UI.Button.Doc.theChapter
                 , UI.Toggle.Doc.theChapter
                 , UI.Modal.Doc.theChapter
+                , UI.Typography.Doc.doc
                 ]
               )
             , ( "Components"

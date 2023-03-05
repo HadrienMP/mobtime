@@ -166,7 +166,7 @@ viewProfile { active, current, onChange } =
         [ Attr.css
             [ Css.border Css.zero
             , Css.backgroundColor Css.transparent
-            , Css.maxWidth <| Css.pct 49
+            , Css.width <| Css.pct 49
             , Css.padding Css.zero
             , Css.overflow Css.hidden
             , Css.position Css.relative

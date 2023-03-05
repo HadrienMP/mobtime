@@ -40,6 +40,7 @@ view attributes props =
                 , Css.padding <| Css.rem 0.5
                 , Css.maxWidth Css.fitContent
                 , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.background
+                , Css.lineHeight <| Css.rem 1
                 ]
             ]
             [ UI.Icons.Ion.settings
