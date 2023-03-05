@@ -52,6 +52,7 @@ view attributes props =
                 [ Css.fontSize <| Css.rem 0.9
                 , Css.fontWeight Css.lighter
                 , Css.color <| Color.toElmCss <| Palettes.monochrome.on.background
+                , Css.textDecoration Css.underline
                 ]
             ]
             [ Html.text "Invite" ]
