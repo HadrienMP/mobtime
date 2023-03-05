@@ -9,7 +9,9 @@ import Js.EventsMapping exposing (EventsMapping)
 import Json.Decode as Decode
 import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
+import Model.Events
 import Model.MobName exposing (MobName)
+import Model.State
 import Routing
 import Url
 import UserPreferences
@@ -28,7 +30,7 @@ type alias Shared =
     , key : Nav.Key
     , url : Url.Url
     , preferences : UserPreferences.Model
-    , mob : Maybe MobName
+    , mob : Maybe Model.State.State
     , devMode : Bool
     , konami : Konami
     , soundOn : Bool
@@ -60,7 +62,7 @@ init { key, url, jsonPreferences, mob } =
       , key = key
       , url = url
       , preferences = preferences
-      , mob = mob
+      , mob = mob |> Maybe.map Model.State.init
       , devMode = False
       , konami = Lib.Konami.init
       , soundOn = False
@@ -85,6 +87,7 @@ type Msg
     | PreferencesMsg UserPreferences.Msg
     | SoundOn
     | JoinMob MobName
+    | ReceivedEvent Model.Events.Event
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -149,7 +152,21 @@ update_ msg shared =
             ( { shared | soundOn = True }, Cmd.none )
 
         JoinMob mob ->
-            ( { shared | mob = Just mob }, Cmd.none )
+            ( { shared | mob = Just <| Model.State.init mob }, Cmd.none )
+
+        ReceivedEvent event ->
+            case shared.mob of
+                Just mob ->
+                    let
+                        ( updated, command ) =
+                            Model.State.evolve event mob
+                    in
+                    ( { shared | mob = Just updated }
+                    , command
+                    )
+
+                Nothing ->
+                    ( shared, Cmd.none )
 
 
 toast : Toast -> Effect Msg msg
@@ -177,6 +194,7 @@ subscriptions shared =
         , Lib.Konami.subscriptions shared.konami
             |> Sub.map KonamiMsg
         , soundOn <| always SoundOn
+        , Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
         ]
 
 

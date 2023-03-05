@@ -14,6 +14,7 @@ import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.MobName exposing (MobName)
 import Model.State
+import Pages.Mob.Settings.Button
 import Pages.Mob.Share.Button
 import Pages.Mob.Tabs.Clocks
 import Pages.Mob.Tabs.Dev
@@ -82,7 +83,7 @@ init shared name =
                 Shared.pushUrl shared <| Routing.Profile name
     in
     ( { name = name
-      , state = Model.State.init
+      , state = Model.State.init name
       , mobbersSettings = Pages.Mob.Tabs.Mobbers.init
       , alarm = Standby
       , now = Time.millisToPosix 0
@@ -351,6 +352,16 @@ body shared model action =
                 ]
             ]
             { sharePage = Routing.toUrl <| Routing.Share model.name
+            , color = Palettes.monochrome.on.background
+            }
+        , Pages.Mob.Settings.Button.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.top <| Css.rem 10
+                , Css.right <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
+                ]
+            ]
+            { target = Routing.toUrl <| Routing.Settings model.name
             , color = Palettes.monochrome.on.background
             }
         , nav []

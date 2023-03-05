@@ -11,6 +11,7 @@ type Page
     | Mob MobName
     | Share MobName
     | Profile MobName
+    | Settings MobName
 
 
 toPage : Url.Url -> Page
@@ -26,6 +27,7 @@ route =
         , map (MobName >> Mob) (s "mob" </> UrlParser.string)
         , map (MobName >> Share) (s "mob" </> UrlParser.string </> s "share")
         , map (MobName >> Profile) (s "mob" </> UrlParser.string </> s "me")
+        , map (MobName >> Settings) (s "mob" </> UrlParser.string </> s "settings")
         ]
 
 
@@ -43,3 +45,6 @@ toUrl page =
 
         Profile mobname ->
             Url.Builder.absolute [ "mob", Model.MobName.print mobname, "me" ] []
+
+        Settings mobname ->
+            Url.Builder.absolute [ "mob", Model.MobName.print mobname, "settings" ] []

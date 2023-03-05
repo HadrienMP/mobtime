@@ -22,7 +22,6 @@ globalStyle =
                 [ Css.Global.everything
                     [ Css.boxSizing Css.borderBox
                     , Css.fontFamilies [ "Oswald", "sans-serif" ]
-                    , Css.lineHeight <| Css.em 1
                     ]
                 ]
             ]

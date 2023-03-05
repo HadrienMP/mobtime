@@ -32,6 +32,7 @@ wrap shared child =
             , Css.flexDirection Css.column
             , Css.overflow Css.hidden
             ]
+        , Attr.class "app"
         ]
         [ Components.NavBar.Component.view (Css.padding sidePadding :: limitWidth) shared
         , div
@@ -74,6 +75,7 @@ forHome shared child =
             , Css.flexDirection Css.column
             , Css.height <| Css.pct 100
             ]
+        , Attr.class "app"
         ]
         [ div
             [ css

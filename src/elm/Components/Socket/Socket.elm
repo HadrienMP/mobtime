@@ -2,7 +2,8 @@ port module Components.Socket.Socket exposing (Model(..), Msg(..), SocketId(..),
 
 import Components.Socket.View
 import Html.Styled as Html
-import Model.MobName exposing (MobName)
+import Model.MobName
+import Model.State
 import UI.Color exposing (RGBA255)
 
 
@@ -47,14 +48,14 @@ type Msg
     | Disconnected
 
 
-update : Maybe MobName -> Msg -> Model -> ( Model, Cmd Msg )
-update mob msg _ =
+update : Maybe Model.State.State -> Msg -> Model -> ( Model, Cmd Msg )
+update maybeMob msg _ =
     case msg of
         Connected id ->
             ( On <| SocketId id
-            , case mob of
-                Just value ->
-                    socketJoin <| Model.MobName.print value
+            , case maybeMob of
+                Just mob ->
+                    socketJoin <| Model.MobName.print mob.name
 
                 Nothing ->
                     Cmd.none

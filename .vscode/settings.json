@@ -1,4 +1,6 @@
 {
     "editor.formatOnSave": true,
     "nixEnvSelector.nixFile": "${workspaceRoot}/flake.nix",
+    "editor.fontWeight": "normal",
+    "window.zoomLevel": 0
 }

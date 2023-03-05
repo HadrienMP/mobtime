@@ -5,6 +5,7 @@ import Js.Commands
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Model.Events exposing (ClockEvent(..), Event(..))
+import Model.MobName
 import Model.Mobber as Mobber
 import Model.Role
 import Model.State
@@ -21,7 +22,8 @@ suite =
                 \_ ->
                     let
                         ( state, _ ) =
-                            Model.State.init
+                            Model.MobName.MobName "awesome"
+                                |> Model.State.init
                                 |> Model.State.evolve (Clock <| turnOnAt midnight)
                     in
                     state.pomodoro
@@ -36,7 +38,8 @@ suite =
                 \_ ->
                     let
                         ( state, _ ) =
-                            Model.State.init
+                            Model.MobName.MobName "awesome"
+                                |> Model.State.init
                                 |> Model.State.evolve (Clock <| turnOnAt midnight)
                                 |> Model.State.evolve_ (Clock <| Stopped)
                                 |> Model.State.evolve_ (Clock <| turnOnAt <| minutesPast 10 midnight)
@@ -53,7 +56,8 @@ suite =
                 \_ ->
                     let
                         ( state, _ ) =
-                            Model.State.init
+                            Model.MobName.MobName "awesome"
+                                |> Model.State.init
                                 |> Model.State.evolve (Clock <| turnOnAt midnight)
                                 |> Model.State.evolve_ PomodoroStopped
                     in
@@ -65,7 +69,8 @@ suite =
                 \_ ->
                     let
                         ( _, command ) =
-                            Model.State.init
+                            Model.MobName.MobName "awesome"
+                                |> Model.State.init
                                 |> Model.State.evolveMany []
                     in
                     command
@@ -80,7 +85,8 @@ suite =
                             Clock <| turnOnWithAlarm alarm
 
                         ( _, command ) =
-                            Model.State.init
+                            Model.MobName.MobName "awesome"
+                                |> Model.State.init
                                 |> Model.State.evolveMany [ started ]
                     in
                     command
@@ -109,7 +115,8 @@ suite =
                             { default = mobber, special = [ driver, navigator ] }
 
                         ( state, _ ) =
-                            Model.State.init
+                            Model.MobName.MobName "awesome"
+                                |> Model.State.init
                                 |> Model.State.evolveMany
                                     [ AddedMobber jane
                                     , AddedMobber camille

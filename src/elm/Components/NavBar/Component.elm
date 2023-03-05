@@ -13,7 +13,7 @@ view addedStyle shared =
     case shared.mob of
         Just mob ->
             Components.NavBar.View.view
-                { mob = mob
+                { mob = mob.name
                 , socket = Components.Socket.Socket.view [] Palettes.monochrome.on.surface shared.socket
                 , addedStyle = addedStyle
                 }

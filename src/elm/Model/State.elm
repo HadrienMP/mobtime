@@ -5,6 +5,7 @@ import Lib.Duration as Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
 import Model.Clock exposing (ClockState(..))
 import Model.Events as Events
+import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Role exposing (Role)
@@ -14,7 +15,8 @@ import Time
 
 
 type alias State =
-    { clock : ClockState
+    { name : MobName
+    , clock : ClockState
     , turnLength : Duration
     , pomodoro : ClockState
     , pomodoroLength : Duration
@@ -24,9 +26,10 @@ type alias State =
     }
 
 
-init : State
-init =
-    { clock = Off
+init : MobName -> State
+init mob =
+    { name = mob
+    , clock = Off
     , turnLength = defaultTurnLength
     , pomodoro = Off
     , pomodoroLength = defaultPomodoroLength

@@ -17,6 +17,7 @@ import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob
 import Pages.Mob.Profile.Page
+import Pages.Mob.Settings.Page
 import Pages.Mob.Share.Page
 import Routing
 import Shared
@@ -52,6 +53,7 @@ type Page
     | Mob Pages.Mob.Model
     | MobShare MobName
     | Profile MobName
+    | Settings
 
 
 type alias Model =
@@ -106,6 +108,33 @@ loadPage shared =
         Routing.Profile mobName ->
             ( Profile mobName, Effect.none )
 
+        Routing.Settings mobName ->
+            case shared.mob of
+                Just mob ->
+                    if mobName == mob.name then
+                        ( Settings, Effect.none )
+
+                    else
+                        redirectToLogin shared
+
+                Nothing ->
+                    redirectToLogin shared
+
+
+redirectToLogin : Shared.Shared -> ( Page, Effect Shared.Msg Msg )
+redirectToLogin shared =
+    Pages.Home.init
+        |> Tuple.mapBoth
+            Home
+            (Effect.map GotHomeMsg)
+        |> Tuple.mapSecond
+            (\effect ->
+                Effect.batch
+                    [ effect
+                    , Shared.pushUrl shared Routing.Login
+                    ]
+            )
+
 
 
 -- UPDATE
@@ -116,6 +145,7 @@ type Msg
     | GotHomeMsg Pages.Home.Msg
     | MobShareMsg Pages.Mob.Share.Page.Msg
     | ProfileMsg Pages.Mob.Profile.Page.Msg
+    | SettingsMsg Pages.Mob.Settings.Page.Msg
     | Batch (List Msg)
     | SharedMsg Shared.Msg
     | UrlChanged Url.Url
@@ -163,6 +193,18 @@ update msg model =
                 |> Effect.map ProfileMsg
             )
                 |> handleEffect
+
+        ( SettingsMsg subMsg, Settings ) ->
+            case model.shared.mob of
+                Just mob ->
+                    Pages.Mob.Settings.Page.update model.shared subMsg mob
+                        |> Tuple.mapBoth
+                            (always model)
+                            (Effect.map SettingsMsg)
+                        |> handleEffect
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         ( Batch messages, _ ) ->
             Lib.BatchMsg.update messages model update
@@ -256,6 +298,9 @@ subscriptions model =
 
             Profile _ ->
                 Sub.none
+
+            Settings ->
+                Sub.none
         , Js.Events.events (dispatch jsEventsMapping)
         , Shared.subscriptions model.shared |> Sub.map SharedMsg
         ]
@@ -295,6 +340,18 @@ view model =
                 Profile mob ->
                     Pages.Mob.Profile.Page.view model.shared mob
                         |> View.map ProfileMsg
+
+                Settings ->
+                    case model.shared.mob of
+                        Just mob ->
+                            Pages.Mob.Settings.Page.view mob
+                                |> View.map SettingsMsg
+
+                        Nothing ->
+                            { title = "Oops"
+                            , body = Html.text "Oops"
+                            , modal = Nothing
+                            }
 
         layout =
             case model.page of
