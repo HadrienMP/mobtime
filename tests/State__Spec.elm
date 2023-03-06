@@ -5,10 +5,10 @@ import Js.Commands
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Model.Events exposing (ClockEvent(..), Event(..))
+import Model.Mob
 import Model.MobName
 import Model.Mobber as Mobber
 import Model.Role
-import Model.State
 import Sounds
 import Test exposing (Test, describe, test)
 import Time
@@ -23,8 +23,8 @@ suite =
                     let
                         ( state, _ ) =
                             Model.MobName.MobName "awesome"
-                                |> Model.State.init
-                                |> Model.State.evolve (Clock <| turnOnAt midnight)
+                                |> Model.Mob.init
+                                |> Model.Mob.evolve (Clock <| turnOnAt midnight)
                     in
                     state.pomodoro
                         |> Expect.equal
@@ -39,10 +39,10 @@ suite =
                     let
                         ( state, _ ) =
                             Model.MobName.MobName "awesome"
-                                |> Model.State.init
-                                |> Model.State.evolve (Clock <| turnOnAt midnight)
-                                |> Model.State.evolve_ (Clock <| Stopped)
-                                |> Model.State.evolve_ (Clock <| turnOnAt <| minutesPast 10 midnight)
+                                |> Model.Mob.init
+                                |> Model.Mob.evolve (Clock <| turnOnAt midnight)
+                                |> Model.Mob.evolve_ (Clock <| Stopped)
+                                |> Model.Mob.evolve_ (Clock <| turnOnAt <| minutesPast 10 midnight)
                     in
                     state.pomodoro
                         |> Expect.equal
@@ -57,9 +57,9 @@ suite =
                     let
                         ( state, _ ) =
                             Model.MobName.MobName "awesome"
-                                |> Model.State.init
-                                |> Model.State.evolve (Clock <| turnOnAt midnight)
-                                |> Model.State.evolve_ PomodoroStopped
+                                |> Model.Mob.init
+                                |> Model.Mob.evolve (Clock <| turnOnAt midnight)
+                                |> Model.Mob.evolve_ PomodoroStopped
                     in
                     state.pomodoro
                         |> Expect.equal Clock.Off
@@ -70,8 +70,8 @@ suite =
                     let
                         ( _, command ) =
                             Model.MobName.MobName "awesome"
-                                |> Model.State.init
-                                |> Model.State.evolveMany []
+                                |> Model.Mob.init
+                                |> Model.Mob.evolveMany []
                     in
                     command
                         |> Expect.equal Cmd.none
@@ -86,8 +86,8 @@ suite =
 
                         ( _, command ) =
                             Model.MobName.MobName "awesome"
-                                |> Model.State.init
-                                |> Model.State.evolveMany [ started ]
+                                |> Model.Mob.init
+                                |> Model.Mob.evolveMany [ started ]
                     in
                     command
                         |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
@@ -116,8 +116,8 @@ suite =
 
                         ( state, _ ) =
                             Model.MobName.MobName "awesome"
-                                |> Model.State.init
-                                |> Model.State.evolveMany
+                                |> Model.Mob.init
+                                |> Model.Mob.evolveMany
                                     [ AddedMobber jane
                                     , AddedMobber camille
                                     , ChangedRoles roles
@@ -126,7 +126,7 @@ suite =
                                     ]
                     in
                     state
-                        |> Model.State.assignRoles
+                        |> Model.Mob.assignRoles
                         |> Expect.equal [ ( driver, camille ), ( navigator, jane ) ]
             ]
         ]

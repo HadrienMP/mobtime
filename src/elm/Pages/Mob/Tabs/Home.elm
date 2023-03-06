@@ -2,10 +2,10 @@ module Pages.Mob.Tabs.Home exposing (Msg(..), update, view)
 
 import Html.Styled exposing (Html, div, li, span, text, ul)
 import Html.Styled.Attributes exposing (class, id)
+import Model.Mob exposing (Mob)
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Role exposing (Role)
-import Model.State exposing (State)
 import Shared exposing (Shared)
 
 
@@ -18,7 +18,7 @@ update _ =
     Cmd.none
 
 
-view : Shared -> MobName -> State -> Html Msg
+view : Shared -> MobName -> Mob -> Html Msg
 view _ mob state =
     div
         [ id "home", class "tab" ]
@@ -27,9 +27,9 @@ view _ mob state =
         ]
 
 
-roles : State -> Html msg
+roles : Mob -> Html msg
 roles state =
-    Model.State.assignSpecialRoles state
+    Model.Mob.assignSpecialRoles state
         |> List.map roleView
         |> (\list ->
                 case list of

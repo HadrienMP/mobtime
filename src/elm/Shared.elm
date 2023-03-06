@@ -10,8 +10,8 @@ import Json.Decode as Decode
 import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.Events
+import Model.Mob
 import Model.MobName exposing (MobName)
-import Model.State
 import Routing
 import Url
 import UserPreferences
@@ -30,7 +30,7 @@ type alias Shared =
     , key : Nav.Key
     , url : Url.Url
     , preferences : UserPreferences.Model
-    , mob : Maybe Model.State.State
+    , mob : Maybe Model.Mob.Mob
     , devMode : Bool
     , konami : Konami
     , soundOn : Bool
@@ -62,7 +62,7 @@ init { key, url, jsonPreferences, mob } =
       , key = key
       , url = url
       , preferences = preferences
-      , mob = mob |> Maybe.map Model.State.init
+      , mob = mob |> Maybe.map Model.Mob.init
       , devMode = False
       , konami = Lib.Konami.init
       , soundOn = False
@@ -152,14 +152,14 @@ update_ msg shared =
             ( { shared | soundOn = True }, Cmd.none )
 
         JoinMob mob ->
-            ( { shared | mob = Just <| Model.State.init mob }, Cmd.none )
+            ( { shared | mob = Just <| Model.Mob.init mob }, Cmd.none )
 
         ReceivedEvent event ->
             case shared.mob of
                 Just mob ->
                     let
                         ( updated, command ) =
-                            Model.State.evolve event mob
+                            Model.Mob.evolve event mob
                     in
                     ( { shared | mob = Just updated }
                     , command

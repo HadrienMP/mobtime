@@ -1,4 +1,4 @@
-module Model.State exposing (State, TimePassedResult, assignRoles, assignSpecialRoles, evolve, evolveMany, evolve_, init, timePassed)
+module Model.Mob exposing (Mob, TimePassedResult, assignRoles, assignSpecialRoles, evolve, evolveMany, evolve_, init, timePassed)
 
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
@@ -14,7 +14,7 @@ import Sounds
 import Time
 
 
-type alias State =
+type alias Mob =
     { name : MobName
     , clock : ClockState
     , turnLength : Duration
@@ -26,7 +26,7 @@ type alias State =
     }
 
 
-init : MobName -> State
+init : MobName -> Mob
 init mob =
     { name = mob
     , clock = Off
@@ -50,12 +50,12 @@ defaultPomodoroLength =
 
 
 type alias TimePassedResult =
-    { updated : State
+    { updated : Mob
     , turnEvent : Model.Clock.Event
     }
 
 
-timePassed : Time.Posix -> State -> TimePassedResult
+timePassed : Time.Posix -> Mob -> TimePassedResult
 timePassed now state =
     let
         ( clock, event ) =
@@ -66,12 +66,12 @@ timePassed now state =
     }
 
 
-evolve : Events.Event -> State -> ( State, Cmd msg )
+evolve : Events.Event -> Mob -> ( Mob, Cmd msg )
 evolve event state =
     evolve_ event ( state, Cmd.none )
 
 
-evolve_ : Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
+evolve_ : Events.Event -> ( Mob, Cmd msg ) -> ( Mob, Cmd msg )
 evolve_ event ( state, previousCommand ) =
     case event of
         Events.Clock clockEvent ->
@@ -128,12 +128,12 @@ evolve_ event ( state, previousCommand ) =
             )
 
 
-evolveMany : List Events.Event -> State -> ( State, Cmd msg )
+evolveMany : List Events.Event -> Mob -> ( Mob, Cmd msg )
 evolveMany events model =
     evolveMany_ events ( model, Cmd.none )
 
 
-evolveMany_ : List Events.Event -> ( State, Cmd msg ) -> ( State, Cmd msg )
+evolveMany_ : List Events.Event -> ( Mob, Cmd msg ) -> ( Mob, Cmd msg )
 evolveMany_ events previous =
     case uncons events of
         ( Nothing, _ ) ->
@@ -143,7 +143,7 @@ evolveMany_ events previous =
             evolveMany_ others (evolve_ first previous)
 
 
-evolveClock : Events.ClockEvent -> State -> ( State, Cmd msg )
+evolveClock : Events.ClockEvent -> Mob -> ( Mob, Cmd msg )
 evolveClock event state =
     case ( event, state.clock ) of
         ( Events.Started started, Off ) ->
@@ -181,11 +181,11 @@ evolveClock event state =
             ( state, Cmd.none )
 
 
-assignRoles : State -> List ( Role, Mobber )
+assignRoles : Mob -> List ( Role, Mobber )
 assignRoles state =
     Mobbers.assignRoles state.roles state.mobbers
 
 
-assignSpecialRoles : State -> List ( Role, Mobber )
+assignSpecialRoles : Mob -> List ( Role, Mobber )
 assignSpecialRoles state =
     Mobbers.assignSpecialRoles state.roles state.mobbers

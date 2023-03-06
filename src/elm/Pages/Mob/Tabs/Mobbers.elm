@@ -12,11 +12,11 @@ import Html.Styled.Attributes as Attr exposing (class, id, type_)
 import Html.Styled.Events exposing (onClick, onSubmit)
 import Lib.Toaster as Toaster
 import Model.Events
+import Model.Mob exposing (Mob)
 import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Role exposing (Role)
-import Model.State exposing (State)
 import Random
 import Shared
 import UI.Button.View
@@ -113,7 +113,7 @@ update msg mobbers mob model =
 -- VIEW
 
 
-view : State -> Model -> Html Msg
+view : Mob -> Model -> Html Msg
 view { mobbers, roles } model =
     div
         [ id "mobbers"

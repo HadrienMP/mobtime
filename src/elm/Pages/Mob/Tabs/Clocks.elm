@@ -8,8 +8,8 @@ import Html.Styled.Events exposing (onClick)
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Model.Events
+import Model.Mob
 import Model.MobName exposing (MobName)
-import Model.State
 import Shared exposing (Shared)
 import Time
 import UI.Css
@@ -33,7 +33,7 @@ update msg mob =
                 |> Effect.share
 
 
-view : Shared -> Time.Posix -> Model.State.State -> Html Msg
+view : Shared -> Time.Posix -> Model.Mob.Mob -> Html Msg
 view shared now state =
     div [ id "timer", class "tab" ]
         [ h3

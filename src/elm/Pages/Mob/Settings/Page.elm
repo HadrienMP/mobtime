@@ -3,7 +3,7 @@ module Pages.Mob.Settings.Page exposing (Model, Msg(..), update, view)
 import Effect exposing (Effect)
 import Lib.Duration exposing (Duration)
 import Model.Events
-import Model.State
+import Model.Mob
 import Pages.Mob.Settings.PageView
 import Routing
 import Shared exposing (Shared)
@@ -12,7 +12,7 @@ import View exposing (View)
 
 
 type alias Model =
-    Model.State.State
+    Model.Mob.Mob
 
 
 type Msg

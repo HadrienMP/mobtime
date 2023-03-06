@@ -2,8 +2,8 @@ port module Components.Socket.Socket exposing (Model(..), Msg(..), SocketId(..),
 
 import Components.Socket.View
 import Html.Styled as Html
+import Model.Mob
 import Model.MobName
-import Model.State
 import UI.Color exposing (RGBA255)
 
 
@@ -48,7 +48,7 @@ type Msg
     | Disconnected
 
 
-update : Maybe Model.State.State -> Msg -> Model -> ( Model, Cmd Msg )
+update : Maybe Model.Mob.Mob -> Msg -> Model -> ( Model, Cmd Msg )
 update maybeMob msg _ =
     case msg of
         Connected id ->
