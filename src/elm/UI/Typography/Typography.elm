@@ -5,7 +5,7 @@ import Css
 
 scaled : Int -> Float
 scaled scale =
-    0.8 * (1.25 ^ toFloat scale)
+    0.6 * (1.3 ^ toFloat scale) |> (*) 10 |> round |> (\x -> toFloat x / 10)
 
 
 xs : Css.Style

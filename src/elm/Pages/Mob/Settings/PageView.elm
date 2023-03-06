@@ -17,6 +17,7 @@ import UI.Icons.Tape
 import UI.Palettes as Palettes
 import UI.Range.View
 import UI.Rem as Rem
+import UI.Typography.Typography
 
 
 type alias Props msg =
@@ -205,12 +206,13 @@ viewProfile { active, current, onChange } =
             Html.span
                 [ Attr.css
                     [ Css.position Css.absolute
-                    , Css.top <| Css.rem 1
-                    , Css.left <| Css.rem 1
+                    , Css.top <| Css.rem 0.6
+                    , Css.left <| Css.rem 0.6
                     , UI.Css.roundBorder
-                    , Css.padding2 (Css.rem 0.4) (Css.rem 1)
+                    , Css.padding2 (Css.rem 0.2) (Css.rem 0.6)
                     , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.surfaceActive
                     , Css.color <| Color.toElmCss <| Palettes.monochrome.on.surfaceActive
+                    , UI.Typography.Typography.s
                     ]
                 ]
                 [ Html.text "Selected" ]
