@@ -2,7 +2,7 @@
     "name": "mob-time-elm",
     "version": "1.0.22",
     "description": "",
-    "source": "public/index.html",
+    "source": "src/index.html",
     "scripts": {
         "build": "parcel build && cp -r public/* dist",
         "start": "node server/app.js",
