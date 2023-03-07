@@ -2,6 +2,7 @@ module Pages.Mob.Main exposing
     ( Model
     , Msg(..)
     , Page(..)
+    , PageMsg
     , init
     , jsEventMapping
     , subscriptions
@@ -19,6 +20,7 @@ import Model.Mob
 import Model.MobName
 import Pages.Mob.Home.Page
 import Pages.Mob.Invite.Page
+import Pages.Mob.Profile.Page
 import Pages.Mob.Routing
 import Pages.Mob.Settings.Page
 import Shared exposing (Shared)
@@ -34,6 +36,7 @@ type Page
     = Home Pages.Mob.Home.Page.Model
     | Settings
     | Invite
+    | Profile
 
 
 type alias Model =
@@ -61,15 +64,18 @@ init shared route =
 initSubPage : Pages.Mob.Routing.Route -> Shared -> ( Page, Effect Shared.Msg Msg )
 initSubPage route shared =
     case route.subRoute of
-        Pages.Mob.Routing.MobHome ->
+        Pages.Mob.Routing.Home ->
             Pages.Mob.Home.Page.init shared route.name
-                |> Tuple.mapBoth Home (Effect.map HomeMsg)
+                |> Tuple.mapBoth Home (Effect.map (PageMsg << HomeMsg))
 
-        Pages.Mob.Routing.MobSettings ->
+        Pages.Mob.Routing.Settings ->
             ( Settings, Effect.none )
 
         Pages.Mob.Routing.Invite ->
             ( Invite, Effect.none )
+
+        Pages.Mob.Routing.Profile ->
+            ( Profile, Effect.none )
 
 
 
@@ -77,42 +83,33 @@ initSubPage route shared =
 
 
 type Msg
-    = HomeMsg Pages.Mob.Home.Page.Msg
-    | SettingsMsg Pages.Mob.Settings.Page.Msg
-    | InviteMsg Pages.Mob.Invite.Page.Msg
+    = PageMsg PageMsg
     | ReceivedEvent Model.Events.Event
     | ReceivedHistory (List Model.Events.Event)
     | Tick Time.Posix
     | RouteChanged Pages.Mob.Routing.Route
 
 
+type PageMsg
+    = HomeMsg Pages.Mob.Home.Page.Msg
+    | SettingsMsg Pages.Mob.Settings.Page.Msg
+    | InviteMsg Pages.Mob.Invite.Page.Msg
+    | ProfileMsg Pages.Mob.Profile.Page.Msg
+
+
 update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
 update shared msg model =
-    case ( msg, model.page ) of
-        ( RouteChanged route, _ ) ->
+    case msg of
+        RouteChanged route ->
             initSubPage route shared
                 |> Tuple.mapFirst
                     (\next -> { model | page = next })
 
-        ( HomeMsg subMsg, Home subModel ) ->
-            Pages.Mob.Home.Page.update shared model.mob subMsg subModel
-                |> Tuple.mapBoth
-                    (\next -> { model | page = Home next })
-                    (Effect.map HomeMsg)
+        PageMsg pageMsg ->
+            updatePage pageMsg model shared
+                |> Tuple.mapSecond (Effect.map PageMsg)
 
-        ( SettingsMsg subMsg, Settings ) ->
-            Pages.Mob.Settings.Page.update shared subMsg model.mob
-                |> Tuple.mapBoth
-                    (\next -> { model | mob = next })
-                    (Effect.map SettingsMsg)
-
-        ( InviteMsg subMsg, Invite ) ->
-            ( model
-            , Pages.Mob.Invite.Page.update shared subMsg model.mob.name
-                |> Effect.map InviteMsg
-            )
-
-        ( ReceivedEvent event, _ ) ->
+        ReceivedEvent event ->
             let
                 ( updated, command ) =
                     Model.Mob.evolve event model.mob
@@ -121,7 +118,7 @@ update shared msg model =
             , Effect.fromCmd command
             )
 
-        ( ReceivedHistory eventsResults, _ ) ->
+        ReceivedHistory eventsResults ->
             let
                 ( updated, command ) =
                     Model.Mob.evolveMany eventsResults model.mob
@@ -130,7 +127,7 @@ update shared msg model =
             , Effect.fromCmd command
             )
 
-        ( Tick now, _ ) ->
+        Tick now ->
             let
                 timePassedResult =
                     Model.Mob.timePassed now model.mob
@@ -154,7 +151,35 @@ update shared msg model =
                 | page = nextPage
                 , mob = timePassedResult.updated
               }
-            , pageEffect
+            , pageEffect |> Effect.map PageMsg
+            )
+
+
+updatePage : PageMsg -> Model -> Shared -> ( Model, Effect Shared.Msg PageMsg )
+updatePage pageMsg model shared =
+    case ( pageMsg, model.page ) of
+        ( HomeMsg subMsg, Home subModel ) ->
+            Pages.Mob.Home.Page.update shared model.mob subMsg subModel
+                |> Tuple.mapBoth
+                    (\next -> { model | page = Home next })
+                    (Effect.map HomeMsg)
+
+        ( SettingsMsg subMsg, Settings ) ->
+            Pages.Mob.Settings.Page.update shared subMsg model.mob
+                |> Tuple.mapBoth
+                    (\next -> { model | mob = next })
+                    (Effect.map SettingsMsg)
+
+        ( InviteMsg subMsg, Invite ) ->
+            ( model
+            , Pages.Mob.Invite.Page.update shared subMsg model.mob.name
+                |> Effect.map InviteMsg
+            )
+
+        ( ProfileMsg subMsg, Profile ) ->
+            ( model
+            , Pages.Mob.Profile.Page.update subMsg shared model.mob.name
+                |> Effect.map ProfileMsg
             )
 
         _ ->
@@ -170,17 +195,7 @@ subscriptions model =
     Sub.batch
         [ Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
         , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
-        , case model.page of
-            Home subModel ->
-                Pages.Mob.Home.Page.subscriptions subModel
-                    |> Sub.map HomeMsg
-
-            Settings ->
-                Pages.Mob.Settings.Page.subscriptions model.mob
-                    |> Sub.map SettingsMsg
-
-            Invite ->
-                Pages.Mob.Invite.Page.subscriptions |> Sub.map InviteMsg
+        , pageSubscriptions model
         , case ( Model.Clock.isOn model.mob.clock, Model.Clock.isOn model.mob.pomodoro ) of
             ( True, _ ) ->
                 Pages.Mob.Home.Page.turnRefreshRate
@@ -195,13 +210,33 @@ subscriptions model =
         ]
 
 
+pageSubscriptions : Model -> Sub Msg
+pageSubscriptions model =
+    case model.page of
+        Home subModel ->
+            Pages.Mob.Home.Page.subscriptions subModel
+                |> Sub.map (HomeMsg >> PageMsg)
+
+        Settings ->
+            Pages.Mob.Settings.Page.subscriptions model.mob
+                |> Sub.map (SettingsMsg >> PageMsg)
+
+        Invite ->
+            Pages.Mob.Invite.Page.subscriptions
+                |> Sub.map (InviteMsg >> PageMsg)
+
+        Profile ->
+            Sub.none
+
+
 
 -- TODO get rid of me !
 
 
 jsEventMapping : Js.EventsMapping.EventsMapping Msg
 jsEventMapping =
-    Pages.Mob.Home.Page.jsEventMapping |> Js.EventsMapping.map HomeMsg
+    Pages.Mob.Home.Page.jsEventMapping
+        |> Js.EventsMapping.map (HomeMsg >> PageMsg)
 
 
 
@@ -215,15 +250,19 @@ view shared model =
             case model.page of
                 Home subModel ->
                     Pages.Mob.Home.Page.view shared model.mob subModel
-                        |> View.map HomeMsg
+                        |> View.map (HomeMsg >> PageMsg)
 
                 Settings ->
                     Pages.Mob.Settings.Page.view model.mob
-                        |> View.map SettingsMsg
+                        |> View.map (SettingsMsg >> PageMsg)
 
                 Invite ->
                     Pages.Mob.Invite.Page.view shared model.mob.name
-                        |> View.map InviteMsg
+                        |> View.map (InviteMsg >> PageMsg)
+
+                Profile ->
+                    Pages.Mob.Profile.Page.view shared model.mob.name
+                        |> View.map (ProfileMsg >> PageMsg)
     in
     { title =
         case subView.title of

@@ -16,7 +16,6 @@ import Model.Events
 import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob.Main
-import Pages.Mob.Profile.Page
 import Routing
 import Shared
 import UI.GlobalStyle
@@ -49,7 +48,6 @@ main =
 type Page
     = Home Pages.Home.Model
     | Mob Pages.Mob.Main.Model
-    | Profile MobName
 
 
 type alias Model =
@@ -106,9 +104,6 @@ loadPage { route, current, shared } =
                     _ ->
                         Pages.Mob.Main.init shared mobRoute
 
-        Routing.Profile mobName ->
-            ( Profile mobName, Effect.none )
-
 
 
 -- UPDATE
@@ -117,7 +112,6 @@ loadPage { route, current, shared } =
 type Msg
     = GotHomeMsg Pages.Home.Msg
     | MobMsg Pages.Mob.Main.Msg
-    | ProfileMsg Pages.Mob.Profile.Page.Msg
     | Batch (List Msg)
     | SharedMsg Shared.Msg
     | UrlChanged Url.Url
@@ -158,13 +152,6 @@ update msg model =
                 |> Tuple.mapBoth
                     (\updated -> { model | page = Home updated })
                     (Effect.map GotHomeMsg)
-                |> handleEffect
-
-        ( ProfileMsg subMsg, Profile mob ) ->
-            ( model
-            , Pages.Mob.Profile.Page.update subMsg model.shared mob
-                |> Effect.map ProfileMsg
-            )
                 |> handleEffect
 
         ( Batch messages, _ ) ->
@@ -250,9 +237,6 @@ subscriptions model =
 
             Mob mobModel ->
                 Pages.Mob.Main.subscriptions mobModel |> Sub.map MobMsg
-
-            Profile _ ->
-                Sub.none
         , Js.Events.events (dispatch jsEventsMapping)
         , Shared.subscriptions model.shared |> Sub.map SharedMsg
         ]
@@ -284,10 +268,6 @@ view model =
                 Mob sub ->
                     Pages.Mob.Main.view model.shared sub
                         |> View.map MobMsg
-
-                Profile mob ->
-                    Pages.Mob.Profile.Page.view model.shared mob
-                        |> View.map ProfileMsg
 
         layout =
             case model.page of

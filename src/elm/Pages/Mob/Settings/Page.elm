@@ -26,7 +26,7 @@ update shared msg model =
             ( model
             , Shared.pushUrl shared <|
                 Routing.Mob <|
-                    { subRoute = Pages.Mob.Routing.MobHome, name = model.name }
+                    { subRoute = Pages.Mob.Routing.Home, name = model.name }
             )
 
         TurnChange turn ->

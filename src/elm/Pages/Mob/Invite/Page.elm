@@ -35,7 +35,7 @@ update shared msg mob =
         Back ->
             Shared.pushUrl shared <|
                 Routing.Mob <|
-                    { subRoute = Pages.Mob.Routing.MobHome, name = mob }
+                    { subRoute = Pages.Mob.Routing.Home, name = mob }
 
 
 subscriptions : Sub Msg

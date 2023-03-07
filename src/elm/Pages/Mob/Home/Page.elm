@@ -87,7 +87,11 @@ init shared name =
                 Effect.none
 
             else
-                Shared.pushUrl shared <| Routing.Profile name
+                Shared.pushUrl shared <|
+                    Routing.Mob
+                        { subRoute = Pages.Mob.Routing.Profile
+                        , name = name
+                        }
     in
     ( { mobbersSettings = Pages.Mob.Tabs.Mobbers.init
       , now = Time.millisToPosix 0
@@ -368,12 +372,29 @@ body shared mob model action =
             { target =
                 Routing.toUrl <|
                     Routing.Mob
-                        { subRoute = Pages.Mob.Routing.MobSettings
+                        { subRoute = Pages.Mob.Routing.Settings
                         , name = mob.name
                         }
             , color = Palettes.monochrome.on.background
             , text = "Settings"
             , icon = UI.Icons.Ion.settings
+            }
+        , UI.Link.IconLink.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.top <| Css.rem 11.2
+                , Css.right <| Css.calc (Css.pct 50) Css.minus (Css.rem 1.4)
+                ]
+            ]
+            { target =
+                Routing.toUrl <|
+                    Routing.Mob
+                        { subRoute = Pages.Mob.Routing.Profile
+                        , name = mob.name
+                        }
+            , color = Palettes.monochrome.on.background
+            , text = "Profile"
+            , icon = UI.Icons.Ion.user
             }
         , nav []
             ([ button

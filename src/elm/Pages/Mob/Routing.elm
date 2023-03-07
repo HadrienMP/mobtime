@@ -10,28 +10,33 @@ type alias Route =
 
 
 type SubRoute
-    = MobHome
-    | MobSettings
+    = Home
+    | Settings
     | Invite
+    | Profile
 
 
 toUrl : Route -> String
 toUrl route =
     case route.subRoute of
-        MobHome ->
+        Home ->
             Url.Builder.relative [ Model.MobName.print route.name ] []
 
-        MobSettings ->
+        Settings ->
             Url.Builder.relative [ Model.MobName.print route.name, "settings" ] []
 
         Invite ->
             Url.Builder.relative [ Model.MobName.print route.name, "invite" ] []
 
+        Profile ->
+            Url.Builder.relative [ Model.MobName.print route.name, "profile" ] []
+
 
 parser : Url.Parser.Parser (Route -> c) c
 parser =
     Url.Parser.oneOf
-        [ Url.Parser.map (MobName >> Route MobHome) Url.Parser.string
-        , Url.Parser.map (MobName >> Route MobSettings) (Url.Parser.string </> Url.Parser.s "settings")
+        [ Url.Parser.map (MobName >> Route Home) Url.Parser.string
+        , Url.Parser.map (MobName >> Route Settings) (Url.Parser.string </> Url.Parser.s "settings")
         , Url.Parser.map (MobName >> Route Invite) (Url.Parser.string </> Url.Parser.s "invite")
+        , Url.Parser.map (MobName >> Route Profile) (Url.Parser.string </> Url.Parser.s "profile")
         ]
