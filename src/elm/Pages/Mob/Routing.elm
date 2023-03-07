@@ -12,6 +12,7 @@ type alias Route =
 type SubRoute
     = MobHome
     | MobSettings
+    | Invite
 
 
 toUrl : Route -> String
@@ -23,10 +24,14 @@ toUrl route =
         MobSettings ->
             Url.Builder.relative [ Model.MobName.print route.name, "settings" ] []
 
+        Invite ->
+            Url.Builder.relative [ Model.MobName.print route.name, "invite" ] []
+
 
 parser : Url.Parser.Parser (Route -> c) c
 parser =
     Url.Parser.oneOf
         [ Url.Parser.map (MobName >> Route MobHome) Url.Parser.string
         , Url.Parser.map (MobName >> Route MobSettings) (Url.Parser.string </> Url.Parser.s "settings")
+        , Url.Parser.map (MobName >> Route Invite) (Url.Parser.string </> Url.Parser.s "invite")
         ]

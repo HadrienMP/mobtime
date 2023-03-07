@@ -348,7 +348,12 @@ body shared mob model action =
                 , Css.left <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
                 ]
             ]
-            { target = Routing.toUrl <| Routing.Share mob.name
+            { target =
+                Routing.toUrl <|
+                    Routing.Mob
+                        { subRoute = Pages.Mob.Routing.Invite
+                        , name = mob.name
+                        }
             , color = Palettes.monochrome.on.background
             , text = "Invite"
             , icon = UI.Icons.Ion.share

@@ -20,6 +20,7 @@ import Model.MobName
 import Pages.Mob.Home.Page
 import Pages.Mob.Routing
 import Pages.Mob.Settings.Page
+import Pages.Mob.Share.Page
 import Shared exposing (Shared)
 import Time
 import View exposing (View)
@@ -32,6 +33,7 @@ import View exposing (View)
 type Page
     = Home Pages.Mob.Home.Page.Model
     | Settings
+    | Invite
 
 
 type alias Model =
@@ -66,6 +68,9 @@ initSubPage route shared =
         Pages.Mob.Routing.MobSettings ->
             ( Settings, Effect.none )
 
+        Pages.Mob.Routing.Invite ->
+            ( Invite, Effect.none )
+
 
 
 -- Update
@@ -74,6 +79,7 @@ initSubPage route shared =
 type Msg
     = HomeMsg Pages.Mob.Home.Page.Msg
     | SettingsMsg Pages.Mob.Settings.Page.Msg
+    | InviteMsg Pages.Mob.Share.Page.Msg
     | ReceivedEvent Model.Events.Event
     | ReceivedHistory (List Model.Events.Event)
     | Tick Time.Posix
@@ -99,6 +105,12 @@ update shared msg model =
                 |> Tuple.mapBoth
                     (\next -> { model | mob = next })
                     (Effect.map SettingsMsg)
+
+        ( InviteMsg subMsg, Invite ) ->
+            ( model
+            , Pages.Mob.Share.Page.update shared subMsg model.mob.name
+                |> Effect.map InviteMsg
+            )
 
         ( ReceivedEvent event, _ ) ->
             let
@@ -166,6 +178,9 @@ subscriptions model =
             Settings ->
                 Pages.Mob.Settings.Page.subscriptions model.mob
                     |> Sub.map SettingsMsg
+
+            Invite ->
+                Pages.Mob.Share.Page.subscriptions |> Sub.map InviteMsg
         , case ( Model.Clock.isOn model.mob.clock, Model.Clock.isOn model.mob.pomodoro ) of
             ( True, _ ) ->
                 Pages.Mob.Home.Page.turnRefreshRate
@@ -205,6 +220,10 @@ view shared model =
                 Settings ->
                     Pages.Mob.Settings.Page.view model.mob
                         |> View.map SettingsMsg
+
+                Invite ->
+                    Pages.Mob.Share.Page.view shared model.mob.name
+                        |> View.map InviteMsg
     in
     { title =
         case subView.title of

@@ -17,7 +17,6 @@ import Model.MobName exposing (MobName)
 import Pages.Home
 import Pages.Mob.Main
 import Pages.Mob.Profile.Page
-import Pages.Mob.Share.Page
 import Routing
 import Shared
 import UI.GlobalStyle
@@ -50,7 +49,6 @@ main =
 type Page
     = Home Pages.Home.Model
     | Mob Pages.Mob.Main.Model
-    | MobShare MobName
     | Profile MobName
 
 
@@ -108,11 +106,6 @@ loadPage { route, current, shared } =
                     _ ->
                         Pages.Mob.Main.init shared mobRoute
 
-        Routing.Share mobName ->
-            ( MobShare mobName
-            , Effect.none
-            )
-
         Routing.Profile mobName ->
             ( Profile mobName, Effect.none )
 
@@ -124,7 +117,6 @@ loadPage { route, current, shared } =
 type Msg
     = GotHomeMsg Pages.Home.Msg
     | MobMsg Pages.Mob.Main.Msg
-    | MobShareMsg Pages.Mob.Share.Page.Msg
     | ProfileMsg Pages.Mob.Profile.Page.Msg
     | Batch (List Msg)
     | SharedMsg Shared.Msg
@@ -166,12 +158,6 @@ update msg model =
                 |> Tuple.mapBoth
                     (\updated -> { model | page = Home updated })
                     (Effect.map GotHomeMsg)
-                |> handleEffect
-
-        ( MobShareMsg subMsg, MobShare mob ) ->
-            Pages.Mob.Share.Page.update model.shared subMsg mob
-                |> Effect.map MobShareMsg
-                |> Tuple.pair model
                 |> handleEffect
 
         ( ProfileMsg subMsg, Profile mob ) ->
@@ -247,9 +233,6 @@ getMob url =
         Routing.Mob { name } ->
             Just name
 
-        Routing.Share mob ->
-            Just mob
-
         _ ->
             Nothing
 
@@ -267,9 +250,6 @@ subscriptions model =
 
             Mob mobModel ->
                 Pages.Mob.Main.subscriptions mobModel |> Sub.map MobMsg
-
-            MobShare _ ->
-                Pages.Mob.Share.Page.subscriptions |> Sub.map MobShareMsg
 
             Profile _ ->
                 Sub.none
@@ -304,10 +284,6 @@ view model =
                 Mob sub ->
                     Pages.Mob.Main.view model.shared sub
                         |> View.map MobMsg
-
-                MobShare mob ->
-                    Pages.Mob.Share.Page.view model.shared mob
-                        |> View.map MobShareMsg
 
                 Profile mob ->
                     Pages.Mob.Profile.Page.view model.shared mob
