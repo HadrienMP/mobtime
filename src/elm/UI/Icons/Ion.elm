@@ -1,4 +1,4 @@
-module UI.Icons.Ion exposing (back, batteryFull, batteryLow, check, clock, close, code, copy, delete, error, github, home, musicNote, mute, paperAirplane, people, play, plus, rotate, settings, share, shuffle, sound, stop, success, user, volumeHigh, volumeLow)
+module UI.Icons.Ion exposing (back, batteryFull, batteryLow, check, clock, close, code, copy, delete, error, github, home, musicNote, mute, paperAirplane, people, play, plus, rotate, settings, share, shuffle, stop, success, user, volumeHigh, volumeLow)
 
 import Ionicon
 import Ionicon.Android
@@ -84,11 +84,6 @@ error =
 success : Icon msg
 success =
     display Ionicon.checkmarkCircled
-
-
-sound : Icon msg
-sound =
-    display Ionicon.musicNote
 
 
 share : Icon msg

@@ -1,4 +1,4 @@
-module UI.Icons.Custom exposing (elephant, hourGlass, rabbit, rocket, tomato)
+module UI.Icons.Custom exposing (elephant, hourGlass, rocket, tomato)
 
 import Css
 import Html.Styled exposing (i)

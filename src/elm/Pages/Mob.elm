@@ -31,7 +31,6 @@ import Pages.Mob.Tabs.Clocks
 import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Mobbers
-import Pages.Mob.Tabs.Sound
 import Random
 import Routing
 import Shared exposing (Shared)
@@ -69,7 +68,6 @@ type Tab
     = Main
     | Mobbers
     | Clock
-    | Sound
     | Dev
 
 
@@ -112,7 +110,6 @@ type Msg
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Tabs.Clocks.Msg
     | GotMobbersSettingsMsg Pages.Mob.Tabs.Mobbers.Msg
-    | GotSoundSettingsMsg Pages.Mob.Tabs.Sound.Msg
     | SwitchTab Tab
     | StopSound
     | AlarmEnded
@@ -173,11 +170,6 @@ update shared mob msg model =
             ( model
             , Pages.Mob.Tabs.Clocks.update subMsg mob.name
                 |> Effect.map GotClockSettingsMsg
-            )
-
-        GotSoundSettingsMsg subMsg ->
-            ( model
-            , Effect.map GotSoundSettingsMsg <| Pages.Mob.Tabs.Sound.update subMsg
             )
 
         TimePassed now timePassedResult ->
@@ -400,16 +392,6 @@ body shared mob model action =
                     , color = Palettes.monochrome.on.surface
                     }
                 ]
-             , button
-                [ onClick <| SwitchTab Sound
-                , classList [ ( "active", model.tab == Sound ) ]
-                , title "Sound Settings"
-                ]
-                [ UI.Icons.Ion.sound
-                    { size = Rem.Rem 3
-                    , color = Palettes.monochrome.on.surface
-                    }
-                ]
              ]
                 ++ (if shared.devMode then
                         [ button
@@ -440,10 +422,6 @@ body shared mob model action =
             Mobbers ->
                 Pages.Mob.Tabs.Mobbers.view mob model.mobbersSettings
                     |> Html.map GotMobbersSettingsMsg
-
-            Sound ->
-                Pages.Mob.Tabs.Sound.view shared mob.name mob.soundProfile
-                    |> Html.map GotSoundSettingsMsg
 
             Dev ->
                 Pages.Mob.Tabs.Dev.view

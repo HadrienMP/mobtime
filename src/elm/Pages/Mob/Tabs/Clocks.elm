@@ -1,9 +1,8 @@
 module Pages.Mob.Tabs.Clocks exposing (Msg(..), update, view)
 
-import Css
 import Effect exposing (Effect)
 import Html.Styled exposing (Html, button, div, h3, label, p, text)
-import Html.Styled.Attributes as Attr exposing (class, for, id)
+import Html.Styled.Attributes exposing (class, for, id)
 import Html.Styled.Events exposing (onClick)
 import Lib.Duration as Duration
 import Model.Clock as Clock
@@ -12,7 +11,6 @@ import Model.Mob
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Time
-import UI.Css
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes as Palettes
@@ -36,50 +34,7 @@ update msg mob =
 view : Shared -> Time.Posix -> Model.Mob.Mob -> Html Msg
 view shared now state =
     div [ id "timer", class "tab" ]
-        [ h3
-            [ Attr.css
-                [ Css.displayFlex
-                , Css.alignItems Css.center
-                , UI.Css.gap <| Rem.Rem 0.4
-                ]
-            ]
-            [ UI.Icons.Ion.people
-                { size = Rem.Rem 3
-                , color = Palettes.monochrome.on.background
-                }
-            , text "Turn"
-            ]
-        , div
-            [ id "turn-length-field", class "form-field" ]
-            [ label
-                [ for "turn-length" ]
-                [ text <|
-                    "Turn : "
-                        ++ Duration.print state.turnLength
-                ]
-            , div [ class "field-input" ]
-                [ UI.Icons.Custom.rabbit
-                    { size = Rem.Rem 1
-                    , color = Palettes.monochrome.on.background
-                    }
-                , UI.Range.View.view
-                    { onChange =
-                        toDuration shared
-                            >> Model.Events.TurnLengthChanged
-                            >> ShareEvent
-                    , min = 2
-                    , max = 20
-                    , value =
-                        state.turnLength
-                            |> toValue shared
-                    }
-                , UI.Icons.Custom.elephant
-                    { size = Rem.Rem 1
-                    , color = Palettes.monochrome.on.background
-                    }
-                ]
-            ]
-        , h3 []
+        [ h3 []
             [ UI.Icons.Custom.tomato
                 { size = Rem.Rem 1
                 , color = Palettes.monochrome.on.background

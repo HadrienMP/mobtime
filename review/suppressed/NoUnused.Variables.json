@@ -3,7 +3,7 @@
   "automatically created by": "elm-review suppress",
   "learn more": "elm-review suppress --help",
   "suppressions": [
-    { "count": 3, "filePath": "src/elm/UI/Icons/Custom.elm" },
+    { "count": 4, "filePath": "src/elm/UI/Icons/Custom.elm" },
     { "count": 2, "filePath": "src/elm/Lib/Duration.elm" },
     { "count": 1, "filePath": "src/elm/Lib/Toaster.elm" },
     { "count": 1, "filePath": "src/elm/UI/Animations.elm" }
