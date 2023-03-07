@@ -25,8 +25,6 @@ import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
-import Pages.Mob.Settings.Button
-import Pages.Mob.Share.Button
 import Pages.Mob.Tabs.Clocks
 import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
@@ -47,6 +45,7 @@ import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
+import UI.Link.IconLink
 import UI.Modal.View
 import UI.Palettes as Palettes
 import UI.Rem as Rem
@@ -341,17 +340,19 @@ body shared mob model action =
             ]
         ]
         [ clockArea mob model action
-        , Pages.Mob.Share.Button.view
+        , UI.Link.IconLink.view
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.top <| Css.rem 10
                 , Css.left <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
                 ]
             ]
-            { sharePage = Routing.toUrl <| Routing.Share mob.name
+            { target = Routing.toUrl <| Routing.Share mob.name
             , color = Palettes.monochrome.on.background
+            , text = "Invite"
+            , icon = UI.Icons.Ion.share
             }
-        , Pages.Mob.Settings.Button.view
+        , UI.Link.IconLink.view
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.top <| Css.rem 10
@@ -365,6 +366,8 @@ body shared mob model action =
                         , name = mob.name
                         }
             , color = Palettes.monochrome.on.background
+            , text = "Settings"
+            , icon = UI.Icons.Ion.settings
             }
         , nav []
             ([ button

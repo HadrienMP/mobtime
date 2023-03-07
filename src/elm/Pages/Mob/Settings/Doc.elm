@@ -5,23 +5,15 @@ import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Lib.Duration
 import Model.MobName exposing (MobName(..))
-import Pages.Mob.Settings.Button as Button
 import Pages.Mob.Settings.PageView as Page
 import Sounds
-import UI.Palettes as Palettes
 
 
 theChapter : Chapter x
 theChapter =
     chapter "Settings"
         |> renderComponentList
-            [ ( "Button"
-              , Button.view []
-                    { target = "#settings"
-                    , color = Palettes.monochrome.on.background
-                    }
-              )
-            , ( "Page"
+            [ ( "Page"
               , Page.view
                     { mob = MobName "Awesome"
                     , onBack = logAction "Back"

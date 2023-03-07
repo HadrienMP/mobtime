@@ -16,6 +16,7 @@ import Pages.Mob.Settings.Doc
 import Pages.Mob.Share.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
+import UI.Link.Doc
 import UI.Modal.Doc
 import UI.Range.Doc
 import UI.Toggle.Doc
@@ -67,6 +68,7 @@ main =
                 , UI.Toggle.Doc.theChapter
                 , UI.Modal.Doc.theChapter
                 , UI.Typography.Doc.doc
+                , UI.Link.Doc.doc
                 ]
               )
             , ( "Components"

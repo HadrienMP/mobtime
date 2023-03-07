@@ -1,22 +1,24 @@
-module Pages.Mob.Settings.Button exposing (Props, view)
+module UI.Link.IconLink exposing (Props, view)
 
 import Css
-import Html.Styled as Html exposing (Html)
+import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import UI.Color as Color exposing (RGBA255)
+import UI.Color as Color
 import UI.Css
-import UI.Icons.Ion
+import UI.Icons.Common exposing (Icon)
 import UI.Palettes as Palettes
 import UI.Rem as Rem
 
 
-type alias Props =
+type alias Props msg =
     { target : String
-    , color : RGBA255
+    , icon : Icon msg
+    , text : String
+    , color : Color.RGBA255
     }
 
 
-view : List (Html.Attribute msg) -> Props -> Html msg
+view : List (Html.Attribute msg) -> Props msg -> Html.Html msg
 view attributes props =
     Html.a
         ([ Attr.css
@@ -40,10 +42,10 @@ view attributes props =
                 , Css.padding <| Css.rem 0.5
                 , Css.maxWidth Css.fitContent
                 , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.background
-                , Css.lineHeight <| Css.rem 1
+                , Css.lineHeight <| Css.num 1
                 ]
             ]
-            [ UI.Icons.Ion.settings
+            [ props.icon
                 { size = Rem.Rem 1.4
                 , color = props.color
                 }
@@ -56,5 +58,5 @@ view attributes props =
                 , Css.textDecoration Css.underline
                 ]
             ]
-            [ Html.text "Settings" ]
+            [ Html.text props.text ]
         ]
