@@ -7,6 +7,7 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Model.MobName exposing (MobName)
 import Pages.Mob.Profile.View
+import Pages.Mob.Routing
 import Routing
 import Shared exposing (Shared)
 import UserPreferences
@@ -32,7 +33,7 @@ update msg shared mob =
             Effect.batch
                 [ Shared.pushUrl shared <|
                     Routing.Mob <|
-                        { subRoute = Routing.MobHome
+                        { subRoute = Pages.Mob.Routing.MobHome
                         , name = mob
                         }
                 , Effect.fromShared <| Shared.SoundOn

@@ -25,6 +25,7 @@ import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
+import Pages.Mob.Routing
 import Pages.Mob.Tabs.Clocks
 import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
@@ -362,7 +363,7 @@ body shared mob model action =
             { target =
                 Routing.toUrl <|
                     Routing.Mob
-                        { subRoute = Routing.MobSettings
+                        { subRoute = Pages.Mob.Routing.MobSettings
                         , name = mob.name
                         }
             , color = Palettes.monochrome.on.background

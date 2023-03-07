@@ -18,8 +18,8 @@ import Model.Events
 import Model.Mob
 import Model.MobName
 import Pages.Mob.Home.Page
+import Pages.Mob.Routing
 import Pages.Mob.Settings.Page
-import Routing
 import Shared exposing (Shared)
 import Time
 import View exposing (View)
@@ -40,7 +40,7 @@ type alias Model =
     }
 
 
-init : Shared -> Routing.MobRoute -> ( Model, Effect Shared.Msg Msg )
+init : Shared -> Pages.Mob.Routing.Route -> ( Model, Effect Shared.Msg Msg )
 init shared route =
     let
         ( page, effect ) =
@@ -56,14 +56,14 @@ init shared route =
     )
 
 
-initSubPage : Routing.MobRoute -> Shared -> ( Page, Effect Shared.Msg Msg )
+initSubPage : Pages.Mob.Routing.Route -> Shared -> ( Page, Effect Shared.Msg Msg )
 initSubPage route shared =
     case route.subRoute of
-        Routing.MobHome ->
+        Pages.Mob.Routing.MobHome ->
             Pages.Mob.Home.Page.init shared route.name
                 |> Tuple.mapBoth Home (Effect.map HomeMsg)
 
-        Routing.MobSettings ->
+        Pages.Mob.Routing.MobSettings ->
             ( Settings, Effect.none )
 
 
@@ -77,7 +77,7 @@ type Msg
     | ReceivedEvent Model.Events.Event
     | ReceivedHistory (List Model.Events.Event)
     | Tick Time.Posix
-    | RouteChanged Routing.MobRoute
+    | RouteChanged Pages.Mob.Routing.Route
 
 
 update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )

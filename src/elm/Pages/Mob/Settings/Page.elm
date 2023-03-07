@@ -4,6 +4,7 @@ import Effect exposing (Effect)
 import Lib.Duration exposing (Duration)
 import Model.Events
 import Model.Mob
+import Pages.Mob.Routing
 import Pages.Mob.Settings.PageView
 import Routing
 import Shared exposing (Shared)
@@ -25,7 +26,7 @@ update shared msg model =
             ( model
             , Shared.pushUrl shared <|
                 Routing.Mob <|
-                    { subRoute = Routing.MobHome, name = model.name }
+                    { subRoute = Pages.Mob.Routing.MobHome, name = model.name }
             )
 
         TurnChange turn ->

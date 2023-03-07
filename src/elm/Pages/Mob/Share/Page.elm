@@ -3,6 +3,7 @@ port module Pages.Mob.Share.Page exposing (Msg(..), subscriptions, update, view)
 import Effect exposing (Effect)
 import Lib.Toaster
 import Model.MobName exposing (MobName)
+import Pages.Mob.Routing
 import Pages.Mob.Share.PageView
 import Routing
 import Shared exposing (Shared)
@@ -34,7 +35,7 @@ update shared msg mob =
         Back ->
             Shared.pushUrl shared <|
                 Routing.Mob <|
-                    { subRoute = Routing.MobHome, name = mob }
+                    { subRoute = Pages.Mob.Routing.MobHome, name = mob }
 
 
 subscriptions : Sub Msg

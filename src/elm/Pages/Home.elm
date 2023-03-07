@@ -10,6 +10,7 @@ import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Lib.Toaster
 import Model.MobName
+import Pages.Mob.Routing
 import Routing
 import Shared exposing (Shared)
 import Slug
@@ -68,7 +69,7 @@ update shared model msg =
                     in
                     ( model
                     , Effect.batch
-                        [ { subRoute = Routing.MobHome, name = mob }
+                        [ { subRoute = Pages.Mob.Routing.MobHome, name = mob }
                             |> Routing.Mob
                             |> Shared.pushUrl shared
                         , Effect.fromShared <| Shared.JoinMob mob
