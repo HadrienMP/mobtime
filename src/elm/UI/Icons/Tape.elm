@@ -10,7 +10,7 @@ import UI.Rem as Rem
 display : Icon msg
 display { size, color } =
     svg
-        [ SvgAttr.height <| Rem.toCssString size
+        [ SvgAttr.height <| String.fromInt <| Rem.toPixelsFake size
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 109 78"
         ]

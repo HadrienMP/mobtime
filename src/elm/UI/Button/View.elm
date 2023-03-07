@@ -11,6 +11,7 @@ import UI.Icons.Common
 import UI.Palettes as Palettes
 import UI.Rem as Rem
 import UI.Row as Row
+import UI.Typography.Typography as Typography
 
 
 type Content msg
@@ -64,7 +65,7 @@ button attributes { content, action, size, variant } =
         )
         (case content of
             Icon icon ->
-                [ icon { size = iconSize size, color = Palettes.monochrome.on.surface } ]
+                [ icon { size = fontSize size, color = Palettes.monochrome.on.surface } ]
 
             Text text ->
                 [ Html.text text ]
@@ -77,25 +78,24 @@ button attributes { content, action, size, variant } =
                         ]
                     ]
                     [ Row.Gap <| iconTextGap size ]
-                    [ icon { size = iconSize size, color = Palettes.monochrome.on.surface }
+                    [ icon { size = fontSize size |> Rem.multiplyBy 1.4, color = Palettes.monochrome.on.surface }
                     , Html.text text
                     ]
                 ]
         )
 
 
-iconSize : Size -> Rem.Rem
-iconSize size =
-    Rem.Rem <|
-        case size of
-            S ->
-                1.8
+fontSize : Size -> Rem.Rem
+fontSize size =
+    case size of
+        S ->
+            Typography.s
 
-            M ->
-                2.5
+        M ->
+            Typography.m
 
-            L ->
-                3.6
+        L ->
+            Typography.l
 
 
 variantStyles : Variant -> List Css.Style
@@ -112,21 +112,17 @@ variantStyles variant =
 
 sizeStyles : Size -> List Css.Style
 sizeStyles size =
-    case size of
+    [ Typography.fontSize <| fontSize size
+    , case size of
         S ->
-            [ Css.padding <| Css.rem 0.4
-            , Css.fontSize <| Css.rem 0.8
-            ]
+            Css.padding <| Css.rem 0.4
 
         M ->
-            [ Css.padding <| Css.rem 0.6
-            , Css.fontSize <| Css.rem 1.2
-            ]
+            Css.padding <| Css.rem 0.6
 
         L ->
-            [ Css.padding <| Css.rem 1.2
-            , Css.fontSize <| Css.rem 1.6
-            ]
+            Css.padding <| Css.rem 1.2
+    ]
 
 
 iconTextGap : Size -> Rem.Rem

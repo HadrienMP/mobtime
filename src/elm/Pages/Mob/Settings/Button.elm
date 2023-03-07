@@ -44,7 +44,7 @@ view attributes props =
                 ]
             ]
             [ UI.Icons.Ion.settings
-                { size = Rem.Rem 2.4
+                { size = Rem.Rem 1.4
                 , color = props.color
                 }
             ]

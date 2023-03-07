@@ -130,7 +130,7 @@ view { mobbers, roles } model =
                 |> Html.fromUnstyled
             , button [ type_ "submit" ]
                 [ Icons.plus
-                    { size = Rem.Rem 2
+                    { size = Rem.Rem 1
                     , color = Palettes.monochrome.on.surface
                     }
                 ]

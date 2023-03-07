@@ -1,7 +1,12 @@
-module UI.Rem exposing (Rem(..), add, divideBy, multiplyBy, multiplyRatio, subtract, toCssString, toElmCss, toPixelsFake)
+module UI.Rem exposing (Rem(..), add, divideBy, multiplyBy, multiplyRatio, rootSizeAsPx, subtract, toCssString, toElmCss, toPixelsFake)
 
 import Css
 import Lib.Ratio
+
+
+rootSizeAsPx : Float
+rootSizeAsPx =
+    20
 
 
 type Rem
@@ -59,4 +64,4 @@ toElmCss rem =
 
 toPixelsFake : Rem -> Int
 toPixelsFake rem =
-    open rem |> (*) 12 |> round
+    open rem |> (*) rootSizeAsPx |> round

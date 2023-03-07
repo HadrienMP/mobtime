@@ -368,7 +368,7 @@ body shared mob model action =
                 , title "Home"
                 ]
                 [ UI.Icons.Ion.home
-                    { size = Rem.Rem 3
+                    { size = Rem.Rem 1.4
                     , color = Palettes.monochrome.on.surface
                     }
                 ]
@@ -378,7 +378,7 @@ body shared mob model action =
                 , title "Clock Settings"
                 ]
                 [ UI.Icons.Ion.clock
-                    { size = Rem.Rem 3
+                    { size = Rem.Rem 1.4
                     , color = Palettes.monochrome.on.surface
                     }
                 ]
@@ -388,7 +388,7 @@ body shared mob model action =
                 , title "Mobbers"
                 ]
                 [ UI.Icons.Ion.people
-                    { size = Rem.Rem 3
+                    { size = Rem.Rem 1.4
                     , color = Palettes.monochrome.on.surface
                     }
                 ]

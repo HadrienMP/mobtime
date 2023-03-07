@@ -1,9 +1,9 @@
 module Pages.Mob.Tabs.Clocks exposing (Msg(..), update, view)
 
+import Css
 import Effect exposing (Effect)
-import Html.Styled exposing (Html, button, div, h3, label, p, text)
-import Html.Styled.Attributes exposing (class, for, id)
-import Html.Styled.Events exposing (onClick)
+import Html.Styled exposing (Html, div, h3, label, p, text)
+import Html.Styled.Attributes as Attr exposing (class, for, id)
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Model.Events
@@ -11,6 +11,7 @@ import Model.Mob
 import Model.MobName exposing (MobName)
 import Shared exposing (Shared)
 import Time
+import UI.Button.View
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes as Palettes
@@ -34,9 +35,9 @@ update msg mob =
 view : Shared -> Time.Posix -> Model.Mob.Mob -> Html Msg
 view shared now state =
     div [ id "timer", class "tab" ]
-        [ h3 []
+        [ h3 [ Attr.css [ Css.displayFlex, Css.alignItems Css.center ] ]
             [ UI.Icons.Custom.tomato
-                { size = Rem.Rem 1
+                { size = Rem.Rem 1.6
                 , color = Palettes.monochrome.on.background
                 }
             , text "Pomodoro"
@@ -44,9 +45,12 @@ view shared now state =
         , div
             [ class "form-field" ]
             [ label [ for "stop-pomodoro" ] [ text "Action" ]
-            , button
-                [ onClick <| ShareEvent <| Model.Events.PomodoroStopped ]
-                [ text "Stop" ]
+            , UI.Button.View.button []
+                { content = UI.Button.View.Text "Stop"
+                , variant = UI.Button.View.Primary
+                , size = UI.Button.View.S
+                , action = UI.Button.View.OnPress <| Just <| ShareEvent <| Model.Events.PomodoroStopped
+                }
             ]
         , div
             [ class "form-field" ]
@@ -63,7 +67,7 @@ view shared now state =
                 ]
             , div [ class "field-input" ]
                 [ UI.Icons.Ion.batteryFull
-                    { size = Rem.Rem 3
+                    { size = Rem.Rem 2
                     , color = Palettes.monochrome.on.background
                     }
                 , UI.Range.View.view
@@ -78,7 +82,7 @@ view shared now state =
                             |> toValue shared
                     }
                 , UI.Icons.Ion.batteryLow
-                    { size = Rem.Rem 3
+                    { size = Rem.Rem 2
                     , color = Palettes.monochrome.on.background
                     }
                 ]

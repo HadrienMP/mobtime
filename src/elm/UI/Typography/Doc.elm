@@ -1,10 +1,10 @@
 module UI.Typography.Doc exposing (doc)
 
-import Css
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import UI.Rem as Rem
 import UI.Typography.Typography as Typography
 
 
@@ -37,7 +37,7 @@ Html.span
 """
 
 
-component : Css.Style -> Html.Html msg
+component : Rem.Rem -> Html.Html msg
 component typography =
-    Html.span [ Attr.css [ typography ] ]
+    Html.span [ Attr.css [ Typography.fontSize typography ] ]
         [ Html.text phrase ]

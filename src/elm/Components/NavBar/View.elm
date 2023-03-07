@@ -111,7 +111,7 @@ rightNavBar props =
             ]
             [ UI.Icons.Ion.user
                 { color = Palettes.monochrome.on.surface
-                , size = Rem.Rem 2
+                , size = Rem.Rem 1.4
                 }
             ]
         ]

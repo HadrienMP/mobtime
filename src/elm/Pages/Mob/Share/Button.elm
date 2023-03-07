@@ -43,7 +43,7 @@ view attributes props =
                 ]
             ]
             [ UI.Icons.Ion.share
-                { size = Rem.Rem 2.4
+                { size = Rem.Rem 1.4
                 , color = props.color
                 }
             ]
