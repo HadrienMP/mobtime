@@ -1,4 +1,4 @@
-module Lib.Duration exposing (Duration(..), DurationStringParts, addToTime, between, jsonDecoder, minus, multiply, ofMillis, ofMinutes, ofSeconds, print, ratio, secondsBetween, toJson, toLongString, toMillis, toMinutes, toSeconds, toShortString)
+module Lib.Duration exposing (Duration(..), DurationStringParts, addToTime, between, digitalPrint, jsonDecoder, minus, multiply, ofMillis, ofMinutes, ofSeconds, print, ratio, secondsBetween, toJson, toLongString, toMillis, toMinutes, toSeconds, toShortString)
 
 import Json.Decode as Decode
 import Json.Encode as Json
@@ -187,3 +187,25 @@ toLongString duration =
             uncons a |> Tuple.mapFirst (Maybe.withDefault "" >> (++) (overtimeSign duration))
     in
     first :: second
+
+
+digitalPrint : Duration -> String
+digitalPrint duration =
+    let
+        seconds =
+            toSeconds duration
+                |> abs
+
+        floatMinutes =
+            toFloat seconds / 60.0
+
+        intMinutes =
+            floor floatMinutes
+
+        secondsLeft =
+            seconds - (floor floatMinutes * 60)
+    in
+    overtimeSign duration
+        ++ (intMinutes |> String.fromInt |> String.padLeft 2 '0')
+        ++ ":"
+        ++ (secondsLeft |> String.fromInt |> String.padLeft 2 '0')

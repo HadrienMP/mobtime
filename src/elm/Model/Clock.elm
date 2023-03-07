@@ -1,4 +1,4 @@
-module Model.Clock exposing (ClockState(..), Event(..), OnModel, isOn, ratio, timeLeft, timePassed)
+module Model.Clock exposing (ClockState(..), Event(..), OnModel, isOn, ratio, timePassed)
 
 import Lib.Duration as Duration exposing (Duration)
 import Lib.Ratio
@@ -38,18 +38,6 @@ timePassed now clockState =
 
         Off ->
             ( clockState, Continued )
-
-
-timeLeft : Time.Posix -> ClockState -> String
-timeLeft now clockState =
-    case clockState of
-        Off ->
-            "Off"
-
-        On onModel ->
-            Duration.between now onModel.end
-                |> Duration.toShortString
-                |> String.join " "
 
 
 ended : OnModel -> Time.Posix -> Bool

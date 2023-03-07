@@ -6,10 +6,10 @@ import UI.Color as Color exposing (RGBA255)
 import UI.Rem as Rem exposing (Rem)
 
 
-display : { height : Rem, color : RGBA255 } -> Svg msg
-display { height, color } =
+display : { size : Rem, color : RGBA255 } -> Svg msg
+display { size, color } =
     svg
-        [ SvgAttr.height <| Rem.toCssString height
+        [ SvgAttr.height <| Rem.toCssString size
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 1269.754 1708.2892"
         ]

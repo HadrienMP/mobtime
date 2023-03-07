@@ -1,4 +1,4 @@
-module UI.Color exposing (RGBA255, black, fromHex, lighten, opactity, toCss, toElmCss, toIonIconRgba, white)
+module UI.Color exposing (RGBA255, black, fromHex, lighten, toCss, toElmCss, toIonIconRgba, white)
 
 import Color
 import Color.Convert

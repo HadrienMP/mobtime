@@ -1,6 +1,5 @@
 module Pages.Mob.Home.Page exposing
-    ( ActionDescription
-    , AlarmState
+    ( AlarmState
     , Model
     , Msg(..)
     , Tab(..)
@@ -15,18 +14,17 @@ module Pages.Mob.Home.Page exposing
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
-import Html.Styled.Attributes as Attr exposing (class, classList, css, id, title)
-import Html.Styled.Events exposing (onClick)
+import Html.Styled.Attributes as Attr
+import Html.Styled.Events as Evts exposing (onClick)
 import Js.Commands
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
-import Lib.Duration as Duration exposing (DurationStringParts)
+import Lib.Duration as Duration
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
 import Pages.Mob.Routing
-import Pages.Mob.Tabs.Clocks
 import Pages.Mob.Tabs.Dev
 import Pages.Mob.Tabs.Home
 import Pages.Mob.Tabs.Mobbers
@@ -34,7 +32,6 @@ import Random
 import Routing
 import Shared exposing (Shared)
 import Sounds
-import Svg.Styled exposing (Svg)
 import Task
 import Time
 import UI.Button.View
@@ -42,7 +39,6 @@ import UI.CircularProgressBar
 import UI.Color as Color
 import UI.Column as Column
 import UI.Css
-import UI.Icons
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
@@ -50,7 +46,9 @@ import UI.Link.IconLink
 import UI.Modal.View
 import UI.Palettes as Palettes
 import UI.Rem as Rem
+import UI.Space as Space
 import UI.Text as Text
+import UI.Typography.Typography as Typography
 import View exposing (View)
 
 
@@ -67,7 +65,6 @@ type AlarmState
 type Tab
     = Main
     | Mobbers
-    | Clock
     | Dev
 
 
@@ -107,48 +104,21 @@ init shared name =
 
 
 type Msg
-    = ShareEvent Model.Events.MobEvent
-    | StartClicked
-    | StartWith ( Time.Posix, Sounds.Sound )
+    = StartWith ( Time.Posix, Sounds.Sound )
     | TimePassed Time.Posix Model.Mob.TimePassedResult
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
-    | GotClockSettingsMsg Pages.Mob.Tabs.Clocks.Msg
     | GotMobbersSettingsMsg Pages.Mob.Tabs.Mobbers.Msg
     | SwitchTab Tab
     | StopSound
     | AlarmEnded
     | StopPomodoro
+    | StartTurn
+    | StopTurn
 
 
 update : Shared -> Model.Mob.Mob -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
 update shared mob msg model =
     case msg of
-        ShareEvent event ->
-            ( model
-            , Effect.share event
-            )
-
-        StartClicked ->
-            ( model
-            , Time.now
-                |> Task.map
-                    (\now -> ( now, selectSound now mob.soundProfile ))
-                |> Task.perform StartWith
-                |> Effect.fromCmd
-            )
-
-        StartWith ( now, sound ) ->
-            ( { model | now = now }
-            , Model.Events.Started
-                { time = now
-                , alarm = sound
-                , length = mob.turnLength
-                }
-                |> Model.Events.Clock
-                |> Model.Events.MobEvent mob.name
-                |> Effect.share
-            )
-
         GotMainTabMsg subMsg ->
             ( model
             , Pages.Mob.Tabs.Home.update subMsg
@@ -168,12 +138,6 @@ update shared mob msg model =
         SwitchTab tab ->
             ( { model | tab = tab }
             , Effect.none
-            )
-
-        GotClockSettingsMsg subMsg ->
-            ( model
-            , Pages.Mob.Tabs.Clocks.update subMsg mob.name
-                |> Effect.map GotClockSettingsMsg
             )
 
         TimePassed now timePassedResult ->
@@ -198,7 +162,7 @@ update shared mob msg model =
                             String.join " | " <|
                                 List.filter (not << String.isEmpty)
                                     [ String.join " " <|
-                                        timeLeftString shared now mob
+                                        timeLeftString shared now mob.clock
                                     , Model.MobName.print mob.name
                                     , "Mob Time"
                                     ]
@@ -218,6 +182,34 @@ update shared mob msg model =
         StopPomodoro ->
             ( model
             , Model.Events.PomodoroStopped
+                |> Model.Events.MobEvent mob.name
+                |> Effect.share
+            )
+
+        StartTurn ->
+            ( model
+            , Time.now
+                |> Task.map
+                    (\now -> ( now, selectSound now mob.soundProfile ))
+                |> Task.perform StartWith
+                |> Effect.fromCmd
+            )
+
+        StartWith ( now, sound ) ->
+            ( { model | now = now }
+            , Model.Events.Started
+                { time = now
+                , alarm = sound
+                , length = mob.turnLength
+                }
+                |> Model.Events.Clock
+                |> Model.Events.MobEvent mob.name
+                |> Effect.share
+            )
+
+        StopTurn ->
+            ( model
+            , Model.Events.Clock Model.Events.Stopped
                 |> Model.Events.MobEvent mob.name
                 |> Effect.share
             )
@@ -266,11 +258,7 @@ jsEventMapping =
 
 view : Shared -> Model.Mob.Mob -> Model -> View Msg
 view shared mob model =
-    let
-        action =
-            detectAction shared model.now mob
-    in
-    { title = String.join " " <| timeLeftString shared model.now mob
+    { title = String.join " " <| timeLeftString shared model.now mob.clock
     , modal =
         case ( model.alarm, mob.clock, mob.pomodoro ) of
             ( Playing, _, _ ) ->
@@ -285,7 +273,7 @@ view shared mob model =
 
             _ ->
                 Nothing
-    , body = body shared mob model action
+    , body = body shared mob model
     }
 
 
@@ -320,7 +308,7 @@ breakModal =
             [ Column.Gap <| Rem.Rem 2 ]
             [ Text.h2 [] "It's time for a break!"
             , UI.Icons.Tea.display
-                { height = Rem.Rem 10
+                { size = Rem.Rem 10
                 , color = Palettes.monochrome.on.background
                 }
             , Html.p
@@ -336,71 +324,20 @@ breakModal =
     }
 
 
-body : Shared -> Model.Mob.Mob -> Model -> ActionDescription -> Html Msg
-body shared mob model action =
+body : Shared -> Model.Mob.Mob -> Model -> Html Msg
+body shared mob model =
     div
-        [ class "container"
+        [ Attr.class "container"
         , Attr.css
             [ Css.position Css.relative
             ]
         ]
-        [ clockArea mob model action
-        , UI.Link.IconLink.view
-            [ Attr.css
-                [ Css.position Css.absolute
-                , Css.top <| Css.rem 10
-                , Css.left <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
-                ]
-            ]
-            { target =
-                Routing.toUrl <|
-                    Routing.Mob
-                        { subRoute = Pages.Mob.Routing.Invite
-                        , name = mob.name
-                        }
-            , color = Palettes.monochrome.on.background
-            , text = "Invite"
-            , icon = UI.Icons.Ion.share
-            }
-        , UI.Link.IconLink.view
-            [ Attr.css
-                [ Css.position Css.absolute
-                , Css.top <| Css.rem 10
-                , Css.right <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
-                ]
-            ]
-            { target =
-                Routing.toUrl <|
-                    Routing.Mob
-                        { subRoute = Pages.Mob.Routing.Settings
-                        , name = mob.name
-                        }
-            , color = Palettes.monochrome.on.background
-            , text = "Settings"
-            , icon = UI.Icons.Ion.settings
-            }
-        , UI.Link.IconLink.view
-            [ Attr.css
-                [ Css.position Css.absolute
-                , Css.top <| Css.rem 11.2
-                , Css.right <| Css.calc (Css.pct 50) Css.minus (Css.rem 1.4)
-                ]
-            ]
-            { target =
-                Routing.toUrl <|
-                    Routing.Mob
-                        { subRoute = Pages.Mob.Routing.Profile
-                        , name = mob.name
-                        }
-            , color = Palettes.monochrome.on.background
-            , text = "Profile"
-            , icon = UI.Icons.Ion.user
-            }
+        [ clockArea mob model
         , nav []
             ([ button
                 [ onClick <| SwitchTab Main
-                , classList [ ( "active", model.tab == Main ) ]
-                , title "Home"
+                , Attr.classList [ ( "active", model.tab == Main ) ]
+                , Attr.title "Home"
                 ]
                 [ UI.Icons.Ion.home
                     { size = Rem.Rem 1.4
@@ -408,19 +345,9 @@ body shared mob model action =
                     }
                 ]
              , button
-                [ onClick <| SwitchTab Clock
-                , classList [ ( "active", model.tab == Clock ) ]
-                , title "Clock Settings"
-                ]
-                [ UI.Icons.Ion.clock
-                    { size = Rem.Rem 1.4
-                    , color = Palettes.monochrome.on.surface
-                    }
-                ]
-             , button
                 [ onClick <| SwitchTab Mobbers
-                , classList [ ( "active", model.tab == Mobbers ) ]
-                , title "Mobbers"
+                , Attr.classList [ ( "active", model.tab == Mobbers ) ]
+                , Attr.title "Mobbers"
                 ]
                 [ UI.Icons.Ion.people
                     { size = Rem.Rem 1.4
@@ -431,8 +358,8 @@ body shared mob model action =
                 ++ (if shared.devMode then
                         [ button
                             [ onClick <| SwitchTab Dev
-                            , classList [ ( "active", model.tab == Dev ) ]
-                            , title "Dev"
+                            , Attr.classList [ ( "active", model.tab == Dev ) ]
+                            , Attr.title "Dev"
                             ]
                             [ UI.Icons.Ion.code
                                 { size = Rem.Rem 1
@@ -450,10 +377,6 @@ body shared mob model action =
                 Pages.Mob.Tabs.Home.view shared mob.name mob
                     |> Html.map GotMainTabMsg
 
-            Clock ->
-                Pages.Mob.Tabs.Clocks.view shared model.now mob
-                    |> Html.map GotClockSettingsMsg
-
             Mobbers ->
                 Pages.Mob.Tabs.Mobbers.view mob model.mobbersSettings
                     |> Html.map GotMobbersSettingsMsg
@@ -463,152 +386,285 @@ body shared mob model action =
         ]
 
 
-clockArea : Model.Mob.Mob -> Model -> ActionDescription -> Html Msg
-clockArea mob model action =
-    header []
-        [ section []
-            [ Html.div
-                [ css
-                    [ Css.position Css.relative
-                    , Css.margin Css.auto
-                    , Css.maxWidth Css.fitContent
+clockArea : Model.Mob.Mob -> Model -> Html Msg
+clockArea mob model =
+    let
+        turnTime duration =
+            Html.div
+                [ Attr.css
+                    [ Css.fontWeight Css.bold
+                    , Typography.fontSize Typography.xl
                     ]
                 ]
-                [ UI.CircularProgressBar.draw
-                    { colors =
-                        { main = Palettes.monochrome.surface |> Color.lighten 0.5
-                        , background = Palettes.monochrome.surface |> Color.lighten 0.9
-                        , border = Palettes.monochrome.surface |> Color.lighten 0.7
-                        }
-                    , strokeWidth = Rem.Rem 0.3
-                    , diameter = Rem.Rem 8.7
-                    , progress = Clock.ratio model.now mob.pomodoro
-                    , refreshRate = turnRefreshRate |> Duration.multiply 2
-                    }
-                , Html.div
-                    [ css
-                        [ Css.position Css.absolute
-                        , Css.top <| Css.rem 0.4
-                        , Css.left <| Css.rem 0.4
+                [ Html.text <| Duration.digitalPrint duration
+                ]
+
+        pomodoroTime duration =
+            Html.div
+                [ Attr.css
+                    [ Css.fontWeight Css.bold
+                    , Typography.fontSize Typography.l
+                    ]
+                ]
+                [ Html.text <| Duration.digitalPrint duration
+                ]
+    in
+    header
+        [ Attr.css
+            [ Css.position Css.relative
+            , Css.maxWidth Css.fitContent
+            , Css.margin Css.auto
+            , Css.displayFlex
+            , Css.alignItems Css.flexStart
+            , Css.paddingBottom (Css.rem 3)
+            , Css.marginTop Space.s
+            , Css.marginBottom Space.l
+            ]
+        ]
+        [ displayClock []
+            { state = mob.clock
+            , now = model.now
+            , messages =
+                { onStart = Just StartTurn
+                , onStop = StopTurn
+                }
+            , content =
+                Html.div
+                    [ Attr.css
+                        [ Css.lineHeight <| Css.num 1
+                        , Css.transform <| Css.translateY <| Css.pct 6
                         ]
                     ]
-                    [ UI.CircularProgressBar.draw
-                        { colors =
-                            { main = Palettes.monochrome.surface
-                            , background = Palettes.monochrome.surface |> Color.lighten 0.9
-                            , border = Palettes.monochrome.surface |> Color.lighten 0.7
-                            }
-                        , strokeWidth = Rem.Rem 0.5
-                        , diameter = Rem.Rem 7.8
-                        , progress = Clock.ratio model.now mob.clock
-                        , refreshRate = turnRefreshRate |> Duration.multiply 2
-                        }
-                    ]
-                , UI.Icons.style
-                    { class = "action"
-                    , size = Rem.Rem 3
-                    , colors =
-                        { normal = Palettes.monochrome.surface
-                        , hover = Palettes.monochrome.surface
-                        }
-                    }
-                  <|
-                    actionButton action
-                ]
-            ]
-        ]
+                    (case mob.clock of
+                        Clock.On on ->
+                            let
+                                timeLeft =
+                                    Duration.between model.now on.end
+                            in
+                            [ turnTime timeLeft
+                            , Html.div []
+                                [ Html.text <|
+                                    if Duration.toMillis timeLeft > 0 then
+                                        "Left in turn"
 
+                                    else
+                                        "Overtime"
+                                ]
+                            ]
 
-actionButton : ActionDescription -> Html Msg
-actionButton action =
-    button
-        [ onClick action.message
-        , id "action"
-        , class action.class
-        , css
-            [ Css.width <| Css.rem 6.6
-            , Css.height <| Css.rem 6.6
-            , Css.borderRadius <| Css.pct 100
-            , Css.position Css.absolute
-            , Css.top <| Css.rem 1.1
-            , Css.left <| Css.rem 1.1
-            , Css.flexDirection Css.column
-            , Css.backgroundColor <|
-                Color.toElmCss <|
-                    Color.opactity 0.5 <|
-                        Palettes.monochrome.background
-            , Css.color <| Color.toElmCss <| Palettes.monochrome.surface
-            , Css.hover
-                [ Css.backgroundColor <|
-                    Color.toElmCss <|
-                        Color.opactity 0 <|
-                            Palettes.monochrome.background
-                ]
-            ]
-        ]
-        [ div [ Attr.id "action-icon" ] [ action.icon ]
-        , div
-            [ id "time-left"
-            , css
-                [ Css.fontWeight Css.bold
-                , Css.fontSize <| Css.rem 1.6
-                ]
-            ]
-            (action.timeLeft
-                |> List.map
-                    (\a ->
-                        span
-                            [ css [ Css.display Css.block ] ]
-                            [ text a ]
+                        Clock.Off ->
+                            [ Html.text "Start a turn"
+                            , turnTime mob.turnLength
+                            , UI.Icons.Ion.play
+                                { size = Rem.Rem 3
+                                , color = Palettes.monochrome.on.background
+                                }
+                            ]
                     )
-            )
+            , style =
+                { strokeWidth = Rem.Rem 0.4
+                , diameter = Rem.Rem 9
+                }
+            }
+        , displayClock
+            [ Attr.css
+                [ Css.marginTop <| Css.rem 6
+                ]
+            ]
+            { state = mob.pomodoro
+            , now = model.now
+            , messages =
+                { onStart = Nothing
+                , onStop = StopPomodoro
+                }
+            , content =
+                Html.div
+                    [ Attr.css
+                        [ Css.lineHeight <| Css.num 1
+                        , Css.transform <| Css.translateY <| Css.pct -10
+                        ]
+                    ]
+                    (UI.Icons.Tea.display
+                        { size = Rem.Rem 2
+                        , color = Palettes.monochrome.on.background
+                        }
+                        :: (case mob.pomodoro of
+                                Clock.On on ->
+                                    [ pomodoroTime <| Duration.between model.now on.end
+                                    , Html.div
+                                        [ Attr.css
+                                            [ Typography.fontSize Typography.s
+                                            ]
+                                        ]
+                                        [ Html.text "Until break" ]
+                                    ]
+
+                                Clock.Off ->
+                                    [ pomodoroTime mob.pomodoroLength
+                                    , Html.text "Pomodoro"
+                                    ]
+                           )
+                    )
+            , style =
+                { strokeWidth = Rem.Rem 0.2
+                , diameter = Rem.Rem 7
+                }
+            }
+        , UI.Link.IconLink.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.bottom <| Css.pct 10
+                , Css.left <| Css.pct 32
+                ]
+            ]
+            { target =
+                Routing.toUrl <|
+                    Routing.Mob
+                        { subRoute = Pages.Mob.Routing.Invite
+                        , name = mob.name
+                        }
+            , color = Palettes.monochrome.on.background
+            , text = "Invite"
+            , icon = UI.Icons.Ion.share
+            }
+        , UI.Link.IconLink.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.top <| Css.pct 5
+                , Css.left <| Css.pct 66
+                ]
+            ]
+            { target =
+                Routing.toUrl <|
+                    Routing.Mob
+                        { subRoute = Pages.Mob.Routing.Settings
+                        , name = mob.name
+                        }
+            , color = Palettes.monochrome.on.background
+            , text = "Settings"
+            , icon = UI.Icons.Ion.settings
+            }
+        , UI.Link.IconLink.view
+            [ Attr.css
+                [ Css.position Css.absolute
+                , Css.bottom <| Css.pct 10
+                , Css.left <| Css.pct 9
+                ]
+            ]
+            { target =
+                Routing.toUrl <|
+                    Routing.Mob
+                        { subRoute = Pages.Mob.Routing.Profile
+                        , name = mob.name
+                        }
+            , color = Palettes.monochrome.on.background
+            , text = "Profile"
+            , icon = UI.Icons.Ion.user
+            }
         ]
 
 
-type alias ActionDescription =
-    { icon : Svg Msg
-    , message : Msg
-    , timeLeft : DurationStringParts
-    , class : String
-    }
-
-
-detectAction : Shared -> Time.Posix -> Model.Mob.Mob -> ActionDescription
-detectAction shared now mob =
-    let
-        timeLeft =
-            timeLeftString shared now mob
-    in
-    case mob.clock of
-        On _ ->
-            { icon =
-                UI.Icons.Ion.stop
-                    { size = Rem.Rem 1
-                    , color = Palettes.monochrome.on.background
-                    }
-            , message =
-                Model.Events.Clock Model.Events.Stopped
-                    |> Model.Events.MobEvent mob.name
-                    |> ShareEvent
-            , class = "on"
-            , timeLeft = timeLeft
+displayClock :
+    List (Html.Attribute Msg)
+    ->
+        { state : Clock.ClockState
+        , now : Time.Posix
+        , messages :
+            { onStart : Maybe Msg
+            , onStop : Msg
             }
-
-        Off ->
-            { icon =
-                UI.Icons.Ion.play
-                    { size = Rem.Rem 1
-                    , color = Palettes.monochrome.on.background
-                    }
-            , message = StartClicked
-            , class = ""
-            , timeLeft = timeLeft
+        , content : Html.Html Msg
+        , style :
+            { strokeWidth : Rem.Rem
+            , diameter : Rem.Rem
             }
+        }
+    -> Html Msg
+displayClock attributes { state, now, style, messages, content } =
+    Html.div
+        (Attr.css
+            [ Css.position Css.relative
+            , Css.maxWidth Css.fitContent
+            ]
+            :: attributes
+        )
+        [ UI.CircularProgressBar.draw
+            { colors =
+                { main = Palettes.monochrome.on.background
+                , background = Palettes.monochrome.on.background |> Color.lighten 0.9
+                , border = Palettes.monochrome.on.background |> Color.lighten 0.7
+                }
+            , strokeWidth = style.strokeWidth
+            , diameter = style.diameter
+            , progress = Clock.ratio now state
+            , refreshRate = turnRefreshRate |> Duration.multiply 2
+            }
+        , Html.button
+            [ case state of
+                Clock.On _ ->
+                    Evts.onClick messages.onStop
+
+                Clock.Off ->
+                    case messages.onStart of
+                        Just msg ->
+                            Evts.onClick msg
+
+                        Nothing ->
+                            Attr.disabled True
+            , Attr.css
+                [ Css.backgroundColor Css.transparent
+                , Css.position Css.absolute
+                , Css.width <| Css.pct 100
+                , Css.height <| Css.pct 100
+                , Css.overflow Css.hidden
+                , Css.top Css.zero
+                , Css.left Css.zero
+                , Css.borderRadius <| Css.pct 50
+                , Css.color <| Color.toElmCss <| Palettes.monochrome.on.background
+                , Css.hover [ Css.backgroundColor Css.transparent ]
+                , Css.disabled
+                    [ Css.hover [ Css.backgroundColor Css.transparent ]
+                    , Css.opacity <| Css.num 1
+                    ]
+                ]
+            ]
+            [ Html.div
+                [ Attr.css
+                    (UI.Css.center
+                        ++ [ Css.displayFlex
+                           , Css.flexDirection Css.column
+                           , Css.alignItems Css.center
+                           , Css.width <| Css.pct 100
+                           ]
+                    )
+                ]
+                [ content
+                ]
+            ]
+        , case state of
+            Clock.On _ ->
+                UI.Button.View.button
+                    [ Attr.css
+                        [ Css.position Css.absolute
+                        , Css.bottom Css.zero
+                        , Css.left <| Css.pct 50
+                        , Css.transform <| Css.translate2 (Css.pct -50) (Css.pct 40)
+                        ]
+                    ]
+                    { content = UI.Button.View.Both { icon = UI.Icons.Ion.stop, text = "Stop" }
+                    , variant = UI.Button.View.Primary
+                    , size = UI.Button.View.S
+                    , action = UI.Button.View.OnPress <| Just messages.onStop
+                    }
+
+            Clock.Off ->
+                Html.span [] []
+        ]
 
 
-timeLeftString : Shared -> Time.Posix -> Model.Mob.Mob -> Duration.DurationStringParts
-timeLeftString shared now mob =
-    case mob.clock of
+timeLeftString : Shared -> Time.Posix -> Clock.ClockState -> Duration.DurationStringParts
+timeLeftString shared now clock =
+    case clock of
         On on ->
             Duration.between now on.end
                 |> (if shared.preferences.displaySeconds then

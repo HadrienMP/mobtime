@@ -1,4 +1,4 @@
-module UI.Icons.Ion exposing (back, batteryFull, batteryLow, check, clock, close, code, copy, delete, error, github, home, musicNote, mute, paperAirplane, people, play, plus, rotate, settings, share, shuffle, stop, success, user, volumeHigh, volumeLow)
+module UI.Icons.Ion exposing (back, check, clock, close, code, copy, delete, error, github, home, musicNote, mute, paperAirplane, people, play, plus, rotate, settings, share, shuffle, stop, success, user, volumeHigh, volumeLow)
 
 import Ionicon
 import Ionicon.Android
@@ -39,16 +39,6 @@ back =
 check : Icon msg
 check =
     display Ionicon.checkmark
-
-
-batteryLow : Icon msg
-batteryLow =
-    display Ionicon.batteryLow
-
-
-batteryFull : Icon msg
-batteryFull =
-    display Ionicon.batteryHalf
 
 
 paperAirplane : Icon msg
