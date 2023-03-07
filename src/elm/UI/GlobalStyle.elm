@@ -25,4 +25,18 @@ globalStyle =
                     ]
                 ]
             ]
+        , Css.Global.selector "#action.on"
+            [ Css.Global.descendants
+                [ Css.Global.id "action-icon"
+                    [ Css.display Css.none
+                    ]
+                ]
+            , Css.hover
+                [ Css.Global.descendants
+                    [ Css.Global.id "action-icon"
+                        [ Css.display Css.block
+                        ]
+                    ]
+                ]
+            ]
         ]

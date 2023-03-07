@@ -574,12 +574,12 @@ actionButton action =
             , Css.hover
                 [ Css.backgroundColor <|
                     Color.toElmCss <|
-                        Color.opactity 0.8 <|
+                        Color.opactity 0 <|
                             Palettes.monochrome.background
                 ]
             ]
         ]
-        [ div [] [ action.icon ]
+        [ div [ Attr.id "action-icon" ] [ action.icon ]
         , div
             [ id "time-left"
             , css
