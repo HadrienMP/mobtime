@@ -29,6 +29,8 @@ view props =
             , Css.borderRadius <| Css.rem 2
             , Css.cursor Css.pointer
             , Css.padding2 Css.zero <| Css.rem 0.1
+            , Css.displayFlex
+            , Css.alignItems Css.center
             , Css.hover
                 [ Css.backgroundColor <|
                     Color.toElmCss <|
