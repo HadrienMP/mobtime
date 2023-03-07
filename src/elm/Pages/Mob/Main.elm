@@ -18,9 +18,9 @@ import Model.Events
 import Model.Mob
 import Model.MobName
 import Pages.Mob.Home.Page
+import Pages.Mob.Invite.Page
 import Pages.Mob.Routing
 import Pages.Mob.Settings.Page
-import Pages.Mob.Share.Page
 import Shared exposing (Shared)
 import Time
 import View exposing (View)
@@ -79,7 +79,7 @@ initSubPage route shared =
 type Msg
     = HomeMsg Pages.Mob.Home.Page.Msg
     | SettingsMsg Pages.Mob.Settings.Page.Msg
-    | InviteMsg Pages.Mob.Share.Page.Msg
+    | InviteMsg Pages.Mob.Invite.Page.Msg
     | ReceivedEvent Model.Events.Event
     | ReceivedHistory (List Model.Events.Event)
     | Tick Time.Posix
@@ -108,7 +108,7 @@ update shared msg model =
 
         ( InviteMsg subMsg, Invite ) ->
             ( model
-            , Pages.Mob.Share.Page.update shared subMsg model.mob.name
+            , Pages.Mob.Invite.Page.update shared subMsg model.mob.name
                 |> Effect.map InviteMsg
             )
 
@@ -180,7 +180,7 @@ subscriptions model =
                     |> Sub.map SettingsMsg
 
             Invite ->
-                Pages.Mob.Share.Page.subscriptions |> Sub.map InviteMsg
+                Pages.Mob.Invite.Page.subscriptions |> Sub.map InviteMsg
         , case ( Model.Clock.isOn model.mob.clock, Model.Clock.isOn model.mob.pomodoro ) of
             ( True, _ ) ->
                 Pages.Mob.Home.Page.turnRefreshRate
@@ -222,7 +222,7 @@ view shared model =
                         |> View.map SettingsMsg
 
                 Invite ->
-                    Pages.Mob.Share.Page.view shared model.mob.name
+                    Pages.Mob.Invite.Page.view shared model.mob.name
                         |> View.map InviteMsg
     in
     { title =

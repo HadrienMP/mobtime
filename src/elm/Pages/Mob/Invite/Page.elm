@@ -1,10 +1,10 @@
-port module Pages.Mob.Share.Page exposing (Msg(..), subscriptions, update, view)
+port module Pages.Mob.Invite.Page exposing (Msg(..), subscriptions, update, view)
 
 import Effect exposing (Effect)
 import Lib.Toaster
 import Model.MobName exposing (MobName)
+import Pages.Mob.Invite.PageView
 import Pages.Mob.Routing
-import Pages.Mob.Share.PageView
 import Routing
 import Shared exposing (Shared)
 import Url
@@ -48,7 +48,7 @@ view shared mob =
     { title = "Share"
     , modal = Nothing
     , body =
-        Pages.Mob.Share.PageView.view
+        Pages.Mob.Invite.PageView.view
             { url = shared.url |> Url.toString
             , copy = Copy
             , mob = mob
