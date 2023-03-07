@@ -1,4 +1,4 @@
-module Pages.Mob.Settings.Page exposing (Model, Msg(..), update, view)
+module Pages.Mob.Settings.Page exposing (Msg(..), subscriptions, update, view)
 
 import Effect exposing (Effect)
 import Lib.Duration exposing (Duration)
@@ -11,10 +11,6 @@ import Sounds
 import View exposing (View)
 
 
-type alias Model =
-    Model.Mob.Mob
-
-
 type Msg
     = Back
     | TurnChange Duration
@@ -22,11 +18,15 @@ type Msg
     | PlaylistChange Sounds.Profile
 
 
-update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
+update : Shared -> Msg -> Model.Mob.Mob -> ( Model.Mob.Mob, Effect Shared.Msg Msg )
 update shared msg model =
     case msg of
         Back ->
-            ( model, Shared.pushUrl shared <| Routing.Mob model.name )
+            ( model
+            , Shared.pushUrl shared <|
+                Routing.Mob <|
+                    { subRoute = Routing.MobHome, name = model.name }
+            )
 
         TurnChange turn ->
             ( model
@@ -53,7 +53,12 @@ update shared msg model =
             )
 
 
-view : Model -> View Msg
+subscriptions : Model.Mob.Mob -> Sub Msg
+subscriptions _ =
+    Sub.none
+
+
+view : Model.Mob.Mob -> View Msg
 view model =
     { title = "Settings"
     , modal = Nothing

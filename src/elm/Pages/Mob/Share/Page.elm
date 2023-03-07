@@ -32,7 +32,9 @@ update shared msg mob =
             Shared.toast <| Lib.Toaster.success "The link has been copied to your clipboard"
 
         Back ->
-            Shared.pushUrl shared <| Routing.Mob mob
+            Shared.pushUrl shared <|
+                Routing.Mob <|
+                    { subRoute = Routing.MobHome, name = mob }
 
 
 subscriptions : Sub Msg

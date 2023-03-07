@@ -1,6 +1,17 @@
-module Pages.Mob exposing (ActionDescription, AlarmState(..), Model, Msg(..), Tab(..), init, jsEventMapping, subscriptions, update, view)
+module Pages.Mob exposing
+    ( ActionDescription
+    , AlarmState
+    , Model
+    , Msg(..)
+    , Tab(..)
+    , init
+    , jsEventMapping
+    , subscriptions
+    , turnRefreshRate
+    , update
+    , view
+    )
 
-import Components.Socket.Socket
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
@@ -8,7 +19,7 @@ import Html.Styled.Attributes as Attr exposing (class, classList, css, id, title
 import Html.Styled.Events exposing (onClick)
 import Js.Commands
 import Js.Events
-import Js.EventsMapping as EventsMapping exposing (EventsMapping)
+import Js.EventsMapping exposing (EventsMapping)
 import Lib.Duration as Duration exposing (DurationStringParts)
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
@@ -28,7 +39,7 @@ import Sounds
 import Svg.Styled exposing (Svg)
 import Task
 import Time
-import UI.Button.View as Button
+import UI.Button.View
 import UI.CircularProgressBar
 import UI.Color as Color
 import UI.Column as Column
@@ -63,11 +74,10 @@ type Tab
 
 
 type alias Model =
-    { mob : Model.Mob.Mob
-    , mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
-    , alarm : AlarmState
+    { mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
     , now : Time.Posix
     , tab : Tab
+    , alarm : AlarmState
     }
 
 
@@ -81,17 +91,12 @@ init shared name =
             else
                 Shared.pushUrl shared <| Routing.Profile name
     in
-    ( { mob = Model.Mob.init name
-      , mobbersSettings = Pages.Mob.Tabs.Mobbers.init
-      , alarm = Standby
+    ( { mobbersSettings = Pages.Mob.Tabs.Mobbers.init
       , now = Time.millisToPosix 0
       , tab = Main
+      , alarm = Standby
       }
-    , Effect.batch
-        [ Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print name
-        , Time.now |> Task.perform TimePassed |> Effect.fromCmd
-        , redirection
-        ]
+    , redirection
     )
 
 
@@ -101,96 +106,32 @@ init shared name =
 
 type Msg
     = ShareEvent Model.Events.MobEvent
-    | ReceivedEvent Model.Events.Event
-    | ReceivedHistory (List Model.Events.Event)
     | StartClicked
     | StartWith ( Time.Posix, Sounds.Sound )
-    | StopSound
-    | AlarmEnded
-    | TimePassed Time.Posix
+    | TimePassed Time.Posix Model.Mob.TimePassedResult
     | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
     | GotClockSettingsMsg Pages.Mob.Tabs.Clocks.Msg
     | GotMobbersSettingsMsg Pages.Mob.Tabs.Mobbers.Msg
     | GotSoundSettingsMsg Pages.Mob.Tabs.Sound.Msg
     | SwitchTab Tab
+    | StopSound
+    | AlarmEnded
+    | StopPomodoro
 
 
-timePassed : Time.Posix -> Shared -> Model -> ( Model, Cmd Msg )
-timePassed now shared model =
-    let
-        timePassedResult =
-            Model.Mob.timePassed now model.mob
-
-        alarmCommand =
-            case timePassedResult.turnEvent of
-                Clock.Ended ->
-                    Js.Commands.send Js.Commands.SoundAlarm
-
-                Clock.Continued ->
-                    Cmd.none
-    in
-    ( { model
-        | alarm =
-            case timePassedResult.turnEvent of
-                Clock.Ended ->
-                    Playing
-
-                Clock.Continued ->
-                    model.alarm
-        , now = now
-        , mob = timePassedResult.updated
-      }
-    , Cmd.batch
-        [ alarmCommand
-        , Js.Commands.send <|
-            Js.Commands.ChangeTitle <|
-                timeLeftTitle model.mob.name <|
-                    timeLeftString shared model
-        ]
-    )
-
-
-update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
-update shared msg model =
+update : Shared -> Model.Mob.Mob -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
+update shared mob msg model =
     case msg of
         ShareEvent event ->
             ( model
             , Effect.share event
             )
 
-        ReceivedEvent event ->
-            let
-                ( updated, command ) =
-                    Model.Mob.evolve event model.mob
-            in
-            ( { model
-                | mob = updated
-                , alarm =
-                    -- Handle alarm (command) as separate from the evolve method ?
-                    case event of
-                        Model.Events.Clock (Model.Events.Started _) ->
-                            Stopped
-
-                        _ ->
-                            model.alarm
-              }
-            , Effect.fromCmd command
-            )
-
-        ReceivedHistory eventsResults ->
-            let
-                ( updated, command ) =
-                    Model.Mob.evolveMany eventsResults model.mob
-            in
-            ( { model | mob = updated }
-            , Effect.fromCmd command
-            )
-
         StartClicked ->
             ( model
             , Time.now
                 |> Task.map
-                    (\now -> ( now, selectSound now model.mob.soundProfile ))
+                    (\now -> ( now, selectSound now mob.soundProfile ))
                 |> Task.perform StartWith
                 |> Effect.fromCmd
             )
@@ -200,21 +141,11 @@ update shared msg model =
             , Model.Events.Started
                 { time = now
                 , alarm = sound
-                , length = model.mob.turnLength
+                , length = mob.turnLength
                 }
                 |> Model.Events.Clock
-                |> Model.Events.MobEvent model.mob.name
+                |> Model.Events.MobEvent mob.name
                 |> Effect.share
-            )
-
-        StopSound ->
-            ( { model | alarm = Stopped }
-            , Effect.js Js.Commands.StopAlarm
-            )
-
-        AlarmEnded ->
-            ( { model | alarm = Stopped }
-            , Effect.fromCmd <| Cmd.none
             )
 
         GotMainTabMsg subMsg ->
@@ -227,7 +158,7 @@ update shared msg model =
         GotMobbersSettingsMsg subMsg ->
             let
                 ( updated, command ) =
-                    Pages.Mob.Tabs.Mobbers.update subMsg model.mob.mobbers model.mob.name model.mobbersSettings
+                    Pages.Mob.Tabs.Mobbers.update subMsg mob.mobbers mob.name model.mobbersSettings
             in
             ( { model | mobbersSettings = updated }
             , Effect.map GotMobbersSettingsMsg command
@@ -240,7 +171,7 @@ update shared msg model =
 
         GotClockSettingsMsg subMsg ->
             ( model
-            , Pages.Mob.Tabs.Clocks.update subMsg model.mob.name
+            , Pages.Mob.Tabs.Clocks.update subMsg mob.name
                 |> Effect.map GotClockSettingsMsg
             )
 
@@ -249,13 +180,45 @@ update shared msg model =
             , Effect.map GotSoundSettingsMsg <| Pages.Mob.Tabs.Sound.update subMsg
             )
 
-        TimePassed now ->
+        TimePassed now timePassedResult ->
             let
-                ( updated, command ) =
-                    timePassed now shared model
+                ( alarm, alarmEffect ) =
+                    case timePassedResult.turnEvent of
+                        Clock.Ended ->
+                            ( Playing, Js.Commands.send Js.Commands.SoundAlarm |> Effect.fromCmd )
+
+                        Clock.Continued ->
+                            ( model.alarm, Effect.none )
             in
-            ( updated
-            , Effect.fromCmd command
+            ( { model
+                | now = now
+                , alarm = alarm
+              }
+            , Effect.batch
+                [ alarmEffect
+                , Effect.fromCmd <|
+                    Js.Commands.send <|
+                        Js.Commands.ChangeTitle <|
+                            String.join " " <|
+                                timeLeftString shared now mob
+                ]
+            )
+
+        StopSound ->
+            ( { model | alarm = Stopped }
+            , Effect.js Js.Commands.StopAlarm
+            )
+
+        AlarmEnded ->
+            ( { model | alarm = Stopped }
+            , Effect.fromCmd <| Cmd.none
+            )
+
+        StopPomodoro ->
+            ( model
+            , Model.Events.PomodoroStopped
+                |> Model.Events.MobEvent mob.name
+                |> Effect.share
             )
 
 
@@ -279,26 +242,18 @@ turnRefreshRate =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
-        , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
-        , case ( Clock.isOn model.mob.clock, Clock.isOn model.mob.pomodoro ) of
-            ( True, _ ) ->
-                Time.every (Duration.toMillis turnRefreshRate |> toFloat) TimePassed
+subscriptions _ =
+    Sub.none
 
-            ( False, True ) ->
-                Time.every 2000 TimePassed
 
-            _ ->
-                Sub.none
-        ]
+
+-- TODO get rid of that
 
 
 jsEventMapping : EventsMapping Msg
 jsEventMapping =
-    EventsMapping.batch
-        [ EventsMapping.create <|
+    Js.EventsMapping.batch
+        [ Js.EventsMapping.create <|
             [ Js.Events.EventMessage "AlarmEnded" (always AlarmEnded)
             ]
         ]
@@ -308,40 +263,87 @@ jsEventMapping =
 -- VIEW
 
 
-view : Shared -> Model -> View Msg
-view shared model =
+view : Shared -> Model.Mob.Mob -> Model -> View Msg
+view shared mob model =
     let
         action =
-            detectAction shared model
+            detectAction shared model.now mob
     in
-    { title = timeLeftTitle model.mob.name action.timeLeft
+    { title = String.join " " <| timeLeftString shared model.now mob
     , modal =
-        case ( model.alarm, model.mob.clock, model.mob.pomodoro ) of
+        case ( model.alarm, mob.clock, mob.pomodoro ) of
             ( Playing, _, _ ) ->
                 Just musicModal
 
             ( _, Clock.Off, Clock.On pomodoro ) ->
                 if Duration.secondsBetween model.now pomodoro.end <= 0 then
-                    Just <| breakModal model.mob.name
+                    Just breakModal
 
                 else
                     Nothing
 
             _ ->
                 Nothing
-    , body = body shared model action
+    , body = body shared mob model action
     }
 
 
-body : Shared -> Model -> ActionDescription -> Html Msg
-body shared model action =
+musicModal : UI.Modal.View.Modal Msg
+musicModal =
+    { onClose = StopSound
+    , content =
+        Column.column
+            [ Attr.css UI.Css.center ]
+            [ Column.Gap <| Rem.Rem 2 ]
+            [ UI.Icons.Tape.display
+                { size = Rem.Rem 10
+                , color = Palettes.monochrome.on.background
+                }
+            , Text.h2 [] "Turn ended !"
+            , UI.Button.View.button [ Attr.css [ Css.width <| Css.pct 100 ] ]
+                { content = UI.Button.View.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
+                , variant = UI.Button.View.Primary
+                , size = UI.Button.View.L
+                , action = UI.Button.View.OnPress <| Just StopSound
+                }
+            ]
+    }
+
+
+breakModal : UI.Modal.View.Modal Msg
+breakModal =
+    { onClose = StopPomodoro
+    , content =
+        Column.column
+            [ Attr.css UI.Css.center ]
+            [ Column.Gap <| Rem.Rem 2 ]
+            [ Text.h2 [] "It's time for a break!"
+            , UI.Icons.Tea.display
+                { height = Rem.Rem 10
+                , color = Palettes.monochrome.on.background
+                }
+            , Html.p
+                [ Attr.css [ Css.textAlign Css.justify ] ]
+                [ Html.text "Boost your productivity by taking a good break." ]
+            , UI.Button.View.button [ Attr.css [ Css.width <| Css.pct 100 ] ]
+                { content = UI.Button.View.Both { icon = UI.Icons.Ion.check, text = "Break over" }
+                , variant = UI.Button.View.Primary
+                , size = UI.Button.View.L
+                , action = UI.Button.View.OnPress <| Just StopPomodoro
+                }
+            ]
+    }
+
+
+body : Shared -> Model.Mob.Mob -> Model -> ActionDescription -> Html Msg
+body shared mob model action =
     div
         [ class "container"
         , Attr.css
             [ Css.position Css.relative
             ]
         ]
-        [ clockArea model action
+        [ clockArea mob model action
         , Pages.Mob.Share.Button.view
             [ Attr.css
                 [ Css.position Css.absolute
@@ -349,7 +351,7 @@ body shared model action =
                 , Css.left <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
                 ]
             ]
-            { sharePage = Routing.toUrl <| Routing.Share model.mob.name
+            { sharePage = Routing.toUrl <| Routing.Share mob.name
             , color = Palettes.monochrome.on.background
             }
         , Pages.Mob.Settings.Button.view
@@ -359,7 +361,12 @@ body shared model action =
                 , Css.right <| Css.calc (Css.pct 50) Css.minus (Css.rem 5)
                 ]
             ]
-            { target = Routing.toUrl <| Routing.Settings model.mob.name
+            { target =
+                Routing.toUrl <|
+                    Routing.Mob
+                        { subRoute = Routing.MobSettings
+                        , name = mob.name
+                        }
             , color = Palettes.monochrome.on.background
             }
         , nav []
@@ -423,19 +430,19 @@ body shared model action =
             )
         , case model.tab of
             Main ->
-                Pages.Mob.Tabs.Home.view shared model.mob.name model.mob
+                Pages.Mob.Tabs.Home.view shared mob.name mob
                     |> Html.map GotMainTabMsg
 
             Clock ->
-                Pages.Mob.Tabs.Clocks.view shared model.now model.mob
+                Pages.Mob.Tabs.Clocks.view shared model.now mob
                     |> Html.map GotClockSettingsMsg
 
             Mobbers ->
-                Pages.Mob.Tabs.Mobbers.view model.mob model.mobbersSettings
+                Pages.Mob.Tabs.Mobbers.view mob model.mobbersSettings
                     |> Html.map GotMobbersSettingsMsg
 
             Sound ->
-                Pages.Mob.Tabs.Sound.view shared model.mob.name model.mob.soundProfile
+                Pages.Mob.Tabs.Sound.view shared mob.name mob.soundProfile
                     |> Html.map GotSoundSettingsMsg
 
             Dev ->
@@ -443,61 +450,8 @@ body shared model action =
         ]
 
 
-musicModal : UI.Modal.View.Modal Msg
-musicModal =
-    { onClose = StopSound
-    , content =
-        Column.column
-            [ css UI.Css.center ]
-            [ Column.Gap <| Rem.Rem 2 ]
-            [ UI.Icons.Tape.display
-                { size = Rem.Rem 10
-                , color = Palettes.monochrome.on.background
-                }
-            , Text.h2 [] "Turn ended !"
-            , Button.button [ css [ Css.width <| Css.pct 100 ] ]
-                { content = Button.Both { icon = UI.Icons.Ion.mute, text = "Stop music" }
-                , variant = Button.Primary
-                , size = Button.L
-                , action = Button.OnPress <| Just StopSound
-                }
-            ]
-    }
-
-
-breakModal : MobName -> UI.Modal.View.Modal Msg
-breakModal mobName =
-    let
-        action =
-            Model.Events.PomodoroStopped
-                |> Model.Events.MobEvent mobName
-                |> ShareEvent
-    in
-    { onClose = action
-    , content =
-        Column.column
-            [ css UI.Css.center ]
-            [ Column.Gap <| Rem.Rem 2 ]
-            [ Text.h2 [] "It's time for a break!"
-            , UI.Icons.Tea.display
-                { height = Rem.Rem 10
-                , color = Palettes.monochrome.on.background
-                }
-            , Html.p
-                [ css [ Css.textAlign Css.justify ] ]
-                [ Html.text "Boost your productivity by taking a good break." ]
-            , Button.button [ css [ Css.width <| Css.pct 100 ] ]
-                { content = Button.Both { icon = UI.Icons.Ion.check, text = "Break over" }
-                , variant = Button.Primary
-                , size = Button.L
-                , action = Button.OnPress <| Just action
-                }
-            ]
-    }
-
-
-clockArea : Model -> ActionDescription -> Html Msg
-clockArea model action =
+clockArea : Model.Mob.Mob -> Model -> ActionDescription -> Html Msg
+clockArea mob model action =
     header []
         [ section []
             [ Html.div
@@ -515,7 +469,7 @@ clockArea model action =
                         }
                     , strokeWidth = Rem.Rem 0.3
                     , diameter = Rem.Rem 8.7
-                    , progress = Clock.ratio model.now model.mob.pomodoro
+                    , progress = Clock.ratio model.now mob.pomodoro
                     , refreshRate = turnRefreshRate |> Duration.multiply 2
                     }
                 , Html.div
@@ -533,7 +487,7 @@ clockArea model action =
                             }
                         , strokeWidth = Rem.Rem 0.5
                         , diameter = Rem.Rem 7.8
-                        , progress = Clock.ratio model.now model.mob.clock
+                        , progress = Clock.ratio model.now mob.clock
                         , refreshRate = turnRefreshRate |> Duration.multiply 2
                         }
                     ]
@@ -606,13 +560,13 @@ type alias ActionDescription =
     }
 
 
-detectAction : Shared -> Model -> ActionDescription
-detectAction shared model =
+detectAction : Shared -> Time.Posix -> Model.Mob.Mob -> ActionDescription
+detectAction shared now mob =
     let
         timeLeft =
-            timeLeftString shared model
+            timeLeftString shared now mob
     in
-    case model.mob.clock of
+    case mob.clock of
         On _ ->
             { icon =
                 UI.Icons.Ion.stop
@@ -621,7 +575,7 @@ detectAction shared model =
                     }
             , message =
                 Model.Events.Clock Model.Events.Stopped
-                    |> Model.Events.MobEvent model.mob.name
+                    |> Model.Events.MobEvent mob.name
                     |> ShareEvent
             , class = "on"
             , timeLeft = timeLeft
@@ -639,11 +593,11 @@ detectAction shared model =
             }
 
 
-timeLeftString : Shared -> Model -> DurationStringParts
-timeLeftString shared model =
-    case model.mob.clock of
+timeLeftString : Shared -> Time.Posix -> Model.Mob.Mob -> Duration.DurationStringParts
+timeLeftString shared now mob =
+    case mob.clock of
         On on ->
-            Duration.between model.now on.end
+            Duration.between now on.end
                 |> (if shared.preferences.displaySeconds then
                         Duration.toLongString
 
@@ -653,16 +607,3 @@ timeLeftString shared model =
 
         _ ->
             []
-
-
-timeLeftTitle : MobName -> DurationStringParts -> String
-timeLeftTitle mob action =
-    (case action of
-        [] ->
-            ""
-
-        _ ->
-            String.join " " action ++ " | "
-    )
-        ++ Model.MobName.print mob
-        ++ " | Mob Time"

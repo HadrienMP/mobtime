@@ -1,4 +1,4 @@
-module Routing exposing (Page(..), toPage, toUrl)
+module Routing exposing (MobRoute, MobSubRoute(..), Route(..), parse, toUrl)
 
 import Model.MobName exposing (MobName(..))
 import Url
@@ -6,45 +6,55 @@ import Url.Builder
 import Url.Parser as UrlParser exposing ((</>), Parser, map, oneOf, s, top)
 
 
-type Page
-    = Login
-    | Mob MobName
+type Route
+    = Home
+    | Mob MobRoute
     | Share MobName
     | Profile MobName
-    | Settings MobName
 
 
-toPage : Url.Url -> Page
-toPage url =
+type alias MobRoute =
+    { subRoute : MobSubRoute, name : MobName }
+
+
+type MobSubRoute
+    = MobHome
+    | MobSettings
+
+
+parse : Url.Url -> Route
+parse url =
     UrlParser.parse route url
-        |> Maybe.withDefault Login
+        |> Maybe.withDefault Home
 
 
-route : Parser (Page -> c) c
+route : Parser (Route -> c) c
 route =
     oneOf
-        [ map Login top
-        , map (MobName >> Mob) (s "mob" </> UrlParser.string)
+        [ map Home top
+        , map (MobName >> MobRoute MobHome >> Mob) (s "mob" </> UrlParser.string)
         , map (MobName >> Share) (s "mob" </> UrlParser.string </> s "share")
         , map (MobName >> Profile) (s "mob" </> UrlParser.string </> s "me")
-        , map (MobName >> Settings) (s "mob" </> UrlParser.string </> s "settings")
+        , map (MobName >> MobRoute MobSettings >> Mob) (s "mob" </> UrlParser.string </> s "settings")
         ]
 
 
-toUrl : Page -> String
+toUrl : Route -> String
 toUrl page =
     case page of
-        Login ->
+        Home ->
             Url.Builder.absolute [ "" ] []
 
-        Mob mobname ->
-            Url.Builder.absolute [ "mob", Model.MobName.print mobname ] []
+        Mob { subRoute, name } ->
+            case subRoute of
+                MobHome ->
+                    Url.Builder.absolute [ "mob", Model.MobName.print name ] []
+
+                MobSettings ->
+                    Url.Builder.absolute [ "mob", Model.MobName.print name, "settings" ] []
 
         Share mobname ->
             Url.Builder.absolute [ "mob", Model.MobName.print mobname, "share" ] []
 
         Profile mobname ->
             Url.Builder.absolute [ "mob", Model.MobName.print mobname, "me" ] []
-
-        Settings mobname ->
-            Url.Builder.absolute [ "mob", Model.MobName.print mobname, "settings" ] []

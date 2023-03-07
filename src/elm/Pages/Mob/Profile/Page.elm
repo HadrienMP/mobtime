@@ -30,7 +30,11 @@ update msg shared mob =
 
         Join ->
             Effect.batch
-                [ Shared.pushUrl shared <| Routing.Mob mob
+                [ Shared.pushUrl shared <|
+                    Routing.Mob <|
+                        { subRoute = Routing.MobHome
+                        , name = mob
+                        }
                 , Effect.fromShared <| Shared.SoundOn
                 ]
 

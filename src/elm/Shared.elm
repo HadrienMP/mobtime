@@ -174,7 +174,7 @@ toast =
     Effect.fromShared << Toast << Lib.Toaster.Add
 
 
-pushUrl : Shared -> Routing.Page -> Effect Msg msg
+pushUrl : Shared -> Routing.Route -> Effect Msg msg
 pushUrl shared =
     Routing.toUrl
         >> Nav.pushUrl shared.key
