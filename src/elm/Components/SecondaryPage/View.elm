@@ -50,7 +50,7 @@ view { onBack, title, mob, content } =
             ]
             [ Row.Gap <| Rem.Rem 1 ]
             [ Text.h2 [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] title
-            , Html.div [] [ Html.text "Mob" ]
+            , Html.div [] [ Html.text "Mob:" ]
             , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print mob ]
             ]
         , content
