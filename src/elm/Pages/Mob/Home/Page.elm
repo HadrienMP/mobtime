@@ -1,4 +1,4 @@
-module Pages.Mob exposing
+module Pages.Mob.Home.Page exposing
     ( ActionDescription
     , AlarmState
     , Model

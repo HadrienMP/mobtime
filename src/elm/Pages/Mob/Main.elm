@@ -17,7 +17,7 @@ import Model.Clock
 import Model.Events
 import Model.Mob
 import Model.MobName
-import Pages.Mob
+import Pages.Mob.Home.Page
 import Pages.Mob.Settings.Page
 import Routing
 import Shared exposing (Shared)
@@ -30,7 +30,7 @@ import View exposing (View)
 
 
 type Page
-    = Home Pages.Mob.Model
+    = Home Pages.Mob.Home.Page.Model
     | Settings
 
 
@@ -60,7 +60,7 @@ initSubPage : Routing.MobRoute -> Shared -> ( Page, Effect Shared.Msg Msg )
 initSubPage route shared =
     case route.subRoute of
         Routing.MobHome ->
-            Pages.Mob.init shared route.name
+            Pages.Mob.Home.Page.init shared route.name
                 |> Tuple.mapBoth Home (Effect.map HomeMsg)
 
         Routing.MobSettings ->
@@ -72,7 +72,7 @@ initSubPage route shared =
 
 
 type Msg
-    = HomeMsg Pages.Mob.Msg
+    = HomeMsg Pages.Mob.Home.Page.Msg
     | SettingsMsg Pages.Mob.Settings.Page.Msg
     | ReceivedEvent Model.Events.Event
     | ReceivedHistory (List Model.Events.Event)
@@ -89,7 +89,7 @@ update shared msg model =
                     (\next -> { model | page = next })
 
         ( HomeMsg subMsg, Home subModel ) ->
-            Pages.Mob.update shared model.mob subMsg subModel
+            Pages.Mob.Home.Page.update shared model.mob subMsg subModel
                 |> Tuple.mapBoth
                     (\next -> { model | page = Home next })
                     (Effect.map HomeMsg)
@@ -126,10 +126,10 @@ update shared msg model =
                 ( nextPage, pageEffect ) =
                     case model.page of
                         Home subModel ->
-                            Pages.Mob.update
+                            Pages.Mob.Home.Page.update
                                 shared
                                 model.mob
-                                (Pages.Mob.TimePassed now timePassedResult)
+                                (Pages.Mob.Home.Page.TimePassed now timePassedResult)
                                 subModel
                                 |> Tuple.mapBoth
                                     Home
@@ -160,7 +160,7 @@ subscriptions model =
         , Model.Events.receiveHistory <| List.map Model.Events.fromJson >> ReceivedHistory
         , case model.page of
             Home subModel ->
-                Pages.Mob.subscriptions subModel
+                Pages.Mob.Home.Page.subscriptions subModel
                     |> Sub.map HomeMsg
 
             Settings ->
@@ -168,7 +168,7 @@ subscriptions model =
                     |> Sub.map SettingsMsg
         , case ( Model.Clock.isOn model.mob.clock, Model.Clock.isOn model.mob.pomodoro ) of
             ( True, _ ) ->
-                Pages.Mob.turnRefreshRate
+                Pages.Mob.Home.Page.turnRefreshRate
                     |> (Lib.Duration.toMillis >> toFloat)
                     |> (\duration -> Time.every duration Tick)
 
@@ -186,7 +186,7 @@ subscriptions model =
 
 jsEventMapping : Js.EventsMapping.EventsMapping Msg
 jsEventMapping =
-    Pages.Mob.jsEventMapping |> Js.EventsMapping.map HomeMsg
+    Pages.Mob.Home.Page.jsEventMapping |> Js.EventsMapping.map HomeMsg
 
 
 
@@ -199,7 +199,7 @@ view shared model =
         subView =
             case model.page of
                 Home subModel ->
-                    Pages.Mob.view shared model.mob subModel
+                    Pages.Mob.Home.Page.view shared model.mob subModel
                         |> View.map HomeMsg
 
                 Settings ->
