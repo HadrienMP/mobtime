@@ -191,8 +191,13 @@ update shared mob msg model =
                 , Effect.fromCmd <|
                     Js.Commands.send <|
                         Js.Commands.ChangeTitle <|
-                            String.join " " <|
-                                timeLeftString shared now mob
+                            String.join " | " <|
+                                List.filter (not << String.isEmpty)
+                                    [ String.join " " <|
+                                        timeLeftString shared now mob
+                                    , Model.MobName.print mob.name
+                                    , "Mob Time"
+                                    ]
                 ]
             )
 

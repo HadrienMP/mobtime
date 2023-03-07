@@ -206,7 +206,13 @@ view shared model =
                     Pages.Mob.Settings.Page.view model.mob
                         |> View.map SettingsMsg
     in
-    { title = subView.title ++ " | " ++ Model.MobName.print model.mob.name
+    { title =
+        case subView.title of
+            "" ->
+                Model.MobName.print model.mob.name
+
+            title ->
+                title ++ " | " ++ Model.MobName.print model.mob.name
     , modal =
         subView.modal
     , body = subView.body
