@@ -143,34 +143,41 @@ draw :
     -> ConcentricCircles msg
     -> Svg msg
 draw attributes builder =
+    let
+        outerBorder : Maybe (Svg msg)
+        outerBorder =
+            builder.outerBorder
+                |> Maybe.map (drawCircle { fragment = Lib.Ratio.full, center = builder.center })
+
+        innerBorder : Maybe (Svg msg)
+        innerBorder =
+            builder.innerBorder
+                |> Maybe.map (drawCircle { fragment = Lib.Ratio.full, center = builder.center })
+
+        background : Maybe (Svg msg)
+        background =
+            builder.background
+                |> Maybe.map (drawCircle { fragment = Lib.Ratio.full, center = builder.center })
+
+        fragment =
+            drawCircle
+                { fragment = builder.fragment |> Maybe.withDefault Lib.Ratio.full
+                , center = builder.center
+                }
+                builder.main
+
+        svgs : List (Svg msg)
+        svgs =
+            [ background, Just fragment, innerBorder, outerBorder ]
+                |> List.filterMap identity
+    in
     Svg.svg
         ([ SvgAttr.width <| Rem.toCssString builder.size
          , SvgAttr.height <| Rem.toCssString builder.size
          ]
             ++ attributes
         )
-        ((builder.background
-            |> Maybe.map (drawCircle { fragment = Lib.Ratio.full, center = builder.center })
-            |> Maybe.map List.singleton
-            |> Maybe.withDefault []
-         )
-            ++ [ drawCircle
-                    { fragment = builder.fragment |> Maybe.withDefault Lib.Ratio.full
-                    , center = builder.center
-                    }
-                    builder.main
-               ]
-            ++ (builder.outerBorder
-                    |> Maybe.map (drawCircle { fragment = Lib.Ratio.full, center = builder.center })
-                    |> Maybe.map List.singleton
-                    |> Maybe.withDefault []
-               )
-            ++ (builder.innerBorder
-                    |> Maybe.map (drawCircle { fragment = Lib.Ratio.full, center = builder.center })
-                    |> Maybe.map List.singleton
-                    |> Maybe.withDefault []
-               )
-        )
+        svgs
 
 
 drawCircle : { fragment : Lib.Ratio.Ratio, center : Rem } -> Circle msg -> Svg msg
@@ -180,6 +187,11 @@ drawCircle { fragment, center } circle =
             circle.radiant
                 |> Rem.multiplyBy 2
                 |> Rem.multiplyBy pi
+
+        toto =
+            fragment
+                |> Lib.Ratio.limit { min = 0, max = 2 }
+                |> (\r -> Rem.multiplyRatio r perimeter)
     in
     Svg.circle
         ([ SvgAttr.cx <| Rem.toCssString center
@@ -189,11 +201,7 @@ drawCircle { fragment, center } circle =
          , SvgAttr.strokeWidth <| Rem.toCssString circle.strokeWidth
          , SvgAttr.fillOpacity "0"
          , SvgAttr.strokeDasharray <| Rem.toCssString perimeter
-         , SvgAttr.strokeDashoffset <|
-            Rem.toCssString <|
-                Rem.multiplyRatio
-                    fragment
-                    perimeter
+         , SvgAttr.strokeDashoffset <| Rem.toCssString <| toto
          ]
             ++ circle.attributes
         )
