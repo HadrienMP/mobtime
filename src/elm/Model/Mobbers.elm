@@ -69,7 +69,7 @@ assignRoles roles mobbers =
         list =
             toList mobbers
     in
-    toList mobbers
+    list
         |> ListExtras.zip
             (roles.special
                 ++ List.repeat (List.length list - List.length roles.special) roles.default

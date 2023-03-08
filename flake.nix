@@ -19,7 +19,7 @@
             lame
             imageworsener
             elmPackages.elm
-            elmPackages.elm-test
+            elmPackages.elm-test-rs
             elmPackages.elm-json
             elmPackages.elm-format
             elmPackages.elm-review

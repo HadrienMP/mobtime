@@ -2,6 +2,7 @@ module Doc exposing (SharedState, main)
 
 import Components.Form.Toggle.Doc
 import Components.Form.Volume.Doc
+import Components.Mobbers.Doc
 import Components.NavBar.Doc
 import Components.SecondaryPage.Doc
 import Components.Socket.Doc
@@ -75,6 +76,7 @@ main =
               , [ Components.Socket.Doc.theChapter
                 , Components.NavBar.Doc.theChapter
                 , Components.SecondaryPage.Doc.theChapter
+                , Components.Mobbers.Doc.doc
                 ]
               )
             , ( "Form"
