@@ -151,7 +151,10 @@ update shared msg model =
                 | page = nextPage
                 , mob = timePassedResult.updated
               }
-            , pageEffect |> Effect.map PageMsg
+            , Effect.batch
+                [ pageEffect |> Effect.map PageMsg
+                , Effect.fromShared <| Shared.Tick now
+                ]
             )
 
 

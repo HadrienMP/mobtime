@@ -13,6 +13,8 @@ import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
 import Routing
+import Task
+import Time
 import Url
 import UserPreferences
 
@@ -34,6 +36,7 @@ type alias Shared =
     , devMode : Bool
     , konami : Konami
     , soundOn : Bool
+    , lastKnownTime : Time.Posix
     }
 
 
@@ -66,10 +69,12 @@ init { key, url, jsonPreferences, mob } =
       , devMode = False
       , konami = Lib.Konami.init
       , soundOn = False
+      , lastKnownTime = Time.millisToPosix 0
       }
     , Cmd.batch
         [ socketCmd
         , preferencesCommand
+        , Time.now |> Task.perform Tick
         ]
     )
 
@@ -88,6 +93,7 @@ type Msg
     | SoundOn
     | JoinMob MobName
     | ReceivedEvent Model.Events.Event
+    | Tick Time.Posix
 
 
 update : Msg -> Shared -> ( Shared, Cmd Msg )
@@ -105,34 +111,34 @@ update msg shared =
 
 
 update_ : Msg -> Shared -> ( Shared, Cmd Msg )
-update_ msg shared =
+update_ msg model =
     case msg of
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( shared, Nav.pushUrl shared.key (Url.toString url) )
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
                 Browser.External href ->
-                    ( shared, Nav.load href )
+                    ( model, Nav.load href )
 
         SocketMsg subMsg ->
-            Socket.update shared.mob subMsg shared.socket
+            Socket.update model.mob subMsg model.socket
                 |> Tuple.mapBoth
-                    (\updated -> { shared | socket = updated })
+                    (\updated -> { model | socket = updated })
                     (Cmd.map SocketMsg)
 
         Toast subMsg ->
-            Lib.Toaster.update subMsg shared.toasts
+            Lib.Toaster.update subMsg model.toasts
                 |> Tuple.mapBoth
-                    (\toasts -> { shared | toasts = toasts })
+                    (\toasts -> { model | toasts = toasts })
                     (Cmd.map Toast)
 
         KonamiMsg subMsg ->
             let
                 ( updated, cmd ) =
-                    Lib.Konami.update subMsg shared.konami
+                    Lib.Konami.update subMsg model.konami
             in
-            ( { shared
+            ( { model
                 | devMode = Lib.Konami.isOn updated
                 , konami = updated
               }
@@ -140,33 +146,36 @@ update_ msg shared =
             )
 
         PreferencesMsg subMsg ->
-            UserPreferences.update subMsg shared.preferences
+            UserPreferences.update subMsg model.preferences
                 |> Tuple.mapBoth
-                    (\volume -> { shared | preferences = volume })
+                    (\volume -> { model | preferences = volume })
                     (Cmd.map PreferencesMsg)
 
         Batch _ ->
-            ( shared, Cmd.none )
+            ( model, Cmd.none )
 
         SoundOn ->
-            ( { shared | soundOn = True }, Cmd.none )
+            ( { model | soundOn = True }, Cmd.none )
 
         JoinMob mob ->
-            ( { shared | mob = Just <| Model.Mob.init mob }, Cmd.none )
+            ( { model | mob = Just <| Model.Mob.init mob }, Cmd.none )
 
         ReceivedEvent event ->
-            case shared.mob of
+            case model.mob of
                 Just mob ->
                     let
                         ( updated, command ) =
                             Model.Mob.evolve event mob
                     in
-                    ( { shared | mob = Just updated }
+                    ( { model | mob = Just updated }
                     , command
                     )
 
                 Nothing ->
-                    ( shared, Cmd.none )
+                    ( model, Cmd.none )
+
+        Tick now ->
+            ( { model | lastKnownTime = now }, Cmd.none )
 
 
 toast : Toast -> Effect Msg msg

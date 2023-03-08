@@ -91,7 +91,7 @@ init shared name =
                         }
     in
     ( { mobbersSettings = Pages.Mob.Tabs.Mobbers.init
-      , now = Time.millisToPosix 0
+      , now = shared.lastKnownTime
       , tab = Main
       , alarm = Standby
       }
