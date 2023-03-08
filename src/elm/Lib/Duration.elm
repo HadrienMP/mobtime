@@ -1,4 +1,4 @@
-module Lib.Duration exposing (Duration(..), DurationStringParts, addToTime, between, digitalPrint, jsonDecoder, minus, multiply, ofMillis, ofMinutes, ofSeconds, print, ratio, secondsBetween, toJson, toLongString, toMillis, toMinutes, toSeconds, toShortString)
+module Lib.Duration exposing (Duration(..), DurationStringParts, addToTime, between, digitalPrint, jsonDecoder, minus, multiply, ofMillis, ofMinutes, ofSeconds, print, ratio, secondsBetween, toJson, toLongString, toMillis, toMinutes, toSeconds)
 
 import Json.Decode as Decode
 import Json.Encode as Json

@@ -403,7 +403,7 @@ clockArea mob model =
             Html.div
                 [ Attr.css
                     [ Css.fontWeight Css.bold
-                    , Typography.fontSize Typography.l
+                    , Typography.fontSize Typography.m
                     ]
                 ]
                 [ Html.text <| Duration.digitalPrint duration
@@ -416,7 +416,7 @@ clockArea mob model =
             , Css.margin Css.auto
             , Css.displayFlex
             , Css.alignItems Css.flexStart
-            , Css.paddingBottom (Css.rem 3)
+            , Css.paddingBottom (Css.rem 4)
             , Css.marginTop Space.s
             , Css.marginBottom Space.l
             ]
@@ -424,6 +424,7 @@ clockArea mob model =
         [ displayClock []
             { state = mob.clock
             , now = model.now
+            , buttonSize = UI.Button.View.S
             , messages =
                 { onStart = Just StartTurn
                 , onStop = StopTurn
@@ -473,6 +474,7 @@ clockArea mob model =
             ]
             { state = mob.pomodoro
             , now = model.now
+            , buttonSize = UI.Button.View.XS
             , messages =
                 { onStart = Nothing
                 , onStop = StopPomodoro
@@ -493,7 +495,7 @@ clockArea mob model =
                                     [ pomodoroTime <| Duration.between model.now on.end
                                     , Html.div
                                         [ Attr.css
-                                            [ Typography.fontSize Typography.s
+                                            [ Typography.fontSize Typography.xs
                                             ]
                                         ]
                                         [ Html.text "Until break" ]
@@ -501,13 +503,18 @@ clockArea mob model =
 
                                 Clock.Off ->
                                     [ pomodoroTime mob.pomodoroLength
-                                    , Html.text "Pomodoro"
+                                    , Html.div
+                                        [ Attr.css
+                                            [ Typography.fontSize Typography.xs
+                                            ]
+                                        ]
+                                        [ Html.text "Pomodoro" ]
                                     ]
                            )
                     )
             , style =
                 { strokeWidth = Rem.Rem 0.2
-                , diameter = Rem.Rem 7
+                , diameter = Rem.Rem 6
                 }
             }
         , UI.Link.IconLink.view
@@ -569,6 +576,7 @@ displayClock :
     ->
         { state : Clock.ClockState
         , now : Time.Posix
+        , buttonSize : UI.Button.View.Size
         , messages :
             { onStart : Maybe Msg
             , onStop : Msg
@@ -580,7 +588,7 @@ displayClock :
             }
         }
     -> Html Msg
-displayClock attributes { state, now, style, messages, content } =
+displayClock attributes { state, buttonSize, now, style, messages, content } =
     Html.div
         (Attr.css
             [ Css.position Css.relative
@@ -653,7 +661,7 @@ displayClock attributes { state, now, style, messages, content } =
                     ]
                     { content = UI.Button.View.Both { icon = UI.Icons.Ion.stop, text = "Stop" }
                     , variant = UI.Button.View.Primary
-                    , size = UI.Button.View.S
+                    , size = buttonSize
                     , action = UI.Button.View.OnPress <| Just messages.onStop
                     }
 
@@ -663,16 +671,11 @@ displayClock attributes { state, now, style, messages, content } =
 
 
 timeLeftString : Shared -> Time.Posix -> Clock.ClockState -> Duration.DurationStringParts
-timeLeftString shared now clock =
+timeLeftString _ now clock =
     case clock of
         On on ->
             Duration.between now on.end
-                |> (if shared.preferences.displaySeconds then
-                        Duration.toLongString
-
-                    else
-                        Duration.toShortString
-                   )
+                |> Duration.toLongString
 
         _ ->
             []

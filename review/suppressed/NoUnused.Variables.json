@@ -6,6 +6,7 @@
     { "count": 5, "filePath": "src/elm/UI/Icons/Custom.elm" },
     { "count": 2, "filePath": "src/elm/Lib/Duration.elm" },
     { "count": 1, "filePath": "src/elm/Lib/Toaster.elm" },
+    { "count": 1, "filePath": "src/elm/Pages/Mob/Profile/View.elm" },
     { "count": 1, "filePath": "src/elm/UI/Animations.elm" },
     { "count": 1, "filePath": "src/elm/UI/Color.elm" }
   ]

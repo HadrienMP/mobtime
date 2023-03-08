@@ -15,7 +15,6 @@ port savePreferences : Json.Value -> Cmd msg
 
 type alias Model =
     { volume : Volume.Volume
-    , displaySeconds : Bool
     , useP2P : Bool
     }
 
@@ -23,7 +22,6 @@ type alias Model =
 default : Model
 default =
     { volume = Volume.default
-    , displaySeconds = False
     , useP2P = False
     }
 
@@ -49,7 +47,6 @@ encode : Model -> Json.Value
 encode model =
     Json.object
         [ ( "volume", Volume.encode model.volume )
-        , ( "displaySeconds", Json.bool model.displaySeconds )
         , ( "useP2P", Json.bool model.useP2P )
         ]
 
@@ -61,9 +58,8 @@ decode json =
 
 decoder : Decode.Decoder Model
 decoder =
-    Decode.map3 Model
+    Decode.map2 Model
         (Decode.field "volume" Volume.decoder)
-        (Decode.field "displaySeconds" Decode.bool)
         (Decode.field "useP2P" Decode.bool)
 
 
@@ -73,7 +69,6 @@ decoder =
 
 type Msg
     = VolumeMsg Volume.Msg
-    | ToggleSeconds
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,8 +81,5 @@ update msg model =
                         |> Tuple.mapBoth
                             (\a -> { model | volume = a })
                             (Cmd.map VolumeMsg)
-
-                ToggleSeconds ->
-                    ( { model | displaySeconds = not model.displaySeconds }, Cmd.none )
     in
     ( updated, Cmd.batch [ command, updated |> encode |> savePreferences ] )

@@ -15,10 +15,6 @@ profileChapter =
             [ ( "With mob"
               , Pages.Mob.Profile.View.view
                     { mob = MobName "A Mob"
-                    , secondsToggle =
-                        { onToggle = logAction "Display seconds"
-                        , value = True
-                        }
                     , onJoin = logAction "Join mob"
                     , volume =
                         { onChange = always <| logAction "Volume change"

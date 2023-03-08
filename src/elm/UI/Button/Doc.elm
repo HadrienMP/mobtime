@@ -79,12 +79,15 @@ Button.button []
 
 
 sizes =
-    [ Button.S, Button.M, Button.L ]
+    [ Button.XS, Button.S, Button.M, Button.L ]
 
 
 sizeToString : Button.Size -> String
 sizeToString size =
     case size of
+        Button.XS ->
+            "Size XS"
+
         Button.S ->
             "Size S"
 

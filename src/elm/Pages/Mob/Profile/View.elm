@@ -14,12 +14,10 @@ import UI.Rem as Rem
 import UI.Row as Row
 import UI.Text as Text
 import UI.Text.View
-import UI.Toggle.View
 
 
 type alias Props msg =
     { mob : MobName
-    , secondsToggle : UI.Toggle.View.Props msg
     , volume : Volume.Props msg
     , onJoin : msg
     }
@@ -69,9 +67,4 @@ fields props =
     Column.column []
         [ Column.Gap <| Rem.Rem 1.4 ]
         [ Volume.display props.volume
-        , Row.row [ Attr.css [ Css.justifyContent Css.spaceBetween, Css.alignItems Css.center ] ]
-            []
-            [ Html.text "Display seconds in clocks"
-            , UI.Toggle.View.view props.secondsToggle
-            ]
         ]

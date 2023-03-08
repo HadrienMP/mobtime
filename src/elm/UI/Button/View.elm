@@ -34,7 +34,8 @@ type Variant
 
 
 type Size
-    = S
+    = XS
+    | S
     | M
     | L
 
@@ -65,7 +66,7 @@ button attributes { content, action, size, variant } =
         )
         (case content of
             Icon icon ->
-                [ icon { size = fontSize size, color = Palettes.monochrome.on.surface } ]
+                [ icon { size = getFontSize size, color = Palettes.monochrome.on.surface } ]
 
             Text text ->
                 [ Html.text text ]
@@ -78,16 +79,19 @@ button attributes { content, action, size, variant } =
                         ]
                     ]
                     [ Row.Gap <| iconTextGap size ]
-                    [ icon { size = fontSize size |> Rem.multiplyBy 1.4, color = Palettes.monochrome.on.surface }
+                    [ icon { size = getFontSize size |> Rem.multiplyBy 1.4, color = Palettes.monochrome.on.surface }
                     , Html.text text
                     ]
                 ]
         )
 
 
-fontSize : Size -> Rem.Rem
-fontSize size =
+getFontSize : Size -> Rem.Rem
+getFontSize size =
     case size of
+        XS ->
+            Typography.xs
+
         S ->
             Typography.s
 
@@ -112,30 +116,24 @@ variantStyles variant =
 
 sizeStyles : Size -> List Css.Style
 sizeStyles size =
-    [ Typography.fontSize <| fontSize size
-    , case size of
-        S ->
-            Css.padding <| Css.rem 0.4
+    let
+        fontSize =
+            getFontSize size
 
-        M ->
-            Css.padding <| Css.rem 0.6
+        paddingY =
+            fontSize |> Rem.multiplyBy 0.5
 
-        L ->
-            Css.padding <| Css.rem 1.2
+        paddingX =
+            fontSize |> Rem.multiplyBy 0.8
+    in
+    [ Typography.fontSize fontSize
+    , Css.padding2 (Rem.toElmCss paddingY) (Rem.toElmCss paddingX)
     ]
 
 
 iconTextGap : Size -> Rem.Rem
 iconTextGap size =
-    case size of
-        S ->
-            Rem.Rem 0.4
-
-        M ->
-            Rem.Rem 0.6
-
-        L ->
-            Rem.Rem 0.8
+    getFontSize size |> Rem.multiplyBy 0.5
 
 
 actionAttributes : Action msg -> List (Html.Attribute msg)

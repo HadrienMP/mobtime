@@ -15,17 +15,13 @@ import View exposing (View)
 
 
 type Msg
-    = ToggleSeconds
-    | VolumeMsg Volume.Msg
+    = VolumeMsg Volume.Msg
     | Join
 
 
 update : Msg -> Shared -> MobName -> Effect Shared.Msg Msg
 update msg shared mob =
     case msg of
-        ToggleSeconds ->
-            Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.ToggleSeconds
-
         VolumeMsg subMsg ->
             Effect.fromShared <| Shared.PreferencesMsg <| UserPreferences.VolumeMsg subMsg
 
@@ -48,10 +44,6 @@ view shared mob =
         Html.div [ Attr.css [ Css.paddingTop <| Css.rem 1 ] ]
             [ Pages.Mob.Profile.View.view
                 { mob = mob
-                , secondsToggle =
-                    { value = shared.preferences.displaySeconds
-                    , onToggle = ToggleSeconds
-                    }
                 , volume =
                     { onChange = VolumeMsg << Volume.Change
                     , onTest = VolumeMsg Volume.Test
