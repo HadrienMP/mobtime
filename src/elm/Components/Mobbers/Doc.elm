@@ -1,6 +1,7 @@
 module Components.Mobbers.Doc exposing (doc)
 
 import Components.Mobbers.View
+import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.Role as Role
@@ -14,24 +15,36 @@ doc =
               , Components.Mobbers.View.view
                     { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
                     , roles = [ "Driver", "Navigator" ] |> List.map Role.fromString
+                    , onShuffle = logAction "Shuffled"
+                    , onRotate = logAction "Rotated"
+                    , onAdd = logAction "Add"
                     }
               )
             , ( "Inversed defaults"
               , Components.Mobbers.View.view
                     { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
                     , roles = [ "Navigator", "Driver" ] |> List.map Role.fromString
+                    , onShuffle = logAction "Shuffled"
+                    , onRotate = logAction "Rotated"
+                    , onAdd = logAction "Add"
                     }
               )
             , ( "Too many specials"
               , Components.Mobbers.View.view
                     { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
                     , roles = [ "Navigator", "Driver", "Navigator", "Driver", "Navigator", "Driver" ] |> List.map Role.fromString
+                    , onShuffle = logAction "Shuffled"
+                    , onRotate = logAction "Rotated"
+                    , onAdd = logAction "Add"
                     }
               )
             , ( "No specials"
               , Components.Mobbers.View.view
                     { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
                     , roles = []
+                    , onShuffle = logAction "Shuffled"
+                    , onRotate = logAction "Rotated"
+                    , onAdd = logAction "Add"
                     }
               )
             , ( "Custom"
@@ -45,6 +58,9 @@ doc =
                         , "Amélie"
                         ]
                     , roles = [ "Scribe", "Moderator", "Artist" ] |> List.map Role.fromString
+                    , onShuffle = logAction "Shuffled"
+                    , onRotate = logAction "Rotated"
+                    , onAdd = logAction "Add"
                     }
               )
             , ( "Too Many real mobbers"
@@ -70,6 +86,9 @@ doc =
                         , "Amélie"
                         ]
                     , roles = []
+                    , onShuffle = logAction "Shuffled"
+                    , onRotate = logAction "Rotated"
+                    , onAdd = logAction "Add"
                     }
               )
             ]
