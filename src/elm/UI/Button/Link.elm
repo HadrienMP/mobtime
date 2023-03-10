@@ -8,7 +8,7 @@ import Html.Styled.Events as Evts
 
 view :
     List (Html.Attribute msg)
-    -> { text : String, onClick : msg }
+    -> { text : Html.Html msg, onClick : msg }
     -> Html.Html msg
 view attributes props =
     Html.button
@@ -23,4 +23,4 @@ view attributes props =
                , Evts.onClick props.onClick
                ]
         )
-        [ Html.text props.text ]
+        [ props.text ]

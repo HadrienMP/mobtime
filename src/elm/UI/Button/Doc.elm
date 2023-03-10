@@ -4,6 +4,7 @@ import Css
 import ElmBook.Actions
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
+import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import UI.Button.Link
 import UI.Button.View as Button
@@ -29,7 +30,7 @@ theChapter =
         |> withComponentList
             [ ( "Link"
               , UI.Button.Link.view []
-                    { text = "Link styled button"
+                    { text = Html.text "Link styled button"
                     , onClick = ElmBook.Actions.logAction "Link clicked"
                     }
               )

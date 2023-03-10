@@ -14,6 +14,7 @@ import ElmBook.ElmCSS exposing (..)
 import ElmBook.StatefulOptions
 import ElmBook.ThemeOptions exposing (globals)
 import Pages.Mob.Invite.Doc
+import Pages.Mob.Mobbers.Doc
 import Pages.Mob.Profile.Doc
 import Pages.Mob.Settings.Doc
 import UI.Button.Doc
@@ -30,6 +31,7 @@ type alias SharedState =
     { volume : Components.Form.Volume.Doc.State
     , range : UI.Range.Doc.State
     , input : String
+    , mobberPageName : String
     }
 
 
@@ -38,6 +40,7 @@ initialState =
     { volume = Components.Form.Volume.Doc.initState
     , range = UI.Range.Doc.initState
     , input = Components.Form.Input.Doc.initState
+    , mobberPageName = Pages.Mob.Mobbers.Doc.initState
     }
 
 
@@ -94,6 +97,7 @@ main =
               , [ Pages.Mob.Profile.Doc.profileChapter
                 , Pages.Mob.Invite.Doc.theChapter
                 , Pages.Mob.Settings.Doc.theChapter
+                , Pages.Mob.Mobbers.Doc.doc
                 ]
               )
             ]

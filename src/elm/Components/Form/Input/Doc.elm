@@ -28,7 +28,7 @@ doc =
 
 
 component state =
-    Components.Form.Input.View.view
+    Components.Form.Input.View.view []
         { id = "myfield"
         , label = "Name"
         , value = state.input

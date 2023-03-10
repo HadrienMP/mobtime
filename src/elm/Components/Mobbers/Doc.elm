@@ -1,10 +1,19 @@
 module Components.Mobbers.Doc exposing (doc)
 
-import Components.Mobbers.View
+import Components.Mobbers.Summary
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
+import Model.Mobber
 import Model.Role as Role
+
+
+props =
+    { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ] |> toMobbers
+    , roles = [ "Driver", "Navigator" ] |> List.map Role.fromString
+    , onShuffle = logAction "Shuffled"
+    , onRotate = logAction "Rotated"
+    }
 
 
 doc : Chapter x
@@ -12,83 +21,57 @@ doc =
     chapter "Mobbers"
         |> withComponentList
             [ ( "Defaults"
-              , Components.Mobbers.View.view
-                    { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
-                    , roles = [ "Driver", "Navigator" ] |> List.map Role.fromString
-                    , onShuffle = logAction "Shuffled"
-                    , onRotate = logAction "Rotated"
-                    , onAdd = logAction "Add"
-                    }
+              , Components.Mobbers.Summary.view props
               )
             , ( "Inversed defaults"
-              , Components.Mobbers.View.view
-                    { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
-                    , roles = [ "Navigator", "Driver" ] |> List.map Role.fromString
-                    , onShuffle = logAction "Shuffled"
-                    , onRotate = logAction "Rotated"
-                    , onAdd = logAction "Add"
+              , Components.Mobbers.Summary.view
+                    { props
+                        | roles = [ "Navigator", "Driver" ] |> List.map Role.fromString
                     }
               )
             , ( "Too many specials"
-              , Components.Mobbers.View.view
-                    { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
-                    , roles = [ "Navigator", "Driver", "Navigator", "Driver", "Navigator", "Driver" ] |> List.map Role.fromString
-                    , onShuffle = logAction "Shuffled"
-                    , onRotate = logAction "Rotated"
-                    , onAdd = logAction "Add"
+              , Components.Mobbers.Summary.view
+                    { props
+                        | roles =
+                            [ "Navigator", "Driver", "Navigator", "Driver", "Navigator", "Driver" ]
+                                |> List.map Role.fromString
                     }
               )
             , ( "No specials"
-              , Components.Mobbers.View.view
-                    { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ]
-                    , roles = []
-                    , onShuffle = logAction "Shuffled"
-                    , onRotate = logAction "Rotated"
-                    , onAdd = logAction "Add"
-                    }
+              , Components.Mobbers.Summary.view
+                    { props | roles = [] }
               )
             , ( "Custom"
-              , Components.Mobbers.View.view
-                    { people =
-                        [ "Pin"
-                        , "Manon"
-                        , "Thomas"
-                        , "Pauline"
-                        , "Jeff"
-                        , "Amélie"
-                        ]
-                    , roles = [ "Scribe", "Moderator", "Artist" ] |> List.map Role.fromString
-                    , onShuffle = logAction "Shuffled"
-                    , onRotate = logAction "Rotated"
-                    , onAdd = logAction "Add"
+              , Components.Mobbers.Summary.view
+                    { props
+                        | roles = [ "Scribe", "Moderator", "Artist" ] |> List.map Role.fromString
                     }
               )
             , ( "Too Many real mobbers"
-              , Components.Mobbers.View.view
-                    { people =
-                        [ "Pin"
-                        , "Manon"
-                        , "Thomas"
-                        , "Pauline"
-                        , "Jeff"
-                        , "Amélie"
-                        , "Pin"
-                        , "Manon"
-                        , "Thomas"
-                        , "Pauline"
-                        , "Jeff"
-                        , "Amélie"
-                        , "Pin"
-                        , "Manon"
-                        , "Thomas"
-                        , "Pauline"
-                        , "Jeff"
-                        , "Amélie"
-                        ]
-                    , roles = []
-                    , onShuffle = logAction "Shuffled"
-                    , onRotate = logAction "Rotated"
-                    , onAdd = logAction "Add"
+              , Components.Mobbers.Summary.view
+                    { props
+                        | people =
+                            [ "Pin"
+                            , "Manon"
+                            , "Thomas"
+                            , "Pauline"
+                            , "Jeff"
+                            , "Amélie"
+                            , "Pin"
+                            , "Manon"
+                            , "Thomas"
+                            , "Pauline"
+                            , "Jeff"
+                            , "Amélie"
+                            , "Pin"
+                            , "Manon"
+                            , "Thomas"
+                            , "Pauline"
+                            , "Jeff"
+                            , "Amélie"
+                            ]
+                                |> toMobbers
+                        , roles = []
                     }
               )
             ]
@@ -102,3 +85,14 @@ doc =
 <component with-label="No specials"/>
 <component with-label="Too Many real mobbers"/>
 """
+
+
+toMobbers : List String -> List Model.Mobber.Mobber
+toMobbers =
+    List.indexedMap Tuple.pair
+        >> List.map
+            (\( i, n ) ->
+                { id = Model.Mobber.idFromString <| String.fromInt i
+                , name = n
+                }
+            )
