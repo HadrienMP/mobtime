@@ -9,8 +9,8 @@ import UI.Color as Color
 import UI.Column as Column
 import UI.Icons.Ion
 import UI.Palettes as Palettes
-import UI.Rem as Rem
 import UI.Row as Row
+import UI.Size as Size
 import UI.Space as Space
 import UI.Text as Text
 
@@ -27,7 +27,7 @@ view : Props msg -> Html.Html msg
 view { onBack, title, mob, content } =
     Column.column
         []
-        [ Column.Gap <| Rem.Rem 1 ]
+        [ Column.Gap <| Size.rem 1 ]
         [ UI.Button.View.button [ Attr.css [ Css.maxWidth Css.fitContent ] ]
             { content =
                 UI.Button.View.Both
@@ -48,7 +48,7 @@ view { onBack, title, mob, content } =
                         Palettes.monochrome.on.background
                 ]
             ]
-            [ Row.Gap <| Rem.Rem 1 ]
+            [ Row.Gap <| Size.rem 1 ]
             [ Text.h2 [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] title
             , Html.div [] [ Html.text "Mob:" ]
             , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print mob ]

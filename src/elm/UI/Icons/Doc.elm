@@ -13,7 +13,7 @@ import UI.Icons.Keyboard
 import UI.Icons.Tape
 import UI.Icons.Tea
 import UI.Palettes as Palettes
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 doc : Chapter x
@@ -57,14 +57,14 @@ doc =
                 |> List.map
                     (\x ->
                         x
-                            { size = Rem.Rem 2
+                            { size = Size.rem 2
                             , color = Palettes.monochrome.on.background
                             }
                     )
                 |> Html.div
                     [ Attr.css
                         [ Css.displayFlex
-                        , UI.Css.gap <| Rem.Rem 1
+                        , UI.Css.gap <| Size.rem 1
                         , Css.flexWrap Css.wrap
                         ]
                     ]

@@ -5,7 +5,7 @@ import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, render, withComponent)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.MobName exposing (MobName(..))
-import UI.Rem as Rem
+import UI.Size as Size
 import Utils
 
 
@@ -17,7 +17,7 @@ theChapter =
                 { onBack = logAction "Back"
                 , title = "My Page"
                 , mob = MobName "Awesome"
-                , content = Utils.placeholder <| Rem.Rem 10
+                , content = Utils.placeholder <| Size.rem 10
                 }
             )
         |> render """
@@ -31,7 +31,7 @@ Components.SecondaryPage.View.view
     { onBack = Back
     , title = "My Page"
     , mob = MobName "Awesome"
-    , content = Utils.placeholder <| Rem.Rem 10
+    , content = Utils.placeholder <| Size.rem 10
     }
 ```
 """

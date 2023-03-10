@@ -10,7 +10,7 @@ import Lib.Delay
 import Lib.Duration
 import UI.Icons.Ion
 import UI.Palettes as Palettes
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 
@@ -141,12 +141,12 @@ icon level =
     case level of
         Error ->
             UI.Icons.Ion.error
-                { size = Rem.Rem 1
+                { size = Size.rem 1
                 , color = Palettes.monochrome.on.error
                 }
 
         Success ->
             UI.Icons.Ion.success
-                { size = Rem.Rem 1
+                { size = Size.rem 1
                 , color = Palettes.monochrome.on.success
                 }

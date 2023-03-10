@@ -20,8 +20,8 @@ import UI.Column as Column
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Palettes as Palettes
-import UI.Rem as Rem
 import UI.Row as Row
+import UI.Size as Size
 import UserPreferences
 import View exposing (View)
 
@@ -95,7 +95,7 @@ view shared model =
     , modal = Nothing
     , body =
         Column.column []
-            [ Column.Gap <| Rem.Rem 4 ]
+            [ Column.Gap <| Size.rem 4 ]
             [ Html.header
                 [ Attr.css
                     [ Css.displayFlex
@@ -103,7 +103,7 @@ view shared model =
                     ]
                 ]
                 [ UI.Icons.Tape.display
-                    { size = Rem.Rem 8
+                    { size = Size.rem 8
                     , color = Palettes.monochrome.on.background
                     }
                 , Html.h1
@@ -118,7 +118,7 @@ view shared model =
                 ]
             , Html.form [ Evts.onSubmit JoinMob ]
                 [ Column.column []
-                    [ Column.Gap <| Rem.Rem 1 ]
+                    [ Column.Gap <| Size.rem 1 ]
                     [ Html.h2
                         [ Attr.css
                             [ Css.borderBottom3 (Css.rem 0.1) Css.solid <|

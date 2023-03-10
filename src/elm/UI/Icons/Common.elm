@@ -2,8 +2,8 @@ module UI.Icons.Common exposing (Icon)
 
 import Svg.Styled exposing (Svg)
 import UI.Color exposing (RGBA255)
-import UI.Rem exposing (Rem)
+import UI.Size exposing (Size)
 
 
 type alias Icon msg =
-    { size : Rem, color : RGBA255 } -> Svg msg
+    { size : Size, color : RGBA255 } -> Svg msg

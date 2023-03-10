@@ -10,8 +10,8 @@ import UI.Color as Color
 import UI.Column as Column
 import UI.Icons.Ion
 import UI.Palettes as Palettes
-import UI.Rem as Rem
 import UI.Row as Row
+import UI.Size as Size
 import UI.Text as Text
 import UI.Text.View
 
@@ -26,7 +26,7 @@ type alias Props msg =
 view : Props msg -> Html msg
 view props =
     Column.column []
-        [ Column.Gap <| Rem.Rem 3 ]
+        [ Column.Gap <| Size.rem 3 ]
         [ head props
         , fields props
         , Button.button []
@@ -45,7 +45,7 @@ view props =
 head : Props msg -> Html msg
 head _ =
     Column.column []
-        [ Column.Gap <| Rem.Rem 0.4 ]
+        [ Column.Gap <| Size.rem 0.4 ]
         [ Row.row
             [ Attr.css
                 [ Css.justifyContent Css.spaceBetween
@@ -65,6 +65,6 @@ head _ =
 fields : Props msg -> Html msg
 fields props =
     Column.column []
-        [ Column.Gap <| Rem.Rem 1.4 ]
+        [ Column.Gap <| Size.rem 1.4 ]
         [ Volume.display props.volume
         ]

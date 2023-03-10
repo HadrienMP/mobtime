@@ -14,7 +14,7 @@ import Lib.Ratio
 import Svg.Styled as Svg exposing (Svg)
 import Svg.Styled.Attributes as SvgAttr
 import UI.Color as Color
-import UI.Rem as Rem exposing (Rem)
+import UI.Size as Size exposing (Size)
 
 
 
@@ -25,15 +25,15 @@ import UI.Rem as Rem exposing (Rem)
 
 type alias Circle msg =
     { color : Color.RGBA255
-    , strokeWidth : Rem
-    , radiant : Rem
+    , strokeWidth : Size
+    , radiant : Size
     , attributes : List (Html.Attribute msg)
     }
 
 
 type alias CircleBorder =
     { color : Color.RGBA255
-    , width : Rem
+    , width : Size
     }
 
 
@@ -43,15 +43,15 @@ type alias ConcentricCircles msg =
     , outerBorder : Maybe (Circle msg)
     , innerBorder : Maybe (Circle msg)
     , background : Maybe (Circle msg)
-    , size : Rem
-    , center : Rem
+    , size : Size
+    , center : Size
     }
 
 
 buildFragment :
     { color : Color.RGBA255
-    , strokeWidth : Rem
-    , diameter : Rem
+    , strokeWidth : Size
+    , diameter : Size
     , fragment : Lib.Ratio.Ratio
     }
     -> ConcentricCircles msg
@@ -107,8 +107,8 @@ addInnerBorder border builder =
                 , strokeWidth = border.width
                 , radiant =
                     builder.main.radiant
-                        |> Rem.subtract (builder.main.strokeWidth |> Rem.divideBy 2)
-                        |> Rem.subtract (border.width |> Rem.divideBy 2)
+                        |> Size.subtract (builder.main.strokeWidth |> Size.divideBy 2)
+                        |> Size.subtract (border.width |> Size.divideBy 2)
                 , attributes = []
                 }
     }
@@ -123,12 +123,12 @@ addOuterBorder border builder =
                 , strokeWidth = border.width
                 , radiant =
                     builder.main.radiant
-                        |> Rem.add (builder.main.strokeWidth |> Rem.divideBy 2)
-                        |> Rem.add (border.width |> Rem.divideBy 2)
+                        |> Size.add (builder.main.strokeWidth |> Size.divideBy 2)
+                        |> Size.add (border.width |> Size.divideBy 2)
                 , attributes = []
                 }
-        , size = builder.size |> Rem.add (border.width |> Rem.multiplyBy 2)
-        , center = builder.center |> Rem.add border.width
+        , size = builder.size |> Size.add (border.width |> Size.multiplyBy 2)
+        , center = builder.center |> Size.add border.width
     }
 
 
@@ -172,53 +172,53 @@ draw attributes builder =
                 |> List.filterMap identity
     in
     Svg.svg
-        ([ SvgAttr.width <| Rem.toCssString builder.size
-         , SvgAttr.height <| Rem.toCssString builder.size
+        ([ SvgAttr.width <| Size.toCssString builder.size
+         , SvgAttr.height <| Size.toCssString builder.size
          ]
             ++ attributes
         )
         svgs
 
 
-drawCircle : { fragment : Lib.Ratio.Ratio, center : Rem } -> Circle msg -> Svg msg
+drawCircle : { fragment : Lib.Ratio.Ratio, center : Size } -> Circle msg -> Svg msg
 drawCircle { fragment, center } circle =
     let
         perimeter =
             circle.radiant
-                |> Rem.multiplyBy 2
-                |> Rem.multiplyBy pi
+                |> Size.multiplyBy 2
+                |> Size.multiplyBy pi
 
         toto =
             fragment
                 |> Lib.Ratio.limit { min = 0, max = 2 }
-                |> (\r -> Rem.multiplyRatio r perimeter)
+                |> (\r -> Size.multiplyRatio r perimeter)
     in
     Svg.circle
-        ([ SvgAttr.cx <| Rem.toCssString center
-         , SvgAttr.cy <| Rem.toCssString center
-         , SvgAttr.r <| Rem.toCssString circle.radiant
+        ([ SvgAttr.cx <| Size.toCssString center
+         , SvgAttr.cy <| Size.toCssString center
+         , SvgAttr.r <| Size.toCssString circle.radiant
          , SvgAttr.stroke <| Color.toCss circle.color
-         , SvgAttr.strokeWidth <| Rem.toCssString circle.strokeWidth
+         , SvgAttr.strokeWidth <| Size.toCssString circle.strokeWidth
          , SvgAttr.fillOpacity "0"
-         , SvgAttr.strokeDasharray <| Rem.toCssString perimeter
-         , SvgAttr.strokeDashoffset <| Rem.toCssString <| toto
+         , SvgAttr.strokeDasharray <| Size.toCssString perimeter
+         , SvgAttr.strokeDashoffset <| Size.toCssString <| toto
          ]
             ++ circle.attributes
         )
         []
 
 
-drawingDimensions : { a | diameter : Rem, strokeWidth : Rem } -> { center : Rem, radiant : Rem }
+drawingDimensions : { a | diameter : Size, strokeWidth : Size } -> { center : Size, radiant : Size }
 drawingDimensions circle =
     let
         radiant =
             circle.diameter
-                |> Rem.divideBy 2
+                |> Size.divideBy 2
                 -- force the diameter to be the outside width
-                |> Rem.subtract (circle.strokeWidth |> Rem.divideBy 2)
+                |> Size.subtract (circle.strokeWidth |> Size.divideBy 2)
 
         -- The stroke spans both sides of the circle, hence the center
         center =
-            circle.diameter |> Rem.divideBy 2
+            circle.diameter |> Size.divideBy 2
     in
     { radiant = radiant, center = center }

@@ -1,7 +1,7 @@
 module UI.Typography.Typography exposing (fontSize, l, m, s, xl, xs)
 
 import Css
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 scaled : Int -> Float
@@ -9,31 +9,31 @@ scaled scale =
     0.6 * (1.3 ^ toFloat scale) |> (*) 10 |> round |> (\x -> toFloat x / 10)
 
 
-xs : Rem.Rem
+xs : Size.Size
 xs =
-    Rem.Rem <| scaled 0
+    Size.rem <| scaled 0
 
 
-s : Rem.Rem
+s : Size.Size
 s =
-    Rem.Rem <| scaled 1
+    Size.rem <| scaled 1
 
 
-m : Rem.Rem
+m : Size.Size
 m =
-    Rem.Rem <| scaled 2
+    Size.rem <| scaled 2
 
 
-l : Rem.Rem
+l : Size.Size
 l =
-    Rem.Rem <| scaled 3
+    Size.rem <| scaled 3
 
 
-xl : Rem.Rem
+xl : Size.Size
 xl =
-    Rem.Rem <| scaled 4
+    Size.rem <| scaled 4
 
 
-fontSize : Rem.Rem -> Css.Style
+fontSize : Size.Size -> Css.Style
 fontSize =
-    Css.fontSize << Rem.toElmCss
+    Css.fontSize << Size.toElmCss

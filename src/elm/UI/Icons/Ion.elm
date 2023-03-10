@@ -8,7 +8,7 @@ import Svg as Unstyled
 import Svg.Styled as Svg
 import UI.Color as Color
 import UI.Icons.Common exposing (Icon)
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 code : Icon msg
@@ -149,6 +149,6 @@ display :
     -> Icon msg
 display icon { size, color } =
     icon
-        (Rem.toPixelsFake size)
+        (round <| Size.toPixels size)
         (Color.toIonIconRgba color)
         |> Svg.fromUnstyled

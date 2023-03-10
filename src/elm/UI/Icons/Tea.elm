@@ -3,13 +3,13 @@ module UI.Icons.Tea exposing (display)
 import Svg.Styled as Svg exposing (Svg, path, svg)
 import Svg.Styled.Attributes as SvgAttr
 import UI.Color as Color exposing (RGBA255)
-import UI.Rem as Rem exposing (Rem)
+import UI.Size as Size exposing (Size)
 
 
-display : { size : Rem, color : RGBA255 } -> Svg msg
+display : { size : Size, color : RGBA255 } -> Svg msg
 display { size, color } =
     svg
-        [ SvgAttr.height <| Rem.toCssString size
+        [ SvgAttr.height <| Size.toCssString size
         , SvgAttr.version "1.1"
         , SvgAttr.viewBox "0 0 1269.754 1708.2892"
         ]

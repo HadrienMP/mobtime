@@ -16,7 +16,7 @@ import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Palettes as Palettes
 import UI.Range.View
-import UI.Rem as Rem
+import UI.Size as Size
 import UI.Typography.Typography as Typography
 
 
@@ -43,7 +43,7 @@ view props =
                 [ Attr.css
                     [ Css.displayFlex
                     , Css.flexDirection Css.column
-                    , UI.Css.gap <| Rem.Rem 3
+                    , UI.Css.gap <| Size.rem 3
                     ]
                 ]
                 [ Html.text "The settings are shared with the whole team"
@@ -55,7 +55,7 @@ view props =
 
 playlist : Props msg -> Html msg
 playlist props =
-    Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| Rem.Rem 0.8 ] ]
+    Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| Size.rem 0.8 ] ]
         [ sectionTitle UI.Icons.Tape.display "Playlist"
         , Html.div
             [ Attr.css
@@ -82,7 +82,7 @@ sectionTitle icon title =
     Html.h3
         [ Attr.css
             [ Css.displayFlex
-            , UI.Css.gap <| Rem.Rem 1
+            , UI.Css.gap <| Size.rem 1
             , Css.borderBottom3 (Css.px 1) Css.solid <|
                 Color.toElmCss <|
                     Palettes.monochrome.on.background
@@ -92,7 +92,7 @@ sectionTitle icon title =
             ]
         ]
         [ icon
-            { size = Rem.Rem 2
+            { size = Size.rem 2
             , color = Palettes.monochrome.on.background
             }
         , Html.text title
@@ -105,7 +105,7 @@ clockLengths props =
         [ Attr.css
             [ Css.displayFlex
             , Css.flexDirection Css.column
-            , UI.Css.gap <| Rem.Rem 0.6
+            , UI.Css.gap <| Size.rem 0.6
             ]
         ]
         [ sectionTitle UI.Icons.Ion.clock "Clocks"
@@ -141,12 +141,12 @@ lengthRange props =
     Html.div
         [ Attr.css
             [ Css.displayFlex
-            , UI.Css.gap <| Rem.Rem 2
+            , UI.Css.gap <| Size.rem 2
             , Css.alignItems Css.center
             ]
         ]
         [ props.icon
-            { size = Rem.Rem 2
+            { size = Size.rem 2
             , color = Palettes.monochrome.on.background
             }
         , Html.span
@@ -174,7 +174,7 @@ viewProfile { active, current, onChange } =
             , Css.marginBottom <| Css.rem 0.4
             , Css.displayFlex
             , Css.flexDirection Css.column
-            , UI.Css.gap <| Rem.Rem 0.1
+            , UI.Css.gap <| Size.rem 0.1
             ]
         , Evts.onClick (onChange current)
         ]

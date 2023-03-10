@@ -4,14 +4,14 @@ import Svg.Styled as Svg exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttr
 import UI.Color as Color
 import UI.Icons.Common exposing (Icon)
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 display : Icon msg
 display { size, color } =
     svg
         [ SvgAttr.version "1.0"
-        , SvgAttr.height <| String.fromInt <| Rem.toPixelsFake size
+        , SvgAttr.height <| String.fromFloat <| Size.toPixels size
         , SvgAttr.viewBox "0 0 512.000000 512.000000"
         , SvgAttr.preserveAspectRatio "xMidYMid meet"
         ]

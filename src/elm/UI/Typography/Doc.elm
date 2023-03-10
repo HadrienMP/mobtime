@@ -4,7 +4,7 @@ import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import UI.Rem as Rem
+import UI.Size as Size
 import UI.Typography.Typography as Typography
 
 
@@ -37,7 +37,7 @@ Html.span
 """
 
 
-component : Rem.Rem -> Html.Html msg
+component : Size.Size -> Html.Html msg
 component typography =
     Html.span [ Attr.css [ Typography.fontSize typography ] ]
         [ Html.text phrase ]

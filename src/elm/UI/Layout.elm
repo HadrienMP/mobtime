@@ -12,7 +12,7 @@ import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes as Palettes
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 limitWidth : List Css.Style
@@ -172,7 +172,7 @@ footerLink attributes { url, icon, label } =
                 , Css.margin Css.auto
                 ]
             ]
-            [ icon { size = Rem.Rem 1.4, color = Palettes.monochrome.on.background }
+            [ icon { size = Size.rem 1.4, color = Palettes.monochrome.on.background }
             , Html.span [ Attr.css [ Css.padding <| Css.rem 0.2 ] ] []
             , div [ Attr.css [ Css.position Css.relative, Css.top <| Css.px -1 ] ] [ text label ]
             ]

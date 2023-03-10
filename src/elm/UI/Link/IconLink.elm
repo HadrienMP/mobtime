@@ -7,7 +7,7 @@ import UI.Color as Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Palettes as Palettes
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 type alias Props msg =
@@ -27,7 +27,7 @@ view attributes props =
             , Css.flexDirection Css.column
             , Css.alignItems Css.center
             , Css.maxWidth Css.fitContent
-            , UI.Css.gap <| Rem.Rem 0.2
+            , UI.Css.gap <| Size.rem 0.2
             , Css.textDecoration Css.none
             , Css.hover [ Css.textDecoration Css.underline ]
             ]
@@ -46,7 +46,7 @@ view attributes props =
                 ]
             ]
             [ props.icon
-                { size = Rem.Rem 1.4
+                { size = Size.rem 1.4
                 , color = props.color
                 }
             ]

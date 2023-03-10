@@ -9,8 +9,8 @@ import UI.Color as Color
 import UI.Css
 import UI.Icons.Common
 import UI.Palettes as Palettes
-import UI.Rem as Rem
 import UI.Row as Row
+import UI.Size as Size
 import UI.Typography.Typography as Typography
 
 
@@ -79,14 +79,14 @@ button attributes { content, action, size, variant } =
                         ]
                     ]
                     [ Row.Gap <| iconTextGap size ]
-                    [ icon { size = getFontSize size |> Rem.multiplyBy 1.4, color = Palettes.monochrome.on.surface }
+                    [ icon { size = getFontSize size |> Size.multiplyBy 1.4, color = Palettes.monochrome.on.surface }
                     , Html.text text
                     ]
                 ]
         )
 
 
-getFontSize : Size -> Rem.Rem
+getFontSize : Size -> Size.Size
 getFontSize size =
     case size of
         XS ->
@@ -121,19 +121,19 @@ sizeStyles size =
             getFontSize size
 
         paddingY =
-            fontSize |> Rem.multiplyBy 0.5
+            fontSize |> Size.multiplyBy 0.5
 
         paddingX =
-            fontSize |> Rem.multiplyBy 0.8
+            fontSize |> Size.multiplyBy 0.8
     in
     [ Typography.fontSize fontSize
-    , Css.padding2 (Rem.toElmCss paddingY) (Rem.toElmCss paddingX)
+    , Css.padding2 (Size.toElmCss paddingY) (Size.toElmCss paddingX)
     ]
 
 
-iconTextGap : Size -> Rem.Rem
+iconTextGap : Size -> Size.Size
 iconTextGap size =
-    getFontSize size |> Rem.multiplyBy 0.5
+    getFontSize size |> Size.multiplyBy 0.5
 
 
 actionAttributes : Action msg -> List (Html.Attribute msg)

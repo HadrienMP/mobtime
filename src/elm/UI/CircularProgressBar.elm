@@ -7,7 +7,7 @@ import Lib.Duration
 import Lib.Ratio
 import UI.Circle
 import UI.Color as Color
-import UI.Rem as Rem exposing (Rem)
+import UI.Size as Size exposing (Size)
 import UI.TransitionExtra
 
 
@@ -17,8 +17,8 @@ draw :
         , background : Color.RGBA255
         , border : Color.RGBA255
         }
-    , strokeWidth : Rem
-    , diameter : Rem
+    , strokeWidth : Size
+    , diameter : Size
     , progress : Lib.Ratio.Ratio
     , refreshRate : Lib.Duration.Duration
     }
@@ -34,6 +34,6 @@ draw { colors, strokeWidth, diameter, progress, refreshRate } =
         |> UI.Circle.addBackground colors.background
         |> UI.Circle.addBorders
             { color = colors.border
-            , width = strokeWidth |> Rem.divideBy 6
+            , width = strokeWidth |> Size.divideBy 6
             }
         |> UI.Circle.draw [ css [ Css.transform <| Css.rotate <| Css.deg -90 ] ]

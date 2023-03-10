@@ -7,8 +7,8 @@ import Model.MobName as MobName exposing (MobName)
 import UI.Color as Color
 import UI.Icons.Tape
 import UI.Palettes as Palettes
-import UI.Rem as Rem
 import UI.Row as Row
+import UI.Size as Size
 
 
 type alias Props msg =
@@ -77,7 +77,7 @@ title =
         , Attr.href "/"
         ]
         [ UI.Icons.Tape.display
-            { size = Rem.Rem 2
+            { size = Size.rem 2
             , color = Palettes.monochrome.on.surface
             }
         , Html.h1
@@ -95,6 +95,6 @@ title =
 rightNavBar : Props msg -> Html msg
 rightNavBar props =
     Row.row [ Attr.css [ Css.alignItems Css.center ] ]
-        [ Row.Gap <| Rem.Rem 0.4 ]
+        [ Row.Gap <| Size.rem 0.4 ]
         [ props.socket
         ]

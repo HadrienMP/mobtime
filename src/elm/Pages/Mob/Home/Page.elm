@@ -45,7 +45,7 @@ import UI.Icons.Tea
 import UI.Link.IconLink
 import UI.Modal.View
 import UI.Palettes as Palettes
-import UI.Rem as Rem
+import UI.Size as Size
 import UI.Space as Space
 import UI.Text as Text
 import UI.Typography.Typography as Typography
@@ -283,9 +283,9 @@ musicModal =
     , content =
         Column.column
             [ Attr.css UI.Css.center ]
-            [ Column.Gap <| Rem.Rem 2 ]
+            [ Column.Gap <| Size.rem 2 ]
             [ UI.Icons.Tape.display
-                { size = Rem.Rem 10
+                { size = Size.rem 10
                 , color = Palettes.monochrome.on.background
                 }
             , Text.h2 [] "Turn ended !"
@@ -305,10 +305,10 @@ breakModal =
     , content =
         Column.column
             [ Attr.css UI.Css.center ]
-            [ Column.Gap <| Rem.Rem 2 ]
+            [ Column.Gap <| Size.rem 2 ]
             [ Text.h2 [] "It's time for a break!"
             , UI.Icons.Tea.display
-                { size = Rem.Rem 10
+                { size = Size.rem 10
                 , color = Palettes.monochrome.on.background
                 }
             , Html.p
@@ -340,7 +340,7 @@ body shared mob model =
                 , Attr.title "Home"
                 ]
                 [ UI.Icons.Ion.home
-                    { size = Rem.Rem 1.4
+                    { size = Size.rem 1.4
                     , color = Palettes.monochrome.on.surface
                     }
                 ]
@@ -350,7 +350,7 @@ body shared mob model =
                 , Attr.title "Mobbers"
                 ]
                 [ UI.Icons.Ion.people
-                    { size = Rem.Rem 1.4
+                    { size = Size.rem 1.4
                     , color = Palettes.monochrome.on.surface
                     }
                 ]
@@ -362,7 +362,7 @@ body shared mob model =
                             , Attr.title "Dev"
                             ]
                             [ UI.Icons.Ion.code
-                                { size = Rem.Rem 1
+                                { size = Size.rem 1
                                 , color = Palettes.monochrome.on.background
                                 }
                             ]
@@ -457,14 +457,14 @@ clockArea mob model =
                             [ Html.text "Start a turn"
                             , turnTime mob.turnLength
                             , UI.Icons.Ion.play
-                                { size = Rem.Rem 3
+                                { size = Size.rem 3
                                 , color = Palettes.monochrome.on.background
                                 }
                             ]
                     )
             , style =
-                { strokeWidth = Rem.Rem 0.4
-                , diameter = Rem.Rem 9
+                { strokeWidth = Size.rem 0.4
+                , diameter = Size.rem 9
                 }
             }
         , displayClock
@@ -487,7 +487,7 @@ clockArea mob model =
                         ]
                     ]
                     (UI.Icons.Tea.display
-                        { size = Rem.Rem 2
+                        { size = Size.rem 2
                         , color = Palettes.monochrome.on.background
                         }
                         :: (case mob.pomodoro of
@@ -513,8 +513,8 @@ clockArea mob model =
                            )
                     )
             , style =
-                { strokeWidth = Rem.Rem 0.2
-                , diameter = Rem.Rem 6
+                { strokeWidth = Size.rem 0.2
+                , diameter = Size.rem 6
                 }
             }
         , UI.Link.IconLink.view
@@ -583,8 +583,8 @@ displayClock :
             }
         , content : Html.Html Msg
         , style :
-            { strokeWidth : Rem.Rem
-            , diameter : Rem.Rem
+            { strokeWidth : Size.Size
+            , diameter : Size.Size
             }
         }
     -> Html Msg

@@ -5,7 +5,7 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import UI.Color exposing (RGBA255)
 import UI.Icons.Plugs
-import UI.Rem exposing (Rem(..))
+import UI.Size as Size
 
 
 type alias Props =
@@ -26,7 +26,7 @@ view attributes props =
         |> Maybe.map
             (\it ->
                 it
-                    { height = Rem 1
+                    { height = Size.rem 1
                     , color = props.color
                     }
             )

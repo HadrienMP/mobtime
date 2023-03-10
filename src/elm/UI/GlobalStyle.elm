@@ -5,7 +5,7 @@ import Css.Global
 import Html.Styled exposing (Html)
 import UI.Color as Color
 import UI.Palettes as Palettes
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 globalStyle : Html msg
@@ -14,7 +14,7 @@ globalStyle =
         [ Css.Global.html
             [ Css.color <| Color.toElmCss <| Palettes.monochrome.on.background
             , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.background
-            , Css.fontSize <| Css.px Rem.rootSizeAsPx
+            , Css.fontSize <| Css.px Size.rootSizeAsPx
             , Css.height <| Css.pct 100
             ]
         , Css.Global.body

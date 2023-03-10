@@ -12,8 +12,8 @@ import UI.Icons.Captain
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Keyboard
 import UI.Palettes as Palettes
-import UI.Rem as Rem
 import UI.Row as Row
+import UI.Size as Size
 import UI.Typography.Typography as Typography
 
 
@@ -66,7 +66,7 @@ displayRealMobbers realMobbers props =
                     , Css.flexWrap Css.wrap
 
                     -- TODO HMP make space use the pivot rem unit and use it here
-                    , UI.Css.gap <| Rem.Rem 1
+                    , UI.Css.gap <| Size.rem 1
                     ]
                 ]
                 (Column.column2 []
@@ -114,12 +114,12 @@ separator =
 
 displaySpecial : ( Role, String ) -> Html.Html msg
 displaySpecial ( role, person ) =
-    Row.row2 [ Attr.css [ Css.alignItems Css.center, UI.Css.gap <| Rem.Rem 0.7 ] ]
+    Row.row2 [ Attr.css [ Css.alignItems Css.center, UI.Css.gap <| Size.rem 0.7 ] ]
         [ iconForRole role
             |> Maybe.map
                 (\icon ->
                     icon
-                        { size = Rem.Rem 3
+                        { size = Size.rem 3
                         , color = Palettes.monochrome.on.background
                         }
                 )

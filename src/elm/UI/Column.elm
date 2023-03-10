@@ -3,11 +3,11 @@ module UI.Column exposing (ColumnAttribute(..), column, column2)
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
-import UI.Rem as Rem
+import UI.Size as Size
 
 
 type ColumnAttribute
-    = Gap Rem.Rem
+    = Gap Size.Size
 
 
 column :
@@ -48,4 +48,4 @@ toStyle : ColumnAttribute -> List Css.Style
 toStyle attr =
     case attr of
         Gap rem ->
-            [ Css.property "gap" <| Rem.toCssString rem ]
+            [ Css.property "gap" <| Size.toCssString rem ]
