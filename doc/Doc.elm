@@ -1,5 +1,6 @@
 module Doc exposing (SharedState, main)
 
+import Components.Form.Input.Doc
 import Components.Form.Toggle.Doc
 import Components.Form.Volume.Doc
 import Components.Mobbers.Doc
@@ -28,6 +29,7 @@ import UI.Typography.Doc
 type alias SharedState =
     { volume : Components.Form.Volume.Doc.State
     , range : UI.Range.Doc.State
+    , input : String
     }
 
 
@@ -35,6 +37,7 @@ initialState : SharedState
 initialState =
     { volume = Components.Form.Volume.Doc.initState
     , range = UI.Range.Doc.initState
+    , input = Components.Form.Input.Doc.initState
     }
 
 
@@ -84,6 +87,7 @@ main =
             , ( "Form"
               , [ Components.Form.Volume.Doc.doc
                 , Components.Form.Toggle.Doc.doc
+                , Components.Form.Input.Doc.doc
                 ]
               )
             , ( "Pages"
