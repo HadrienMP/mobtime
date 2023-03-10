@@ -1,7 +1,7 @@
 module UI.Space exposing (l, m, s, scale, spacer, xl, xs, xxl)
 
 import Html.Styled as Html
-import UI.Size
+import UI.Size as Size
 
 
 spacer : Html.Html msg
@@ -14,31 +14,31 @@ scale value =
     6 * (1.5 ^ toFloat value)
 
 
-xs : UI.Size.Size
+xs : Size.Size
 xs =
-    scale 1 |> UI.Size.px
+    scale 1 |> Size.px
 
 
-s : UI.Size.Size
+s : Size.Size
 s =
-    scale 2 |> UI.Size.px
+    scale 2 |> Size.px
 
 
-m : UI.Size.Size
+m : Size.Size
 m =
-    scale 3 |> UI.Size.px
+    scale 3 |> Size.px
 
 
-l : UI.Size.Size
+l : Size.Size
 l =
-    scale 4 |> UI.Size.px
+    scale 4 |> Size.px
 
 
-xl : UI.Size.Size
+xl : Size.Size
 xl =
-    scale 5 |> UI.Size.px
+    scale 5 |> Size.px
 
 
-xxl : UI.Size.Size
+xxl : Size.Size
 xxl =
-    scale 6 |> UI.Size.px
+    scale 6 |> Size.px
