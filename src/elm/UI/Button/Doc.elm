@@ -5,6 +5,7 @@ import ElmBook.Actions
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled.Attributes as Attr
+import UI.Button.Link
 import UI.Button.View as Button
 import UI.Icons.Ion
 import UI.Row as Row
@@ -26,12 +27,31 @@ theChapter =
     in
     chapter "Buttons"
         |> withComponentList
-            [ ( "Primary", component props )
+            [ ( "Link"
+              , UI.Button.Link.view []
+                    { text = "Link styled button"
+                    , onClick = ElmBook.Actions.logAction "Link clicked"
+                    }
+              )
+            , ( "Primary", component props )
             , ( "Secondary", component { props | variant = Button.Secondary } )
             , ( "Text only", component { props | content = Button.Text << sizeToString } )
             , ( "Icon only", component { props | content = always <| Button.Icon UI.Icons.Ion.check } )
             ]
         |> render """
+## Link Style
+<component with-label="Link" />
+```elm
+type Msg
+    = OnClick
+    | ...
+    
+UI.Button.Link.view []
+    { text = "Link styled button"
+    , onClick = OnClick
+    }
+```
+
 ## With icon
 ```elm
 type Msg
