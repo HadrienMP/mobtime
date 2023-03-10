@@ -1,4 +1,4 @@
-module UI.Column exposing (ColumnAttribute(..), column)
+module UI.Column exposing (ColumnAttribute(..), column, column2)
 
 import Css
 import Html.Styled as Html exposing (Html)
@@ -24,6 +24,22 @@ column htmlAttr colAttr children =
                 ++ (colAttr |> List.map toStyle |> List.foldl (++) [])
          )
             :: htmlAttr
+        )
+        children
+
+
+column2 :
+    List (Html.Attribute msg)
+    -> List (Html msg)
+    -> Html msg
+column2 colAttr children =
+    Html.div
+        ((Attr.css <|
+            [ Css.displayFlex
+            , Css.flexDirection Css.column
+            ]
+         )
+            :: colAttr
         )
         children
 

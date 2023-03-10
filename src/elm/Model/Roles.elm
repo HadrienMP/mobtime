@@ -13,7 +13,7 @@ type alias Roles =
 
 default : Roles
 default =
-    { special = [ "Driver", "Navigator", "Next Up" ] |> List.map Model.Role.fromString
+    { special = [ Model.Role.driver, Model.Role.navigator ]
     , default = Model.Role.fromString "Mobber"
     }
 

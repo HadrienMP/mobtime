@@ -1,4 +1,4 @@
-module Model.Role exposing (Role, decoder, encode, fromString, print)
+module Model.Role exposing (Role, decoder, driver, encode, fromString, navigator, print, toNextUp)
 
 import Json.Decode as Decode
 import Json.Encode as Json
@@ -21,6 +21,21 @@ open role =
 
 
 -- Public
+
+
+toNextUp : Role -> Role
+toNextUp lastSpecialRole =
+    fromString <| "Next " ++ print lastSpecialRole
+
+
+driver : Role
+driver =
+    Role "Driver"
+
+
+navigator : Role
+navigator =
+    Role "Navigator"
 
 
 fromString : String -> Role
