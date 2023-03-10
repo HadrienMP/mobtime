@@ -417,8 +417,8 @@ clockArea mob model =
             , Css.displayFlex
             , Css.alignItems Css.flexStart
             , Css.paddingBottom (Css.rem 4)
-            , Css.marginTop Space.s
-            , Css.marginBottom Space.l
+            , Css.marginTop <| Size.toElmCss Space.s
+            , Css.marginBottom <| Size.toElmCss Space.l
             ]
         ]
         [ displayClock []

@@ -14,6 +14,7 @@ import UI.Icons.Keyboard
 import UI.Palettes as Palettes
 import UI.Row as Row
 import UI.Size as Size
+import UI.Space as Space
 import UI.Typography.Typography as Typography
 
 
@@ -64,9 +65,7 @@ displayRealMobbers realMobbers props =
                     [ Css.justifyContent Css.spaceBetween
                     , Css.alignItems Css.flexEnd
                     , Css.flexWrap Css.wrap
-
-                    -- TODO HMP make space use the pivot rem unit and use it here
-                    , UI.Css.gap <| Size.rem 1
+                    , UI.Css.gap Space.s
                     ]
                 ]
                 (Column.column2 []

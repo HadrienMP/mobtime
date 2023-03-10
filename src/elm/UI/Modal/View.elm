@@ -11,6 +11,7 @@ import UI.Css
 import UI.Icons.Ion
 import UI.Palettes as Palettes
 import UI.Row as Row
+import UI.Size as Size
 import UI.Space as Space
 
 
@@ -55,7 +56,7 @@ view { onClose, content } =
         , div
             [ Attr.css
                 [ Css.flexGrow <| Css.int 1
-                , Css.padding Space.s
+                , Css.padding <| Size.toElmCss Space.s
                 , Css.displayFlex
                 , Css.alignItems Css.center
                 , Css.justifyContent Css.center

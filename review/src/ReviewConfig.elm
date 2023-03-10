@@ -59,7 +59,7 @@ config =
                 , ( "Element.Border", "Border" )
                 , ( "Element.Background", "Background" )
                 , ( "Element.Input", "Input" )
-                , ( "UI.Rem", "Rem")
+                , ( "UI.Size", "Size")
                 , ( "UI.Space", "Space")
                 , ( "UI.Row", "Row")
                 , ( "UI.Column", "Column")
