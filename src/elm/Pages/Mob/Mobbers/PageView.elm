@@ -2,14 +2,15 @@ module Pages.Mob.Mobbers.PageView exposing (Props, view)
 
 import Components.Form.Input.View
 import Components.Mobbers.Summary
+import Components.SecondaryPage.View
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Lib.ListExtras
+import Model.MobName exposing (MobName)
 import Model.Mobber
 import Model.Role
-import UI.Button.Link
 import UI.Button.View
 import UI.Column as Column
 import UI.Css
@@ -18,7 +19,6 @@ import UI.Palettes as Palettes
 import UI.Row as Row
 import UI.Size as Size
 import UI.Space as Space
-import UI.Typography.Typography as Typography
 
 
 type alias Props msg =
@@ -27,25 +27,36 @@ type alias Props msg =
     , onShuffle : msg
     , onRotate : msg
     , onDelete : Model.Mobber.Mobber -> msg
-    , onAdd : String -> msg
+    , onBack : msg
+    , mob : MobName
     , input : { value : String, onChange : String -> msg, onSubmit : msg }
     }
 
 
 view : Props msg -> Html.Html msg
 view props =
-    Column.column2
-        [ Attr.css [ UI.Css.gap Space.s ] ]
-        [ form props
-        , viewMobbers props
-        ]
+    Components.SecondaryPage.View.view
+        { onBack = props.onBack
+        , title = "Mobbers"
+        , mob = props.mob
+        , content =
+            Column.column2
+                [ Attr.css [ UI.Css.gap Space.s ] ]
+                [ form props
+                , viewMobbers props
+                ]
+        }
 
 
 form : Props msg -> Html.Html msg
 form props =
     Html.form
         [ Evts.onSubmit props.input.onSubmit
-        , Attr.css [ Css.displayFlex, UI.Css.gap <| Space.s ]
+        , Attr.css
+            [ Css.displayFlex
+            , UI.Css.gap <| Space.s
+            , Css.alignItems Css.flexEnd
+            ]
         ]
         [ Components.Form.Input.View.view
             [ Attr.css [ Css.flexGrow <| Css.num 1 ]
@@ -85,13 +96,17 @@ viewMobbers props =
                 , Css.justifyContent Css.right
                 ]
             ]
-            [ UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
-                { text = Html.span [] [ Html.text "Shuffle" ]
-                , onClick = props.onShuffle
+            [ UI.Button.View.button []
+                { content = UI.Button.View.Both { icon = UI.Icons.Ion.shuffle, text = "Shuffle" }
+                , variant = UI.Button.View.Primary
+                , action = UI.Button.View.OnPress <| Just props.onShuffle
+                , size = UI.Button.View.S
                 }
-            , UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
-                { text = Html.text "Rotate"
-                , onClick = props.onRotate
+            , UI.Button.View.button []
+                { content = UI.Button.View.Both { icon = UI.Icons.Ion.rotate, text = "Rotate" }
+                , variant = UI.Button.View.Primary
+                , action = UI.Button.View.OnPress <| Just props.onRotate
+                , size = UI.Button.View.S
                 }
             ]
         , Column.column2

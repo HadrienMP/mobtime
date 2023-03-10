@@ -1,8 +1,9 @@
 module Pages.Mob.Mobbers.Doc exposing (SharedState, doc, initState)
 
-import ElmBook.Actions exposing (logAction, logActionWith, logActionWithString, updateStateWith)
+import ElmBook.Actions exposing (logAction, logActionWith, updateStateWith)
 import ElmBook.Chapter exposing (chapter, renderStatefulComponent)
 import ElmBook.ElmCSS exposing (Chapter)
+import Model.MobName exposing (MobName(..))
 import Model.Mobber
 import Model.Role
 import Pages.Mob.Mobbers.PageView
@@ -32,8 +33,9 @@ doc =
                     , roles = [ "Driver", "Navigator" ] |> List.map Model.Role.fromString
                     , onShuffle = logAction "Shuffled"
                     , onRotate = logAction "Rotated"
-                    , onAdd = logActionWithString "Add"
                     , onDelete = logActionWith .name "Deleted"
+                    , onBack = logAction "Back"
+                    , mob = MobName "Awesome"
                     , input =
                         { value = state.mobberPageName
                         , onChange = updateStateWith updateSharedState

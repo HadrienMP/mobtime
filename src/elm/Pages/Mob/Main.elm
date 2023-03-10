@@ -20,6 +20,7 @@ import Model.Mob
 import Model.MobName
 import Pages.Mob.Home.Page
 import Pages.Mob.Invite.Page
+import Pages.Mob.Mobbers.Page
 import Pages.Mob.Profile.Page
 import Pages.Mob.Routing
 import Pages.Mob.Settings.Page
@@ -37,6 +38,7 @@ type Page
     | Settings
     | Invite
     | Profile
+    | Mobbers Pages.Mob.Mobbers.Page.Model
 
 
 type alias Model =
@@ -77,6 +79,11 @@ initSubPage route shared =
         Pages.Mob.Routing.Profile ->
             ( Profile, Effect.none )
 
+        Pages.Mob.Routing.Mobbers ->
+            ( Mobbers <| Pages.Mob.Mobbers.Page.init
+            , Effect.none
+            )
+
 
 
 -- Update
@@ -95,6 +102,7 @@ type PageMsg
     | SettingsMsg Pages.Mob.Settings.Page.Msg
     | InviteMsg Pages.Mob.Invite.Page.Msg
     | ProfileMsg Pages.Mob.Profile.Page.Msg
+    | MobbersMsg Pages.Mob.Mobbers.Page.Msg
 
 
 update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
@@ -185,6 +193,12 @@ updatePage pageMsg model shared =
                 |> Effect.map ProfileMsg
             )
 
+        ( MobbersMsg subMsg, Mobbers subModel ) ->
+            Pages.Mob.Mobbers.Page.update shared model.mob subMsg subModel
+                |> Tuple.mapBoth
+                    (\updated -> { model | page = Mobbers updated })
+                    (Effect.map MobbersMsg)
+
         _ ->
             ( model, Effect.none )
 
@@ -231,6 +245,9 @@ pageSubscriptions model =
         Profile ->
             Sub.none
 
+        Mobbers _ ->
+            Sub.none
+
 
 
 -- TODO get rid of me !
@@ -266,6 +283,10 @@ view shared model =
                 Profile ->
                     Pages.Mob.Profile.Page.view shared model.mob.name
                         |> View.map (ProfileMsg >> PageMsg)
+
+                Mobbers subModel ->
+                    Pages.Mob.Mobbers.Page.view model.mob subModel
+                        |> View.map (MobbersMsg >> PageMsg)
     in
     { title =
         case subView.title of

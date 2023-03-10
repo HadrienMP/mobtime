@@ -22,7 +22,13 @@ type alias Props msg =
 view : List (Html.Attribute msg) -> Props msg -> Html.Html msg
 view attributes props =
     Html.div attributes
-        [ Html.label [ Attr.for props.id, Attr.css [ Css.display Css.none ] ] [ Html.text props.label ]
+        [ Html.label
+            [ Attr.for props.id
+            , Attr.css
+                [ Css.display Css.none
+                ]
+            ]
+            [ Html.text props.label ]
         , Html.input
             [ Attr.type_ "text"
             , Attr.id props.id
@@ -30,12 +36,12 @@ view attributes props =
             , Attr.placeholder props.label
             , Evts.onInput props.onChange
             , Attr.css
-                [ Css.border3 (Css.px 1) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
+                [ Css.border Css.zero
+                , Css.borderBottom3 (Css.px 2) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
+                , Css.borderRadius Css.zero
                 , Typography.fontSize Typography.m
-                , Css.padding2
-                    (Size.toElmCss <| Space.xs)
-                    (Size.toElmCss <| Space.s)
-                , Css.borderRadius <| Css.px 4
+                , Css.padding Css.zero
+                , Css.paddingBottom (Size.toElmCss <| Space.s)
                 , Css.width <| Css.pct 100
                 ]
             ]

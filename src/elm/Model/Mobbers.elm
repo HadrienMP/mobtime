@@ -1,4 +1,4 @@
-module Model.Mobbers exposing (Mobbers(..), add, assignRoles, assignSpecialRoles, decoder, delete, empty, merge, rotatable, rotate, shufflable, shuffle, toJson)
+module Model.Mobbers exposing (Mobbers(..), add, assignRoles, assignSpecialRoles, decoder, delete, empty, merge, rotatable, rotate, shufflable, shuffle, toJson, toList)
 
 import Json.Decode as Decode
 import Json.Encode as Json
