@@ -17,6 +17,7 @@ import Pages.Mob.Profile.Doc
 import Pages.Mob.Settings.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
+import UI.Icons.Doc
 import UI.Link.Doc
 import UI.Modal.Doc
 import UI.Range.Doc
@@ -70,6 +71,7 @@ main =
                 , UI.Modal.Doc.theChapter
                 , UI.Typography.Doc.doc
                 , UI.Link.Doc.doc
+                , UI.Icons.Doc.doc
                 ]
               )
             , ( "Components"
