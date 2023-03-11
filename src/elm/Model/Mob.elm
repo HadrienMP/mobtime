@@ -1,4 +1,4 @@
-module Model.Mob exposing (Mob, TimePassedResult, assignRoles, assignSpecialRoles, evolve, evolveMany, evolve_, init, timePassed)
+module Model.Mob exposing (Mob, TimePassedResult, assignRoles, evolve, evolveMany, evolve_, init, timePassed)
 
 import Js.Commands
 import Lib.Duration as Duration exposing (Duration)
@@ -184,8 +184,3 @@ evolveClock event state =
 assignRoles : Mob -> List ( Role, Mobber )
 assignRoles state =
     Mobbers.assignRoles state.roles state.mobbers
-
-
-assignSpecialRoles : Mob -> List ( Role, Mobber )
-assignSpecialRoles state =
-    Mobbers.assignSpecialRoles state.roles state.mobbers

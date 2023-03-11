@@ -2,7 +2,6 @@ module Pages.Mob.Home.Page exposing
     ( AlarmState
     , Model
     , Msg(..)
-    , Tab(..)
     , init
     , jsEventMapping
     , subscriptions
@@ -11,11 +10,12 @@ module Pages.Mob.Home.Page exposing
     , view
     )
 
+import Components.Mobbers.Component
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes as Attr
-import Html.Styled.Events as Evts exposing (onClick)
+import Html.Styled.Events as Evts
 import Js.Commands
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
@@ -25,9 +25,6 @@ import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
 import Pages.Mob.Routing
-import Pages.Mob.Tabs.Dev
-import Pages.Mob.Tabs.Home
-import Pages.Mob.Tabs.Mobbers
 import Random
 import Routing
 import Shared exposing (Shared)
@@ -62,16 +59,8 @@ type AlarmState
     | Standby
 
 
-type Tab
-    = Main
-    | Mobbers
-    | Dev
-
-
 type alias Model =
-    { mobbersSettings : Pages.Mob.Tabs.Mobbers.Model
-    , now : Time.Posix
-    , tab : Tab
+    { now : Time.Posix
     , alarm : AlarmState
     }
 
@@ -90,9 +79,7 @@ init shared name =
                         , name = name
                         }
     in
-    ( { mobbersSettings = Pages.Mob.Tabs.Mobbers.init
-      , now = shared.lastKnownTime
-      , tab = Main
+    ( { now = shared.lastKnownTime
       , alarm = Standby
       }
     , redirection
@@ -106,40 +93,17 @@ init shared name =
 type Msg
     = StartWith ( Time.Posix, Sounds.Sound )
     | TimePassed Time.Posix Model.Mob.TimePassedResult
-    | GotMainTabMsg Pages.Mob.Tabs.Home.Msg
-    | GotMobbersSettingsMsg Pages.Mob.Tabs.Mobbers.Msg
-    | SwitchTab Tab
     | StopSound
     | AlarmEnded
     | StopPomodoro
     | StartTurn
     | StopTurn
+    | MobbersMsg Components.Mobbers.Component.Msg
 
 
 update : Shared -> Model.Mob.Mob -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
 update shared mob msg model =
     case msg of
-        GotMainTabMsg subMsg ->
-            ( model
-            , Pages.Mob.Tabs.Home.update subMsg
-                |> Cmd.map GotMainTabMsg
-                |> Effect.fromCmd
-            )
-
-        GotMobbersSettingsMsg subMsg ->
-            let
-                ( updated, command ) =
-                    Pages.Mob.Tabs.Mobbers.update subMsg mob.mobbers mob.name model.mobbersSettings
-            in
-            ( { model | mobbersSettings = updated }
-            , Effect.map GotMobbersSettingsMsg command
-            )
-
-        SwitchTab tab ->
-            ( { model | tab = tab }
-            , Effect.none
-            )
-
         TimePassed now timePassedResult ->
             let
                 ( alarm, alarmEffect ) =
@@ -214,6 +178,12 @@ update shared mob msg model =
                 |> Effect.share
             )
 
+        MobbersMsg subMsg ->
+            ( model
+            , Components.Mobbers.Component.update shared mob subMsg
+                |> Effect.map MobbersMsg
+            )
+
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
 selectSound now profile =
@@ -273,7 +243,7 @@ view shared mob model =
 
             _ ->
                 Nothing
-    , body = body shared mob model
+    , body = body mob model
     }
 
 
@@ -324,65 +294,11 @@ breakModal =
     }
 
 
-body : Shared -> Model.Mob.Mob -> Model -> Html Msg
-body shared mob model =
-    div
-        [ Attr.class "container"
-        , Attr.css
-            [ Css.position Css.relative
-            ]
-        ]
+body : Model.Mob.Mob -> Model -> Html Msg
+body mob model =
+    div []
         [ clockArea mob model
-        , nav []
-            ([ button
-                [ onClick <| SwitchTab Main
-                , Attr.classList [ ( "active", model.tab == Main ) ]
-                , Attr.title "Home"
-                ]
-                [ UI.Icons.Ion.home
-                    { size = Size.rem 1.4
-                    , color = Palettes.monochrome.on.surface
-                    }
-                ]
-             , button
-                [ onClick <| SwitchTab Mobbers
-                , Attr.classList [ ( "active", model.tab == Mobbers ) ]
-                , Attr.title "Mobbers"
-                ]
-                [ UI.Icons.Ion.people
-                    { size = Size.rem 1.4
-                    , color = Palettes.monochrome.on.surface
-                    }
-                ]
-             ]
-                ++ (if shared.devMode then
-                        [ button
-                            [ onClick <| SwitchTab Dev
-                            , Attr.classList [ ( "active", model.tab == Dev ) ]
-                            , Attr.title "Dev"
-                            ]
-                            [ UI.Icons.Ion.code
-                                { size = Size.rem 1
-                                , color = Palettes.monochrome.on.background
-                                }
-                            ]
-                        ]
-
-                    else
-                        []
-                   )
-            )
-        , case model.tab of
-            Main ->
-                Pages.Mob.Tabs.Home.view shared mob.name mob
-                    |> Html.map GotMainTabMsg
-
-            Mobbers ->
-                Pages.Mob.Tabs.Mobbers.view mob model.mobbersSettings
-                    |> Html.map GotMobbersSettingsMsg
-
-            Dev ->
-                Pages.Mob.Tabs.Dev.view
+        , Components.Mobbers.Component.view mob |> Html.map MobbersMsg
         ]
 
 

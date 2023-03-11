@@ -1,7 +1,7 @@
 module Pages.Mob.Mobbers.PageView exposing (Props, view)
 
 import Components.Form.Input.View
-import Components.Mobbers.Summary
+import Components.Mobbers.View
 import Components.SecondaryPage.View
 import Css
 import Html.Styled as Html
@@ -146,7 +146,7 @@ displayMobber { role, mobber, onDelete } =
         ]
         [ role
             |> Maybe.andThen
-                Components.Mobbers.Summary.iconForRole
+                Components.Mobbers.View.iconForRole
             |> Maybe.map
                 (\icon ->
                     icon

@@ -12,7 +12,6 @@ type Command
     | SetAlarm Sounds.Sound
     | StopAlarm
     | ChangeTitle String
-    | GetSocketId
 
 
 type alias OutCommand =
@@ -33,9 +32,6 @@ send command =
 
             StopAlarm ->
                 OutCommand "StopAlarm" Json.null
-
-            GetSocketId ->
-                OutCommand "GetSocketId" Json.null
 
             ChangeTitle title ->
                 OutCommand "ChangeTitle" <| Json.string title

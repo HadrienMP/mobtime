@@ -1,6 +1,6 @@
 module Components.Mobbers.Doc exposing (doc)
 
-import Components.Mobbers.Summary
+import Components.Mobbers.View
 import ElmBook
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
@@ -9,7 +9,7 @@ import Model.Mobber
 import Model.Role as Role
 
 
-props : Components.Mobbers.Summary.Props (ElmBook.Msg x)
+props : Components.Mobbers.View.Props (ElmBook.Msg x)
 props =
     { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ] |> toMobbers
     , roles = [ "Driver", "Navigator" ] |> List.map Role.fromString
@@ -24,16 +24,16 @@ doc =
     chapter "Mobbers"
         |> withComponentList
             [ ( "Defaults"
-              , Components.Mobbers.Summary.view props
+              , Components.Mobbers.View.view props
               )
             , ( "Inversed defaults"
-              , Components.Mobbers.Summary.view
+              , Components.Mobbers.View.view
                     { props
                         | roles = [ "Navigator", "Driver" ] |> List.map Role.fromString
                     }
               )
             , ( "Too many specials"
-              , Components.Mobbers.Summary.view
+              , Components.Mobbers.View.view
                     { props
                         | roles =
                             [ "Navigator", "Driver", "Navigator", "Driver", "Navigator", "Driver" ]
@@ -41,17 +41,17 @@ doc =
                     }
               )
             , ( "No specials"
-              , Components.Mobbers.Summary.view
+              , Components.Mobbers.View.view
                     { props | roles = [] }
               )
             , ( "Custom"
-              , Components.Mobbers.Summary.view
+              , Components.Mobbers.View.view
                     { props
                         | roles = [ "Scribe", "Moderator", "Artist" ] |> List.map Role.fromString
                     }
               )
             , ( "Too Many real mobbers"
-              , Components.Mobbers.Summary.view
+              , Components.Mobbers.View.view
                     { props
                         | people =
                             [ "Pin"
@@ -78,7 +78,7 @@ doc =
                     }
               )
             , ( "Nobody"
-              , Components.Mobbers.Summary.view
+              , Components.Mobbers.View.view
                     { props | people = [] |> toMobbers }
               )
             ]

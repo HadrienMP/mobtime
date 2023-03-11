@@ -1,4 +1,4 @@
-module Components.Mobbers.Summary exposing (Props, iconForRole, view)
+module Components.Mobbers.View exposing (Props, iconForRole, view)
 
 import Css
 import Html.Styled as Html
@@ -33,7 +33,12 @@ type alias Props msg =
 view : Props msg -> Html.Html msg
 view props =
     Column.column2
-        [ Attr.css [ Css.lineHeight <| Css.num 1.1 ] ]
+        [ Attr.css
+            [ Css.lineHeight <| Css.num 1.1
+            , Css.paddingBottom <| Size.toElmCss Space.s
+            , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
+            ]
+        ]
         -- TODO delete normal row
         [ Row.row2
             [ Attr.css
@@ -60,7 +65,7 @@ view props =
                 { text = Html.text "Rotate"
                 , onClick = props.onRotate
                 }
-            , UI.Button.Link.view [ Attr.css [ Css.transform <| Css.translateY <| Css.px 3 ] ]
+            , UI.Button.Link.view []
                 { text =
                     UI.Icons.Ion.settings
                         { size = Typography.m
@@ -134,7 +139,6 @@ displayRealMobbers props =
                     , Css.alignItems Css.flexEnd
                     , Css.flexWrap Css.wrap
                     , UI.Css.gap Space.s
-                    , Css.paddingBottom <| Size.toElmCss Space.s
                     ]
                 ]
                 (displayMobber

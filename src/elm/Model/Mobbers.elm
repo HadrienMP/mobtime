@@ -1,4 +1,16 @@
-module Model.Mobbers exposing (Mobbers(..), add, assignRoles, assignSpecialRoles, decoder, delete, empty, merge, rotatable, rotate, shufflable, shuffle, toJson, toList)
+module Model.Mobbers exposing
+    ( Mobbers(..)
+    , add
+    , assignRoles
+    , decoder
+    , delete
+    , empty
+    , merge
+    , rotate
+    , shuffle
+    , toJson
+    , toList
+    )
 
 import Json.Decode as Decode
 import Json.Encode as Json
@@ -76,24 +88,9 @@ assignRoles roles mobbers =
             )
 
 
-assignSpecialRoles : Roles -> Mobbers -> List ( Role, Mobber )
-assignSpecialRoles roles mobbers =
-    toList mobbers |> ListExtras.zip roles.special
-
-
-rotatable : Mobbers -> Bool
-rotatable mobbers =
-    (List.length <| toList mobbers) >= 2
-
-
 rotate : Mobbers -> Mobbers
 rotate mobbers =
     toList mobbers |> ListExtras.rotate |> Mobbers
-
-
-shufflable : Mobbers -> Bool
-shufflable mobbers =
-    (List.length <| toList mobbers) >= 3
 
 
 shuffle : Mobbers -> Random.Generator Mobbers
