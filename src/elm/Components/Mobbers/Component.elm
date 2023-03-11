@@ -34,10 +34,9 @@ update shared mob msg =
             Effect.share <| Model.Events.MobEvent mob.name <| Model.Events.RotatedMobbers
 
         GoToSettings ->
-            -- TODO rename the name field to mob (routing)
             Shared.pushUrl shared <|
                 Routing.Mob
-                    { name = mob.name
+                    { mob = mob.name
                     , subRoute = Pages.Mob.Routing.Mobbers
                     }
 

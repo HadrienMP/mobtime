@@ -49,7 +49,7 @@ update shared mob msg model =
             ( model
             , Shared.pushUrl shared <|
                 Routing.Mob
-                    { name = mob.name
+                    { mob = mob.name
                     , subRoute = Pages.Mob.Routing.Home
                     }
             )

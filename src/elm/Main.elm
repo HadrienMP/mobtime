@@ -217,8 +217,8 @@ handleAtomicEffect model effect =
 getMob : Url.Url -> Maybe MobName
 getMob url =
     case Routing.parse url of
-        Routing.Mob { name } ->
-            Just name
+        Routing.Mob { mob } ->
+            Just mob
 
         _ ->
             Nothing

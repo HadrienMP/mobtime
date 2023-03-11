@@ -6,7 +6,7 @@ import Url.Parser exposing ((</>))
 
 
 type alias Route =
-    { subRoute : SubRoute, name : MobName }
+    { subRoute : SubRoute, mob : MobName }
 
 
 type SubRoute
@@ -21,19 +21,19 @@ toUrl : Route -> String
 toUrl route =
     case route.subRoute of
         Home ->
-            Url.Builder.relative [ Model.MobName.print route.name ] []
+            Url.Builder.relative [ Model.MobName.print route.mob ] []
 
         Settings ->
-            Url.Builder.relative [ Model.MobName.print route.name, "settings" ] []
+            Url.Builder.relative [ Model.MobName.print route.mob, "settings" ] []
 
         Invite ->
-            Url.Builder.relative [ Model.MobName.print route.name, "invite" ] []
+            Url.Builder.relative [ Model.MobName.print route.mob, "invite" ] []
 
         Profile ->
-            Url.Builder.relative [ Model.MobName.print route.name, "profile" ] []
+            Url.Builder.relative [ Model.MobName.print route.mob, "profile" ] []
 
         Mobbers ->
-            Url.Builder.relative [ Model.MobName.print route.name, "mobbers" ] []
+            Url.Builder.relative [ Model.MobName.print route.mob, "mobbers" ] []
 
 
 parser : Url.Parser.Parser (Route -> c) c

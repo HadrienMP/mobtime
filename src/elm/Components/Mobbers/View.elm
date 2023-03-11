@@ -39,7 +39,6 @@ view props =
             , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
             ]
         ]
-        -- TODO delete normal row
         [ Row.row
             [ Attr.css
                 [ UI.Css.gap Space.s

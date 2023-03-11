@@ -30,7 +30,7 @@ update msg shared mob =
                 [ Shared.pushUrl shared <|
                     Routing.Mob <|
                         { subRoute = Pages.Mob.Routing.Home
-                        , name = mob
+                        , mob = mob
                         }
                 , Effect.fromShared <| Shared.SoundOn
                 ]

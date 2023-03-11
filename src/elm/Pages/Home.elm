@@ -69,7 +69,7 @@ update shared model msg =
                     in
                     ( model
                     , Effect.batch
-                        [ { subRoute = Pages.Mob.Routing.Home, name = mob }
+                        [ { subRoute = Pages.Mob.Routing.Home, mob = mob }
                             |> Routing.Mob
                             |> Shared.pushUrl shared
                         , Effect.fromShared <| Shared.JoinMob mob

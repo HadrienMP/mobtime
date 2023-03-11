@@ -53,12 +53,12 @@ init shared route =
         ( page, effect ) =
             initSubPage route shared
     in
-    ( { mob = Model.Mob.init route.name
+    ( { mob = Model.Mob.init route.mob
       , page = page
       }
     , Effect.batch
         [ effect
-        , Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print route.name
+        , Effect.fromCmd <| Components.Socket.Socket.joinRoom <| Model.MobName.print route.mob
         ]
     )
 
@@ -67,7 +67,7 @@ initSubPage : Pages.Mob.Routing.Route -> Shared -> ( Page, Effect Shared.Msg Msg
 initSubPage route shared =
     case route.subRoute of
         Pages.Mob.Routing.Home ->
-            Pages.Mob.Home.Page.init shared route.name
+            Pages.Mob.Home.Page.init shared route.mob
                 |> Tuple.mapBoth Home (Effect.map (PageMsg << HomeMsg))
 
         Pages.Mob.Routing.Settings ->

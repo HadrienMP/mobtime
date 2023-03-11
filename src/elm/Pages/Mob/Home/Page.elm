@@ -76,7 +76,7 @@ init shared name =
                 Shared.pushUrl shared <|
                     Routing.Mob
                         { subRoute = Pages.Mob.Routing.Profile
-                        , name = name
+                        , mob = name
                         }
     in
     ( { now = shared.lastKnownTime
@@ -444,7 +444,7 @@ clockArea mob model =
                 Routing.toUrl <|
                     Routing.Mob
                         { subRoute = Pages.Mob.Routing.Invite
-                        , name = mob.name
+                        , mob = mob.name
                         }
             , color = Palettes.monochrome.on.background
             , text = "Invite"
@@ -461,7 +461,7 @@ clockArea mob model =
                 Routing.toUrl <|
                     Routing.Mob
                         { subRoute = Pages.Mob.Routing.Settings
-                        , name = mob.name
+                        , mob = mob.name
                         }
             , color = Palettes.monochrome.on.background
             , text = "Settings"
@@ -478,7 +478,7 @@ clockArea mob model =
                 Routing.toUrl <|
                     Routing.Mob
                         { subRoute = Pages.Mob.Routing.Profile
-                        , name = mob.name
+                        , mob = mob.name
                         }
             , color = Palettes.monochrome.on.background
             , text = "Profile"
