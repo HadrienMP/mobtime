@@ -40,7 +40,7 @@ view props =
             ]
         ]
         -- TODO delete normal row
-        [ Row.row2
+        [ Row.row
             [ Attr.css
                 [ UI.Css.gap Space.s
                 , Css.alignItems Css.center
@@ -102,7 +102,7 @@ separator =
 
 displaySpecials : Props msg -> Html.Html msg
 displaySpecials props =
-    Row.row2
+    Row.row
         [ Attr.css
             [ Css.justifyContent Css.spaceBetween
             , Css.flexWrap Css.wrap
@@ -133,7 +133,7 @@ displayRealMobbers props =
                 lastSpecialRole =
                     props.roles |> List.reverse |> List.head
             in
-            Row.row2
+            Row.row
                 [ Attr.css
                     [ Css.justifyContent Css.spaceBetween
                     , Css.alignItems Css.flexEnd
@@ -173,7 +173,7 @@ displayMobber :
     }
     -> Html.Html msg
 displayMobber { role, mobber, emphasis } =
-    Row.row2
+    Row.row
         [ Attr.css
             [ Css.alignItems Css.center
             , UI.Css.gap <| Size.rem 0.7

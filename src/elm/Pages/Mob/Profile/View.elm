@@ -55,7 +55,6 @@ head _ =
                 , Css.paddingBottom <| Css.rem 1
                 ]
             ]
-            []
             [ Text.h2 [] "Your Profile"
             ]
         , UI.Text.View.light "Setup your personal preferences before joining your teammates"

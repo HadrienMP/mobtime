@@ -44,7 +44,6 @@ view { onClose, content } =
             )
         ]
         [ Row.row [ Attr.css [ Css.width <| Css.pct 100 ] ]
-            []
             [ Html.span [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] []
             , UI.Button.View.button []
                 { content = UI.Button.View.Both { icon = UI.Icons.Ion.close, text = "Close" }

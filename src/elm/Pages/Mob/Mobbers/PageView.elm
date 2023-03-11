@@ -89,7 +89,7 @@ viewMobbers props =
     in
     Column.column2
         [ Attr.css [ UI.Css.gap Space.xs ] ]
-        [ Row.row2
+        [ Row.row
             [ Attr.css
                 [ UI.Css.gap Space.s
                 , Css.justifyContent Css.right
@@ -136,7 +136,7 @@ viewMobbers props =
 
 displayMobber : { role : Maybe Model.Role.Role, mobber : Model.Mobber.Mobber, onDelete : Model.Mobber.Mobber -> msg } -> Html.Html msg
 displayMobber { role, mobber, onDelete } =
-    Row.row2
+    Row.row
         [ Attr.css
             [ Css.alignItems Css.center
             , Css.lineHeight <| Css.num 1

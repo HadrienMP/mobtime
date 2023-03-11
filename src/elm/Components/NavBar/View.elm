@@ -5,10 +5,12 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Model.MobName as MobName exposing (MobName)
 import UI.Color as Color
+import UI.Css
 import UI.Icons.Tape
 import UI.Palettes as Palettes
 import UI.Row as Row
 import UI.Size as Size
+import UI.Space as Space
 
 
 type alias Props msg =
@@ -94,7 +96,11 @@ title =
 
 rightNavBar : Props msg -> Html msg
 rightNavBar props =
-    Row.row [ Attr.css [ Css.alignItems Css.center ] ]
-        [ Row.Gap <| Size.rem 0.4 ]
+    Row.row
+        [ Attr.css
+            [ Css.alignItems Css.center
+            , UI.Css.gap Space.xs
+            ]
+        ]
         [ props.socket
         ]

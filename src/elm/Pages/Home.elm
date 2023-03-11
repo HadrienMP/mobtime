@@ -178,9 +178,7 @@ mobField model =
 
 formRow : List (Html msg) -> Html msg
 formRow =
-    Row.row
-        [ Attr.css [ Css.width <| Css.pct 100 ] ]
-        []
+    Row.row [ Attr.css [ Css.width <| Css.pct 100 ] ]
 
 
 labelWitdh : Css.Style

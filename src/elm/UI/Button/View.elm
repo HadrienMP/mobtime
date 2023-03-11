@@ -76,9 +76,9 @@ button attributes { content, action, size, variant } =
                     [ Attr.css
                         [ Css.justifyContent Css.center
                         , Css.alignItems Css.center
+                        , UI.Css.gap <| iconTextGap size
                         ]
                     ]
-                    [ Row.Gap <| iconTextGap size ]
                     [ icon { size = getFontSize size |> Size.multiplyBy 1.4, color = Palettes.monochrome.on.surface }
                     , Html.text text
                     ]

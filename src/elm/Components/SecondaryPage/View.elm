@@ -44,9 +44,9 @@ view { onBack, title, content } =
                 , Css.borderBottom3 (Css.px 6) Css.double <|
                     Color.toElmCss <|
                         Palettes.monochrome.on.background
+                , UI.Css.gap Space.s
                 ]
             ]
-            [ Row.Gap <| Size.rem 1 ]
             [ Text.h2 [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] title
             ]
         , content

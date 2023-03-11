@@ -8,9 +8,10 @@ import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import UI.Button.Link
 import UI.Button.View as Button
+import UI.Css
 import UI.Icons.Ion
 import UI.Row as Row
-import UI.Size as Size
+import UI.Space as Space
 
 
 theChapter : Chapter x
@@ -120,8 +121,7 @@ sizeToString size =
 
 
 component props =
-    Row.row [ Attr.css [ Css.alignItems Css.flexStart ] ]
-        [ Row.Gap <| Size.rem 0.6 ]
+    Row.row [ Attr.css [ Css.alignItems Css.flexStart, UI.Css.gap Space.s ] ]
         (sizes
             |> List.map
                 (\size ->

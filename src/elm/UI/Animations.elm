@@ -1,4 +1,4 @@
-module UI.Animations exposing (blinkDuration, bottomSlide, fadeIn)
+module UI.Animations exposing (bottomSlide, fadeIn)
 
 import Css exposing (Style)
 import Css.Animations
