@@ -2257,7 +2257,7 @@ hosted-git-info@^4.0.1:
 
 howler@^2.2.3:
   version "2.2.3"
-  resolved "https://registry.npmjs.org/howler/-/howler-2.2.3.tgz"
+  resolved "https://registry.yarnpkg.com/howler/-/howler-2.2.3.tgz#a2eff9b08b586798e7a2ee17a602a90df28715da"
   integrity sha512-QM0FFkw0LRX1PR8pNzJVAY25JhIWvbKMBFM4gqk+QdV+kPXOhleWGCB6AiAF/goGjIHK2e/nIElplvjQwhr0jg==
 
 html-tags@^3.2.0:

@@ -3,7 +3,7 @@ import '../sass/main.scss';
 import * as tooltips from './tooltips';
 import * as sockets from './sockets';
 import * as p2p from './p2p';
-import * as sound from './sound';
+import * as alarm from './alarm';
 import * as copy from './copy';
 import { Elm } from '../elm/Main.elm';
 
@@ -16,9 +16,7 @@ const app = Elm.Main.init({
 
 copy.setup(app);
 tooltips.setup();
-
-let alarm = sound.load('/sound/silence.mp3');
-alarm.play();
+alarm.setup(app);
 
 const talkMode = process.env.TALK_MODE;
 if (talkMode === 'p2p') {
@@ -44,24 +42,6 @@ if (talkMode === 'p2p') {
 // -----------------------------------------
 app.ports.commands.subscribe((command) => {
     switch (command.name) {
-        case 'SoundAlarm':
-            alarm.play();
-            break;
-        case 'SetAlarm':
-            alarm = sound.load('/sound/' + command.value, () =>
-                app.ports.events.send({ name: 'AlarmEnded', value: '' })
-            );
-            break;
-        case 'StopAlarm':
-            alarm.stop();
-            break;
-        case 'ChangeVolume':
-            window.localStorage.setItem(
-                'preferences',
-                JSON.stringify({ volume: parseInt(command.value) })
-            );
-            sound.volume(command.value);
-            break;
         case 'ChangeTitle':
             document.title = command.value;
             break;
@@ -71,18 +51,3 @@ app.ports.commands.subscribe((command) => {
 app.ports.savePreferences.subscribe((preferences) =>
     window.localStorage.setItem('preferences', JSON.stringify(preferences))
 );
-
-app.ports.changeVolume.subscribe(sound.volume);
-app.ports.testVolume.subscribe(() => sound.play('/sound/hello.mp3'));
-testSound();
-const soundOnInterval = setInterval(testSound(), 100);
-
-function testSound() {
-    return sound.play('/sound/silence.mp3', {
-        onError: console.debug,
-        onSuccess: () => {
-            app.ports.soundOn.send('');
-            clearInterval(soundOnInterval);
-        },
-    });
-}

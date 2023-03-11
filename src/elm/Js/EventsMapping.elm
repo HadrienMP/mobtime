@@ -1,4 +1,4 @@
-module Js.EventsMapping exposing (EventsMapping, batch, create, dispatch, map)
+module Js.EventsMapping exposing (EventsMapping, create, dispatch, map)
 
 import Js.Events exposing (Event, EventMessage)
 
@@ -19,19 +19,11 @@ map f eventsMapping =
         |> EventsMapping
 
 
-batch : List (EventsMapping msg) -> EventsMapping msg
-batch eventsMappings =
-    eventsMappings
-        |> List.map open
-        |> List.foldr (++) []
-        |> EventsMapping
-
-
 dispatch : Event -> EventsMapping msg -> List msg
 dispatch event eventsMapping =
     open eventsMapping
         |> List.filter (\eventMessage -> eventMessage.name == event.name)
-        |> List.map (\eventMessage -> eventMessage.messageFunction event.value )
+        |> List.map (\eventMessage -> eventMessage.messageFunction event.value)
 
 
 open : EventsMapping msg -> List (EventMessage msg)

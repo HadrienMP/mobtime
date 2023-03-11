@@ -1,4 +1,4 @@
-port module Shared exposing (Msg(..), Shared, init, pushUrl, subscriptions, toast, update, withUrl)
+module Shared exposing (Msg(..), Shared, init, pushUrl, subscriptions, toast, update, withUrl)
 
 import Browser
 import Browser.Navigation as Nav
@@ -7,6 +7,7 @@ import Effect exposing (Effect)
 import Js.Events
 import Js.EventsMapping exposing (EventsMapping)
 import Json.Decode as Decode
+import Lib.Alarm
 import Lib.Konami exposing (Konami)
 import Lib.Toaster exposing (Toast, Toasts)
 import Model.Events
@@ -17,9 +18,6 @@ import Task
 import Time
 import Url
 import UserPreferences
-
-
-port soundOn : (String -> msg) -> Sub msg
 
 
 
@@ -91,6 +89,7 @@ type Msg
     | Batch (List Msg)
     | PreferencesMsg UserPreferences.Msg
     | SoundOn
+    | CheckSound
     | JoinMob MobName
     | ReceivedEvent Model.Events.Event
     | Tick Time.Posix
@@ -157,6 +156,9 @@ update_ msg model =
         SoundOn ->
             ( { model | soundOn = True }, Cmd.none )
 
+        CheckSound ->
+            ( model, Lib.Alarm.play )
+
         JoinMob mob ->
             ( { model | mob = Just <| Model.Mob.init mob }, Cmd.none )
 
@@ -202,8 +204,13 @@ subscriptions shared =
             |> Sub.map SocketMsg
         , Lib.Konami.subscriptions shared.konami
             |> Sub.map KonamiMsg
-        , soundOn <| always SoundOn
         , Model.Events.receiveOne <| Model.Events.fromJson >> ReceivedEvent
+        , Lib.Alarm.onPlaying SoundOn
+        , if shared.soundOn then
+            Sub.none
+
+          else
+            Time.every 100 (always CheckSound)
         ]
 
 

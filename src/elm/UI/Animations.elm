@@ -1,4 +1,4 @@
-module UI.Animations exposing (bottomSlide, fadeIn)
+module UI.Animations exposing (bottomSlide)
 
 import Css exposing (Style)
 import Css.Animations
@@ -33,17 +33,6 @@ blink =
             ]
     , animationDuration blinkDuration
     , Css.animationIterationCount Css.infinite
-    ]
-
-
-fadeIn : Lib.Duration.Duration -> List Style
-fadeIn duration =
-    [ Css.animationName <|
-        Css.Animations.keyframes
-            [ ( 0, [ Css.Animations.opacity <| Css.num 0 ] )
-            , ( 100, [ Css.Animations.opacity <| Css.num 1 ] )
-            ]
-    , animationDuration duration
     ]
 
 

@@ -6,11 +6,7 @@ import Css
 import Effect exposing (Effect)
 import Html.Styled as Html
 import Html.Styled.Attributes exposing (css)
-import Js.Commands
-import Js.Events
-import Js.EventsMapping as EventsMapping exposing (EventsMapping)
 import Json.Decode as Decode
-import Lib.BatchMsg
 import Lib.Toaster as Toaster
 import Model.Events
 import Model.MobName exposing (MobName)
@@ -112,7 +108,6 @@ loadPage { route, current, shared } =
 type Msg
     = GotHomeMsg Pages.Home.Msg
     | MobMsg Pages.Mob.Main.Msg
-    | Batch (List Msg)
     | SharedMsg Shared.Msg
     | UrlChanged Url.Url
 
@@ -153,9 +148,6 @@ update msg model =
                     (\updated -> { model | page = Home updated })
                     (Effect.map GotHomeMsg)
                 |> handleEffect
-
-        ( Batch messages, _ ) ->
-            Lib.BatchMsg.update messages model update
 
         ( SharedMsg subMsg, _ ) ->
             Shared.update subMsg model.shared
@@ -201,9 +193,6 @@ handleAtomicEffect model effect =
                     (\updated -> { model | shared = updated })
                     (Cmd.map SharedMsg)
 
-        Effect.Js js ->
-            ( model, Js.Commands.send js )
-
         Effect.Command command ->
             ( model, command )
 
@@ -237,19 +226,8 @@ subscriptions model =
 
             Mob mobModel ->
                 Pages.Mob.Main.subscriptions mobModel |> Sub.map MobMsg
-        , Js.Events.events (dispatch jsEventsMapping)
         , Shared.subscriptions model.shared |> Sub.map SharedMsg
         ]
-
-
-dispatch : EventsMapping Msg -> Js.Events.Event -> Msg
-dispatch mapping event =
-    Batch <| EventsMapping.dispatch event mapping
-
-
-jsEventsMapping : EventsMapping Msg
-jsEventsMapping =
-    EventsMapping.map MobMsg Pages.Mob.Main.jsEventMapping
 
 
 

@@ -4,7 +4,6 @@ module Pages.Mob.Main exposing
     , Page(..)
     , PageMsg
     , init
-    , jsEventMapping
     , subscriptions
     , update
     , view
@@ -12,7 +11,6 @@ module Pages.Mob.Main exposing
 
 import Components.Socket.Socket
 import Effect exposing (Effect)
-import Js.EventsMapping
 import Lib.Duration
 import Model.Clock
 import Model.Events
@@ -247,16 +245,6 @@ pageSubscriptions model =
 
         Mobbers _ ->
             Sub.none
-
-
-
--- TODO get rid of me !
-
-
-jsEventMapping : Js.EventsMapping.EventsMapping Msg
-jsEventMapping =
-    Pages.Mob.Home.Page.jsEventMapping
-        |> Js.EventsMapping.map (HomeMsg >> PageMsg)
 
 
 

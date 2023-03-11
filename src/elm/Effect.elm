@@ -1,6 +1,5 @@
-module Effect exposing (Atomic(..), Effect(..), batch, fromCmd, fromShared, js, map, none, share)
+module Effect exposing (Atomic(..), Effect(..), batch, fromCmd, fromShared, map, none, share)
 
-import Js.Commands
 import Model.Events exposing (MobEvent)
 
 
@@ -11,7 +10,6 @@ type Effect sharedMsg msg
 
 type Atomic sharedMsg msg
     = Shared sharedMsg
-    | Js Js.Commands.Command
     | Command (Cmd msg)
     | MobEvent MobEvent
     | None
@@ -36,9 +34,6 @@ mapAtomic f atomic =
         Shared shared ->
             Shared shared
 
-        Js command ->
-            Js command
-
         MobEvent it ->
             MobEvent it
 
@@ -54,11 +49,6 @@ fromShared =
 none : Effect sharedMsg msg
 none =
     Atomic None
-
-
-js : Js.Commands.Command -> Effect sharedMsg msg
-js =
-    Atomic << Js
 
 
 share : MobEvent -> Effect sharedMsg msg

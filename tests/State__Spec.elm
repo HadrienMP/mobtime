@@ -1,7 +1,6 @@
 module State__Spec exposing (..)
 
 import Expect
-import Js.Commands
 import Lib.Duration as Duration
 import Model.Clock as Clock
 import Model.Events exposing (ClockEvent(..), Event(..))
@@ -75,22 +74,6 @@ suite =
                     in
                     command
                         |> Expect.equal Cmd.none
-            , test "set alarm for one start event" <|
-                \_ ->
-                    let
-                        alarm =
-                            Sounds.default
-
-                        started =
-                            Clock <| turnOnWithAlarm alarm
-
-                        ( _, command ) =
-                            Model.MobName.MobName "awesome"
-                                |> Model.Mob.init
-                                |> Model.Mob.evolveMany [ started ]
-                    in
-                    command
-                        |> Expect.equal (Js.Commands.send <| Js.Commands.SetAlarm alarm)
             ]
         , describe "full turn: when every mobber has been driver and navigator"
             [ test "notify everyone" <|

@@ -1,6 +1,6 @@
 module Model.Mob exposing (Mob, TimePassedResult, assignRoles, evolve, evolveMany, evolve_, init, timePassed)
 
-import Js.Commands
+import Lib.Alarm
 import Lib.Duration as Duration exposing (Duration)
 import Lib.ListExtras exposing (uncons)
 import Model.Clock exposing (ClockState(..))
@@ -166,7 +166,7 @@ evolveClock event state =
                                 , ended = False
                                 }
               }
-            , Js.Commands.send <| Js.Commands.SetAlarm started.alarm
+            , Lib.Alarm.load started.alarm
             )
 
         ( Events.Stopped, On _ ) ->

@@ -4,7 +4,6 @@
   "learn more": "elm-review suppress --help",
   "suppressions": [
     { "count": 2, "filePath": "src/elm/Model/Mob.elm" },
-    { "count": 1, "filePath": "src/elm/Lib/BatchMsg.elm" },
     { "count": 1, "filePath": "src/elm/Lib/ListExtras.elm" },
     { "count": 1, "filePath": "src/elm/Shared.elm" },
     { "count": 1, "filePath": "src/elm/UI/Icons/Custom.elm" }

@@ -1,9 +1,10 @@
-port module Components.Form.Volume.Field exposing (Msg(..), change, update, view)
+module Components.Form.Volume.Field exposing (Msg(..), change, update, view)
 
 import Components.Form.Volume.Type exposing (Volume, open)
 import Components.Form.Volume.View as View
 import Css
 import Html.Styled exposing (Html)
+import Lib.Alarm
 
 
 
@@ -12,13 +13,7 @@ import Html.Styled exposing (Html)
 
 change : Volume -> Cmd msg
 change =
-    open >> changeVolume
-
-
-port changeVolume : Int -> Cmd msg
-
-
-port testVolume : () -> Cmd msg
+    open >> Lib.Alarm.alarmChangeVolume
 
 
 
@@ -34,10 +29,10 @@ update : Msg -> Volume -> ( Volume, Cmd msg )
 update msg volume =
     case msg of
         Change it ->
-            ( it, changeVolume <| open it )
+            ( it, Lib.Alarm.alarmChangeVolume <| open it )
 
         Test ->
-            ( volume, testVolume () )
+            ( volume, Lib.Alarm.alarmTestVolume () )
 
 
 

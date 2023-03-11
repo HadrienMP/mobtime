@@ -3,7 +3,6 @@ module Pages.Mob.Home.Page exposing
     , Model
     , Msg(..)
     , init
-    , jsEventMapping
     , subscriptions
     , turnRefreshRate
     , update
@@ -17,8 +16,7 @@ import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Js.Commands
-import Js.Events
-import Js.EventsMapping exposing (EventsMapping)
+import Lib.Alarm
 import Lib.Duration as Duration
 import Model.Clock as Clock exposing (ClockState(..))
 import Model.Events
@@ -109,7 +107,7 @@ update shared mob msg model =
                 ( alarm, alarmEffect ) =
                     case timePassedResult.turnEvent of
                         Clock.Ended ->
-                            ( Playing, Js.Commands.send Js.Commands.SoundAlarm |> Effect.fromCmd )
+                            ( Playing, Lib.Alarm.play |> Effect.fromCmd )
 
                         Clock.Continued ->
                             ( model.alarm, Effect.none )
@@ -135,7 +133,7 @@ update shared mob msg model =
 
         StopSound ->
             ( { model | alarm = Stopped }
-            , Effect.js Js.Commands.StopAlarm
+            , Effect.fromCmd Lib.Alarm.stop
             )
 
         AlarmEnded ->
@@ -206,20 +204,7 @@ turnRefreshRate =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
-
-
-
--- TODO get rid of that
-
-
-jsEventMapping : EventsMapping Msg
-jsEventMapping =
-    Js.EventsMapping.batch
-        [ Js.EventsMapping.create <|
-            [ Js.Events.EventMessage "AlarmEnded" (always AlarmEnded)
-            ]
-        ]
+    Lib.Alarm.onFinished AlarmEnded
 
 
 
