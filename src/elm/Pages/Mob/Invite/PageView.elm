@@ -24,7 +24,6 @@ view : Props msg -> Html msg
 view props =
     Components.SecondaryPage.View.view
         { onBack = props.onBack
-        , mob = props.mob
         , title = "Invite your team"
         , content =
             Column.column

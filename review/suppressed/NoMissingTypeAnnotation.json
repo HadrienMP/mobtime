@@ -5,7 +5,6 @@
   "suppressions": [
     { "count": 2, "filePath": "src/elm/UI/Button/Doc.elm" },
     { "count": 1, "filePath": "src/elm/Components/Form/Input/Doc.elm" },
-    { "count": 1, "filePath": "src/elm/Components/Form/Volume/Doc.elm" },
-    { "count": 1, "filePath": "src/elm/Components/Mobbers/Doc.elm" }
+    { "count": 1, "filePath": "src/elm/Components/Form/Volume/Doc.elm" }
   ]
 }

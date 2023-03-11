@@ -1,6 +1,7 @@
 module Components.Mobbers.Doc exposing (doc)
 
 import Components.Mobbers.Summary
+import ElmBook
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
@@ -8,6 +9,7 @@ import Model.Mobber
 import Model.Role as Role
 
 
+props : Components.Mobbers.Summary.Props (ElmBook.Msg x)
 props =
     { people = [ "Pin", "Manon", "Thomas", "Pauline", "Jeff", "Amélie" ] |> toMobbers
     , roles = [ "Driver", "Navigator" ] |> List.map Role.fromString

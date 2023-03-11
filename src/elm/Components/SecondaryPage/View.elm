@@ -3,10 +3,10 @@ module Components.SecondaryPage.View exposing (Props, view)
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import Model.MobName exposing (MobName)
 import UI.Button.View
 import UI.Color as Color
 import UI.Column as Column
+import UI.Css
 import UI.Icons.Ion
 import UI.Palettes as Palettes
 import UI.Row as Row
@@ -18,16 +18,14 @@ import UI.Text as Text
 type alias Props msg =
     { onBack : msg
     , title : String
-    , mob : MobName
     , content : Html.Html msg
     }
 
 
 view : Props msg -> Html.Html msg
-view { onBack, title, mob, content } =
-    Column.column
-        []
-        [ Column.Gap <| Size.rem 1 ]
+view { onBack, title, content } =
+    Column.column2
+        [ Attr.css [ UI.Css.gap Space.m ] ]
         [ UI.Button.View.button [ Attr.css [ Css.maxWidth Css.fitContent ] ]
             { content =
                 UI.Button.View.Both
@@ -42,16 +40,14 @@ view { onBack, title, mob, content } =
         , Row.row
             [ Attr.css
                 [ Css.alignItems Css.end
-                , Css.paddingBottom <| Css.rem 0.8
-                , Css.borderBottom3 (Css.rem 0.1) Css.solid <|
+                , Css.paddingBottom <| Size.toElmCss Space.xs
+                , Css.borderBottom3 (Css.px 6) Css.double <|
                     Color.toElmCss <|
                         Palettes.monochrome.on.background
                 ]
             ]
             [ Row.Gap <| Size.rem 1 ]
             [ Text.h2 [ Attr.css [ Css.flexGrow <| Css.int 1 ] ] title
-            , Html.div [] [ Html.text "Mob:" ]
-            , Html.div [ Attr.css [ Css.fontWeight Css.bold ] ] [ Html.text <| Model.MobName.print mob ]
             ]
         , content
         ]

@@ -38,7 +38,6 @@ view props =
     Components.SecondaryPage.View.view
         { onBack = props.onBack
         , title = "Mobbers"
-        , mob = props.mob
         , content =
             Column.column2
                 [ Attr.css [ UI.Css.gap Space.s ] ]
