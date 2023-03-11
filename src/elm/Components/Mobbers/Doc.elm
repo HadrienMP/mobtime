@@ -15,6 +15,7 @@ props =
     , roles = [ "Driver", "Navigator" ] |> List.map Role.fromString
     , onShuffle = logAction "Shuffled"
     , onRotate = logAction "Rotated"
+    , onSettings = logAction "Go to Settings"
     }
 
 
@@ -76,6 +77,10 @@ doc =
                         , roles = []
                     }
               )
+            , ( "Nobody"
+              , Components.Mobbers.Summary.view
+                    { props | people = [] |> toMobbers }
+              )
             ]
         |> render """
 <component with-label="Defaults"/>
@@ -86,6 +91,7 @@ doc =
 <component with-label="Too many specials"/>
 <component with-label="No specials"/>
 <component with-label="Too Many real mobbers"/>
+<component with-label="Nobody"/>
 """
 
 

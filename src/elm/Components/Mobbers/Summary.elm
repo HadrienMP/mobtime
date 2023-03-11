@@ -12,6 +12,7 @@ import UI.Column as Column
 import UI.Css
 import UI.Icons.Captain
 import UI.Icons.Common exposing (Icon)
+import UI.Icons.Ion
 import UI.Icons.Keyboard
 import UI.Palettes as Palettes
 import UI.Row as Row
@@ -25,6 +26,7 @@ type alias Props msg =
     , roles : List Role
     , onShuffle : msg
     , onRotate : msg
+    , onSettings : msg
     }
 
 
@@ -36,19 +38,35 @@ view props =
         [ Row.row2
             [ Attr.css
                 [ UI.Css.gap Space.s
-                , Css.justifyContent Css.right
+                , Css.alignItems Css.center
                 , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
                 , Css.paddingBottom <| Size.toElmCss Space.xs
                 , Css.marginBottom <| Size.toElmCss Space.s
                 ]
             ]
-            [ UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
+            [ Html.h3
+                [ Attr.css
+                    [ Css.margin Css.zero
+                    , Css.flexGrow <| Css.num 1
+                    , Css.fontWeight Css.normal
+                    ]
+                ]
+                [ Html.text "Mobbers" ]
+            , UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
                 { text = Html.text "Shuffle"
                 , onClick = props.onShuffle
                 }
             , UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
                 { text = Html.text "Rotate"
                 , onClick = props.onRotate
+                }
+            , UI.Button.Link.view [ Attr.css [ Css.transform <| Css.translateY <| Css.px 3 ] ]
+                { text =
+                    UI.Icons.Ion.settings
+                        { size = Typography.m
+                        , color = Palettes.monochrome.on.background
+                        }
+                , onClick = props.onSettings
                 }
             ]
         , displaySpecials props
