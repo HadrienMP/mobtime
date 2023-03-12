@@ -4,7 +4,7 @@
     "description": "",
     "source": "src/index.html",
     "scripts": {
-        "build": "parcel build && cp -r public/* dist",
+        "build": "parcel build",
         "start": "node server/app.js",
         "start:dev": "concurrently --kill-others \"yarn dev:build-front\" \"yarn dev:server\"",
         "dev:build-front": "parcel watch",
@@ -20,6 +20,9 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "staticFiles": {
+        "staticPath": "public"
+    },
     "devDependencies": {
         "@parcel/packager-raw-url": "^2.8.3",
         "@parcel/transformer-elm": "^2.8.3",
@@ -33,6 +36,7 @@
         "husky": "^8.0.2",
         "nodemon": "^2.0.7",
         "parcel": "^2.8.3",
+        "parcel-reporter-static-files-copy": "^1.5.0",
         "prettier": "^2.8.2",
         "process": "^0.11.10",
         "sass": "^1.43.4",
@@ -49,10 +53,10 @@
     },
     "dependencies": {
         "express": "^4.17.1",
+        "howler": "^2.2.3",
         "socket.io": "^4.6.1",
         "y-indexeddb": "^9.0.9",
         "y-webrtc": "^10.2.4",
-        "yjs": "^13.5.48",
-        "howler": "^2.2.3"
+        "yjs": "^13.5.48"
     }
 }
