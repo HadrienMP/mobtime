@@ -2,7 +2,6 @@
 import '../sass/main.scss';
 import * as tooltips from './tooltips';
 import * as sockets from './sockets';
-import * as p2p from './p2p';
 import * as alarm from './alarm';
 import * as copy from './copy';
 import { Elm } from '../elm/Main.elm';
@@ -19,7 +18,7 @@ tooltips.setup();
 alarm.setup(app);
 
 if (process.env.TALK_MODE === 'p2p') {
-    p2p.setup(app);
+    import('./p2p').then((p2p) => p2p.setup(app));
 } else {
     const socket = sockets.setup(app);
     app.ports.commands.subscribe((command) => {
