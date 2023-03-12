@@ -3,10 +3,10 @@
 # ------------------------------------
 build: build-with-server
 build-with-server:
-	TALK_MODE=server yarn build
+	TALK_MODE=server SOCKET_SERVER=https://mobtime2.herokuapp.com/ yarn build
 
 dev-with-server:
-	TALK_MODE=server yarn start:dev
+	TALK_MODE=server SOCKET_SERVER=https://mobtime2.herokuapp.com/ yarn start:dev
 
 # ------------------------------------
 # Working with peer to peer

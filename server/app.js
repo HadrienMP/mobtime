@@ -1,9 +1,7 @@
-const express = require('express');
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const path = require('path');
-
+var cors = require('cors');
 const history = {};
 
 io.on('connection', (socket) => {
@@ -28,20 +26,8 @@ function historize(room, message) {
     history[room] = roomHistory;
 }
 
-let publicDirPath = path.join(__dirname + '/../', 'dist');
-app.use(express.static(publicDirPath));
-app.get('/', (_, res) => {
-    res.sendFile(path.join(publicDirPath, 'index.html'));
-})
-    .get('/mob/:mob', (_, res) => {
-        res.sendFile(path.join(publicDirPath, 'index.html'));
-    })
-    .get('/mob/:mob/*', (_, res) => {
-        res.sendFile(path.join(publicDirPath, 'index.html'));
-    })
-    .get('/me', (_, res) => {
-        res.sendFile(path.join(publicDirPath, 'index.html'));
-    });
+app.use(cors);
+app.get('/', (_, res) => res.send('This is the legacy mobtime server'));
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
