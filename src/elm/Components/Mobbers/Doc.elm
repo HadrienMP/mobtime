@@ -16,6 +16,7 @@ props =
     , onShuffle = logAction "Shuffled"
     , onRotate = logAction "Rotated"
     , onSettings = logAction "Go to Settings"
+    , onAdd = logAction "Add"
     }
 
 

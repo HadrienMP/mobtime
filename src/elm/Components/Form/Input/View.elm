@@ -16,6 +16,7 @@ type alias Props msg =
     , label : String
     , value : String
     , onChange : String -> msg
+    , required : Bool
     }
 
 
@@ -35,13 +36,14 @@ view attributes props =
             , Attr.value props.value
             , Attr.placeholder props.label
             , Evts.onInput props.onChange
+            , Attr.required props.required
             , Attr.css
                 [ Css.border Css.zero
                 , Css.borderBottom3 (Css.px 2) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
                 , Css.borderRadius Css.zero
                 , Typography.fontSize Typography.m
                 , Css.padding Css.zero
-                , Css.paddingBottom (Size.toElmCss <| Space.s)
+                , Css.paddingBottom (Size.toElmCss <| Space.xs)
                 , Css.width <| Css.pct 100
                 ]
             ]

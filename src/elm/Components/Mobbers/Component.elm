@@ -49,4 +49,5 @@ view state =
         , onShuffle = Shuffe
         , onRotate = Rotate
         , onSettings = GoToSettings
+        , onAdd = GoToSettings
         }

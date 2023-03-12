@@ -27,6 +27,7 @@ type alias Props msg =
     , onShuffle : msg
     , onRotate : msg
     , onSettings : msg
+    , onAdd : msg
     }
 
 
@@ -34,65 +35,89 @@ view : Props msg -> Html.Html msg
 view props =
     Column.column2
         [ Attr.css
-            [ Css.lineHeight <| Css.num 1.1
-            , Css.paddingBottom <| Size.toElmCss Space.s
-            , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
+            [ Css.paddingBottom <| Size.toElmCss Space.s
+            , if List.length props.people == 0 then
+                Css.borderBottom Css.zero
+
+              else
+                Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
             ]
         ]
-        [ Row.row
-            [ Attr.css
-                [ UI.Css.gap Space.s
-                , Css.alignItems Css.center
-                , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
-                , Css.paddingBottom <| Size.toElmCss Space.xs
-                , Css.marginBottom <| Size.toElmCss Space.s
-                ]
-            ]
-            [ Html.h3
-                [ Attr.css
-                    [ Css.margin Css.zero
-                    , Css.flexGrow <| Css.num 1
-                    , Css.fontWeight Css.normal
-                    ]
-                ]
-                [ Html.text "Mobbers" ]
-            , UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
-                { text = Html.text "Shuffle"
-                , onClick = props.onShuffle
-                }
-            , UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.s ] ]
-                { text = Html.text "Rotate"
-                , onClick = props.onRotate
-                }
-            , UI.Button.Link.view []
-                { text =
-                    UI.Icons.Ion.settings
-                        { size = Typography.m
-                        , color = Palettes.monochrome.on.background
-                        }
-                , onClick = props.onSettings
-                }
-            ]
+        [ header props
         , displaySpecials props
-        , if List.isEmpty props.roles || List.length props.people <= List.length props.roles then
-            none
-
-          else
-            separator
+        , separator props
         , displayRealMobbers props
         ]
 
 
-separator : Html.Html msg
-separator =
-    Html.hr
+header : Props msg -> Html.Html msg
+header props =
+    Row.row
         [ Attr.css
-            [ Css.border Css.zero
-            , Css.borderTop3 (Css.px 1) Css.dashed <| Color.toElmCss <| Palettes.monochrome.on.background
-            , Css.width <| Css.pct 100
+            [ UI.Css.gap Space.s
+            , Css.alignItems Css.center
+            , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
+            , Css.paddingBottom <| Size.toElmCss Space.xs
+            , Css.marginBottom <| Size.toElmCss Space.s
             ]
         ]
-        []
+        [ Html.h3
+            [ Attr.css
+                [ Css.margin Css.zero
+                , Css.flexGrow <| Css.num 1
+                , Css.fontWeight Css.normal
+                ]
+            ]
+            [ Html.text "Mobbers" ]
+        , UI.Button.Link.view [ Attr.title "Add" ]
+            { text =
+                UI.Icons.Ion.plus
+                    { size = Typography.m
+                    , color = Palettes.monochrome.on.background
+                    }
+            , onClick = props.onAdd
+            }
+        , UI.Button.Link.view [ Attr.title "Shuffle" ]
+            { text =
+                UI.Icons.Ion.shuffle
+                    { size = Typography.m
+                    , color = Palettes.monochrome.on.background
+                    }
+            , onClick = props.onShuffle
+            }
+        , UI.Button.Link.view [ Attr.title "Rotate" ]
+            { text =
+                UI.Icons.Ion.rotate
+                    { size = Typography.m
+                    , color = Palettes.monochrome.on.background
+                    }
+            , onClick = props.onRotate
+            }
+        , UI.Button.Link.view [ Attr.css [ Css.transform <| Css.translateY <| Css.px 1 ] ]
+            { text =
+                UI.Icons.Ion.settings
+                    { size = Typography.m
+                    , color = Palettes.monochrome.on.background
+                    }
+            , onClick = props.onSettings
+            }
+        ]
+
+
+separator : Props msg -> Html.Html msg
+separator props =
+    if List.isEmpty props.roles || List.length props.people <= List.length props.roles then
+        none
+
+    else
+        Html.hr
+            [ Attr.css
+                [ Css.border Css.zero
+                , Css.borderTop3 (Css.px 1) Css.dashed <| Color.toElmCss <| Palettes.monochrome.on.background
+                , Css.width <| Css.pct 100
+                ]
+            ]
+            []
 
 
 
@@ -176,29 +201,37 @@ displayMobber { role, mobber, emphasis } =
         [ Attr.css
             [ Css.alignItems Css.center
             , UI.Css.gap <| Size.rem 0.7
+            , Css.maxWidth <| Css.pct 100
             ]
         ]
         [ role
             |> Maybe.andThen iconForRole
             |> Maybe.map
                 (\icon ->
-                    icon
-                        { size = Size.rem 3
-                        , color = Palettes.monochrome.on.background
-                        }
+                    Html.div [ Attr.css [ Css.flexShrink Css.zero ] ]
+                        [ icon
+                            { size = Size.rem 3
+                            , color = Palettes.monochrome.on.background
+                            }
+                        ]
                 )
             |> Maybe.withDefault none
-        , Column.column2 []
+        , Html.div [ Attr.css [ Css.overflow Css.hidden ] ]
             [ role |> Maybe.map displayRoleName |> Maybe.withDefault none
-            , Html.span
+            , Html.div
                 [ Attr.css <|
-                    if emphasis then
+                    ((if emphasis then
                         [ Typography.fontSize Typography.l
                         , Css.fontWeight Css.bold
                         ]
 
-                    else
+                      else
                         []
+                     )
+                        ++ [ Css.overflow Css.hidden
+                           , Css.textOverflow Css.ellipsis
+                           ]
+                    )
                 ]
                 [ Html.text mobber.name ]
             ]
@@ -219,7 +252,8 @@ iconForRole role =
 
 displayRoleName : Role -> Html.Html msg
 displayRoleName lastSpecialRole =
-    Html.span [ Attr.css [ Typography.fontSize Typography.s ] ]
+    Html.div
+        [ Attr.css [ Typography.fontSize Typography.s ] ]
         [ Html.text <| Role.print lastSpecialRole
         ]
 

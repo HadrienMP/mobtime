@@ -110,6 +110,7 @@ view shared model =
                     [ Attr.css
                         [ Css.fontSize <| Css.rem 3.8
                         , Css.paddingLeft <| Css.rem 1.3
+                        , Css.lineHeight <| Css.num 1
                         ]
                     ]
                     [ Html.div [ Attr.css [ Css.fontWeight <| Css.bolder ] ] [ Html.text "Mob" ]

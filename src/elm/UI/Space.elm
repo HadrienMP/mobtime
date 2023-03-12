@@ -1,4 +1,4 @@
-module UI.Space exposing (l, m, s, scale, spacer, xl, xs, xxl)
+module UI.Space exposing (l, m, s, spacer, xl, xs, xxl)
 
 import Html.Styled as Html
 import UI.Size as Size

@@ -2,14 +2,14 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
 
-export const setup = (app) => {
+export const setup = (app, room) => {
     let currentRoom = null;
     let ydoc = null;
     let provider = null;
     let messages = null;
     let context = null;
 
-    app.ports.socketJoin.subscribe((room) => {
+    const join = (room) => {
         ydoc?.destroy();
         provider?.destroy();
 
@@ -33,7 +33,9 @@ export const setup = (app) => {
                 app.ports.receiveHistory.send(changes);
             }
         });
-    });
+    };
+    if (room) join(room);
+    app.ports.socketJoin.subscribe(join);
 
     app.ports.sendEvent.subscribe((event) => {
         messages.push([event]);

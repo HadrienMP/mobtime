@@ -42,7 +42,7 @@ view props =
                 ([ Css.displayFlex
                  , Css.alignItems Css.center
                  , Css.justifyContent Css.spaceBetween
-                 , Css.padding <| Css.rem 0.4
+                 , Css.padding <| Size.toElmCss Space.xs
                  ]
                     ++ props.addedStyle
                 )
@@ -86,6 +86,7 @@ title =
             [ Attr.css
                 [ Css.alignSelf <| Css.center
                 , Css.paddingLeft <| Css.rem 0.5
+                , Css.lineHeight <| Css.num 1
                 ]
             ]
             [ Html.div [ Attr.css [ Css.fontWeight Css.bolder ] ] [ Html.text "Mob" ]

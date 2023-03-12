@@ -64,6 +64,7 @@ form props =
             , label = "Name"
             , value = props.input.value
             , onChange = props.input.onChange
+            , required = True
             }
         , UI.Button.View.button []
             { content =
@@ -139,9 +140,9 @@ displayMobber { role, mobber, onDelete } =
     Row.row
         [ Attr.css
             [ Css.alignItems Css.center
-            , Css.lineHeight <| Css.num 1
             , UI.Css.gap <| Size.rem 1
             , Css.borderTop2 (Css.px 1) Css.solid
+            , Css.padding2 (Size.toElmCss Space.xs) Css.zero
             ]
         ]
         [ role
@@ -154,8 +155,18 @@ displayMobber { role, mobber, onDelete } =
                         , color = Palettes.monochrome.on.background
                         }
                 )
-            |> Maybe.withDefault (Html.span [ Attr.css [ Css.height <| Css.rem 2, Css.width <| Css.rem 2 ] ] [])
-        , Html.span [ Attr.css [ Css.flexGrow <| Css.num 1 ] ] [ Html.text mobber.name ]
+            |> Maybe.withDefault (Html.div [ Attr.css [ Css.height <| Css.rem 2, Css.width <| Css.rem 2 ] ] [])
+            |> List.singleton
+            |> Html.span [ Attr.css [ Css.flexShrink Css.zero ] ]
+        , Html.span
+            [ Attr.css
+                [ Css.flexGrow <| Css.num 1
+                , Css.overflow Css.hidden
+                , Css.textOverflow Css.ellipsis
+                ]
+            , Attr.title mobber.name
+            ]
+            [ Html.text mobber.name ]
         , Html.span
             [ Attr.css
                 [ Css.cursor Css.pointer

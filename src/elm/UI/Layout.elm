@@ -13,6 +13,7 @@ import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Palettes as Palettes
 import UI.Size as Size
+import UI.Space as Space
 
 
 limitWidth : List Css.Style
@@ -34,7 +35,7 @@ wrap shared child =
             ]
         , Attr.class "app"
         ]
-        [ Components.NavBar.Component.view (Css.padding sidePadding :: limitWidth) shared
+        [ Components.NavBar.Component.view limitWidth shared
         , div
             [ Attr.css
                 [ Css.flexGrow <| Css.num 1
@@ -48,11 +49,15 @@ wrap shared child =
                     [ Css.flexGrow <| Css.num 1
                     , Css.displayFlex
                     , Css.flexDirection Css.column
-                    , Css.padding sidePadding
+                    , Css.padding4
+                        (Size.toElmCss Space.s)
+                        (Size.toElmCss Space.xs)
+                        (Size.toElmCss Space.xxl)
+                        (Size.toElmCss Space.xs)
                     ]
                 ]
                 [ div
-                    [ Attr.css (Css.padding sidePadding :: limitWidth)
+                    [ Attr.css limitWidth
                     ]
                     [ child
                     ]
@@ -60,11 +65,6 @@ wrap shared child =
             , footer
             ]
         ]
-
-
-sidePadding : Css.Rem
-sidePadding =
-    Css.rem 0.5
 
 
 forHome : Shared -> Html msg -> Html msg
@@ -85,7 +85,7 @@ forHome shared child =
             ]
             [ div
                 [ css
-                    (Css.padding sidePadding
+                    (Css.padding2 (Size.toElmCss Space.m) (Size.toElmCss Space.s)
                         :: UI.Css.center
                         ++ limitWidth
                     )

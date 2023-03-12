@@ -33,6 +33,7 @@ component state =
         , label = "Name"
         , value = state.input
         , onChange = updateStateWith updateSharedState
+        , required = True
         }
 
 
