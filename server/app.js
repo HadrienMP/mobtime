@@ -26,7 +26,7 @@ function historize(room, message) {
     history[room] = roomHistory;
 }
 
-app.use(cors);
+app.use(cors());
 app.get('/', (_, res) => res.send('This is the legacy mobtime server'));
 
 const port = process.env.PORT || 3000;
