@@ -49,7 +49,6 @@
         "tippy.js": "^6.3.7"
     },
     "dependencies": {
-        "cors": "^2.8.5",
         "express": "^4.17.1",
         "howler": "^2.2.3",
         "socket.io": "^4.6.1",
