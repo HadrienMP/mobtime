@@ -18,8 +18,7 @@ copy.setup(app);
 tooltips.setup();
 alarm.setup(app);
 
-const talkMode = process.env.TALK_MODE;
-if (talkMode === 'p2p') {
+if (process.env.TALK_MODE === 'p2p') {
     p2p.setup(app);
 } else {
     const socket = sockets.setup(app);
