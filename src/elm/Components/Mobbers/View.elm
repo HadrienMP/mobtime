@@ -4,6 +4,7 @@ import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import Lib.ListExtras
+import Lib.StringExtra
 import Model.Mobber
 import Model.Role as Role exposing (Role)
 import UI.Button.Link
@@ -208,7 +209,7 @@ displayMobber { role, mobber, emphasis } =
             |> Maybe.andThen iconForRole
             |> Maybe.map
                 (\icon ->
-                    Html.div [ Attr.css [ Css.flexShrink Css.zero ] ]
+                    Html.div [ Attr.css [ Css.flexShrink Css.zero, Css.height <| Css.rem 3 ] ]
                         [ icon
                             { size = Size.rem 3
                             , color = Palettes.monochrome.on.background
@@ -233,7 +234,7 @@ displayMobber { role, mobber, emphasis } =
                            ]
                     )
                 ]
-                [ Html.text mobber.name ]
+                [ Html.text <| Lib.StringExtra.capitalize mobber.name ]
             ]
         ]
 
@@ -253,7 +254,7 @@ iconForRole role =
 displayRoleName : Role -> Html.Html msg
 displayRoleName lastSpecialRole =
     Html.div
-        [ Attr.css [ Typography.fontSize Typography.s ] ]
+        [ Attr.css [ Typography.fontSize Typography.s, Css.fontWeight Css.lighter ] ]
         [ Html.text <| Role.print lastSpecialRole
         ]
 
