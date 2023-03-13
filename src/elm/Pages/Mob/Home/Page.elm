@@ -317,7 +317,7 @@ clockArea mob model =
             , Css.margin Css.auto
             , Css.displayFlex
             , Css.alignItems Css.flexStart
-            , Css.paddingBottom (Css.rem 4)
+            , Css.paddingBottom (Css.px 70)
             , Css.marginTop <| Size.toElmCss Space.s
             , Css.marginBottom <| Size.toElmCss Space.l
             ]
@@ -365,7 +365,7 @@ clockArea mob model =
                     )
             , style =
                 { strokeWidth = Size.rem 0.4
-                , diameter = Size.rem 9
+                , diameter = Size.rem 10
                 }
             }
         , displayClock
@@ -421,8 +421,8 @@ clockArea mob model =
         , UI.Link.IconLink.view
             [ Attr.css
                 [ Css.position Css.absolute
-                , Css.bottom <| Css.pct 10
-                , Css.left <| Css.pct 32
+                , Css.bottom <| Css.pct 0
+                , Css.left <| Css.pct 34
                 ]
             ]
             { target =
@@ -439,7 +439,7 @@ clockArea mob model =
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.top <| Css.pct 5
-                , Css.left <| Css.pct 66
+                , Css.left <| Css.pct 72
                 ]
             ]
             { target =
@@ -455,8 +455,8 @@ clockArea mob model =
         , UI.Link.IconLink.view
             [ Attr.css
                 [ Css.position Css.absolute
-                , Css.bottom <| Css.pct 10
-                , Css.left <| Css.pct 9
+                , Css.bottom <| Css.pct 0
+                , Css.left <| Css.pct 14
                 ]
             ]
             { target =
