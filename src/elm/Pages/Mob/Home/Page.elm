@@ -10,6 +10,7 @@ module Pages.Mob.Home.Page exposing
     )
 
 import Components.Mobbers.Component
+import Components.Playlist.View
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
@@ -281,9 +282,15 @@ breakModal =
 
 body : Model.Mob.Mob -> Model -> Html Msg
 body mob model =
-    div []
+    Column.column2
+        [ Attr.css
+            [ UI.Css.gap Space.xxl
+            , Css.alignItems Css.center
+            ]
+        ]
         [ clockArea mob model
         , Components.Mobbers.Component.view mob |> Html.map MobbersMsg
+        , Components.Playlist.View.view mob.soundProfile
         ]
 
 
@@ -319,7 +326,6 @@ clockArea mob model =
             , Css.alignItems Css.flexStart
             , Css.paddingBottom (Css.px 70)
             , Css.marginTop <| Size.toElmCss Space.s
-            , Css.marginBottom <| Size.toElmCss Space.l
             ]
         ]
         [ displayClock []

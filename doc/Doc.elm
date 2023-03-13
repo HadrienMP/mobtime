@@ -5,6 +5,7 @@ import Components.Form.Toggle.Doc
 import Components.Form.Volume.Doc
 import Components.Mobbers.Doc
 import Components.NavBar.Doc
+import Components.Playlist.Doc
 import Components.SecondaryPage.Doc
 import Components.Socket.Doc
 import Css
@@ -85,6 +86,7 @@ main =
                 , Components.NavBar.Doc.theChapter
                 , Components.SecondaryPage.Doc.theChapter
                 , Components.Mobbers.Doc.doc
+                , Components.Playlist.Doc.doc
                 ]
               )
             , ( "Form"

@@ -131,6 +131,7 @@ displaySpecials props =
         [ Attr.css
             [ Css.justifyContent Css.spaceBetween
             , Css.flexWrap Css.wrap
+            , UI.Css.gap Space.m
             ]
         ]
         (props.people
