@@ -18,12 +18,6 @@
             nodePackages.gitmoji-cli
             lame
             imageworsener
-            elmPackages.elm
-            elmPackages.elm-test-rs
-            elmPackages.elm-json
-            elmPackages.elm-format
-            elmPackages.elm-review
-            elmPackages.elm-language-server
           ];
           shellHook = ''
             yarn install
