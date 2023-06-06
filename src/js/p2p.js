@@ -1,6 +1,7 @@
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
+import { openInTab } from './jsonTab';
 
 export const setup = (app, room) => {
     let currentRoom = null;
@@ -41,4 +42,6 @@ export const setup = (app, room) => {
         messages.push([event]);
         context.set('lastUpdate', new Date().getTime());
     });
+
+    document.addEventListener('log', () => openInTab(messages));
 };

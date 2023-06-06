@@ -9,9 +9,12 @@ const history = {};
 io.on('connection', (socket) => {
     socket.on('join', (room) => {
         socket.join(room);
-        socket.emit('history', history[room] ? history[room] : []);
+        const roomHistory = history[room] ? history[room] : [];
+        console.log('join');
+        socket.emit('history', roomHistory);
     });
     socket.on('message', (room, message) => {
+        console.log({ message });
         historize(room, message);
         io.in(room).emit('message', message);
     });
