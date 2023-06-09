@@ -127,6 +127,7 @@ baseElement props attr children =
                 (Evts.onClick msg
                     :: Attr.css
                         [ Css.padding Css.zero
+                        , Css.lineHeight <| Css.num 1.2
                         , Css.hover [ Css.backgroundColor Css.transparent ]
                         ]
                     :: attr
