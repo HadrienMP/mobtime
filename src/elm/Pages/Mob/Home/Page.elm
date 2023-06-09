@@ -38,7 +38,7 @@ import UI.Css
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
-import UI.Link.IconLink
+import UI.Button.RoundIcon
 import UI.Modal.View
 import UI.Palettes as Palettes
 import UI.Size as Size
@@ -424,7 +424,7 @@ clockArea mob model =
                 , diameter = Size.rem 6
                 }
             }
-        , UI.Link.IconLink.view
+        , UI.Button.RoundIcon.view
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.bottom <| Css.pct 0
@@ -432,16 +432,17 @@ clockArea mob model =
                 ]
             ]
             { target =
-                Routing.toUrl <|
-                    Routing.Mob
-                        { subRoute = Pages.Mob.Routing.Invite
-                        , mob = mob.name
-                        }
+                UI.Button.RoundIcon.Link <|
+                    Routing.toUrl <|
+                        Routing.Mob
+                            { subRoute = Pages.Mob.Routing.Invite
+                            , mob = mob.name
+                            }
             , color = Palettes.monochrome.on.background
             , text = "Invite"
             , icon = UI.Icons.Ion.share
             }
-        , UI.Link.IconLink.view
+        , UI.Button.RoundIcon.view
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.top <| Css.pct 5
@@ -449,16 +450,17 @@ clockArea mob model =
                 ]
             ]
             { target =
-                Routing.toUrl <|
-                    Routing.Mob
-                        { subRoute = Pages.Mob.Routing.Settings
-                        , mob = mob.name
-                        }
+                UI.Button.RoundIcon.Link <|
+                    Routing.toUrl <|
+                        Routing.Mob
+                            { subRoute = Pages.Mob.Routing.Settings
+                            , mob = mob.name
+                            }
             , color = Palettes.monochrome.on.background
             , text = "Settings"
             , icon = UI.Icons.Ion.settings
             }
-        , UI.Link.IconLink.view
+        , UI.Button.RoundIcon.view
             [ Attr.css
                 [ Css.position Css.absolute
                 , Css.bottom <| Css.pct 0
@@ -466,11 +468,12 @@ clockArea mob model =
                 ]
             ]
             { target =
-                Routing.toUrl <|
-                    Routing.Mob
-                        { subRoute = Pages.Mob.Routing.Profile
-                        , mob = mob.name
-                        }
+                UI.Button.RoundIcon.Link <|
+                    Routing.toUrl <|
+                        Routing.Mob
+                            { subRoute = Pages.Mob.Routing.Profile
+                            , mob = mob.name
+                            }
             , color = Palettes.monochrome.on.background
             , text = "Profile"
             , icon = UI.Icons.Ion.user

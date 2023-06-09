@@ -21,7 +21,7 @@ import Pages.Mob.Settings.Doc
 import UI.Button.Doc
 import UI.GlobalStyle
 import UI.Icons.Doc
-import UI.Link.Doc
+import UI.Button.RoundIcon
 import UI.Modal.Doc
 import UI.Range.Doc
 import UI.Toggle.Doc
@@ -77,7 +77,7 @@ main =
                 , UI.Toggle.Doc.theChapter
                 , UI.Modal.Doc.theChapter
                 , UI.Typography.Doc.doc
-                , UI.Link.Doc.doc
+                , UI.Button.RoundIcon.doc
                 , UI.Icons.Doc.doc
                 ]
               )

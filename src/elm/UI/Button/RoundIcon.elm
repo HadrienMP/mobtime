@@ -1,17 +1,60 @@
-module UI.Link.IconLink exposing (Props, view)
+module UI.Button.RoundIcon exposing (Props, Target(..), doc, view)
 
 import Css
+import ElmBook.Chapter exposing (chapter, render, withComponent)
+import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Html.Styled.Events as Evts
 import UI.Color as Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
+import UI.Icons.Ion
 import UI.Palettes as Palettes
 import UI.Size as Size
 
 
+
+-- Doc
+
+
+doc : Chapter x
+doc =
+    chapter "Link"
+        |> withComponent
+            (view []
+                { target = Link "#here"
+                , text = "To somewhere"
+                , icon = UI.Icons.Ion.code
+                , color = Palettes.monochrome.on.background
+                }
+            )
+        |> render """
+## Icon Link
+<component />
+
+```elm
+UI.Button.RoundIcon.view []
+    { target = UI.Button.RoundIcon.Link "#here" -- or UI.Button.RoundIcon.Button Clicked
+    , text = "To somewhere"
+    , icon = UI.Icons.Ion.code
+    , color = UI.Palettes.monochrome.on.background
+    }
+```
+"""
+
+
+
+-- View
+
+
+type Target msg
+    = Link String
+    | Button msg
+
+
 type alias Props msg =
-    { target : String
+    { target : Target msg
     , icon : Icon msg
     , text : String
     , color : Color.RGBA255
@@ -31,7 +74,12 @@ view attributes props =
             , Css.textDecoration Css.none
             , Css.hover [ Css.textDecoration Css.underline ]
             ]
-         , Attr.href props.target
+         , case props.target of
+            Link url ->
+                Attr.href url
+
+            Button msg ->
+                Evts.onClick msg
          ]
             ++ attributes
         )
