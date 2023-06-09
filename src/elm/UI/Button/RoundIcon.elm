@@ -124,4 +124,9 @@ baseElement props attr children =
             Html.a (Attr.href url :: attr) children
 
         Button msg ->
-            Html.button (Evts.onClick msg :: attr) children
+            Html.button
+                (Evts.onClick msg
+                    :: Attr.css [ Css.padding Css.zero ]
+                    :: attr
+                )
+                children
