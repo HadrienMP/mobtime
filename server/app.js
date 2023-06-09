@@ -14,7 +14,6 @@ io.on('connection', (socket) => {
         socket.emit('history', roomHistory);
     });
     socket.on('message', (room, message) => {
-        console.log({ message });
         historize(room, message);
         io.in(room).emit('message', message);
     });
