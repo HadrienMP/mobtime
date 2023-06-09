@@ -63,8 +63,8 @@ type alias Props msg =
 
 view : List (Html.Attribute msg) -> Props msg -> Html.Html msg
 view attributes props =
-    Html.a
-        ([ Attr.css
+    baseElement props
+        (Attr.css
             [ Css.cursor Css.pointer
             , Css.displayFlex
             , Css.flexDirection Css.column
@@ -73,15 +73,10 @@ view attributes props =
             , UI.Css.gap <| Size.rem 0.2
             , Css.textDecoration Css.none
             , Css.hover [ Css.textDecoration Css.underline ]
+            , Css.border Css.zero
+            , Css.backgroundColor Css.transparent
             ]
-         , case props.target of
-            Link url ->
-                Attr.href url
-
-            Button msg ->
-                Evts.onClick msg
-         ]
-            ++ attributes
+            :: attributes
         )
         [ Html.div
             [ Attr.css
@@ -108,3 +103,13 @@ view attributes props =
             ]
             [ Html.text props.text ]
         ]
+
+
+baseElement : Props msg -> List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
+baseElement props attr children =
+    case props.target of
+        Link url ->
+            Html.a (Attr.href url :: attr) children
+
+        Button msg ->
+            Html.button (Evts.onClick msg :: attr) children

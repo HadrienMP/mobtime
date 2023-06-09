@@ -3,6 +3,7 @@ module Doc exposing (SharedState, main)
 import Components.Form.Input.Doc
 import Components.Form.Toggle.Doc
 import Components.Form.Volume.Doc
+import Components.Log
 import Components.Mobbers.Doc
 import Components.NavBar.Doc
 import Components.Playlist.Doc
@@ -87,6 +88,7 @@ main =
                 , Components.SecondaryPage.Doc.theChapter
                 , Components.Mobbers.Doc.doc
                 , Components.Playlist.Doc.doc
+                , Components.Log.doc
                 ]
               )
             , ( "Form"

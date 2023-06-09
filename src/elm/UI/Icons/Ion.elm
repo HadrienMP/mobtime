@@ -1,4 +1,31 @@
-module UI.Icons.Ion exposing (back, check, clock, close, code, copy, delete, error, github, home, musicNote, mute, paperAirplane, people, play, plus, rotate, settings, share, shuffle, stop, success, user, volumeHigh, volumeLow)
+module UI.Icons.Ion exposing
+    ( back
+    , bug
+    , check
+    , clock
+    , close
+    , code
+    , copy
+    , delete
+    , error
+    , github
+    , home
+    , musicNote
+    , mute
+    , paperAirplane
+    , people
+    , play
+    , plus
+    , rotate
+    , settings
+    , share
+    , shuffle
+    , stop
+    , success
+    , user
+    , volumeHigh
+    , volumeLow
+    )
 
 import Ionicon
 import Ionicon.Android
@@ -9,6 +36,11 @@ import Svg.Styled as Svg
 import UI.Color as Color
 import UI.Icons.Common exposing (Icon)
 import UI.Size as Size
+
+
+bug : Icon msg
+bug =
+    display Ionicon.bug
 
 
 code : Icon msg
