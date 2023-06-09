@@ -13,7 +13,7 @@
       {
         devShell = pkgs.mkShell {
           packages = with pkgs; [
-            nodejs-18_x
+            nodejs_20
             yarn
             nodePackages.gitmoji-cli
             lame

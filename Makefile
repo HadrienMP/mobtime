@@ -21,6 +21,9 @@ dev-with-p2p:
 install:
 	yarn install
 
+update:
+	nix flake update .
+
 # ------------------------------------
 # Run vim in nix with node 16
 # - allows elm language server to work
