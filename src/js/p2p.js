@@ -43,5 +43,5 @@ export const setup = (app, room) => {
         context.set('lastUpdate', new Date().getTime());
     });
 
-    document.addEventListener('log', () => openInTab(messages));
+    app.ports.displayLogs.subscribe(() => openInTab(messages));
 };

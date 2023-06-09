@@ -1,4 +1,4 @@
-module Pages.Mob.Home.Page exposing
+port module Pages.Mob.Home.Page exposing
     ( AlarmState
     , Model
     , Msg(..)
@@ -9,6 +9,7 @@ module Pages.Mob.Home.Page exposing
     , view
     )
 
+import Components.Log
 import Components.Mobbers.Component
 import Components.Playlist.View
 import Css
@@ -30,6 +31,7 @@ import Shared exposing (Shared)
 import Sounds
 import Task
 import Time
+import UI.Button.RoundIcon
 import UI.Button.View
 import UI.CircularProgressBar
 import UI.Color as Color
@@ -38,7 +40,6 @@ import UI.Css
 import UI.Icons.Ion
 import UI.Icons.Tape
 import UI.Icons.Tea
-import UI.Button.RoundIcon
 import UI.Modal.View
 import UI.Palettes as Palettes
 import UI.Size as Size
@@ -46,6 +47,9 @@ import UI.Space as Space
 import UI.Text as Text
 import UI.Typography.Typography as Typography
 import View exposing (View)
+
+
+port displayLogs : () -> Cmd msg
 
 
 
@@ -97,6 +101,7 @@ type Msg
     | StopPomodoro
     | StartTurn
     | StopTurn
+    | DisplayLogs
     | MobbersMsg Components.Mobbers.Component.Msg
 
 
@@ -182,6 +187,9 @@ update shared mob msg model =
             , Components.Mobbers.Component.update shared mob subMsg
                 |> Effect.map MobbersMsg
             )
+
+        DisplayLogs ->
+            ( model, displayLogs () |> Effect.fromCmd )
 
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
@@ -427,24 +435,6 @@ clockArea mob model =
         , UI.Button.RoundIcon.view
             [ Attr.css
                 [ Css.position Css.absolute
-                , Css.bottom <| Css.pct 0
-                , Css.left <| Css.pct 34
-                ]
-            ]
-            { target =
-                UI.Button.RoundIcon.Link <|
-                    Routing.toUrl <|
-                        Routing.Mob
-                            { subRoute = Pages.Mob.Routing.Invite
-                            , mob = mob.name
-                            }
-            , color = Palettes.monochrome.on.background
-            , text = "Invite"
-            , icon = UI.Icons.Ion.share
-            }
-        , UI.Button.RoundIcon.view
-            [ Attr.css
-                [ Css.position Css.absolute
                 , Css.top <| Css.pct 5
                 , Css.left <| Css.pct 72
                 ]
@@ -460,24 +450,41 @@ clockArea mob model =
             , text = "Settings"
             , icon = UI.Icons.Ion.settings
             }
-        , UI.Button.RoundIcon.view
+        , Html.div
             [ Attr.css
-                [ Css.position Css.absolute
-                , Css.bottom <| Css.pct 0
-                , Css.left <| Css.pct 14
+                [ Css.bottom Css.zero
+                , Css.position Css.absolute
+                , Css.left <| Css.pct 4
+                , Css.displayFlex
+                , Css.property "gap" "0.7rem"
                 ]
             ]
-            { target =
-                UI.Button.RoundIcon.Link <|
-                    Routing.toUrl <|
-                        Routing.Mob
-                            { subRoute = Pages.Mob.Routing.Profile
-                            , mob = mob.name
-                            }
-            , color = Palettes.monochrome.on.background
-            , text = "Profile"
-            , icon = UI.Icons.Ion.user
-            }
+            [ UI.Button.RoundIcon.view []
+                { target =
+                    UI.Button.RoundIcon.Link <|
+                        Routing.toUrl <|
+                            Routing.Mob
+                                { subRoute = Pages.Mob.Routing.Profile
+                                , mob = mob.name
+                                }
+                , color = Palettes.monochrome.on.background
+                , text = "Profile"
+                , icon = UI.Icons.Ion.user
+                }
+            , UI.Button.RoundIcon.view []
+                { target =
+                    UI.Button.RoundIcon.Link <|
+                        Routing.toUrl <|
+                            Routing.Mob
+                                { subRoute = Pages.Mob.Routing.Invite
+                                , mob = mob.name
+                                }
+                , color = Palettes.monochrome.on.background
+                , text = "Invite"
+                , icon = UI.Icons.Ion.share
+                }
+            , Components.Log.view [] { onClick = DisplayLogs }
+            ]
         ]
 
 

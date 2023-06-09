@@ -36,7 +36,7 @@ export function setup(app) {
         }
     });
 
-    document.addEventListener('log', () => openInTab(history));
+    app.ports.displayLogs.subscribe(() => openInTab(history));
 
     return socket;
 }
