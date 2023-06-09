@@ -21,7 +21,7 @@ import UI.Size as Size
 
 doc : Chapter x
 doc =
-    chapter "Buttons.RoundIcon"
+    chapter "Buttons / RoundIcon"
         |> withComponentList
             [ ( "Link"
               , view []
@@ -41,7 +41,6 @@ doc =
               )
             ]
         |> render """
-## Icon Link
 <component with-label="Link" />
 <component with-label="Button" />
 
@@ -126,7 +125,10 @@ baseElement props attr children =
         Button msg ->
             Html.button
                 (Evts.onClick msg
-                    :: Attr.css [ Css.padding Css.zero ]
+                    :: Attr.css
+                        [ Css.padding Css.zero
+                        , Css.hover [ Css.backgroundColor Css.transparent ]
+                        ]
                     :: attr
                 )
                 children
