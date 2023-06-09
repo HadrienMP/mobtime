@@ -1,7 +1,8 @@
 module UI.Button.RoundIcon exposing (Props, Target(..), doc, view)
 
 import Css
-import ElmBook.Chapter exposing (chapter, render, withComponent)
+import ElmBook.Actions exposing (logAction)
+import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
@@ -20,18 +21,29 @@ import UI.Size as Size
 
 doc : Chapter x
 doc =
-    chapter "Link"
-        |> withComponent
-            (view []
-                { target = Link "#here"
-                , text = "To somewhere"
-                , icon = UI.Icons.Ion.code
-                , color = Palettes.monochrome.on.background
-                }
-            )
+    chapter "Buttons.RoundIcon"
+        |> withComponentList
+            [ ( "Link"
+              , view []
+                    { target = Link "#here"
+                    , text = "To somewhere"
+                    , icon = UI.Icons.Ion.code
+                    , color = Palettes.monochrome.on.background
+                    }
+              )
+            , ( "Button"
+              , view []
+                    { target = Button <| logAction "Clicked"
+                    , text = "label"
+                    , icon = UI.Icons.Ion.copy
+                    , color = Palettes.monochrome.on.background
+                    }
+              )
+            ]
         |> render """
 ## Icon Link
-<component />
+<component with-label="Link" />
+<component with-label="Button" />
 
 ```elm
 UI.Button.RoundIcon.view []
