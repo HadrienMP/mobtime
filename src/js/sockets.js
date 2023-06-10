@@ -4,11 +4,12 @@ import { openInTab } from './jsonTab';
 
 export function setup(app) {
     const socket = io();
-    const history = [];
+    let history = [];
 
     app.ports.socketJoin.subscribe((room) => {
         debounce(
             () => {
+                history = [];
                 socket.emit('join', room);
             },
             'join',
