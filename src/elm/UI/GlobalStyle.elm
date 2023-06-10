@@ -26,6 +26,9 @@ globalStyle =
                     ]
                 ]
             ]
+        , Css.Global.p
+            [ Css.margin Css.zero
+            ]
         , Css.Global.selector "#action.on"
             [ Css.Global.descendants
                 [ Css.Global.id "action-icon"

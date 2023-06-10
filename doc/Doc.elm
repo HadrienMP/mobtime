@@ -15,14 +15,15 @@ import ElmBook exposing (withChapterGroups, withStatefulOptions, withThemeOption
 import ElmBook.ElmCSS exposing (..)
 import ElmBook.StatefulOptions
 import ElmBook.ThemeOptions exposing (globals)
+import Pages.Mob.Bug
 import Pages.Mob.Invite.Doc
 import Pages.Mob.Mobbers.Doc
 import Pages.Mob.Profile.Doc
 import Pages.Mob.Settings.Doc
 import UI.Button.Doc
+import UI.Button.RoundIcon
 import UI.GlobalStyle
 import UI.Icons.Doc
-import UI.Button.RoundIcon
 import UI.Modal.Doc
 import UI.Range.Doc
 import UI.Toggle.Doc
@@ -102,6 +103,7 @@ main =
                 , Pages.Mob.Invite.Doc.theChapter
                 , Pages.Mob.Settings.Doc.theChapter
                 , Pages.Mob.Mobbers.Doc.doc
+                , Pages.Mob.Bug.doc
                 ]
               )
             ]
