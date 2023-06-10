@@ -2,7 +2,7 @@ module Pages.Mob.Mobbers.PageView exposing (Props, view)
 
 import Components.Form.Input.View
 import Components.Mobbers.View
-import Components.SecondaryPage.View
+import Components.SecondaryPage
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
@@ -35,9 +35,10 @@ type alias Props msg =
 
 view : Props msg -> Html.Html msg
 view props =
-    Components.SecondaryPage.View.view
+    Components.SecondaryPage.view
         { onBack = props.onBack
         , title = "Mobbers"
+        , subTitle = Nothing
         , content =
             Column.column2
                 [ Attr.css [ UI.Css.gap Space.s ] ]

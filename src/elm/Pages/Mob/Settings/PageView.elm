@@ -1,6 +1,6 @@
 module Pages.Mob.Settings.PageView exposing (Props, view)
 
-import Components.SecondaryPage.View
+import Components.SecondaryPage
 import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
@@ -34,9 +34,10 @@ type alias Props msg =
 
 view : Props msg -> Html msg
 view props =
-    Components.SecondaryPage.View.view
+    Components.SecondaryPage.view
         { onBack = props.onBack
         , title = "Settings"
+        , subTitle = Just "The settings are shared with the whole team"
         , content =
             Html.div
                 [ Attr.css
@@ -45,8 +46,7 @@ view props =
                     , UI.Css.gap <| Size.rem 3
                     ]
                 ]
-                [ Html.text "The settings are shared with the whole team"
-                , clockLengths props
+                [ clockLengths props
                 , playlist props
                 ]
         }

@@ -1,7 +1,6 @@
 module Pages.Mob.Bug exposing (doc)
 
-import Components.SecondaryPage.View
-import Css
+import Components.SecondaryPage
 import ElmBook.Actions exposing (logAction)
 import ElmBook.Chapter exposing (chapter, renderComponent)
 import ElmBook.ElmCSS exposing (Chapter)
@@ -15,18 +14,13 @@ doc : Chapter x
 doc =
     chapter "Bug"
         |> renderComponent
-            (Components.SecondaryPage.View.view
+            (Components.SecondaryPage.view
                 { onBack = logAction "Back"
                 , title = "Found a bug?"
+                , subTitle = Just "Help make mobtime better by reporting it!"
                 , content =
                     Html.div []
-                        [ Html.p
-                            [ Attr.css
-                                [ Css.fontWeight Css.lighter
-                                ]
-                            ]
-                            [ Html.text "Help make mobtime better by reporting it!" ]
-                        , Html.p []
+                        [ Html.p []
                             [ Html.text "1. "
                             , UI.Button.Link.view [ Attr.css [ Typography.fontSize Typography.m ] ]
                                 { text = Html.text " Display the event log "

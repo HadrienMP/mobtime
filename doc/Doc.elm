@@ -7,7 +7,7 @@ import Components.Log
 import Components.Mobbers.Doc
 import Components.NavBar.Doc
 import Components.Playlist.Doc
-import Components.SecondaryPage.Doc
+import Components.SecondaryPage
 import Components.Socket.Doc
 import Css
 import Css.Global
@@ -60,9 +60,6 @@ main =
                             [ Css.Global.h1
                                 [ Css.margin Css.zero
                                 ]
-                            , Css.Global.h2
-                                [ Css.margin Css.zero
-                                ]
                             ]
                         ]
                     , Css.Global.selector ".elmsh:is(code)"
@@ -86,7 +83,7 @@ main =
             , ( "Components"
               , [ Components.Socket.Doc.theChapter
                 , Components.NavBar.Doc.theChapter
-                , Components.SecondaryPage.Doc.theChapter
+                , Components.SecondaryPage.theChapter
                 , Components.Mobbers.Doc.doc
                 , Components.Playlist.Doc.doc
                 , Components.Log.doc

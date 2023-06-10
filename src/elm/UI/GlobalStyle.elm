@@ -26,6 +26,7 @@ globalStyle =
                     ]
                 ]
             ]
+        , Css.Global.h2 [ Css.margin Css.zero ]
         , Css.Global.p
             [ Css.margin Css.zero
             ]
