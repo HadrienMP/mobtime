@@ -17,7 +17,7 @@ import UI.Icons.Tape
 import UI.Palettes as Palettes
 import UI.Range.View
 import UI.Size as Size
-import UI.Typography.Typography as Typography
+import UI.Typography as Typography
 
 
 type alias Props msg =

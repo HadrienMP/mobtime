@@ -11,7 +11,7 @@ import UI.Icons.Common
 import UI.Palettes as Palettes
 import UI.Row as Row
 import UI.Size as Size
-import UI.Typography.Typography as Typography
+import UI.Typography as Typography
 
 
 type Content msg

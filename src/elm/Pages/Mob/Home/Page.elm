@@ -45,7 +45,7 @@ import UI.Palettes as Palettes
 import UI.Size as Size
 import UI.Space as Space
 import UI.Text as Text
-import UI.Typography.Typography as Typography
+import UI.Typography as Typography
 import View exposing (View)
 
 

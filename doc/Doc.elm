@@ -27,7 +27,7 @@ import UI.Icons.Doc
 import UI.Modal.Doc
 import UI.Range.Doc
 import UI.Toggle.Doc
-import UI.Typography.Doc
+import UI.Typography as Typography
 
 
 type alias SharedState =
@@ -78,7 +78,7 @@ main =
                 , UI.Button.Doc.theChapter
                 , UI.Toggle.Doc.theChapter
                 , UI.Modal.Doc.theChapter
-                , UI.Typography.Doc.doc
+                , Typography.doc
                 , UI.Button.RoundIcon.doc
                 , UI.Icons.Doc.doc
                 ]

@@ -19,7 +19,7 @@ import UI.Palettes as Palettes
 import UI.Row as Row
 import UI.Size as Size
 import UI.Space as Space
-import UI.Typography.Typography as Typography
+import UI.Typography as Typography
 
 
 type alias Props msg =

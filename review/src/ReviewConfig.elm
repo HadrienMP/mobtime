@@ -66,7 +66,7 @@ config =
                 , ( "UI.Text", "Text")
                 , ( "UI.Color", "Color")
                 , ( "UI.Palettes", "Palettes")
-                , ( "UI.Typography.Typography", "Typography")
+                , ( "UI.Typography", "Typography")
                 ]
                 |> NoInconsistentAliases.noMissingAliases
                 |> NoInconsistentAliases.rule

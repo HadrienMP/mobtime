@@ -8,7 +8,7 @@ import ElmBook.ElmCSS exposing (Chapter)
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
 import UI.Button.Link
-import UI.Typography.Typography as Typography
+import UI.Typography as Typography
 
 
 doc : Chapter x
