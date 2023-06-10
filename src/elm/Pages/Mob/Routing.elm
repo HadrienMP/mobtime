@@ -15,6 +15,7 @@ type SubRoute
     | Invite
     | Profile
     | Mobbers
+    | Bug
 
 
 toUrl : Route -> String
@@ -35,6 +36,9 @@ toUrl route =
         Mobbers ->
             Url.Builder.relative [ Model.MobName.print route.mob, "mobbers" ] []
 
+        Bug ->
+            Url.Builder.relative [ Model.MobName.print route.mob, "bug" ] []
+
 
 parser : Url.Parser.Parser (Route -> c) c
 parser =
@@ -44,4 +48,5 @@ parser =
         , Url.Parser.map (MobName >> Route Invite) (Url.Parser.string </> Url.Parser.s "invite")
         , Url.Parser.map (MobName >> Route Profile) (Url.Parser.string </> Url.Parser.s "profile")
         , Url.Parser.map (MobName >> Route Mobbers) (Url.Parser.string </> Url.Parser.s "mobbers")
+        , Url.Parser.map (MobName >> Route Bug) (Url.Parser.string </> Url.Parser.s "bug")
         ]

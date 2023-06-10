@@ -1,4 +1,4 @@
-port module Pages.Mob.Home.Page exposing
+module Pages.Mob.Home.Page exposing
     ( AlarmState
     , Model
     , Msg(..)
@@ -9,7 +9,6 @@ port module Pages.Mob.Home.Page exposing
     , view
     )
 
-import Components.Log
 import Components.Mobbers.Component
 import Components.Playlist.View
 import Css
@@ -47,9 +46,6 @@ import UI.Space as Space
 import UI.Text as Text
 import UI.Typography as Typography
 import View exposing (View)
-
-
-port displayLogs : () -> Cmd msg
 
 
 
@@ -101,7 +97,6 @@ type Msg
     | StopPomodoro
     | StartTurn
     | StopTurn
-    | DisplayLogs
     | MobbersMsg Components.Mobbers.Component.Msg
 
 
@@ -187,9 +182,6 @@ update shared mob msg model =
             , Components.Mobbers.Component.update shared mob subMsg
                 |> Effect.map MobbersMsg
             )
-
-        DisplayLogs ->
-            ( model, displayLogs () |> Effect.fromCmd )
 
 
 selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
@@ -483,7 +475,18 @@ clockArea mob model =
                 , text = "Invite"
                 , icon = UI.Icons.Ion.share
                 }
-            , Components.Log.view [] { onClick = DisplayLogs }
+            , UI.Button.RoundIcon.view []
+                { target =
+                    UI.Button.RoundIcon.Link <|
+                        Routing.toUrl <|
+                            Routing.Mob
+                                { subRoute = Pages.Mob.Routing.Bug
+                                , mob = mob.name
+                                }
+                , text = "Bug"
+                , icon = UI.Icons.Ion.bug
+                , color = Palettes.monochrome.on.background
+                }
             ]
         ]
 

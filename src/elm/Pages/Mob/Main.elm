@@ -16,6 +16,7 @@ import Model.Clock
 import Model.Events
 import Model.Mob
 import Model.MobName
+import Pages.Mob.Bug
 import Pages.Mob.Home.Page
 import Pages.Mob.Invite.Page
 import Pages.Mob.Mobbers.Page
@@ -37,6 +38,7 @@ type Page
     | Invite
     | Profile
     | Mobbers Pages.Mob.Mobbers.Page.Model
+    | Bug
 
 
 type alias Model =
@@ -82,6 +84,9 @@ initSubPage route shared =
             , Effect.none
             )
 
+        Pages.Mob.Routing.Bug ->
+            ( Bug, Effect.none )
+
 
 
 -- Update
@@ -101,6 +106,7 @@ type PageMsg
     | InviteMsg Pages.Mob.Invite.Page.Msg
     | ProfileMsg Pages.Mob.Profile.Page.Msg
     | MobbersMsg Pages.Mob.Mobbers.Page.Msg
+    | BugMsg Pages.Mob.Bug.Msg
 
 
 update : Shared -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
@@ -197,6 +203,9 @@ updatePage pageMsg model shared =
                     (\updated -> { model | page = Mobbers updated })
                     (Effect.map MobbersMsg)
 
+        ( BugMsg subMsg, Bug ) ->
+            ( model, Pages.Mob.Bug.update shared subMsg |> Effect.map BugMsg )
+
         _ ->
             ( model, Effect.none )
 
@@ -246,6 +255,9 @@ pageSubscriptions model =
         Mobbers _ ->
             Sub.none
 
+        Bug ->
+            Sub.none
+
 
 
 -- View
@@ -275,6 +287,9 @@ view shared model =
                 Mobbers subModel ->
                     Pages.Mob.Mobbers.Page.view model.mob subModel
                         |> View.map (MobbersMsg >> PageMsg)
+
+                Bug ->
+                    Pages.Mob.Bug.view |> View.map (BugMsg >> PageMsg)
     in
     { title =
         case subView.title of

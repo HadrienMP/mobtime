@@ -13,6 +13,7 @@ import UI.Button.Link
 import UI.Css
 import UI.Space
 import UI.Typography as Typography
+import View
 
 
 port displayLogs : () -> Cmd msg
@@ -57,9 +58,13 @@ update shared msg =
 -- View
 
 
-view : Html.Html Msg
+view : View.View Msg
 view =
-    internalView { onBack = Back, onDisplayLogs = DisplayLogs }
+    { title = "Found a bug?"
+    , modal = Nothing
+    , body =
+        internalView { onBack = Back, onDisplayLogs = DisplayLogs }
+    }
 
 
 type alias Props msg =
