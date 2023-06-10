@@ -1,4 +1,4 @@
-module Shared exposing (Msg(..), Shared, init, pushUrl, subscriptions, toast, update, withUrl)
+module Shared exposing (Msg(..), Shared, backToMob, init, pushUrl, subscriptions, toast, update, withUrl)
 
 import Browser
 import Browser.Navigation as Nav
@@ -13,6 +13,7 @@ import Lib.Toaster exposing (Toast, Toasts)
 import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
+import Pages.Mob.Routing
 import Routing
 import Task
 import Time
@@ -190,6 +191,20 @@ pushUrl shared =
     Routing.toUrl
         >> Nav.pushUrl shared.key
         >> Effect.fromCmd
+
+
+backToMob : Shared -> Effect Msg msg
+backToMob shared =
+    case shared.mob of
+        Just mob ->
+            pushUrl shared <|
+                Routing.Mob
+                    { subRoute = Pages.Mob.Routing.Home
+                    , mob = mob.name
+                    }
+
+        Nothing ->
+            Effect.none
 
 
 
