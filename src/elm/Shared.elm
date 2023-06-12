@@ -158,7 +158,7 @@ update_ msg model =
             ( { model | soundOn = True }, Cmd.none )
 
         CheckSound ->
-            ( model, Lib.Alarm.play )
+            ( model, Lib.Alarm.checkSound () )
 
         JoinMob mob ->
             ( { model | mob = Just <| Model.Mob.init mob }, Cmd.none )

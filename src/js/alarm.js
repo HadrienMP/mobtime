@@ -2,6 +2,7 @@ import { Howl, Howler } from 'howler';
 
 export const setup = (app) => {
     let alarm = load('silence.mp3');
+    const silence = load('silence.mp3');
 
     function load(music) {
         Howler.stop();
@@ -11,6 +12,8 @@ export const setup = (app) => {
             onplay: () => app.ports.alarmPlaying.send(''),
         });
     }
+
+    app.ports.checkSound.subscribe(() => silence.play());
 
     app.ports.alarmLoad.subscribe((music) => {
         alarm = load(music);

@@ -1,4 +1,13 @@
-port module Lib.Alarm exposing (alarmChangeVolume, alarmTestVolume, load, onFinished, onPlaying, play, stop)
+port module Lib.Alarm exposing
+    ( alarmChangeVolume
+    , alarmTestVolume
+    , checkSound
+    , load
+    , onFinished
+    , onPlaying
+    , play
+    , stop
+    )
 
 import Sounds
 
@@ -22,6 +31,9 @@ port alarmPlaying : (String -> msg) -> Sub msg
 
 
 port alarmFinished : (String -> msg) -> Sub msg
+
+
+port checkSound : () -> Cmd msg
 
 
 load : Sounds.Sound -> Cmd msg
