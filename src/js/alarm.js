@@ -23,8 +23,5 @@ export const setup = (app) => {
     app.ports.alarmChangeVolume.subscribe((volume) =>
         Howler.volume(volume / 100.0)
     );
-    app.ports.alarmTestVolume.subscribe(() => {
-        alarm = load('hello.mp3');
-        alarm.play();
-    });
+    app.ports.alarmTestVolume.subscribe(() => load('hello.mp3').play());
 };
