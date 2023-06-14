@@ -38,6 +38,7 @@ view props =
     Components.SecondaryPage.view
         { onBack = props.onBack
         , title = "Mobbers"
+        , icon = UI.Icons.Ion.people
         , subTitle = Nothing
         , content =
             Column.column2

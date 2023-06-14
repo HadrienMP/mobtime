@@ -10,11 +10,11 @@ import UI.Button.View
 import UI.Color as Color
 import UI.Column as Column
 import UI.Css
+import UI.Icons.Common exposing (Icon)
 import UI.Icons.Ion
 import UI.Palettes as Palettes
 import UI.Size as Size
 import UI.Space as Space
-import UI.Text as Text
 import Utils
 
 
@@ -29,6 +29,7 @@ theChapter =
             (view
                 { onBack = logAction "Back"
                 , title = "My Page"
+                , icon = UI.Icons.Ion.bug
                 , subTitle = Just "Subtitle"
                 , content = Utils.placeholder <| Size.rem 10
                 }
@@ -57,13 +58,14 @@ Components.SecondaryPage.view
 type alias Props msg =
     { onBack : msg
     , title : String
+    , icon : Icon msg
     , subTitle : Maybe String
     , content : Html.Html msg
     }
 
 
 view : Props msg -> Html.Html msg
-view { onBack, title, subTitle, content } =
+view { onBack, title, icon, subTitle, content } =
     Column.column2
         [ Attr.css [ UI.Css.gap Space.m ] ]
         [ UI.Button.View.button [ Attr.css [ Css.maxWidth Css.fitContent ] ]
@@ -78,16 +80,26 @@ view { onBack, title, subTitle, content } =
             }
         , Space.spacer
         , Html.div []
-            [ Text.h2
+            [ Html.h2
                 [ Attr.css
-                    [ Css.borderBottom3 (Css.px 6)
+                    [ Css.displayFlex
+                    , Css.alignItems Css.center
+                    , Css.property "gap" "0.5rem"
+                    , Css.borderBottom3 (Css.px 6)
                         Css.double
                         (Color.toElmCss Palettes.monochrome.on.background)
                     , Css.paddingBottom <| Size.toElmCss Space.xs
                     , Css.marginBottom <| Size.toElmCss Space.xs
+                    , Css.fontSize <| Css.rem 2
+                    , Css.lineHeight <| Css.num 1.1
                     ]
                 ]
-                title
+                [ icon
+                    { size = Size.rem 2.2
+                    , color = Palettes.monochrome.on.background
+                    }
+                , Html.text title
+                ]
             , case subTitle of
                 Just it ->
                     Html.p [ Attr.css [ Css.fontWeight Css.lighter ] ] [ Html.text it ]

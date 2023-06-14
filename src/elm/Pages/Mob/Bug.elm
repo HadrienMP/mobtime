@@ -11,6 +11,7 @@ import Html.Styled.Attributes as Attr
 import Shared exposing (Shared)
 import UI.Button.Link
 import UI.Css
+import UI.Icons.Ion
 import UI.Space
 import UI.Typography as Typography
 import View
@@ -78,6 +79,7 @@ internalView props =
     Components.SecondaryPage.view
         { onBack = props.onBack
         , title = "Found a bug?"
+        , icon = UI.Icons.Ion.bug
         , subTitle = Just "Help make mobtime better by reporting it!"
         , content =
             Html.div

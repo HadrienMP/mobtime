@@ -26,6 +26,7 @@ view props =
         { onBack = props.onBack
         , title = "Invite your team"
         , subTitle = Nothing
+        , icon = UI.Icons.Ion.share
         , content =
             Column.column
                 [ Attr.css

@@ -38,6 +38,7 @@ view props =
     Components.SecondaryPage.view
         { onBack = props.onBack
         , title = "Settings"
+        , icon = UI.Icons.Ion.settings
         , subTitle = Just "The settings are shared with the whole team"
         , content =
             Html.div
