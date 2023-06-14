@@ -178,15 +178,16 @@ viewProfile { active, current, onChange } =
     Html.button
         [ Attr.css
             [ Css.border Css.zero
+            , Css.border3 (Css.px 1) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
             , Css.backgroundColor Css.transparent
             , Css.width <| Css.pct 49
+            , Css.maxWidth <| Css.px 300
             , Css.padding Css.zero
             , Css.overflow Css.hidden
             , Css.position Css.relative
             , Css.marginBottom <| Css.rem 0.4
             , Css.displayFlex
             , Css.flexDirection Css.column
-            , UI.Css.gap <| Size.rem 0.1
             ]
         , Evts.onClick (onChange current)
         ]
@@ -196,7 +197,6 @@ viewProfile { active, current, onChange } =
                 [ Css.padding2 (Css.rem 0.6) (Css.rem 1)
                 , Css.margin Css.zero
                 , Css.fontSize <| Css.rem 1
-                , UI.Css.roundBorder
                 , Css.backgroundColor <|
                     Color.toElmCss <|
                         if active == current then
@@ -220,7 +220,6 @@ viewProfile { active, current, onChange } =
                     [ Css.position Css.absolute
                     , Css.top <| Css.rem 0.6
                     , Css.left <| Css.rem 0.6
-                    , UI.Css.roundBorder
                     , Css.padding2 (Css.rem 0.2) (Css.rem 0.6)
                     , Css.backgroundColor <| Color.toElmCss <| Palettes.monochrome.surfaceActive
                     , Css.color <| Color.toElmCss <| Palettes.monochrome.on.surfaceActive
@@ -241,8 +240,6 @@ viewPoster { url, alt } =
         , Attr.alt alt
         , Attr.css
             [ Css.width <| Css.pct 100
-            , Css.border3 (Css.px 1) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
-            , UI.Css.roundBorder
             , Css.property "aspect-ratio" "3/2"
             ]
         ]
