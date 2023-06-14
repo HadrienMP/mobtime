@@ -59,8 +59,8 @@ subscriptions _ =
     Sub.none
 
 
-view : Model.Mob.Mob -> View Msg
-view model =
+view : Shared -> Model.Mob.Mob -> View Msg
+view shared model =
     { title = "Settings"
     , modal = Nothing
     , body =
@@ -73,5 +73,6 @@ view model =
             , onTurnLengthChange = TurnChange
             , onPomodoroChange = PomodoroChange
             , onPlaylistChange = PlaylistChange
+            , devMode = shared.devMode
             }
     }

@@ -23,6 +23,20 @@ theChapter =
                     , pomodoro = Lib.Duration.ofMinutes 25
                     , currentPlaylist = Sounds.ClassicWeird
                     , onPlaylistChange = logActionWith Sounds.title "Playlist changed"
+                    , devMode = False
+                    }
+              )
+            , ( "In dev mode"
+              , Page.view
+                    { mob = MobName "Awesome"
+                    , onBack = logAction "Back"
+                    , onTurnLengthChange = logActionWith Lib.Duration.print "Turn changed"
+                    , turnLength = Lib.Duration.ofMinutes 6
+                    , onPomodoroChange = logActionWith Lib.Duration.print "Pomodoro changed"
+                    , pomodoro = Lib.Duration.ofMinutes 25
+                    , currentPlaylist = Sounds.ClassicWeird
+                    , onPlaylistChange = logActionWith Sounds.title "Playlist changed"
+                    , devMode = True
                     }
               )
             ]

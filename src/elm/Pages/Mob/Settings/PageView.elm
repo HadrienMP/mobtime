@@ -5,7 +5,7 @@ import Css
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
-import Lib.Duration exposing (Duration)
+import Lib.Duration as Duration exposing (Duration)
 import Model.MobName exposing (MobName)
 import Sounds
 import UI.Color as Color
@@ -22,6 +22,7 @@ import UI.Typography as Typography
 
 type alias Props msg =
     { mob : MobName
+    , devMode : Bool
     , onBack : msg
     , onTurnLengthChange : Duration -> msg
     , turnLength : Duration
@@ -113,16 +114,18 @@ clockLengths props =
             , icon = UI.Icons.Custom.hourGlass
             , length = props.turnLength
             , onChange = props.onTurnLengthChange
-            , min = Lib.Duration.ofMinutes 2
-            , max = Lib.Duration.ofMinutes 15
+            , min = 2
+            , max = 15
+            , devMode = props.devMode
             }
         , lengthRange
             { title = "Pomodoro"
             , icon = UI.Icons.Custom.tomato
             , length = props.pomodoro
             , onChange = props.onPomodoroChange
-            , min = Lib.Duration.ofMinutes 10
-            , max = Lib.Duration.ofMinutes 45
+            , min = 10
+            , max = 45
+            , devMode = props.devMode
             }
         ]
 
@@ -132,11 +135,20 @@ lengthRange :
     , icon : Icon msg
     , length : Duration
     , onChange : Duration -> msg
-    , min : Duration
-    , max : Duration
+    , min : Int
+    , max : Int
+    , devMode : Bool
     }
     -> Html msg
 lengthRange props =
+    let
+        ( durationToInt, durationFromInt ) =
+            if props.devMode then
+                ( Duration.toSeconds, Duration.ofSeconds )
+
+            else
+                ( Duration.toMinutes, Duration.ofMinutes )
+    in
     Html.div
         [ Attr.css
             [ Css.displayFlex
@@ -150,12 +162,12 @@ lengthRange props =
             }
         , Html.span
             [ Attr.css [ Css.width <| Css.rem 18 ] ]
-            [ Html.text <| props.title ++ ": " ++ Lib.Duration.print props.length ]
+            [ Html.text <| props.title ++ ": " ++ Duration.print props.length ]
         , UI.Range.View.view
-            { onChange = Lib.Duration.ofMinutes >> props.onChange
-            , min = Lib.Duration.toMinutes props.min
-            , max = Lib.Duration.toMinutes props.max
-            , value = props.length |> Lib.Duration.toMinutes
+            { onChange = durationFromInt >> props.onChange
+            , min = props.min
+            , max = props.max
+            , value = props.length |> durationToInt
             }
         ]
 

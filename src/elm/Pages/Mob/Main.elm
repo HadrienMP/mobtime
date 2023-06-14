@@ -273,7 +273,7 @@ view shared model =
                         |> View.map (HomeMsg >> PageMsg)
 
                 Settings ->
-                    Pages.Mob.Settings.Page.view model.mob
+                    Pages.Mob.Settings.Page.view shared model.mob
                         |> View.map (SettingsMsg >> PageMsg)
 
                 Invite ->
