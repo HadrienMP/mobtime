@@ -37,6 +37,7 @@ view props =
     Column.column2
         [ Attr.css
             [ Css.paddingBottom <| Size.toElmCss Space.s
+            , Css.width <| Css.pct 100
             , if List.length props.people == 0 then
                 Css.borderBottom Css.zero
 
