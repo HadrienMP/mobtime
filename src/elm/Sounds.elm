@@ -29,6 +29,7 @@ type Profile
     = ClassicWeird
     | OfficeSafe
     | Riot
+    | Funky
 
 
 poster : Profile -> Image
@@ -44,6 +45,10 @@ poster profile =
 
                 OfficeSafe ->
                     "officesafe.jpg"
+
+                Funky ->
+                    "funky.webp"
+
     , alt =
         case profile of
             ClassicWeird ->
@@ -54,6 +59,9 @@ poster profile =
 
             OfficeSafe ->
                 "An office meeting room full of multicolored plastic balls"
+
+            Funky ->
+                "Photography of George Clinton"
     }
 
 
@@ -75,6 +83,9 @@ nextProfile list =
             nextProfile (OfficeSafe :: list)
 
         Just OfficeSafe ->
+            nextProfile (Funky :: list)
+
+        Just Funky ->
             list
 
 
@@ -90,6 +101,9 @@ title profile =
         OfficeSafe ->
             "Office Safe"
 
+        Funky ->
+            "Funky"
+
 
 code : Profile -> String
 code profile =
@@ -102,6 +116,9 @@ code profile =
 
         OfficeSafe ->
             "OfficeSafe"
+
+        Funky ->
+            "Funky"
 
 
 fromCode : String -> Profile
@@ -142,6 +159,10 @@ soundsOf profile =
             , officeSafe
             )
 
+        Funky ->
+            ( "funky/essence.mp3"
+            , funky
+            )
 
 riot : List Sound
 riot =
@@ -154,6 +175,23 @@ riot =
     , "riot/mort aux patrons.mp3"
     , "riot/ravachole.mp3"
     , "riot/eiffel_larue.wav.mp3"
+    ]
+
+funky : List Sound
+funky =
+    ["funky/essence.mp3"
+    , "funky/caravan.mp3"
+    , "funky/cry.mp3"
+    , "funky/do-it.mp3"
+    , "funky/feuille.mp3"
+    , "funky/fly.mp3"
+    , "funky/little.mp3"
+    , "funky/merci.mp3"
+    , "funky/rock.mp3"
+    , "funky/snip-snap.mp3"
+    , "funky/sol.mp3"
+    , "funky/stolen.mp3"
+    , "funky/there.mp3"
     ]
 
 

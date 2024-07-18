@@ -1,0 +1,6 @@
+# INSTALLATION
+
+# Prérequis
+
+elm
+nix
