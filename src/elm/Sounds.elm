@@ -261,7 +261,6 @@ classicWeird =
     , "classic-weird/thislove.wav.mp3"
     , "classic-weird/toto_africa.wav.mp3"
     , "classic-weird/toxic.wav.mp3"
-    , "classic-weird/untitled_3.mp3"
     , "classic-weird/utini.mp3"
     , "classic-weird/we-are-the-champions-copia.mp3"
     , "classic-weird/zelda.mp3"
