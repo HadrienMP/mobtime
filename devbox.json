@@ -5,7 +5,8 @@
     "pnpm@latest",
     "just@latest",
     "gitmoji-cli@latest",
-    "lame@latest"
+    "lame@latest",
+    "process-compose@latest"
   ],
   "shell": {
     "init_hook": [

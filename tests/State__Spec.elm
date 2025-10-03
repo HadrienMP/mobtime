@@ -115,11 +115,6 @@ suite =
         ]
 
 
-turnOnWithAlarm : Sounds.Sound -> ClockEvent
-turnOnWithAlarm sound =
-    Started { time = midnight, alarm = sound, length = Duration.ofMinutes 10 }
-
-
 turnOnAt : Time.Posix -> ClockEvent
 turnOnAt posix =
     Started { time = posix, alarm = Sounds.default, length = Duration.ofMinutes 10 }

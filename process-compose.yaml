@@ -1,0 +1,27 @@
+version: '0.5'
+
+processes:
+    doc:
+        command: 'pnpm run start:doc'
+        readiness_probe:
+            initial_delay_seconds: 1
+            period_seconds: 2
+            timeout_seconds: 360
+            failure_threshold: 500
+            http_get:
+                host: localhost
+                scheme: http
+                port: 4321
+    server:
+        command: 'pnpm dev:server'
+        readiness_probe:
+            initial_delay_seconds: 1
+            period_seconds: 2
+            timeout_seconds: 360
+            failure_threshold: 500
+            http_get:
+                host: localhost
+                scheme: http
+                port: 3000
+    front:
+        command: 'pnpx vite build --watch'

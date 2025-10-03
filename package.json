@@ -4,17 +4,15 @@
     "description": "",
     "source": "src/index.html",
     "scripts": {
-        "build": "parcel build",
-        "start": "node server/app.js",
-        "start:dev": "concurrently --kill-others \"yarn dev:build-front\" \"yarn dev:server\"",
-        "dev:build-front": "parcel watch",
-        "start:dev:front": "parcel",
+        "build:front": "vite build",
+        "start:sever": "node server/app.js",
+        "dev:front": "vite",
         "dev:server": "nodemon server/app.js",
         "test": "elm-test-rs",
         "postinstall": "elm-tooling install ; husky install",
         "review": "elm-review",
-        "build:doc": "parcel build doc/index.html --dist-dir=doc/dist",
-        "start:doc": "parcel doc/index.html --dist-dir=doc/dist --port=4321",
+        "build:doc": "vite build --config ./doc/vite.config.js",
+        "start:doc": "vite --config ./doc/vite.config.js ",
         "stylelint": "stylelint **/*.scss"
     },
     "keywords": [],
@@ -24,10 +22,6 @@
         "staticPath": "public"
     },
     "devDependencies": {
-        "@parcel/packager-raw-url": "^2.8.3",
-        "@parcel/transformer-elm": "^2.8.3",
-        "@parcel/transformer-sass": "^2.8.3",
-        "@parcel/transformer-webmanifest": "^2.8.3",
         "buffer": "^5.7.1",
         "concurrently": "^7.0.0",
         "elm": "^0.19.1-5",
@@ -36,8 +30,6 @@
         "elm-tooling": "^1.8.0",
         "husky": "^8.0.2",
         "nodemon": "^2.0.7",
-        "parcel": "^2.8.3",
-        "parcel-reporter-static-files-copy": "^1.5.0",
         "postcss": "^8.4.21",
         "prettier": "^2.8.2",
         "process": "^0.11.10",
@@ -47,7 +39,9 @@
         "stylelint-config-sass-guidelines": "^9.0.1",
         "stylelint-config-standard": "^29.0.0",
         "stylelint-scss": "^4.3.0",
-        "tippy.js": "^6.3.7"
+        "tippy.js": "^6.3.7",
+        "vite": "^7.1.9",
+        "vite-plugin-elm": "^3.0.1"
     },
     "dependencies": {
         "express": "^4.17.1",

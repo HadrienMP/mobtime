@@ -223,7 +223,8 @@ subscriptions model =
         , case ( Model.Clock.isOn model.mob.clock, Model.Clock.isOn model.mob.pomodoro ) of
             ( True, _ ) ->
                 Pages.Mob.Home.Page.turnRefreshRate
-                    |> (Lib.Duration.toMillis >> toFloat)
+                    |> Lib.Duration.toMillis
+                    |> toFloat
                     |> (\duration -> Time.every duration Tick)
 
             ( False, True ) ->
