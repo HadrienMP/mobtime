@@ -5,7 +5,7 @@
     "source": "src/index.html",
     "scripts": {
         "build:front": "vite build",
-        "start:sever": "node server/app.js",
+        "start": "node server/app.js",
         "dev:front": "vite",
         "dev:server": "nodemon server/app.js",
         "test": "elm-test-rs",
