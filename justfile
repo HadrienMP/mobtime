@@ -5,34 +5,27 @@ start: dev-with-p2p
 # ------------------------------------
 build: build-with-server
 build-with-server:
-	TALK_MODE=server yarn build
+	TALK_MODE=server pnpm build
 
 dev-with-server:
-	TALK_MODE=server yarn start:dev
+	TALK_MODE=server pnpm start:dev
 
 # ------------------------------------
 # Working with peer to peer
 # ------------------------------------
 build-with-p2p:
-	TALK_MODE=p2p yarn build
+	TALK_MODE=p2p pnpm build
 
 dev-with-p2p:
-	TALK_MODE=p2p yarn start:dev:front
+	TALK_MODE=p2p pnpm start:dev:front
 
 # ------------------------------------
 install:
-	yarn install
+	pnpm install
 
 update:
 	nix flake update .
 
 # ------------------------------------
-# Run vim in nix with node 16
-# - allows elm language server to work
-# ------------------------------------
-vim:
-	nix-shell --packages nodejs-16_x --command 'nvim'
-
-# ------------------------------------
 run-doc:
-	yarn start:doc
+	pnpm start:doc
