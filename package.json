@@ -4,7 +4,7 @@
     "description": "",
     "source": "src/index.html",
     "scripts": {
-        "build:front": "vite build",
+        "build": "vite build",
         "start": "node server/app.js",
         "dev:front": "vite",
         "dev:server": "nodemon server/app.js",
