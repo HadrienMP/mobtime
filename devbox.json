@@ -6,7 +6,8 @@
     "just@latest",
     "gitmoji-cli@latest",
     "lame@latest",
-    "process-compose@latest"
+    "process-compose@latest",
+    "mp3gain@latest"
   ],
   "shell": {
     "init_hook": [

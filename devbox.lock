@@ -217,6 +217,54 @@
         }
       }
     },
+    "mp3gain@latest": {
+      "last_modified": "2026-01-23T17:20:52Z",
+      "resolved": "github:NixOS/nixpkgs/a1bab9e494f5f4939442a57a58d0449a109593fe#mp3gain",
+      "source": "devbox-search",
+      "version": "1.6.2",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/amd8wyxwm70rdnhcna0jfmxwli23x09s-mp3gain-1.6.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/amd8wyxwm70rdnhcna0jfmxwli23x09s-mp3gain-1.6.2"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/c11w8xf0hi4v67af8y6cj1gacf1jnlfx-mp3gain-1.6.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/c11w8xf0hi4v67af8y6cj1gacf1jnlfx-mp3gain-1.6.2"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/76jz76pxnl3fk3gpcgq7rzf2l0cfgm3v-mp3gain-1.6.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/76jz76pxnl3fk3gpcgq7rzf2l0cfgm3v-mp3gain-1.6.2"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/d5gphfx58z9hwczxx9mb0zpnqd8bzyrx-mp3gain-1.6.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/d5gphfx58z9hwczxx9mb0zpnqd8bzyrx-mp3gain-1.6.2"
+        }
+      }
+    },
     "nodejs-slim@latest": {
       "last_modified": "2025-09-21T00:54:27Z",
       "plugin_version": "0.0.2",
