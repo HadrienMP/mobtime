@@ -313,8 +313,10 @@ viewPoster { url, alt } =
         [ Attr.src url
         , Attr.alt alt
         , Attr.css
-            [ Css.width <| Css.pct 100
-            , Css.property "aspect-ratio" "3/2"
+            [ Css.width <| Css.px 214
+            , Css.height <| Css.px 142
+            , Css.property "object-fit" "cover"
+            , Css.property "object-position" "top"
             ]
         ]
         []
