@@ -48,7 +48,6 @@ poster profile =
 
                 Funky ->
                     "funky.webp"
-
     , alt =
         case profile of
             ClassicWeird ->
@@ -150,7 +149,7 @@ soundsOf profile =
             )
 
         Riot ->
-            ( "riot/faut plus de gouvernement.mp3"
+            ( "riot/faut-plus-de-gouvernement.mp3"
             , riot
             )
 
@@ -164,22 +163,24 @@ soundsOf profile =
             , funky
             )
 
+
 riot : List Sound
 riot =
-    [ "riot/ca cest paris.mp3"
-    , "riot/el pueblo unido.mp3"
-    , "riot/france qui ferme sa gueule.mp3"
+    [ "riot/ca-cest-paris.mp3"
+    , "riot/el-pueblo-unido.mp3"
+    , "riot/france-qui-ferme-sa-gueule.mp3"
     , "riot/internationale.mp3"
     , "riot/internationale2.mp3"
-    , "riot/milliards contre une elite.mp3"
-    , "riot/mort aux patrons.mp3"
+    , "riot/milliards-contre-une-elite.mp3"
+    , "riot/mort-aux-patrons.mp3"
     , "riot/ravachole.mp3"
     , "riot/eiffel_larue.wav.mp3"
     ]
 
+
 funky : List Sound
 funky =
-    ["funky/essence.mp3"
+    [ "funky/essence.mp3"
     , "funky/caravan.mp3"
     , "funky/cry.mp3"
     , "funky/do-it.mp3"

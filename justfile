@@ -9,3 +9,6 @@ build *FLAGS:
 
 lint:
 	yes | pnpx elm-review --fix-all
+
+normalize:
+	./normalize-library-volume.sh
