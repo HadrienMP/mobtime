@@ -5,51 +5,83 @@
       "last_modified": "2025-10-02T15:02:55Z",
       "resolved": "github:NixOS/nixpkgs/dc704e6102e76aad573f63b74c742cd96f8f1e6c?lastModified=1759417375"
     },
-    "gitmoji-cli@latest": {
-      "last_modified": "2025-09-18T16:33:27Z",
-      "resolved": "github:NixOS/nixpkgs/f4b140d5b253f5e2a1ff4e5506edbf8267724bde#gitmoji-cli",
+    "imagemagick@latest": {
+      "last_modified": "2026-02-15T17:45:47Z",
+      "resolved": "github:NixOS/nixpkgs/ac055f38c798b0d87695240c7b761b82fc7e5bc2#imagemagick",
       "source": "devbox-search",
-      "version": "9.7.0",
+      "version": "7.1.2-12",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/gpgdaargqn2srvn9hisl3y9k1mjzh6am-gitmoji-cli-9.7.0",
+              "path": "/nix/store/qm3i85s0dfha5r320c5gyygaqnqxap0k-imagemagick-7.1.2-12",
               "default": true
+            },
+            {
+              "name": "dev",
+              "path": "/nix/store/mxks47yhp0ax42p27mdidzyx6970w0kh-imagemagick-7.1.2-12-dev"
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/iqiqy0rhcl992qb149675737ga0w0v7d-imagemagick-7.1.2-12-doc"
             }
           ],
-          "store_path": "/nix/store/gpgdaargqn2srvn9hisl3y9k1mjzh6am-gitmoji-cli-9.7.0"
+          "store_path": "/nix/store/qm3i85s0dfha5r320c5gyygaqnqxap0k-imagemagick-7.1.2-12"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/a92hbn0053c6m8gfb46nqbysjk8j13hn-gitmoji-cli-9.7.0",
+              "path": "/nix/store/ynkqmcr4kqx6jjp8mn0q7sqiax129yg5-imagemagick-7.1.2-12",
               "default": true
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/qaa257fbjzw8v9x2cy650cnlw954yib1-imagemagick-7.1.2-12-doc"
+            },
+            {
+              "name": "dev",
+              "path": "/nix/store/mk9cs25z5ngs8ip2z9m8kg2pp3sf4sr5-imagemagick-7.1.2-12-dev"
             }
           ],
-          "store_path": "/nix/store/a92hbn0053c6m8gfb46nqbysjk8j13hn-gitmoji-cli-9.7.0"
+          "store_path": "/nix/store/ynkqmcr4kqx6jjp8mn0q7sqiax129yg5-imagemagick-7.1.2-12"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/786979ahdkqr99nhwkb2scgh9nxyan6j-gitmoji-cli-9.7.0",
+              "path": "/nix/store/f3ngpyhmhpiw0z52gmajfhc3yirn364h-imagemagick-7.1.2-12",
               "default": true
+            },
+            {
+              "name": "dev",
+              "path": "/nix/store/bg195ahm482lwhn2zyambfywvkis9gvq-imagemagick-7.1.2-12-dev"
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/nmmii01cniapjkz0cdrzz8lfj92gkaym-imagemagick-7.1.2-12-doc"
             }
           ],
-          "store_path": "/nix/store/786979ahdkqr99nhwkb2scgh9nxyan6j-gitmoji-cli-9.7.0"
+          "store_path": "/nix/store/f3ngpyhmhpiw0z52gmajfhc3yirn364h-imagemagick-7.1.2-12"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/i1dvh9hrwb5kfnqg3kbh5vil8fr1aids-gitmoji-cli-9.7.0",
+              "path": "/nix/store/x60ccfr9gd8dqm91aqz8x5s8dhsdvr69-imagemagick-7.1.2-12",
               "default": true
+            },
+            {
+              "name": "doc",
+              "path": "/nix/store/s3ds4smhj3s2kwwbazz4qz6lrhv7zqvn-imagemagick-7.1.2-12-doc"
+            },
+            {
+              "name": "dev",
+              "path": "/nix/store/pj6ixbvy24gfsb68p7i0214dgwnwm3lf-imagemagick-7.1.2-12-dev"
             }
           ],
-          "store_path": "/nix/store/i1dvh9hrwb5kfnqg3kbh5vil8fr1aids-gitmoji-cli-9.7.0"
+          "store_path": "/nix/store/x60ccfr9gd8dqm91aqz8x5s8dhsdvr69-imagemagick-7.1.2-12"
         }
       }
     },

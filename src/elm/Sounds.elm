@@ -49,6 +49,7 @@ poster profile =
 
                 Funky ->
                     "funky.webp"
+
                 Kaamelott ->
                     "Kaamelott.webp"
     , alt =
@@ -64,6 +65,7 @@ poster profile =
 
             Funky ->
                 "Photography of George Clinton"
+
             Kaamelott ->
                 "Kaamelott"
     }
@@ -110,6 +112,7 @@ title profile =
 
         Funky ->
             "Funky"
+
         Kaamelott ->
             "Kaamelott"
 
@@ -128,6 +131,7 @@ code profile =
 
         Funky ->
             "Funky"
+
         Kaamelott ->
             "Kaamelott"
 
@@ -179,7 +183,6 @@ soundsOf profile =
             ( "kaamelott/il_ne_comprennent_jamais_le_code.mp3"
             , kaamelottSounds
             )
-
 
 
 riot : List Sound
@@ -360,6 +363,7 @@ officeSafe =
 
     -- TODO: what is love
     ]
+
 
 kaamelottSounds : List Sound
 kaamelottSounds =

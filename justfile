@@ -12,3 +12,10 @@ lint:
 
 normalize:
 	./normalize-library-volume.sh
+
+
+[no-cd]
+to-miniature extension:
+    find . -name "*.{{extension}}" \
+        | sed "s/.{{extension}}//" \
+        | xargs -I {} magick {}.{{extension}} -resize 214x142^ {}.webp
