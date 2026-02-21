@@ -9,7 +9,7 @@ port module Lib.Alarm exposing
     , stop
     )
 
-import Sounds
+import Playlist.Types exposing (Sound)
 
 
 port alarmLoad : String -> Cmd msg
@@ -36,7 +36,7 @@ port alarmFinished : (String -> msg) -> Sub msg
 port checkSound : () -> Cmd msg
 
 
-load : Sounds.Sound -> Cmd msg
+load : Sound -> Cmd msg
 load =
     alarmLoad
 

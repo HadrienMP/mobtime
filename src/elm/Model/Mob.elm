@@ -10,7 +10,8 @@ import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Role exposing (Role)
 import Model.Roles
-import Sounds
+import Playlist.ClassicWeird exposing (classicWeird)
+import Playlist.Types exposing (Playlist)
 import Time
 
 
@@ -22,7 +23,7 @@ type alias Mob =
     , pomodoroLength : Duration
     , mobbers : Mobbers
     , roles : Model.Roles.Roles
-    , soundProfile : Sounds.Profile
+    , soundProfile : Playlist
     , extremeMode : Bool
     }
 
@@ -36,7 +37,7 @@ init mob =
     , pomodoroLength = defaultPomodoroLength
     , mobbers = Mobbers.empty
     , roles = Model.Roles.default
-    , soundProfile = Sounds.ClassicWeird
+    , soundProfile = classicWeird
     , extremeMode = False
     }
 
@@ -109,8 +110,8 @@ evolve_ event ( state, previousCommand ) =
             , previousCommand
             )
 
-        Events.SelectedMusicProfile profile ->
-            ( { state | soundProfile = profile }
+        Events.SelectedMusicProfile playlist ->
+            ( { state | soundProfile = playlist }
             , previousCommand
             )
 

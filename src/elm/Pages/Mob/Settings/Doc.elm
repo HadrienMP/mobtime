@@ -7,7 +7,7 @@ import ElmBook.ElmCSS exposing (Chapter)
 import Lib.Duration
 import Model.MobName exposing (MobName(..))
 import Pages.Mob.Settings.PageView as Page
-import Sounds
+import Playlist.ClassicWeird exposing (classicWeird)
 
 
 theChapter : Chapter x
@@ -16,11 +16,11 @@ theChapter =
         |> renderComponentList
             [ ( "Page"
               , Page.view
-                    { currentPlaylist = Sounds.ClassicWeird
+                    { currentPlaylist = classicWeird.code
                     , devMode = False
                     , mob = MobName "Awesome"
                     , onBack = logAction "Back"
-                    , onPlaylistChange = logActionWith Sounds.title "Playlist changed"
+                    , onPlaylistChange = logActionWith .title "Playlist changed"
                     , onPomodoroChange = logActionWith Lib.Duration.print "Pomodoro changed"
                     , onTurnLengthChange = logActionWith (Lib.Duration.toLongString >> String.join " ") "Turn changed"
                     , onExtremeModeChange = logAction "Extreme mode toggled"
@@ -36,11 +36,11 @@ theChapter =
               )
             , ( "Extreme Mode"
               , Page.view
-                    { currentPlaylist = Sounds.ClassicWeird
+                    { currentPlaylist = classicWeird.code
                     , devMode = False
                     , mob = MobName "Awesome"
                     , onBack = logAction "Back"
-                    , onPlaylistChange = logActionWith Sounds.title "Playlist changed"
+                    , onPlaylistChange = logActionWith .title "Playlist changed"
                     , onPomodoroChange = logActionWith Lib.Duration.print "Pomodoro changed"
                     , onTurnLengthChange = logActionWith (Lib.Duration.toLongString >> String.join " ") "Turn changed"
                     , onExtremeModeChange = logAction "Extreme mode toggled"

@@ -1,13 +1,13 @@
 import { Howl, Howler } from 'howler';
 
 export const setup = (app) => {
-    let alarm = load('silence.mp3');
-    const silence = load('silence.mp3');
+    let alarm = load('/sound/silence.mp3');
+    const silence = load('/sound/silence.mp3');
 
     function load(music) {
         Howler.stop();
         return new Howl({
-            src: ['/sound/' + music],
+            src: [music],
             onend: () => app.ports.alarmFinished.send(''),
             onplay: () => app.ports.alarmPlaying.send(''),
         });
@@ -23,5 +23,5 @@ export const setup = (app) => {
     app.ports.alarmChangeVolume.subscribe((volume) =>
         Howler.volume(volume / 100.0)
     );
-    app.ports.alarmTestVolume.subscribe(() => load('hello.mp3').play());
+    app.ports.alarmTestVolume.subscribe(() => load('/sound/hello.mp3').play());
 };

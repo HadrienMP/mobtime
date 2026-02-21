@@ -8,7 +8,6 @@ import Model.Mob
 import Model.MobName
 import Model.Mobber as Mobber
 import Model.Role
-import Sounds
 import Test exposing (Test, describe, test)
 import Time
 
@@ -117,7 +116,7 @@ suite =
 
 turnOnAt : Time.Posix -> ClockEvent
 turnOnAt posix =
-    Started { time = posix, alarm = Sounds.default, length = Duration.ofMinutes 10 }
+    Started { time = posix, alarm = "", length = Duration.ofMinutes 10 }
 
 
 midnight : Time.Posix

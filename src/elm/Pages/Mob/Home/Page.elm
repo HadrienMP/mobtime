@@ -24,10 +24,11 @@ import Model.Events
 import Model.Mob
 import Model.MobName exposing (MobName)
 import Pages.Mob.Routing
+import Playlist.Pick exposing (pick)
+import Playlist.Types exposing (Playlist, Sound)
 import Random
 import Routing
 import Shared exposing (Shared)
-import Sounds
 import Task
 import Time
 import UI.Button.RoundIcon
@@ -88,7 +89,7 @@ init shared name =
 
 
 type Msg
-    = StartWith ( Time.Posix, Sounds.Sound )
+    = StartWith ( Time.Posix, Sound )
     | TimePassed Time.Posix Model.Mob.TimePassedResult
     | StopSound
     | AlarmEnded
@@ -182,9 +183,9 @@ update shared mob msg model =
             )
 
 
-selectSound : Time.Posix -> Sounds.Profile -> Sounds.Sound
-selectSound now profile =
-    Random.step (Sounds.pick profile)
+selectSound : Time.Posix -> Playlist -> Sound
+selectSound now playlist =
+    Random.step (pick playlist)
         (now
             |> Time.posixToMillis
             |> Random.initialSeed

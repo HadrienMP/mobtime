@@ -11,6 +11,14 @@ The most fun web timer to time mob or pair turns. At the end of each turn, it pl
 -   Synced pomodoro timer
 -   Displays the current driver and navigator
 
+## Contributing
+
+If you feel like it contribute to the code or playlists ! You'll find some guides in [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Install
+
+Check [INSTALL.md](./INSTALL.md)
+
 ## Design doc
 
 It's just starting for now but it's hosted here :

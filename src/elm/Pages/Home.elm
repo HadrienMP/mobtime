@@ -132,8 +132,6 @@ view shared model =
                         [ Html.text "Create a mob" ]
                     , mobField model
                     , volumeField shared
-
-                    -- , p2pField shared
                     , Button.button
                         [ Attr.css
                             [ Css.width <| Css.pct 100

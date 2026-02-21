@@ -9,7 +9,8 @@ import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Lib.Duration as Duration exposing (Duration, Unit(..))
 import Model.MobName exposing (MobName)
-import Sounds
+import Playlist.All
+import Playlist.Types exposing (Playlist, PlaylistCode, codeToString)
 import UI.Color as Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
@@ -20,14 +21,15 @@ import UI.Palettes as Palettes
 import UI.Range.View
 import UI.Size as Size
 import UI.Typography as Typography
+import Url.Builder
 
 
 type alias Props msg =
-    { currentPlaylist : Sounds.Profile
+    { currentPlaylist : PlaylistCode
     , devMode : Bool
     , mob : MobName
     , onBack : msg
-    , onPlaylistChange : Sounds.Profile -> msg
+    , onPlaylistChange : Playlist -> msg
     , onPomodoroChange : Duration -> msg
     , onTurnLengthChange : Duration -> msg
     , onExtremeModeChange : msg
@@ -55,7 +57,7 @@ view props =
                 ]
                 [ viewPersonalSection props
                 , viewClockLengths props
-                , viewPlaylist props
+                , viewPlaylists props
                 ]
         }
 
@@ -223,8 +225,8 @@ viewExtremeMode props =
         ]
 
 
-viewPlaylist : Props msg -> Html msg
-viewPlaylist props =
+viewPlaylists : Props msg -> Html msg
+viewPlaylists props =
     Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| Size.rem 0.8 ] ]
         [ sectionTitle UI.Icons.Tape.display "Playlist"
         , Html.div
@@ -234,21 +236,19 @@ viewPlaylist props =
                 , Css.justifyContent Css.spaceBetween
                 ]
             ]
-            (Sounds.allProfiles
+            (Playlist.All.playlists
                 |> List.map
-                    (\profile ->
-                        viewProfile
-                            { active = props.currentPlaylist
-                            , current = profile
-                            , onChange = props.onPlaylistChange
-                            }
+                    (viewPlaylist
+                        { active = props.currentPlaylist
+                        , onChange = props.onPlaylistChange
+                        }
                     )
             )
         ]
 
 
-viewProfile : { active : Sounds.Profile, current : Sounds.Profile, onChange : Sounds.Profile -> msg } -> Html msg
-viewProfile { active, current, onChange } =
+viewPlaylist : { active : PlaylistCode, onChange : Playlist -> msg } -> Playlist -> Html msg
+viewPlaylist { active, onChange } playlist =
     Html.button
         [ Attr.css
             [ Css.border Css.zero
@@ -263,9 +263,9 @@ viewProfile { active, current, onChange } =
             , Css.displayFlex
             , Css.flexDirection Css.column
             ]
-        , Evts.onClick (onChange current)
+        , Evts.onClick (onChange playlist)
         ]
-        [ Sounds.poster current |> viewPoster
+        [ viewPoster playlist
         , Html.p
             [ Attr.css
                 [ Css.padding2 (Css.rem 0.6) (Css.rem 1)
@@ -273,22 +273,22 @@ viewProfile { active, current, onChange } =
                 , Css.fontSize <| Css.rem 1
                 , Css.backgroundColor <|
                     Color.toElmCss <|
-                        if active == current then
+                        if active == playlist.code then
                             Palettes.monochrome.surfaceActive
 
                         else
                             Palettes.monochrome.surface
                 , Css.color <|
                     Color.toElmCss <|
-                        if active == current then
+                        if active == playlist.code then
                             Palettes.monochrome.on.surfaceActive
 
                         else
                             Palettes.monochrome.on.surface
                 ]
             ]
-            [ Html.text <| Sounds.title current ]
-        , if current == active then
+            [ Html.text playlist.title ]
+        , if playlist.code == active then
             Html.span
                 [ Attr.css
                     [ Css.position Css.absolute
@@ -307,11 +307,11 @@ viewProfile { active, current, onChange } =
         ]
 
 
-viewPoster : Sounds.Image -> Html msg
-viewPoster { url, alt } =
+viewPoster : Playlist -> Html msg
+viewPoster { title, code } =
     Html.img
-        [ Attr.src url
-        , Attr.alt alt
+        [ Attr.src <| Url.Builder.absolute [ "playlists", codeToString code, "miniature.webp" ] []
+        , Attr.alt title
         , Attr.css
             [ Css.width <| Css.px 214
             , Css.height <| Css.px 142

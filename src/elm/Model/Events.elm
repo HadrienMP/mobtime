@@ -7,7 +7,8 @@ import Model.MobName exposing (MobName)
 import Model.Mobber as Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Roles
-import Sounds
+import Playlist.All
+import Playlist.Types exposing (Playlist, PlaylistCode(..), Sound)
 import Time
 
 
@@ -21,7 +22,7 @@ port sendEvent : Json.Value -> Cmd msg
 
 
 type ClockEvent
-    = Started { time : Time.Posix, alarm : Sounds.Sound, length : Duration }
+    = Started { time : Time.Posix, alarm : Sound, length : Duration }
     | Stopped
 
 
@@ -39,7 +40,7 @@ type Event
     | RotatedMobbers
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
-    | SelectedMusicProfile Sounds.Profile
+    | SelectedMusicProfile Playlist
     | Unknown Decode.Value
     | PomodoroStopped
     | PomodoroLengthChanged Duration
@@ -100,7 +101,8 @@ eventFromNameDecoder eventName =
 
         "SelectedMusicProfile" ->
             Decode.string
-                |> Decode.map Sounds.fromCode
+                |> Decode.map PlaylistCode
+                |> Decode.map Playlist.All.fromCode
                 |> Decode.field "profile"
                 |> Decode.map SelectedMusicProfile
 
@@ -179,7 +181,7 @@ eventToJson event =
 
         SelectedMusicProfile profile ->
             [ ( "name", Json.string "SelectedMusicProfile" )
-            , ( "profile", Json.string <| Sounds.code profile )
+            , ( "profile", Playlist.Types.codeToJson profile.code )
             ]
 
         Unknown value ->

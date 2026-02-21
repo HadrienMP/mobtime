@@ -3,7 +3,7 @@ module Components.Playlist.View exposing (view)
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
-import Sounds
+import Playlist.Types exposing (Playlist)
 import UI.Css
 import UI.Icons.Tape
 import UI.Palettes as Palettes
@@ -13,7 +13,7 @@ import UI.Space as Space
 import UI.Typography as Typography
 
 
-view : Sounds.Profile -> Html.Html msg
+view : Playlist -> Html.Html msg
 view playlist =
     Row.row
         [ Attr.css
@@ -30,6 +30,6 @@ view playlist =
             , Html.div
                 [ Attr.css [ Typography.fontSize Typography.l ]
                 ]
-                [ Html.text <| Sounds.title playlist ]
+                [ Html.text playlist.title ]
             ]
         ]

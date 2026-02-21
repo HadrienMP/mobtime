@@ -7,9 +7,9 @@ import Model.Events
 import Model.Mob
 import Pages.Mob.Routing
 import Pages.Mob.Settings.PageView
+import Playlist.Types exposing (Playlist)
 import Routing
 import Shared exposing (Shared)
-import Sounds
 import UserPreferences
 import View exposing (View)
 
@@ -18,7 +18,7 @@ type Msg
     = Back
     | TurnChange Duration
     | PomodoroChange Duration
-    | PlaylistChange Sounds.Profile
+    | PlaylistChange Playlist
     | VolumeMsg VolumeField.Msg
     | ExtremeModeToggle
 
@@ -88,7 +88,7 @@ view shared model =
     , modal = Nothing
     , body =
         Pages.Mob.Settings.PageView.view
-            { currentPlaylist = model.soundProfile
+            { currentPlaylist = model.soundProfile.code
             , devMode = shared.devMode
             , mob = model.name
             , onBack = Back
