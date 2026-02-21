@@ -51,7 +51,7 @@ poster profile =
                     "funky.webp"
 
                 Kaamelott ->
-                    "Kaamelott.webp"
+                    "kaamelott.webp"
     , alt =
         case profile of
             ClassicWeird ->
