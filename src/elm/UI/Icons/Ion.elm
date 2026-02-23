@@ -8,7 +8,7 @@ module UI.Icons.Ion exposing
     , copy
     , delete
     , error
-    , fireball
+    , flipRoles
     , github
     , home
     , musicNote
@@ -22,6 +22,7 @@ module UI.Icons.Ion exposing
     , settings
     , share
     , shuffle
+    , speedometer
     , stop
     , success
     , user
@@ -175,9 +176,14 @@ questionMark =
     display Ionicon.helpCircled
 
 
-fireball : Icon msg
-fireball =
+speedometer : Icon msg
+speedometer =
     display Ionicon.speedometer
+
+
+flipRoles : Icon msg
+flipRoles =
+    display Ionicon.Android.sync
 
 
 display :

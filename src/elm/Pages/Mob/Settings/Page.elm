@@ -21,6 +21,7 @@ type Msg
     | PlaylistChange Playlist
     | VolumeMsg VolumeField.Msg
     | ExtremeModeToggle
+    | FlipRoles
 
 
 update : Shared -> Msg -> Model.Mob.Mob -> ( Model.Mob.Mob, Effect Shared.Msg Msg )
@@ -76,6 +77,18 @@ update shared msg model =
                 |> Effect.share
             )
 
+        FlipRoles ->
+            let
+                updated =
+                    not model.flippedRoles
+            in
+            ( model
+            , updated
+                |> Model.Events.FlippedRoles
+                |> Model.Events.MobEvent model.name
+                |> Effect.share
+            )
+
 
 subscriptions : Model.Mob.Mob -> Sub Msg
 subscriptions _ =
@@ -96,7 +109,9 @@ view shared model =
             , onPomodoroChange = PomodoroChange
             , onTurnLengthChange = TurnChange
             , onExtremeModeChange = ExtremeModeToggle
+            , onFlippedRoles = FlipRoles
             , extremeMode = model.extremeMode
+            , flippedRoles = model.flippedRoles
             , pomodoro = model.pomodoroLength
             , turnLength = model.turnLength
             , volume =

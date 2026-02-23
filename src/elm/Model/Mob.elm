@@ -9,7 +9,7 @@ import Model.MobName exposing (MobName)
 import Model.Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Role exposing (Role)
-import Model.Roles
+import Model.Roles as Roles
 import Playlist.ClassicWeird exposing (classicWeird)
 import Playlist.Types exposing (Playlist)
 import Time
@@ -22,9 +22,10 @@ type alias Mob =
     , pomodoro : ClockState
     , pomodoroLength : Duration
     , mobbers : Mobbers
-    , roles : Model.Roles.Roles
+    , roles : Roles.Roles
     , soundProfile : Playlist
     , extremeMode : Bool
+    , flippedRoles : Bool
     }
 
 
@@ -36,9 +37,10 @@ init mob =
     , pomodoro = Off
     , pomodoroLength = defaultPomodoroLength
     , mobbers = Mobbers.empty
-    , roles = Model.Roles.default
+    , roles = Roles.default
     , soundProfile = classicWeird
     , extremeMode = False
+    , flippedRoles = False
     }
 
 
@@ -132,6 +134,19 @@ evolve_ event ( state, previousCommand ) =
 
         Events.ExtremeModeChanged extreme ->
             ( { state | extremeMode = extreme }
+            , previousCommand
+            )
+
+        Events.FlippedRoles flipped ->
+            ( { state
+                | flippedRoles = flipped
+                , roles =
+                    if flipped then
+                        Roles.flipped
+
+                    else
+                        Roles.default
+              }
             , previousCommand
             )
 

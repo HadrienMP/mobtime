@@ -1,4 +1,4 @@
-module Model.Roles exposing (Roles, decoder, default, encode)
+module Model.Roles exposing (Roles, decoder, default, encode, flipped)
 
 import Json.Decode as Decode
 import Json.Encode as Json
@@ -16,6 +16,11 @@ default =
     { special = [ Model.Role.driver, Model.Role.navigator ]
     , default = Model.Role.fromString "Mobber"
     }
+
+
+flipped : Roles
+flipped =
+    { default | special = List.reverse default.special }
 
 
 

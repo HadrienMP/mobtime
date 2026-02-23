@@ -33,7 +33,9 @@ type alias Props msg =
     , onPomodoroChange : Duration -> msg
     , onTurnLengthChange : Duration -> msg
     , onExtremeModeChange : msg
+    , onFlippedRoles : msg
     , extremeMode : Bool
+    , flippedRoles : Bool
     , pomodoro : Duration
     , turnLength : Duration
     , volume : VolumeView.Props msg
@@ -85,7 +87,7 @@ viewClockLengths props =
             , UI.Css.gap <| Size.rem 0.6
             ]
         ]
-        [ sectionTitle UI.Icons.Ion.clock "Clocks"
+        [ sectionTitle UI.Icons.Ion.clock "Clocks and Roles"
         , if props.extremeMode then
             lengthRange
                 { title = "Turn"
@@ -117,6 +119,7 @@ viewClockLengths props =
             , unit = Minutes
             }
         , viewExtremeMode props
+        , viewFlippedRoles props
         ]
 
 
@@ -166,7 +169,7 @@ lengthRange props =
             }
         , Html.div
             [ Attr.css
-                [ Css.width <| Css.px 142
+                [ labelWidthAttr
                 , Css.flexShrink (Css.int 1)
                 ]
             ]
@@ -195,13 +198,13 @@ viewExtremeMode props =
             , Css.alignItems Css.center
             ]
         ]
-        [ UI.Icons.Ion.fireball
+        [ UI.Icons.Ion.speedometer
             { size = Size.rem 2
             , color = Palettes.monochrome.on.background
             }
         , Html.div
             [ Attr.css
-                [ Css.width <| Css.px 142
+                [ labelWidthAttr
                 , Css.displayFlex
                 , UI.Css.gap <| Size.rem 0.4
                 , Css.alignItems Css.center
@@ -219,6 +222,50 @@ viewExtremeMode props =
         , Components.Form.Toggle.View.view
             { onToggle = props.onExtremeModeChange
             , value = props.extremeMode
+            , labelOn = Just "On"
+            , labelOff = Just "Off"
+            }
+        ]
+
+
+labelWidthAttr : Css.Style
+labelWidthAttr =
+    Css.width <| Css.px 142
+
+
+viewFlippedRoles : Props msg -> Html msg
+viewFlippedRoles props =
+    Html.div
+        [ Attr.css
+            [ Css.displayFlex
+            , UI.Css.gap <| Size.rem 1
+            , Css.alignItems Css.center
+            ]
+        ]
+        [ UI.Icons.Ion.flipRoles
+            { size = Size.rem 2
+            , color = Palettes.monochrome.on.background
+            }
+        , Html.div
+            [ Attr.css
+                [ labelWidthAttr
+                , Css.displayFlex
+                , UI.Css.gap <| Size.rem 0.4
+                , Css.alignItems Css.center
+                ]
+            ]
+            [ Html.text "Flip roles"
+            , Html.span
+                [ Attr.title "On rotation, the driver becomes the navigator" ]
+                [ UI.Icons.Ion.questionMark
+                    { size = Size.rem 1
+                    , color = Palettes.monochrome.on.background
+                    }
+                ]
+            ]
+        , Components.Form.Toggle.View.view
+            { onToggle = props.onFlippedRoles
+            , value = props.flippedRoles
             , labelOn = Just "On"
             , labelOff = Just "Off"
             }
