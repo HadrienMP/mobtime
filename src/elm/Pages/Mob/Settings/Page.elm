@@ -1,10 +1,11 @@
-module Pages.Mob.Settings.Page exposing (Msg(..), subscriptions, update, view)
+module Pages.Mob.Settings.Page exposing (Model, Msg(..), init, subscriptions, update, view)
 
 import Components.Form.Volume.Field as VolumeField
 import Effect exposing (Effect)
 import Lib.Duration exposing (Duration)
 import Model.Events
-import Model.Mob
+import Model.Mob exposing (Mob)
+import Model.Roles as Roles
 import Pages.Mob.Routing
 import Pages.Mob.Settings.PageView
 import Playlist.Types exposing (Playlist)
@@ -14,6 +15,23 @@ import UserPreferences
 import View exposing (View)
 
 
+
+-- Model
+
+
+type alias Model =
+    { rawRoles : Maybe String }
+
+
+init : Model
+init =
+    { rawRoles = Nothing }
+
+
+
+-- Update
+
+
 type Msg
     = Back
     | TurnChange Duration
@@ -21,24 +39,24 @@ type Msg
     | PlaylistChange Playlist
     | VolumeMsg VolumeField.Msg
     | ExtremeModeToggle
-    | FlipRoles
+    | RolesChange String
 
 
-update : Shared -> Msg -> Model.Mob.Mob -> ( Model.Mob.Mob, Effect Shared.Msg Msg )
-update shared msg model =
+update : Shared -> Mob -> Msg -> Model -> ( Model, Effect Shared.Msg Msg )
+update shared mob msg model =
     case msg of
         Back ->
             ( model
             , Shared.pushUrl shared <|
                 Routing.Mob <|
-                    { subRoute = Pages.Mob.Routing.Home, mob = model.name }
+                    { subRoute = Pages.Mob.Routing.Home, mob = mob.name }
             )
 
         TurnChange turn ->
             ( model
             , turn
                 |> Model.Events.TurnLengthChanged
-                |> Model.Events.MobEvent model.name
+                |> Model.Events.MobEvent mob.name
                 |> Effect.share
             )
 
@@ -46,7 +64,7 @@ update shared msg model =
             ( model
             , pomodoro
                 |> Model.Events.PomodoroLengthChanged
-                |> Model.Events.MobEvent model.name
+                |> Model.Events.MobEvent mob.name
                 |> Effect.share
             )
 
@@ -54,7 +72,7 @@ update shared msg model =
             ( model
             , playlist
                 |> Model.Events.SelectedMusicProfile
-                |> Model.Events.MobEvent model.name
+                |> Model.Events.MobEvent mob.name
                 |> Effect.share
             )
 
@@ -66,54 +84,46 @@ update shared msg model =
             )
 
         ExtremeModeToggle ->
-            let
-                updated =
-                    not model.extremeMode
-            in
-            ( { model | extremeMode = updated }
-            , updated
-                |> Model.Events.ExtremeModeChanged
-                |> Model.Events.MobEvent model.name
-                |> Effect.share
-            )
-
-        FlipRoles ->
-            let
-                updated =
-                    not model.flippedRoles
-            in
             ( model
-            , updated
-                |> Model.Events.FlippedRoles
-                |> Model.Events.MobEvent model.name
+            , not mob.extremeMode
+                |> Model.Events.ExtremeModeChanged
+                |> Model.Events.MobEvent mob.name
+                |> Effect.share
+            )
+
+        RolesChange roles ->
+            ( { model | rawRoles = Just roles }
+            , Roles.parse roles
+                |> Model.Events.ChangedRoles
+                |> Model.Events.MobEvent mob.name
                 |> Effect.share
             )
 
 
-subscriptions : Model.Mob.Mob -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
 
 
-view : Shared -> Model.Mob.Mob -> View Msg
-view shared model =
+view : Shared -> Mob -> Model -> View Msg
+view shared mob model =
     { title = "Settings"
     , modal = Nothing
     , body =
         Pages.Mob.Settings.PageView.view
-            { currentPlaylist = model.soundProfile.code
+            { currentPlaylist = mob.soundProfile.code
             , devMode = shared.devMode
-            , mob = model.name
+            , mob = mob.name
             , onBack = Back
             , onPlaylistChange = PlaylistChange
             , onPomodoroChange = PomodoroChange
             , onTurnLengthChange = TurnChange
             , onExtremeModeChange = ExtremeModeToggle
-            , onFlippedRoles = FlipRoles
-            , extremeMode = model.extremeMode
-            , flippedRoles = model.flippedRoles
-            , pomodoro = model.pomodoroLength
-            , turnLength = model.turnLength
+            , extremeMode = mob.extremeMode
+            , rawRoles = model.rawRoles |> Maybe.withDefault (Roles.toString mob.roles)
+            , onRoleChange = RolesChange
+            , pomodoro = mob.pomodoroLength
+            , turnLength = mob.turnLength
             , volume =
                 { onChange = VolumeMsg << VolumeField.Change
                 , onTest = VolumeMsg VolumeField.Test

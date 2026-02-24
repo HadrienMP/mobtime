@@ -1,7 +1,7 @@
 module Pages.Mob.Settings.Doc exposing (theChapter)
 
 import Components.Form.Volume.Type as Volume
-import ElmBook.Actions exposing (logAction, logActionWith)
+import ElmBook.Actions exposing (logAction, logActionWith, logActionWithString)
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Lib.Duration
@@ -26,8 +26,8 @@ theChapter =
                     , onExtremeModeChange = logAction "Extreme mode toggled"
                     , pomodoro = Lib.Duration.ofMinutes 25
                     , extremeMode = False
-                    , flippedRoles = False
-                    , onFlippedRoles = logAction "Roles flipped"
+                    , rawRoles = "Driver, Navigator"
+                    , onRoleChange = logActionWithString "Roles Changed"
                     , turnLength = Lib.Duration.ofMinutes 6
                     , volume =
                         { onChange = always <| logAction "Volume change"
@@ -48,8 +48,8 @@ theChapter =
                     , onExtremeModeChange = logAction "Extreme mode toggled"
                     , pomodoro = Lib.Duration.ofMinutes 25
                     , extremeMode = True
-                    , flippedRoles = True
-                    , onFlippedRoles = logAction "Roles flipped"
+                    , rawRoles = "Driver, Navigator"
+                    , onRoleChange = logActionWithString "Roles Changed"
                     , turnLength = Lib.Duration.ofMinutes 1
                     , volume =
                         { onChange = always <| logAction "Volume change"

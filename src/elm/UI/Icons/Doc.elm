@@ -12,6 +12,7 @@ import UI.Icons.Ion
 import UI.Icons.Keyboard
 import UI.Icons.Tape
 import UI.Icons.Tea
+import UI.Icons.TheatreMask
 import UI.Palettes as Palettes
 import UI.Size as Size
 
@@ -24,6 +25,7 @@ doc =
              , UI.Icons.Captain.display
              , UI.Icons.Tape.display
              , UI.Icons.Tea.display
+             , UI.Icons.TheatreMask.display
              , UI.Icons.Custom.elephant
              , UI.Icons.Custom.hourGlass
              , UI.Icons.Custom.rocket

@@ -25,7 +25,6 @@ type alias Mob =
     , roles : Roles.Roles
     , soundProfile : Playlist
     , extremeMode : Bool
-    , flippedRoles : Bool
     }
 
 
@@ -40,7 +39,6 @@ init mob =
     , roles = Roles.default
     , soundProfile = classicWeird
     , extremeMode = False
-    , flippedRoles = False
     }
 
 
@@ -134,19 +132,6 @@ evolve_ event ( state, previousCommand ) =
 
         Events.ExtremeModeChanged extreme ->
             ( { state | extremeMode = extreme }
-            , previousCommand
-            )
-
-        Events.FlippedRoles flipped ->
-            ( { state
-                | flippedRoles = flipped
-                , roles =
-                    if flipped then
-                        Roles.flipped
-
-                    else
-                        Roles.default
-              }
             , previousCommand
             )
 

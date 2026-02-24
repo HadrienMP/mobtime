@@ -8,7 +8,6 @@ module UI.Icons.Ion exposing
     , copy
     , delete
     , error
-    , flipRoles
     , github
     , home
     , musicNote
@@ -179,11 +178,6 @@ questionMark =
 speedometer : Icon msg
 speedometer =
     display Ionicon.speedometer
-
-
-flipRoles : Icon msg
-flipRoles =
-    display Ionicon.Android.sync
 
 
 display :

@@ -15,6 +15,7 @@ import UI.Icons.Captain
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Ion
 import UI.Icons.Keyboard
+import UI.Icons.Microphone
 import UI.Palettes as Palettes
 import UI.Row as Row
 import UI.Size as Size
@@ -70,7 +71,7 @@ header props =
                 , Css.fontWeight Css.normal
                 ]
             ]
-            [ Html.text "Mobbers" ]
+            [ Html.text "Team" ]
         , UI.Button.Link.view [ Attr.title "Add" ]
             { text =
                 UI.Icons.Ion.plus
@@ -243,14 +244,21 @@ displayMobber { role, mobber, emphasis } =
 
 iconForRole : Role -> Maybe (Icon msg)
 iconForRole role =
-    if role == Role.driver then
-        Just UI.Icons.Keyboard.display
+    case role.name of
+        "Driver" ->
+            Just UI.Icons.Keyboard.display
 
-    else if role == Role.navigator then
-        Just UI.Icons.Captain.display
+        "Navigator" ->
+            Just UI.Icons.Captain.display
 
-    else
-        Nothing
+        "Translator" ->
+            Just UI.Icons.Keyboard.display
+
+        "Moderator" ->
+            Just UI.Icons.Microphone.display
+
+        _ ->
+            Nothing
 
 
 displayRoleName : Role -> Html.Html msg

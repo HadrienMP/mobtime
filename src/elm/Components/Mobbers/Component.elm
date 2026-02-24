@@ -45,7 +45,7 @@ view : Mob -> Html Msg
 view state =
     Components.Mobbers.View.view
         { people = state.mobbers |> Model.Mobbers.toList
-        , roles = state.roles.special
+        , roles = state.roles
         , onShuffle = Shuffe
         , onRotate = Rotate
         , onSettings = GoToSettings

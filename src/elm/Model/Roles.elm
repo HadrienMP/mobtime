@@ -1,26 +1,29 @@
-module Model.Roles exposing (Roles, decoder, default, encode, flipped)
+module Model.Roles exposing (Roles, decoder, default, encode, parse, toString)
 
 import Json.Decode as Decode
 import Json.Encode as Json
-import Model.Role exposing (Role)
+import Model.Role as Role exposing (Role)
 
 
 type alias Roles =
-    { default : Role
-    , special : List Role
-    }
+    List Role
 
 
 default : Roles
 default =
-    { special = [ Model.Role.driver, Model.Role.navigator ]
-    , default = Model.Role.fromString "Mobber"
-    }
+    [ Role.driver, Role.navigator ]
 
 
-flipped : Roles
-flipped =
-    { default | special = List.reverse default.special }
+parse : String -> Roles
+parse raw =
+    raw
+        |> String.split ","
+        |> List.map (String.trim >> Role.fromString)
+
+
+toString : Roles -> String
+toString roles =
+    roles |> List.map .name |> String.join ", "
 
 
 
@@ -29,14 +32,9 @@ flipped =
 
 encode : Roles -> Json.Value
 encode roles =
-    Json.object
-        [ ( "default", Model.Role.encode roles.default )
-        , ( "special", Json.list Model.Role.encode roles.special )
-        ]
+    Json.list Role.encode roles
 
 
 decoder : Decode.Decoder Roles
 decoder =
-    Decode.map2 Roles
-        (Decode.field "default" Model.Role.decoder)
-        (Decode.field "special" (Decode.list Model.Role.decoder))
+    Decode.list Role.decoder

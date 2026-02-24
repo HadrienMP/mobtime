@@ -1,4 +1,4 @@
-module Model.Role exposing (Role, decoder, driver, encode, fromString, navigator, toNextUp)
+module Model.Role exposing (Role, decoder, driver, encode, fromString, navigator, none, toNextUp)
 
 import Json.Decode as Decode
 import Json.Encode as Json
@@ -25,6 +25,11 @@ navigator =
     { name = "Navigator"
     , description = Just "The person that tells the driver what to do. They should give the intention at the highest level. They should not go into details unless requested by the driver."
     }
+
+
+none : Role
+none =
+    fromString ""
 
 
 fromString : String -> Role

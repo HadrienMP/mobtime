@@ -13,6 +13,8 @@ lint:
 normalize:
 	./normalize-library-volume.sh
 
+test watch:
+	pnpm run test --watch
 
 [no-cd]
 to-miniature extension:

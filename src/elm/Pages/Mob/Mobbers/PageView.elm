@@ -37,7 +37,7 @@ view : Props msg -> Html.Html msg
 view props =
     Components.SecondaryPage.view
         { onBack = props.onBack
-        , title = "Mobbers"
+        , title = "Team"
         , icon = UI.Icons.Ion.people
         , subTitle = Nothing
         , content =

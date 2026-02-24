@@ -34,7 +34,7 @@ import View exposing (View)
 
 type Page
     = Home Pages.Mob.Home.Page.Model
-    | Settings
+    | Settings Pages.Mob.Settings.Page.Model
     | Invite
     | Profile
     | Mobbers Pages.Mob.Mobbers.Page.Model
@@ -71,7 +71,7 @@ initSubPage route shared =
                 |> Tuple.mapBoth Home (Effect.map (PageMsg << HomeMsg))
 
         Pages.Mob.Routing.Settings ->
-            ( Settings, Effect.none )
+            ( Settings Pages.Mob.Settings.Page.init, Effect.none )
 
         Pages.Mob.Routing.Invite ->
             ( Invite, Effect.none )
@@ -179,10 +179,10 @@ updatePage pageMsg model shared =
                     (\next -> { model | page = Home next })
                     (Effect.map HomeMsg)
 
-        ( SettingsMsg subMsg, Settings ) ->
-            Pages.Mob.Settings.Page.update shared subMsg model.mob
+        ( SettingsMsg subMsg, Settings subModel ) ->
+            Pages.Mob.Settings.Page.update shared model.mob subMsg subModel
                 |> Tuple.mapBoth
-                    (\next -> { model | mob = next })
+                    (\next -> { model | page = Settings next })
                     (Effect.map SettingsMsg)
 
         ( InviteMsg subMsg, Invite ) ->
@@ -242,8 +242,8 @@ pageSubscriptions model =
             Pages.Mob.Home.Page.subscriptions subModel
                 |> Sub.map (HomeMsg >> PageMsg)
 
-        Settings ->
-            Pages.Mob.Settings.Page.subscriptions model.mob
+        Settings subModel ->
+            Pages.Mob.Settings.Page.subscriptions subModel
                 |> Sub.map (SettingsMsg >> PageMsg)
 
         Invite ->
@@ -273,8 +273,8 @@ view shared model =
                     Pages.Mob.Home.Page.view shared model.mob subModel
                         |> View.map (HomeMsg >> PageMsg)
 
-                Settings ->
-                    Pages.Mob.Settings.Page.view shared model.mob
+                Settings subModel ->
+                    Pages.Mob.Settings.Page.view shared model.mob subModel
                         |> View.map (SettingsMsg >> PageMsg)
 
                 Invite ->

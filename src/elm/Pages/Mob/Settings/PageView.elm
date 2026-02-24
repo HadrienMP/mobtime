@@ -1,5 +1,6 @@
 module Pages.Mob.Settings.PageView exposing (Props, view)
 
+import Components.Form.Input.View
 import Components.Form.Toggle.View
 import Components.Form.Volume.View as VolumeView
 import Components.SecondaryPage
@@ -17,6 +18,7 @@ import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
 import UI.Icons.Tape
+import UI.Icons.TheatreMask
 import UI.Palettes as Palettes
 import UI.Range.View
 import UI.Size as Size
@@ -33,9 +35,9 @@ type alias Props msg =
     , onPomodoroChange : Duration -> msg
     , onTurnLengthChange : Duration -> msg
     , onExtremeModeChange : msg
-    , onFlippedRoles : msg
     , extremeMode : Bool
-    , flippedRoles : Bool
+    , rawRoles : String
+    , onRoleChange : String -> msg
     , pomodoro : Duration
     , turnLength : Duration
     , volume : VolumeView.Props msg
@@ -59,6 +61,7 @@ view props =
                 ]
                 [ viewPersonalSection props
                 , viewClockLengths props
+                , viewRolesSection props
                 , viewPlaylists props
                 ]
         }
@@ -87,7 +90,7 @@ viewClockLengths props =
             , UI.Css.gap <| Size.rem 0.6
             ]
         ]
-        [ sectionTitle UI.Icons.Ion.clock "Clocks and Roles"
+        [ sectionTitle UI.Icons.Ion.clock "Clocks"
         , if props.extremeMode then
             lengthRange
                 { title = "Turn"
@@ -119,7 +122,6 @@ viewClockLengths props =
             , unit = Minutes
             }
         , viewExtremeMode props
-        , viewFlippedRoles props
         ]
 
 
@@ -233,43 +235,42 @@ labelWidthAttr =
     Css.width <| Css.px 142
 
 
-viewFlippedRoles : Props msg -> Html msg
-viewFlippedRoles props =
+viewRolesSection : Props msg -> Html msg
+viewRolesSection props =
     Html.div
         [ Attr.css
             [ Css.displayFlex
-            , UI.Css.gap <| Size.rem 1
-            , Css.alignItems Css.center
+            , Css.flexDirection Css.column
+            , UI.Css.gap <| Size.rem 0.6
             ]
         ]
-        [ UI.Icons.Ion.flipRoles
-            { size = Size.rem 2
-            , color = Palettes.monochrome.on.background
-            }
-        , Html.div
-            [ Attr.css
-                [ labelWidthAttr
-                , Css.displayFlex
-                , UI.Css.gap <| Size.rem 0.4
-                , Css.alignItems Css.center
-                ]
+        [ sectionTitle UI.Icons.TheatreMask.display "Roles (experimental)"
+        , Html.p [ Attr.css [ Css.fontWeight Css.lighter ] ]
+            [ Html.text <|
+                "Define the roles you like in the order you like. "
+                    ++ "Separate them by commas. "
+                    ++ "Special ones will have icons, they include : "
+                    ++ "Driver and Navigator"
             ]
-            [ Html.text "Flip roles"
-            , Html.span
-                [ Attr.title "On rotation, the driver becomes the navigator" ]
-                [ UI.Icons.Ion.questionMark
-                    { size = Size.rem 1
-                    , color = Palettes.monochrome.on.background
-                    }
-                ]
-            ]
-        , Components.Form.Toggle.View.view
-            { onToggle = props.onFlippedRoles
-            , value = props.flippedRoles
-            , labelOn = Just "On"
-            , labelOff = Just "Off"
-            }
+        , viewRolesInput props
         ]
+
+
+viewRolesInput : Props msg -> Html msg
+viewRolesInput props =
+    Components.Form.Input.View.view
+        [ Attr.css
+            [ Css.width <| Css.pct 100
+            , Css.fontSize <| Css.rem 1
+            , Css.fontWeight Css.normal
+            ]
+        ]
+        { id = "roles"
+        , label = "Roles"
+        , value = props.rawRoles
+        , onChange = props.onRoleChange
+        , required = False
+        }
 
 
 viewPlaylists : Props msg -> Html msg

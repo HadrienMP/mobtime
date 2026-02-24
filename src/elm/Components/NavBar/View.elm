@@ -42,7 +42,7 @@ view props =
                 ([ Css.displayFlex
                  , Css.alignItems Css.center
                  , Css.justifyContent Css.spaceBetween
-                 , Css.padding <| Size.toElmCss Space.xs
+                 , Css.padding2 (Size.toElmCss Space.xs) Css.zero
                  ]
                     ++ props.addedStyle
                 )

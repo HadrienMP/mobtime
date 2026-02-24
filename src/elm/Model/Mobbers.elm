@@ -16,7 +16,7 @@ import Json.Decode as Decode
 import Json.Encode as Json
 import Lib.ListExtras as ListExtras
 import Model.Mobber as Mobber exposing (Mobber)
-import Model.Role exposing (Role)
+import Model.Role as Role exposing (Role)
 import Model.Roles exposing (Roles)
 import Random
 import Random.List
@@ -83,8 +83,8 @@ assignRoles roles mobbers =
     in
     list
         |> ListExtras.zip
-            (roles.special
-                ++ List.repeat (List.length list - List.length roles.special) roles.default
+            (roles
+                ++ List.repeat (List.length list - List.length roles) Role.none
             )
 
 

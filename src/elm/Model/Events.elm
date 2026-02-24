@@ -45,7 +45,6 @@ type Event
     | PomodoroStopped
     | PomodoroLengthChanged Duration
     | ExtremeModeChanged Bool
-    | FlippedRoles Bool
 
 
 
@@ -116,11 +115,6 @@ eventFromNameDecoder eventName =
             Decode.bool
                 |> Decode.field "value"
                 |> Decode.map ExtremeModeChanged
-
-        "RolesFlipped" ->
-            Decode.bool
-                |> Decode.field "value"
-                |> Decode.map FlippedRoles
 
         _ ->
             Decode.fail <| "I don't know this event " ++ eventName
@@ -206,11 +200,6 @@ eventToJson event =
         ExtremeModeChanged extreme ->
             [ ( "name", Json.string "ExtremeModeChanged" )
             , ( "value", Json.bool extreme )
-            ]
-
-        FlippedRoles flip ->
-            [ ( "name", Json.string "RolesFlipped" )
-            , ( "value", Json.bool flip )
             ]
 
 

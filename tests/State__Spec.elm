@@ -84,9 +84,6 @@ suite =
                         navigator =
                             Model.Role.fromString "Navigator"
 
-                        mobber =
-                            Model.Role.fromString "Mobber"
-
                         jane =
                             { id = Mobber.idFromString "jane", name = "Jane" }
 
@@ -94,7 +91,7 @@ suite =
                             { id = Mobber.idFromString "camille", name = "Camille" }
 
                         roles =
-                            { default = mobber, special = [ driver, navigator ] }
+                            [ driver, navigator ]
 
                         ( state, _ ) =
                             Model.MobName.MobName "awesome"

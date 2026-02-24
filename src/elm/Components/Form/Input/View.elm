@@ -39,7 +39,7 @@ view attributes props =
             , Attr.required props.required
             , Attr.css
                 [ Css.border Css.zero
-                , Css.borderBottom3 (Css.px 2) Css.solid <| Color.toElmCss <| Palettes.monochrome.on.background
+                , Css.borderBottom3 (Css.px 2) Css.solid (Color.toElmCss Palettes.monochrome.on.background)
                 , Css.borderRadius Css.zero
                 , Typography.fontSize Typography.m
                 , Css.padding Css.zero
