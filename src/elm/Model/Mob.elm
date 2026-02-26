@@ -25,7 +25,6 @@ type alias Mob =
     , roles : Roles.Roles
     , soundProfile : Playlist
     , extremeMode : Bool
-    , stopAutomatically : Bool
     }
 
 
@@ -40,7 +39,6 @@ init mob =
     , roles = Roles.default
     , soundProfile = classicWeird
     , extremeMode = False
-    , stopAutomatically = False
     }
 
 
@@ -134,11 +132,6 @@ evolve_ event ( state, previousCommand ) =
 
         Events.ExtremeModeChanged extreme ->
             ( { state | extremeMode = extreme }
-            , previousCommand
-            )
-
-        Events.StopAutomatically stopAutomatically ->
-            ( { state | stopAutomatically = stopAutomatically }
             , previousCommand
             )
 

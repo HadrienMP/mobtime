@@ -107,18 +107,7 @@ update shared mob msg model =
                 ( alarm, alarmEffect ) =
                     case timePassedResult.turnEvent of
                         Clock.Ended ->
-                            let
-                                toto =
-                                    if mob.stopAutomatically then
-                                        [ Model.Events.Clock Model.Events.Stopped
-                                            |> Model.Events.MobEvent mob.name
-                                            |> Effect.share
-                                        ]
-
-                                    else
-                                        []
-                            in
-                            ( Playing, Effect.batch (toto ++ [ Lib.Alarm.play |> Effect.fromCmd ]) )
+                            ( Playing, Lib.Alarm.play |> Effect.fromCmd )
 
                         Clock.Continued ->
                             ( model.alarm, Effect.none )

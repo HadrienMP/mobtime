@@ -39,7 +39,6 @@ type Msg
     | PlaylistChange Playlist
     | VolumeMsg VolumeField.Msg
     | ExtremeModeToggle
-    | ToggleStopAutomatically
     | RolesChange String
 
 
@@ -100,14 +99,6 @@ update shared mob msg model =
                 |> Effect.share
             )
 
-        ToggleStopAutomatically ->
-            ( model
-            , not mob.stopAutomatically
-                |> Model.Events.StopAutomatically
-                |> Model.Events.MobEvent mob.name
-                |> Effect.share
-            )
-
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -131,8 +122,6 @@ view shared mob model =
             , extremeMode = mob.extremeMode
             , rawRoles = model.rawRoles |> Maybe.withDefault (Roles.toString mob.roles)
             , onRoleChange = RolesChange
-            , stopAutomatically = mob.stopAutomatically
-            , onStopAutomatically = ToggleStopAutomatically
             , pomodoro = mob.pomodoroLength
             , turnLength = mob.turnLength
             , volume =
