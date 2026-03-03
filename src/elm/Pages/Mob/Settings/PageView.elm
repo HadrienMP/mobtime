@@ -17,6 +17,7 @@ import UI.Css
 import UI.Icons.Common exposing (Icon)
 import UI.Icons.Custom
 import UI.Icons.Ion
+import UI.Icons.StopCircle
 import UI.Icons.Tape
 import UI.Icons.TheatreMask
 import UI.Palettes as Palettes
@@ -38,6 +39,8 @@ type alias Props msg =
     , extremeMode : Bool
     , rawRoles : String
     , onRoleChange : String -> msg
+    , stopAutomatically : Bool
+    , onStopAutomatically : msg
     , pomodoro : Duration
     , turnLength : Duration
     , volume : VolumeView.Props msg
@@ -122,6 +125,7 @@ viewClockLengths props =
             , unit = Minutes
             }
         , viewExtremeMode props
+        , viewStopAutomatically props
         ]
 
 
@@ -224,6 +228,45 @@ viewExtremeMode props =
         , Components.Form.Toggle.View.view
             { onToggle = props.onExtremeModeChange
             , value = props.extremeMode
+            , labelOn = Just "On"
+            , labelOff = Just "Off"
+            }
+        ]
+
+
+viewStopAutomatically : Props msg -> Html msg
+viewStopAutomatically props =
+    Html.div
+        [ Attr.css
+            [ Css.displayFlex
+            , UI.Css.gap <| Size.rem 1
+            , Css.alignItems Css.center
+            ]
+        ]
+        [ UI.Icons.StopCircle.display
+            { size = Size.rem 2
+            , color = Palettes.monochrome.on.background
+            }
+        , Html.div
+            [ Attr.css
+                [ labelWidthAttr
+                , Css.displayFlex
+                , UI.Css.gap <| Size.rem 0.4
+                , Css.alignItems Css.center
+                ]
+            ]
+            [ Html.text "Stop auto"
+            , Html.span
+                [ Attr.title "Don't count overtime, the turn clock will stop directly" ]
+                [ UI.Icons.Ion.questionMark
+                    { size = Size.rem 1
+                    , color = Palettes.monochrome.on.background
+                    }
+                ]
+            ]
+        , Components.Form.Toggle.View.view
+            { onToggle = props.onStopAutomatically
+            , value = props.stopAutomatically
             , labelOn = Just "On"
             , labelOff = Just "Off"
             }

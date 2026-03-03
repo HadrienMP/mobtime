@@ -45,6 +45,7 @@ type Event
     | PomodoroStopped
     | PomodoroLengthChanged Duration
     | ExtremeModeChanged Bool
+    | StopAutomatically Bool
 
 
 
@@ -115,6 +116,11 @@ eventFromNameDecoder eventName =
             Decode.bool
                 |> Decode.field "value"
                 |> Decode.map ExtremeModeChanged
+
+        "StopAutomatically" ->
+            Decode.bool
+                |> Decode.field "value"
+                |> Decode.map StopAutomatically
 
         _ ->
             Decode.fail <| "I don't know this event " ++ eventName
@@ -200,6 +206,11 @@ eventToJson event =
         ExtremeModeChanged extreme ->
             [ ( "name", Json.string "ExtremeModeChanged" )
             , ( "value", Json.bool extreme )
+            ]
+
+        StopAutomatically stopAutomatically ->
+            [ ( "name", Json.string "StopAutomatically" )
+            , ( "value", Json.bool stopAutomatically )
             ]
 
 
