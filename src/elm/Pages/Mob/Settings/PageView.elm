@@ -255,7 +255,7 @@ viewStopAutomatically props =
                 , Css.alignItems Css.center
                 ]
             ]
-            [ Html.text "Stop auto"
+            [ Html.text "No overtime"
             , Html.span
                 [ Attr.title "Don't count overtime, the turn clock will stop directly" ]
                 [ UI.Icons.Ion.questionMark
