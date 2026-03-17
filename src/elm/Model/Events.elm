@@ -7,8 +7,8 @@ import Model.MobName exposing (MobName)
 import Model.Mobber as Mobber exposing (Mobber)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Roles
-import Playlist.All
-import Playlist.Types exposing (Playlist, PlaylistCode(..), Sound)
+import Playlist.All as All
+import Playlist.Types exposing (PlaylistCode(..), Playlists, Sound)
 import Time
 
 
@@ -40,7 +40,7 @@ type Event
     | RotatedMobbers
     | ShuffledMobbers Mobbers
     | TurnLengthChanged Duration
-    | SelectedMusicProfile Playlist
+    | SelectedPlaylists Playlists
     | Unknown Decode.Value
     | PomodoroStopped
     | PomodoroLengthChanged Duration
@@ -100,12 +100,16 @@ eventFromNameDecoder eventName =
         "RotatedMobbers" ->
             Decode.succeed RotatedMobbers
 
-        "SelectedMusicProfile" ->
-            Decode.string
-                |> Decode.map PlaylistCode
-                |> Decode.map Playlist.All.fromCode
-                |> Decode.field "profile"
-                |> Decode.map SelectedMusicProfile
+        "SelectedPlaylists" ->
+            Decode.map2 (\first rest -> SelectedPlaylists ( first, rest ))
+                (Decode.string
+                    |> Decode.map (PlaylistCode >> All.fromCode)
+                    |> Decode.field "first"
+                )
+                (Decode.list Decode.string
+                    |> Decode.map (List.map (PlaylistCode >> All.fromCode))
+                    |> Decode.field "rest"
+                )
 
         "ChangedRoles" ->
             Model.Roles.decoder
@@ -185,9 +189,10 @@ eventToJson event =
             , ( "seconds", Json.int <| Lib.Duration.toSeconds duration )
             ]
 
-        SelectedMusicProfile profile ->
-            [ ( "name", Json.string "SelectedMusicProfile" )
-            , ( "profile", Playlist.Types.codeToJson profile.code )
+        SelectedPlaylists ( first, rest ) ->
+            [ ( "name", Json.string "SelectedPlaylists" )
+            , ( "first", Playlist.Types.codeToJson first.code )
+            , ( "rest", Json.list (\playlist -> Playlist.Types.codeToJson playlist.code) rest )
             ]
 
         Unknown value ->

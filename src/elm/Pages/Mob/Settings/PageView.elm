@@ -9,9 +9,10 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Lib.Duration as Duration exposing (Duration, Unit(..))
+import Lib.NonEmptyList as NonEmptyList
 import Model.MobName exposing (MobName)
 import Playlist.All
-import Playlist.Types exposing (Playlist, PlaylistCode, codeToString)
+import Playlist.Types exposing (Playlist, Playlists, codeToString)
 import UI.Color as Color
 import UI.Css
 import UI.Icons.Common exposing (Icon)
@@ -28,7 +29,7 @@ import Url.Builder
 
 
 type alias Props msg =
-    { currentPlaylist : PlaylistCode
+    { active : Playlists
     , devMode : Bool
     , mob : MobName
     , onBack : msg
@@ -320,6 +321,10 @@ viewPlaylists : Props msg -> Html msg
 viewPlaylists props =
     Html.div [ Attr.css [ Css.displayFlex, Css.flexDirection Css.column, UI.Css.gap <| Size.rem 0.8 ] ]
         [ sectionTitle UI.Icons.Tape.display "Playlist"
+        , Html.p [ Attr.css [ Css.fontWeight Css.lighter ] ]
+            [ Html.text <|
+                "Select one or more playlists to draw sounds from"
+            ]
         , Html.div
             [ Attr.css
                 [ Css.displayFlex
@@ -330,7 +335,7 @@ viewPlaylists props =
             (Playlist.All.playlists
                 |> List.map
                     (viewPlaylist
-                        { active = props.currentPlaylist
+                        { active = props.active
                         , onChange = props.onPlaylistChange
                         }
                     )
@@ -338,7 +343,7 @@ viewPlaylists props =
         ]
 
 
-viewPlaylist : { active : PlaylistCode, onChange : Playlist -> msg } -> Playlist -> Html msg
+viewPlaylist : { active : Playlists, onChange : Playlist -> msg } -> Playlist -> Html msg
 viewPlaylist { active, onChange } playlist =
     Html.button
         [ Attr.css
@@ -354,7 +359,7 @@ viewPlaylist { active, onChange } playlist =
             , Css.displayFlex
             , Css.flexDirection Css.column
             ]
-        , Evts.onClick (onChange playlist)
+        , Evts.onClick <| onChange playlist
         ]
         [ viewPoster playlist
         , Html.p
@@ -364,14 +369,14 @@ viewPlaylist { active, onChange } playlist =
                 , Css.fontSize <| Css.rem 1
                 , Css.backgroundColor <|
                     Color.toElmCss <|
-                        if active == playlist.code then
+                        if NonEmptyList.member playlist active then
                             Palettes.monochrome.surfaceActive
 
                         else
                             Palettes.monochrome.surface
                 , Css.color <|
                     Color.toElmCss <|
-                        if active == playlist.code then
+                        if NonEmptyList.member playlist active then
                             Palettes.monochrome.on.surfaceActive
 
                         else
@@ -379,7 +384,7 @@ viewPlaylist { active, onChange } playlist =
                 ]
             ]
             [ Html.text playlist.title ]
-        , if playlist.code == active then
+        , if NonEmptyList.member playlist active then
             Html.span
                 [ Attr.css
                     [ Css.position Css.absolute

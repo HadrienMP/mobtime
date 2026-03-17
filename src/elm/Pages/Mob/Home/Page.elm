@@ -11,7 +11,6 @@ module Pages.Mob.Home.Page exposing
 
 import Components.Clock.View
 import Components.Mobbers.Component
-import Components.Playlist.View
 import Css
 import Effect exposing (Effect)
 import Html.Styled as Html exposing (..)
@@ -25,7 +24,7 @@ import Model.Mob
 import Model.MobName exposing (MobName)
 import Pages.Mob.Routing
 import Playlist.Pick exposing (pick)
-import Playlist.Types exposing (Playlist, Sound)
+import Playlist.Types exposing (Playlists, Sound)
 import Random
 import Routing
 import Shared exposing (Shared)
@@ -163,7 +162,7 @@ update shared mob msg model =
             ( model
             , Time.now
                 |> Task.map
-                    (\now -> ( now, selectSound now mob.soundProfile ))
+                    (\now -> ( now, selectSound now mob.playlists ))
                 |> Task.perform StartWith
                 |> Effect.fromCmd
             )
@@ -194,9 +193,9 @@ update shared mob msg model =
             )
 
 
-selectSound : Time.Posix -> Playlist -> Sound
-selectSound now playlist =
-    Random.step (pick playlist)
+selectSound : Time.Posix -> Playlists -> Sound
+selectSound now playlists =
+    Random.step (pick playlists)
         (now
             |> Time.posixToMillis
             |> Random.initialSeed
@@ -300,7 +299,6 @@ body mob model =
         ]
         [ clockArea mob model
         , Components.Mobbers.Component.view mob |> Html.map MobbersMsg
-        , Components.Playlist.View.view mob.soundProfile
         ]
 
 

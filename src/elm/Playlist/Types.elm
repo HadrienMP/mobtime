@@ -1,6 +1,7 @@
-module Playlist.Types exposing (Playlist, PlaylistCode(..), Sound, codeToJson, codeToString)
+module Playlist.Types exposing (Playlist, PlaylistCode(..), Playlists, Sound, codeToJson, codeToString)
 
 import Json.Encode as Json
+import Lib.NonEmptyList exposing (NonEmptyList)
 
 
 type alias Sound =
@@ -9,6 +10,10 @@ type alias Sound =
 
 type PlaylistCode
     = PlaylistCode String
+
+
+type alias Playlists =
+    NonEmptyList Playlist
 
 
 type alias Playlist =

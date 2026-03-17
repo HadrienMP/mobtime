@@ -16,20 +16,20 @@ theChapter =
         |> renderComponentList
             [ ( "Page"
               , Page.view
-                    { currentPlaylist = classicWeird.code
+                    { active = ( classicWeird, [] )
                     , devMode = False
+                    , extremeMode = False
                     , mob = MobName "Awesome"
                     , onBack = logAction "Back"
-                    , onPlaylistChange = logActionWith .title "Playlist changed"
-                    , onPomodoroChange = logActionWith Lib.Duration.print "Pomodoro changed"
-                    , onTurnLengthChange = logActionWith (Lib.Duration.toLongString >> String.join " ") "Turn changed"
                     , onExtremeModeChange = logAction "Extreme mode toggled"
-                    , pomodoro = Lib.Duration.ofMinutes 25
-                    , extremeMode = False
-                    , rawRoles = "Driver, Navigator"
+                    , onPlaylistChange = logActionWith .title "Playlist toggled"
+                    , onPomodoroChange = logActionWith Lib.Duration.print "Pomodoro changed"
                     , onRoleChange = logActionWithString "Roles Changed"
-                    , stopAutomatically = False
                     , onStopAutomatically = logAction "Toggled stop automatically"
+                    , onTurnLengthChange = logActionWith (Lib.Duration.toLongString >> String.join " ") "Turn changed"
+                    , pomodoro = Lib.Duration.ofMinutes 25
+                    , rawRoles = "Driver, Navigator"
+                    , stopAutomatically = False
                     , turnLength = Lib.Duration.ofMinutes 6
                     , volume =
                         { onChange = always <| logAction "Volume change"
@@ -40,7 +40,7 @@ theChapter =
               )
             , ( "Extreme Mode"
               , Page.view
-                    { currentPlaylist = classicWeird.code
+                    { active = ( classicWeird, [] )
                     , devMode = False
                     , mob = MobName "Awesome"
                     , onBack = logAction "Back"

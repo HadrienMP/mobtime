@@ -3,6 +3,7 @@ module Pages.Mob.Settings.Page exposing (Model, Msg(..), init, subscriptions, up
 import Components.Form.Volume.Field as VolumeField
 import Effect exposing (Effect)
 import Lib.Duration exposing (Duration)
+import Lib.NonEmptyList as NonEmptyList
 import Model.Events
 import Model.Mob exposing (Mob)
 import Model.Roles as Roles
@@ -36,7 +37,7 @@ type Msg
     = Back
     | TurnChange Duration
     | PomodoroChange Duration
-    | PlaylistChange Playlist
+    | PlaylistToggled Playlist
     | VolumeMsg VolumeField.Msg
     | ExtremeModeToggle
     | ToggleStopAutomatically
@@ -69,10 +70,11 @@ update shared mob msg model =
                 |> Effect.share
             )
 
-        PlaylistChange playlist ->
+        PlaylistToggled playlist ->
             ( model
-            , playlist
-                |> Model.Events.SelectedMusicProfile
+            , mob.playlists
+                |> NonEmptyList.toggle playlist
+                |> Model.Events.SelectedPlaylists
                 |> Model.Events.MobEvent mob.name
                 |> Effect.share
             )
@@ -120,11 +122,11 @@ view shared mob model =
     , modal = Nothing
     , body =
         Pages.Mob.Settings.PageView.view
-            { currentPlaylist = mob.soundProfile.code
+            { active = mob.playlists
             , devMode = shared.devMode
             , mob = mob.name
             , onBack = Back
-            , onPlaylistChange = PlaylistChange
+            , onPlaylistChange = PlaylistToggled
             , onPomodoroChange = PomodoroChange
             , onTurnLengthChange = TurnChange
             , onExtremeModeChange = ExtremeModeToggle
