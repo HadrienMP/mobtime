@@ -41,6 +41,7 @@ display { onChange, onTest, volume } =
                     , min = 0
                     , max = 50
                     , value = open volume
+                    , id = "volume"
                     }
                 , UI.Icons.Ion.volumeHigh
                     { size = Size.rem 2

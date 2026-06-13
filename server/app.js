@@ -32,18 +32,9 @@ function historize(room, message) {
 
 let publicDirPath = path.join(__dirname + '/../', 'dist');
 app.use(express.static(publicDirPath));
-app.get('/', (_, res) => {
+app.get(/.*/, (_, res) => {
     res.sendFile(path.join(publicDirPath, 'index.html'));
-})
-    .get('/mob/:mob', (_, res) => {
-        res.sendFile(path.join(publicDirPath, 'index.html'));
-    })
-    .get(/mob\/:mob\/.*/, (_, res) => {
-        res.sendFile(path.join(publicDirPath, 'index.html'));
-    })
-    .get('/me', (_, res) => {
-        res.sendFile(path.join(publicDirPath, 'index.html'));
-    });
+});
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {

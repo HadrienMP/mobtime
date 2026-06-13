@@ -12,6 +12,7 @@ theChapter =
         props =
             { onToggle = logAction "Toggle switched"
             , value = True
+            , id = "toggle"
             }
     in
     chapter "Toggle"

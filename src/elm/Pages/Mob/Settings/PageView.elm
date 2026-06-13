@@ -104,6 +104,7 @@ viewClockLengths props =
                 , min = 1
                 , max = 120
                 , unit = Seconds
+                , id = "turn-length"
                 }
 
           else
@@ -115,6 +116,7 @@ viewClockLengths props =
                 , min = 2
                 , max = 15
                 , unit = Minutes
+                , id = "turn-length"
                 }
         , lengthRange
             { title = "Pomodoro"
@@ -124,6 +126,7 @@ viewClockLengths props =
             , min = 10
             , max = 45
             , unit = Minutes
+            , id = "turn-length"
             }
         , viewExtremeMode props
         , viewStopAutomatically props
@@ -160,6 +163,7 @@ lengthRange :
     , min : Int
     , max : Int
     , unit : Duration.Unit
+    , id : String
     }
     -> Html msg
 lengthRange props =
@@ -174,11 +178,12 @@ lengthRange props =
             { size = Size.rem 2
             , color = Palettes.monochrome.on.background
             }
-        , Html.div
+        , Html.label
             [ Attr.css
                 [ labelWidthAttr
                 , Css.flexShrink (Css.int 1)
                 ]
+            , Attr.for props.id
             ]
             [ Html.text <| props.title ++ ": " ++ Duration.printLong props.length ]
         , Html.div
@@ -191,6 +196,7 @@ lengthRange props =
                 , min = props.min
                 , max = props.max
                 , value = props.length |> Duration.toInt props.unit
+                , id = props.id
                 }
             ]
         ]
@@ -217,7 +223,7 @@ viewExtremeMode props =
                 , Css.alignItems Css.center
                 ]
             ]
-            [ Html.text "Extreme Mode"
+            [ Html.label [ Attr.for "extreme-mode" ] [ Html.text "Extreme Mode" ]
             , Html.span
                 [ Attr.title "Allows for turn lenghts shorter than 2 minutes" ]
                 [ UI.Icons.Ion.questionMark
@@ -231,6 +237,7 @@ viewExtremeMode props =
             , value = props.extremeMode
             , labelOn = Just "On"
             , labelOff = Just "Off"
+            , id = "extreme-mode"
             }
         ]
 
@@ -256,7 +263,7 @@ viewStopAutomatically props =
                 , Css.alignItems Css.center
                 ]
             ]
-            [ Html.text "No overtime"
+            [ Html.label [ Attr.id "no-overtime" ] [ Html.text "No overtime" ]
             , Html.span
                 [ Attr.title "Don't count overtime, the turn clock will stop directly" ]
                 [ UI.Icons.Ion.questionMark
@@ -270,6 +277,7 @@ viewStopAutomatically props =
             , value = props.stopAutomatically
             , labelOn = Just "On"
             , labelOff = Just "Off"
+            , id = "no-overtime"
             }
         ]
 

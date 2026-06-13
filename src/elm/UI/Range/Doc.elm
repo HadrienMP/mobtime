@@ -40,6 +40,7 @@ component { range } =
         , value = range
         , min = 0
         , max = 100
+        , id = "range"
         }
 
 

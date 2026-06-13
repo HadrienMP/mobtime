@@ -9,7 +9,8 @@ import UI.Toggle.View
 
 
 type alias Props msg =
-    { labelOn : Maybe String
+    { id : String
+    , labelOn : Maybe String
     , labelOff : Maybe String
     , onToggle : msg
     , value : Bool
@@ -27,7 +28,8 @@ view props =
         ]
         [ smallLabel props.labelOff
         , UI.Toggle.View.view
-            { onToggle = props.onToggle
+            { id = props.id
+            , onToggle = props.onToggle
             , value = props.value
             }
         , smallLabel props.labelOn

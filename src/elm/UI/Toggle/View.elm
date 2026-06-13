@@ -9,13 +9,17 @@ import UI.Palettes as Palettes
 
 
 type alias Props msg =
-    { onToggle : msg, value : Bool }
+    { id : String
+    , onToggle : msg
+    , value : Bool
+    }
 
 
 view : Props msg -> Html msg
 view props =
     Html.button
-        [ Attr.css
+        [ Attr.id props.id
+        , Attr.css
             [ Css.height <| Css.rem 1.3
             , Css.width <| Css.rem 2.8
             , Css.backgroundColor <|

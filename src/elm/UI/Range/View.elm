@@ -9,15 +9,16 @@ import UI.Palettes as Palettes
 
 
 view :
-    { onChange : Int -> msg
+    { id : String
+    , onChange : Int -> msg
     , value : Int
     , min : Int
     , max : Int
     }
     -> Html msg
-view { onChange, value, min, max } =
+view { id, onChange, value, min, max } =
     Html.input
-        [ Attr.id "volume"
+        [ Attr.id id
         , Attr.type_ "range"
         , Evts.onInput
             (String.toInt

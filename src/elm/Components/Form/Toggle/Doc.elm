@@ -15,6 +15,7 @@ doc =
                 , value = True
                 , labelOn = Just "On"
                 , labelOff = Just "Off"
+                , id = "toggle"
                 }
             )
         |> render """
