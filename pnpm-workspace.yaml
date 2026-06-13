@@ -1,0 +1,4 @@
+allowBuilds:
+  '@parcel/watcher': set this to true or false
+  elm: set this to true or false
+  esbuild: set this to true or false
