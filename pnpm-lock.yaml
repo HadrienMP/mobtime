@@ -10,23 +10,29 @@ importers:
     dependencies:
       express:
         specifier: ^5.2.1
-        version: 5.2.1
+        version: 5.2.1(supports-color@5.5.0)
       howler:
         specifier: ^2.2.4
         version: 2.2.4
       socket.io:
         specifier: ^4.8.3
-        version: 4.8.3
+        version: 4.8.3(supports-color@5.5.0)
       y-indexeddb:
         specifier: ^9.0.12
         version: 9.0.12(yjs@13.6.31)
       y-webrtc:
         specifier: ^10.3.0
-        version: 10.3.0(yjs@13.6.31)
+        version: 10.3.0(supports-color@5.5.0)(yjs@13.6.31)
       yjs:
         specifier: ^13.6.31
         version: 13.6.31
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.60.0
+        version: 1.60.0
+      '@types/node':
+        specifier: ^25.9.3
+        version: 25.9.3
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -65,19 +71,19 @@ importers:
         version: 1.101.0
       socket.io-client:
         specifier: ^4.8.3
-        version: 4.8.3
+        version: 4.8.3(supports-color@5.5.0)
       stylelint:
         specifier: ^17.13.0
-        version: 17.13.0
+        version: 17.13.0(supports-color@5.5.0)
       stylelint-config-sass-guidelines:
         specifier: ^13.0.0
-        version: 13.0.0(postcss@8.5.15)(stylelint@17.13.0)
+        version: 13.0.0(postcss@8.5.15)(stylelint@17.13.0(supports-color@5.5.0))
       stylelint-config-standard:
         specifier: ^40.0.0
-        version: 40.0.0(stylelint@17.13.0)
+        version: 40.0.0(stylelint@17.13.0(supports-color@5.5.0))
       stylelint-scss:
         specifier: ^7.2.0
-        version: 7.2.0(stylelint@17.13.0)
+        version: 7.2.0(stylelint@17.13.0(supports-color@5.5.0))
       tippy.js:
         specifier: ^6.3.7
         version: 6.3.7
@@ -310,6 +316,11 @@ packages:
   '@parcel/watcher@2.5.6':
     resolution: {integrity: sha512-tmmZ3lQxAe/k/+rNnXQRawJ4NjxO2hqiOLTHvWchtGZULp4RyFeh6aU4XdOYBFe2KE1oShQTv4AblOs2iOrNnQ==}
     engines: {node: '>= 10.0.0'}
+
+  '@playwright/test@1.60.0':
+    resolution: {integrity: sha512-O71yZIbAh/PxDMNGns37GHBIfrVkEVyn+AXyIa5dOTfb4/xNvRWV+Vv/NMbNCtODB/pO7vLlF2OTmMVLhmr7Ag==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -900,6 +911,11 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -1440,6 +1456,16 @@ packages:
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
+
+  playwright-core@1.60.0:
+    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.60.0:
+    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   postcss-media-query-parser@0.2.3:
     resolution: {integrity: sha512-3sOlxmbKcSHMjlUXQZKQ06jOswE7oVkXPxmZdoB1r5l0q6gTFTQSHxNxOrCccElbW7dxNytifNEo8qidX2Vsig==}
@@ -2198,6 +2224,10 @@ snapshots:
       '@parcel/watcher-win32-x64': 2.5.6
     optional: true
 
+  '@playwright/test@1.60.0':
+    dependencies:
+      playwright: 1.60.0
+
   '@popperjs/core@2.11.8': {}
 
   '@rolldown/binding-android-arm64@1.0.3':
@@ -2257,7 +2287,7 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@stylistic/stylelint-plugin@5.2.0(stylelint@17.13.0)':
+  '@stylistic/stylelint-plugin@5.2.0(stylelint@17.13.0(supports-color@5.5.0))':
     dependencies:
       '@csstools/css-parser-algorithms': 4.0.0(@csstools/css-tokenizer@4.0.0)
       '@csstools/css-tokenizer': 4.0.0
@@ -2266,7 +2296,7 @@ snapshots:
       postcss-selector-parser: 7.1.4
       postcss-value-parser: 4.2.0
       style-search: 0.1.0
-      stylelint: 17.13.0
+      stylelint: 17.13.0(supports-color@5.5.0)
 
   '@szmarczak/http-timer@4.0.6':
     dependencies:
@@ -2368,7 +2398,7 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
-  body-parser@2.2.2:
+  body-parser@2.2.2(supports-color@5.5.0):
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
@@ -2645,7 +2675,7 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  engine.io-client@6.6.5:
+  engine.io-client@6.6.5(supports-color@5.5.0):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.4.3(supports-color@5.5.0)
@@ -2659,7 +2689,7 @@ snapshots:
 
   engine.io-parser@5.2.3: {}
 
-  engine.io@6.6.8:
+  engine.io@6.6.8(supports-color@5.5.0):
     dependencies:
       '@types/cors': 2.8.19
       '@types/node': 25.9.3
@@ -2698,10 +2728,10 @@ snapshots:
 
   etag@1.8.1: {}
 
-  express@5.2.1:
+  express@5.2.1(supports-color@5.5.0):
     dependencies:
       accepts: 2.0.0
-      body-parser: 2.2.2
+      body-parser: 2.2.2(supports-color@5.5.0)
       content-disposition: 1.1.0
       content-type: 1.0.5
       cookie: 0.7.2
@@ -2711,7 +2741,7 @@ snapshots:
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
-      finalhandler: 2.1.1
+      finalhandler: 2.1.1(supports-color@5.5.0)
       fresh: 2.0.0
       http-errors: 2.0.1
       merge-descriptors: 2.0.0
@@ -2722,8 +2752,8 @@ snapshots:
       proxy-addr: 2.0.7
       qs: 6.15.2
       range-parser: 1.2.1
-      router: 2.2.0
-      send: 1.2.1
+      router: 2.2.0(supports-color@5.5.0)
+      send: 1.2.1(supports-color@5.5.0)
       serve-static: 2.2.1
       statuses: 2.0.2
       type-is: 2.1.0
@@ -2761,7 +2791,7 @@ snapshots:
     dependencies:
       to-regex-range: 5.0.1
 
-  finalhandler@2.1.1:
+  finalhandler@2.1.1(supports-color@5.5.0):
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
@@ -2811,6 +2841,9 @@ snapshots:
   fresh@2.0.0: {}
 
   fs.realpath@1.0.0: {}
+
+  fsevents@2.3.2:
+    optional: true
 
   fsevents@2.3.3:
     optional: true
@@ -3263,6 +3296,14 @@ snapshots:
 
   picomatch@4.0.4: {}
 
+  playwright-core@1.60.0: {}
+
+  playwright@1.60.0:
+    dependencies:
+      playwright-core: 1.60.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
   postcss-media-query-parser@0.2.3: {}
 
   postcss-resolve-nested-selector@0.1.6: {}
@@ -3388,7 +3429,7 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.0.3
       '@rolldown/binding-win32-x64-msvc': 1.0.3
 
-  router@2.2.0:
+  router@2.2.0(supports-color@5.5.0):
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       depd: 2.0.0
@@ -3422,7 +3463,7 @@ snapshots:
 
   semver@7.8.4: {}
 
-  send@1.2.1:
+  send@1.2.1(supports-color@5.5.0):
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       encodeurl: 2.0.0
@@ -3443,7 +3484,7 @@ snapshots:
       encodeurl: 2.0.0
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 1.2.1
+      send: 1.2.1(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -3495,7 +3536,7 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-peer@9.11.1:
+  simple-peer@9.11.1(supports-color@5.5.0):
     dependencies:
       buffer: 6.0.3
       debug: 4.4.3(supports-color@5.5.0)
@@ -3521,7 +3562,7 @@ snapshots:
       astral-regex: 2.0.0
       is-fullwidth-code-point: 3.0.0
 
-  socket.io-adapter@2.5.7:
+  socket.io-adapter@2.5.7(supports-color@5.5.0):
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
       ws: 8.20.1
@@ -3530,33 +3571,33 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  socket.io-client@4.8.3:
+  socket.io-client@4.8.3(supports-color@5.5.0):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.4.3(supports-color@5.5.0)
-      engine.io-client: 6.6.5
-      socket.io-parser: 4.2.6
+      engine.io-client: 6.6.5(supports-color@5.5.0)
+      socket.io-parser: 4.2.6(supports-color@5.5.0)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  socket.io-parser@4.2.6:
+  socket.io-parser@4.2.6(supports-color@5.5.0):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.4.3(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
-  socket.io@4.8.3:
+  socket.io@4.8.3(supports-color@5.5.0):
     dependencies:
       accepts: 1.3.8
       base64id: 2.0.0
       cors: 2.8.6
       debug: 4.4.3(supports-color@5.5.0)
-      engine.io: 6.6.8
-      socket.io-adapter: 2.5.7
-      socket.io-parser: 4.2.6
+      engine.io: 6.6.8(supports-color@5.5.0)
+      socket.io-adapter: 2.5.7(supports-color@5.5.0)
+      socket.io-parser: 4.2.6(supports-color@5.5.0)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -3610,24 +3651,24 @@ snapshots:
 
   style-search@0.1.0: {}
 
-  stylelint-config-recommended@18.0.0(stylelint@17.13.0):
+  stylelint-config-recommended@18.0.0(stylelint@17.13.0(supports-color@5.5.0)):
     dependencies:
-      stylelint: 17.13.0
+      stylelint: 17.13.0(supports-color@5.5.0)
 
-  stylelint-config-sass-guidelines@13.0.0(postcss@8.5.15)(stylelint@17.13.0):
+  stylelint-config-sass-guidelines@13.0.0(postcss@8.5.15)(stylelint@17.13.0(supports-color@5.5.0)):
     dependencies:
-      '@stylistic/stylelint-plugin': 5.2.0(stylelint@17.13.0)
+      '@stylistic/stylelint-plugin': 5.2.0(stylelint@17.13.0(supports-color@5.5.0))
       postcss: 8.5.15
       postcss-scss: 4.0.9(postcss@8.5.15)
-      stylelint: 17.13.0
-      stylelint-scss: 7.2.0(stylelint@17.13.0)
+      stylelint: 17.13.0(supports-color@5.5.0)
+      stylelint-scss: 7.2.0(stylelint@17.13.0(supports-color@5.5.0))
 
-  stylelint-config-standard@40.0.0(stylelint@17.13.0):
+  stylelint-config-standard@40.0.0(stylelint@17.13.0(supports-color@5.5.0)):
     dependencies:
-      stylelint: 17.13.0
-      stylelint-config-recommended: 18.0.0(stylelint@17.13.0)
+      stylelint: 17.13.0(supports-color@5.5.0)
+      stylelint-config-recommended: 18.0.0(stylelint@17.13.0(supports-color@5.5.0))
 
-  stylelint-scss@7.2.0(stylelint@17.13.0):
+  stylelint-scss@7.2.0(stylelint@17.13.0(supports-color@5.5.0)):
     dependencies:
       '@csstools/css-calc': 3.2.1(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.0))(@csstools/css-tokenizer@4.0.0)
       '@csstools/css-parser-algorithms': 4.0.0(@csstools/css-tokenizer@4.0.0)
@@ -3640,9 +3681,9 @@ snapshots:
       postcss-resolve-nested-selector: 0.1.6
       postcss-selector-parser: 7.1.4
       postcss-value-parser: 4.2.0
-      stylelint: 17.13.0
+      stylelint: 17.13.0(supports-color@5.5.0)
 
-  stylelint@17.13.0:
+  stylelint@17.13.0(supports-color@5.5.0):
     dependencies:
       '@csstools/css-calc': 3.2.1(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.0))(@csstools/css-tokenizer@4.0.0)
       '@csstools/css-parser-algorithms': 4.0.0(@csstools/css-tokenizer@4.0.0)
@@ -3847,10 +3888,10 @@ snapshots:
       lib0: 0.2.117
       yjs: 13.6.31
 
-  y-webrtc@10.3.0(yjs@13.6.31):
+  y-webrtc@10.3.0(supports-color@5.5.0)(yjs@13.6.31):
     dependencies:
       lib0: 0.2.117
-      simple-peer: 9.11.1
+      simple-peer: 9.11.1(supports-color@5.5.0)
       y-protocols: 1.0.7(yjs@13.6.31)
       yjs: 13.6.31
     optionalDependencies:

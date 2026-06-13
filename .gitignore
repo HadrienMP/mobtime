@@ -11,3 +11,10 @@ server/elm-server.js
 .parcel-cache
 parcel-bundle-reports
 tmp/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

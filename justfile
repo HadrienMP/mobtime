@@ -16,6 +16,9 @@ normalize:
 test watch:
 	pnpm run test --watch
 
+test-e2e:
+	playwright test --reporter list
+
 [no-cd]
 to-miniature extension:
     find . -name "*.{{extension}}" \

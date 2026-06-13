@@ -7,7 +7,8 @@
     "lame@latest",
     "process-compose@latest",
     "mp3gain@latest",
-    "imagemagick@latest"
+    "imagemagick@latest",
+    "playwright-driver.browsers"
   ],
   "shell": {
     "init_hook": ["echo 'Welcome to devbox!' > /dev/null"],
