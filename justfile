@@ -21,3 +21,8 @@ to-miniature extension:
     find . -name "*.{{extension}}" \
         | sed "s/.{{extension}}//" \
         | xargs -I {} magick {}.{{extension}} -resize 214x142^ {}.webp
+
+update:
+	devbox update
+	pnpm update --latest
+	elm-json upgrade --unsafe --yes
