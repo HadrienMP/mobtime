@@ -52,6 +52,14 @@ export class MobHome {
     async stopTurn() {
         await this.page.getByRole('button', { name: 'Stop' }).first().click();
     }
+
+    async shuffleMobbers() {
+        await this.page.getByRole('button', { name: 'Shuffle' }).click();
+    }
+
+    async getTeamText() {
+        return await this.page.getByText('TeamDriver').allInnerTexts();
+    }
 }
 
 export class Profile {
