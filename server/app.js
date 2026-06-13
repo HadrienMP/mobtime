@@ -38,7 +38,7 @@ app.get('/', (_, res) => {
     .get('/mob/:mob', (_, res) => {
         res.sendFile(path.join(publicDirPath, 'index.html'));
     })
-    .get('/mob/:mob/*', (_, res) => {
+    .get(/mob\/:mob\/.*/, (_, res) => {
         res.sendFile(path.join(publicDirPath, 'index.html'));
     })
     .get('/me', (_, res) => {
