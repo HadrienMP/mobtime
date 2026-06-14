@@ -5,7 +5,6 @@
     "pnpm@latest",
     "just@latest",
     "lame@latest",
-    "process-compose@latest",
     "mp3gain@latest",
     "imagemagick@latest",
     "playwright-driver.browsers"
