@@ -2,8 +2,6 @@ import { v4 as uuid } from 'uuid';
 import { AppHome, MobHome } from './POMs.ts';
 import { test, expect } from '@playwright/test';
 
-const testMobId = `test-${uuid()}`;
-
 // TODO: Quand on lance un tour ca le lance chez tout le monde
 // TODO: Quand le tour se termine ca joue un son de la playlist selectionnee, le meme chez tout le monde
 // TODO: On peut ajouter des gens
@@ -13,7 +11,7 @@ const testMobId = `test-${uuid()}`;
 // TODO: Quand on change les roles dans les settings ca change chez tout le monde
 // TODO: Quand on change la duree d'un tour ca change chez tout le monde
 test('has title', async ({ page }) => {
-    const mobHome = new MobHome(page, testMobId);
+    const mobHome = new MobHome(page, `test-${uuid()}`);
     const profile = await mobHome.goto();
     await profile.expectPageTitle();
     await profile.gotoMobHome();
