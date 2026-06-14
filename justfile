@@ -1,5 +1,5 @@
 start: 
-	process-compose up
+	pnpm start
 
 install: 
 	pnpm install
