@@ -87,6 +87,12 @@ importers:
       vite-plugin-elm:
         specifier: ^3.0.1
         version: 3.0.1(vite@8.0.16(@types/node@25.9.3)(sass@1.101.0)(terser@5.44.0))
+      y-websocket:
+        specifier: ^3.0.0
+        version: 3.0.0(yjs@13.6.31)
+      yjs:
+        specifier: ^13.6.31
+        version: 13.6.31
 
 packages:
 
@@ -2296,6 +2302,22 @@ packages:
   xmlhttprequest-ssl@2.1.2:
     resolution: {integrity: sha512-TEU+nJVUUnA4CYJFLvK5X9AOeH4KvDvhIfm0vV1GaQRtchnG0hgK5p8hw/xjv8cunWYCsiPCSDzObPyhEwq3KQ==}
     engines: {node: '>=0.4.0'}
+
+  y-protocols@1.0.7:
+    resolution: {integrity: sha512-YSVsLoXxO67J6eE/nV4AtFtT3QEotZf5sK5BHxFBXso7VDUT3Tx07IfA6hsu5Q5OmBdMkQVmFZ9QOA7fikWvnw==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    peerDependencies:
+      yjs: ^13.0.0
+
+  y-websocket@3.0.0:
+    resolution: {integrity: sha512-mUHy7AzkOZ834T/7piqtlA8Yk6AchqKqcrCXjKW8J1w2lPtRDjz8W5/CvXz9higKAHgKRKqpI3T33YkRFLkPtg==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    peerDependencies:
+      yjs: ^13.5.6
+
+  yjs@13.6.31:
+    resolution: {integrity: sha512-Eq+5BRfbeGyqGVrTJL3bEcr8gKkxPuyuoHmAwpk52fDb8kOVMrfVSTRPd6yiGgX5Fskb96qCRjzjbRjrL4YEnw==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
 
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
@@ -4664,6 +4686,21 @@ snapshots:
   xmlbuilder@15.1.1: {}
 
   xmlhttprequest-ssl@2.1.2: {}
+
+  y-protocols@1.0.7(yjs@13.6.31):
+    dependencies:
+      lib0: 0.2.117
+      yjs: 13.6.31
+
+  y-websocket@3.0.0(yjs@13.6.31):
+    dependencies:
+      lib0: 0.2.117
+      y-protocols: 1.0.7(yjs@13.6.31)
+      yjs: 13.6.31
+
+  yjs@13.6.31:
+    dependencies:
+      lib0: 0.2.117
 
   yocto-queue@0.1.0: {}
 
