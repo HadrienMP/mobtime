@@ -13,7 +13,7 @@ export class MobHome {
     }
 
     async goto() {
-        await this.page.goto(`http://localhost:5173/mob/${this.mobId}`);
+        await this.page.goto(`http://localhost:4173/mob/${this.mobId}`);
         return new Profile(this.page, this.mobId);
     }
 
@@ -141,7 +141,7 @@ export class AppHome {
     }
 
     async goto() {
-        await this.page.goto('http://localhost:5173/');
+        await this.page.goto('http://localhost:4173/');
     }
 
     async fillMobName() {

@@ -122,7 +122,7 @@ update_ msg model =
                     ( model, Nav.load href )
 
         SocketMsg subMsg ->
-            Socket.update model.mob subMsg model.socket
+            Socket.update subMsg model.socket
                 |> Tuple.mapBoth
                     (\updated -> { model | socket = updated })
                     (Cmd.map SocketMsg)

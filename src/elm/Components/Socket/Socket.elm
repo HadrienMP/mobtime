@@ -1,16 +1,11 @@
-port module Components.Socket.Socket exposing (Model(..), Msg(..), SocketId(..), init, joinRoom, subscriptions, update, view)
+port module Components.Socket.Socket exposing (Model, Msg(..), init, joinRoom, subscriptions, update, view)
 
-import Components.Socket.View
+import Components.Socket.View exposing (SocketStatus(..))
 import Html.Styled as Html
-import Model.Mob
-import Model.MobName
 import UI.Color exposing (RGBA255)
 
 
-port socketConnected : (String -> msg) -> Sub msg
-
-
-port socketDisconnected : ({} -> msg) -> Sub msg
+port socketStatusChange : (String -> msg) -> Sub msg
 
 
 port socketJoin : String -> Cmd msg
@@ -25,18 +20,13 @@ joinRoom =
 -- Init
 
 
-type SocketId
-    = SocketId String
-
-
-type Model
-    = On SocketId
-    | Off
+type alias Model =
+    SocketStatus
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Off, Cmd.none )
+    ( Disconnected, Cmd.none )
 
 
 
@@ -44,25 +34,25 @@ init =
 
 
 type Msg
-    = Connected String
-    | Disconnected
+    = GotStatusChange String
 
 
-update : Maybe Model.Mob.Mob -> Msg -> Model -> ( Model, Cmd Msg )
-update maybeMob msg _ =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
-        Connected id ->
-            ( On <| SocketId id
-            , case maybeMob of
-                Just mob ->
-                    socketJoin <| Model.MobName.print mob.name
-
-                Nothing ->
-                    Cmd.none
+        GotStatusChange "connected" ->
+            ( Connected
+            , Cmd.none
             )
 
-        Disconnected ->
-            ( Off, Cmd.none )
+        GotStatusChange "disconnected" ->
+            ( Disconnected, Cmd.none )
+
+        GotStatusChange "connecting" ->
+            ( Connecting, Cmd.none )
+
+        GotStatusChange _ ->
+            ( model, Cmd.none )
 
 
 
@@ -71,10 +61,7 @@ update maybeMob msg _ =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch
-        [ socketConnected Connected
-        , socketDisconnected <| always Disconnected
-        ]
+    socketStatusChange GotStatusChange
 
 
 
@@ -84,6 +71,6 @@ subscriptions _ =
 view : List (Html.Attribute msg) -> RGBA255 -> Model -> Html.Html msg
 view attributes color status =
     Components.Socket.View.view attributes
-        { socketConnected = status /= Off
+        { status = status
         , color = color
         }

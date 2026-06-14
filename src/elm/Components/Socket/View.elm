@@ -1,4 +1,4 @@
-module Components.Socket.View exposing (Props, view)
+module Components.Socket.View exposing (Props, SocketStatus(..), view)
 
 import Css
 import Html.Styled as Html exposing (Html)
@@ -8,15 +8,21 @@ import UI.Icons.Plugs
 import UI.Size as Size
 
 
+type SocketStatus
+    = Connected
+    | Connecting
+    | Disconnected
+
+
 type alias Props =
-    { socketConnected : Bool, color : RGBA255 }
+    { status : SocketStatus, color : RGBA255 }
 
 
 view : List (Html.Attribute msg) -> Props -> Html msg
 view attributes props =
     let
         ( icon, title ) =
-            if props.socketConnected then
+            if props.status == Connected then
                 ( Nothing, "Connected to the server" )
 
             else

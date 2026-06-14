@@ -1,7 +1,7 @@
 module Components.NavBar.Doc exposing (theChapter)
 
 import Components.NavBar.View
-import Components.Socket.View
+import Components.Socket.View exposing (SocketStatus(..))
 import ElmBook.Chapter exposing (chapter, renderComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.MobName exposing (MobName(..))
@@ -15,7 +15,7 @@ theChapter =
             { mob = MobName "Awesome"
             , socket =
                 Components.Socket.View.view []
-                    { socketConnected = False
+                    { status = Disconnected
                     , color = Palettes.monochrome.on.surface
                     }
             , addedStyle = []

@@ -22,6 +22,9 @@ export const setup = (app, room) => {
             `mobtime-${room}`,
             ydoc,
         );
+        provider.on('status', (event) => {
+            app.ports.socketStatusChange.send(event.status);
+        });
         messages.observe((event) => {
             const changes = event.changes.delta
                 .filter((it) => !!it.insert)

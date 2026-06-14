@@ -72,8 +72,8 @@ export default defineConfig({
 
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'pnpm start',
-        url: 'http://localhost:5173',
+        command: 'pnpm exec vite build && pnpm exec vite preview',
+        url: 'http://localhost:4173',
         reuseExistingServer: !process.env.CI,
     },
 });
