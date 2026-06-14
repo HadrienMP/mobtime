@@ -3,6 +3,9 @@
     "version": "1.0.22",
     "description": "",
     "source": "src/index.html",
+    "engines": {
+        "node": "^26"
+    },
     "scripts": {
         "build": "vite build",
         "build:watch": "vite build --watch",
