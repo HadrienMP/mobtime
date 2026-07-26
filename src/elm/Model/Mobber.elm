@@ -23,6 +23,7 @@ idAsString id =
 type alias Mobber =
     { id : MobberId
     , name : String
+    , isOn : Bool
     }
 
 
@@ -32,9 +33,10 @@ type alias Mobber =
 
 jsonDecoder : Decode.Decoder Mobber
 jsonDecoder =
-    Decode.map2 Mobber
+    Decode.map3 Mobber
         (Decode.field "id" (Decode.string |> Decode.map MobberId))
         (Decode.field "name" Decode.string)
+        (Decode.maybe (Decode.field "isOn" Decode.bool) |> Decode.map (Maybe.withDefault True))
 
 
 toJson : Mobber -> Json.Value
@@ -42,4 +44,5 @@ toJson mobber =
     Json.object
         [ ( "id", mobber.id |> idAsString |> Json.string )
         , ( "name", Json.string mobber.name )
+        , ( "isOn", Json.bool mobber.isOn )
         ]

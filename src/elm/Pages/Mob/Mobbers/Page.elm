@@ -92,6 +92,7 @@ update shared mob msg model =
                     (\id ->
                         { id = Model.Mobber.idFromString <| Uuid.toString id
                         , name = model.value
+                        , isOn = True
                         }
                     )
                 |> Random.generate Created

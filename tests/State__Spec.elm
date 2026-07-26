@@ -85,10 +85,10 @@ suite =
                             Model.Role.fromString "Navigator"
 
                         jane =
-                            { id = Mobber.idFromString "jane", name = "Jane" }
+                            { id = Mobber.idFromString "jane", name = "Jane", isOn = True }
 
                         camille =
-                            { id = Mobber.idFromString "camille", name = "Camille" }
+                            { id = Mobber.idFromString "camille", name = "Camille", isOn = True }
 
                         roles =
                             [ driver, navigator ]

@@ -52,5 +52,6 @@ toMobbers =
             (\( i, n ) ->
                 { id = Model.Mobber.idFromString <| String.fromInt i
                 , name = n
+                , isOn = True
                 }
             )
