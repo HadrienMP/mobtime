@@ -3,9 +3,11 @@ module Components.Mobbers.View exposing (Props, iconForRole, view)
 import Css
 import Html.Styled as Html
 import Html.Styled.Attributes as Attr
+import Html.Styled.Events as Evts
 import Lib.ListExtras
 import Lib.StringExtra
 import Model.Mobber
+import Model.Mobbers
 import Model.Role as Role exposing (Role)
 import UI.Button.Link
 import UI.Color as Color
@@ -28,6 +30,7 @@ type alias Props msg =
     , onRotate : msg
     , onSettings : msg
     , onAdd : msg
+    , onOrderChange : Model.Mobbers.Mobbers -> msg
     }
 
 
@@ -119,6 +122,7 @@ displayMobbersWithRoles props =
                         { role = Just role
                         , mobber = mobber
                         , emphasis = True
+                        , props = props
                         }
                 )
         )
@@ -141,6 +145,7 @@ displayOtherMobbers props =
                     { role = lastSpecialRole |> Maybe.map Role.toNextUp
                     , mobber = nextUp
                     , emphasis = False
+                    , props = props
                     }
                     :: (mobbers
                             |> List.map
@@ -149,6 +154,7 @@ displayOtherMobbers props =
                                         { role = Nothing
                                         , mobber = mobber
                                         , emphasis = False
+                                        , props = props
                                         }
                                 )
                        )
@@ -166,9 +172,10 @@ displayMobber :
     { role : Maybe Role
     , mobber : Model.Mobber.Mobber
     , emphasis : Bool
+    , props : Props msg
     }
     -> Html.Html msg
-displayMobber { role, mobber, emphasis } =
+displayMobber { role, mobber, emphasis, props } =
     Html.div
         [ Attr.class "mobber"
         , Attr.css
@@ -219,6 +226,32 @@ displayMobber { role, mobber, emphasis } =
                 ]
                 [ Html.text <| Lib.StringExtra.capitalize mobber.name ]
             , role |> Maybe.map displayRoleName |> Maybe.withDefault none
+            ]
+        , Html.div [ Attr.css [ Css.displayFlex, Css.marginLeft Css.auto ] ]
+            [ Html.button
+                [ Attr.css
+                    [ Css.transform <| Css.rotate <| Css.deg -90
+                    , Css.backgroundColor Css.transparent
+                    , Css.padding Css.zero
+                    , Css.hover [ Css.backgroundColor Css.transparent ]
+                    ]
+                , Attr.title "Move up"
+                , Evts.onClick <| props.onOrderChange <| Model.Mobbers.moveUp mobber props.people
+                ]
+                [ UI.Icons.Ion.play { size = Size.rem 1, color = Color.black }
+                ]
+            , Html.button
+                [ Attr.css
+                    [ Css.transform <| Css.rotate <| Css.deg 90
+                    , Css.backgroundColor Css.transparent
+                    , Css.padding Css.zero
+                    , Css.hover [ Css.backgroundColor Css.transparent ]
+                    ]
+                , Attr.title "Move down"
+                , Evts.onClick <| props.onOrderChange <| Model.Mobbers.moveDown mobber props.people
+                ]
+                [ UI.Icons.Ion.play { size = Size.rem 1, color = Color.black }
+                ]
             ]
         ]
 

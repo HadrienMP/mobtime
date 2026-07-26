@@ -2,7 +2,7 @@ module Components.Mobbers.Doc exposing (doc)
 
 import Components.Mobbers.View
 import ElmBook
-import ElmBook.Actions exposing (logAction)
+import ElmBook.Actions exposing (logAction, logActionWith)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
 import Model.Mobber
@@ -17,6 +17,7 @@ props =
     , onRotate = logAction "Rotated"
     , onSettings = logAction "Go to Settings"
     , onAdd = logAction "Add"
+    , onOrderChange = logActionWith (always "") "Order changed"
     }
 
 

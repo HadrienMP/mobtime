@@ -50,4 +50,5 @@ view state =
         , onRotate = Rotate
         , onSettings = GoToSettings
         , onAdd = GoToSettings
+        , onOrderChange = ChangedOrder
         }

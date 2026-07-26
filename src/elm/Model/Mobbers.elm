@@ -1,11 +1,13 @@
 module Model.Mobbers exposing
-    ( Mobbers(..)
+    ( Mobbers
     , add
     , assignRoles
     , decoder
     , delete
     , empty
     , merge
+    , moveDown
+    , moveUp
     , rotate
     , shuffle
     , toJson
@@ -22,13 +24,13 @@ import Random
 import Random.List
 
 
-type Mobbers
-    = Mobbers (List Mobber)
+type alias Mobbers =
+    List Mobber
 
 
 empty : Mobbers
 empty =
-    Mobbers []
+    []
 
 
 add : Mobber -> Mobbers -> Mobbers
@@ -43,7 +45,7 @@ add mobber mobbers =
         mobbers
 
     else
-        toList mobbers ++ [ mobber ] |> Mobbers
+        toList mobbers ++ [ mobber ]
 
 
 merge : Mobbers -> Mobbers -> Mobbers
@@ -58,21 +60,18 @@ merge a b =
         missingMembersInA =
             List.filter (\someB -> not <| List.member someB aList) bList
     in
-    Mobbers <| aList ++ missingMembersInA
+    aList ++ missingMembersInA
 
 
 delete : Mobber -> Mobbers -> Mobbers
 delete mobber mobbers =
     toList mobbers
         |> List.filter (\m -> m.id /= mobber.id)
-        |> Mobbers
 
 
 toList : Mobbers -> List Mobber
 toList mobbers =
-    case mobbers of
-        Mobbers list ->
-            list
+    mobbers
 
 
 assignRoles : Roles -> Mobbers -> List ( Role, Mobber )
@@ -89,23 +88,64 @@ assignRoles roles mobbers =
 
 
 rotate : Mobbers -> Mobbers
-rotate mobbers =
-    toList mobbers |> ListExtras.rotate |> Mobbers
+rotate =
+    ListExtras.rotate
+
+
+moveUp : Mobber -> Mobbers -> Mobbers
+moveUp target all =
+    moveUpRec target { seen = [], toSee = all }
+
+
+moveUpRec : Mobber -> { seen : List Mobber, toSee : List Mobber } -> List Mobber
+moveUpRec target { seen, toSee } =
+    case toSee of
+        [] ->
+            seen ++ toSee
+
+        [ _ ] ->
+            seen ++ toSee
+
+        a :: b :: rest ->
+            if b == target then
+                seen ++ (b :: a :: rest)
+
+            else
+                moveUpRec target { seen = seen ++ [ a ], toSee = b :: rest }
+
+
+moveDown : Mobber -> Mobbers -> Mobbers
+moveDown target all =
+    moveDownRec target { seen = [], toSee = all }
+
+
+moveDownRec : Mobber -> { seen : List Mobber, toSee : List Mobber } -> List Mobber
+moveDownRec target { seen, toSee } =
+    case toSee of
+        [] ->
+            seen ++ toSee
+
+        [ _ ] ->
+            seen ++ toSee
+
+        a :: b :: rest ->
+            if a.id == target.id then
+                seen ++ (b :: a :: rest)
+
+            else
+                moveDownRec target { seen = seen ++ [ a ], toSee = b :: rest }
 
 
 shuffle : Mobbers -> Random.Generator Mobbers
-shuffle mobbers =
-    toList mobbers |> Random.List.shuffle |> Random.map Mobbers
+shuffle =
+    Random.List.shuffle
 
 
 decoder : Decode.Decoder Mobbers
 decoder =
     Decode.list Mobber.jsonDecoder
-        |> Decode.map Mobbers
 
 
 toJson : Mobbers -> Json.Value
-toJson mobbers =
-    case mobbers of
-        Mobbers list ->
-            Json.list Mobber.toJson list
+toJson =
+    Json.list Mobber.toJson
