@@ -4,7 +4,7 @@ import Json.Decode as Decode
 import Json.Encode as Json
 import Lib.Duration exposing (Duration)
 import Model.MobName exposing (MobName)
-import Model.Mobber as Mobber exposing (Mobber)
+import Model.Mobber as Mobber exposing (Mobber, MobberId)
 import Model.Mobbers as Mobbers exposing (Mobbers)
 import Model.Roles
 import Playlist.All as All
@@ -46,6 +46,7 @@ type Event
     | PomodoroLengthChanged Duration
     | ExtremeModeChanged Bool
     | StopAutomatically Bool
+    | ToggledMobber MobberId
 
 
 
@@ -125,6 +126,12 @@ eventFromNameDecoder eventName =
             Decode.bool
                 |> Decode.field "value"
                 |> Decode.map StopAutomatically
+
+        "ToggledMobber" ->
+            Decode.string
+                |> Decode.field "id"
+                |> Decode.map Mobber.idFromString
+                |> Decode.map ToggledMobber
 
         _ ->
             Decode.fail <| "I don't know this event " ++ eventName
@@ -216,6 +223,11 @@ eventToJson event =
         StopAutomatically stopAutomatically ->
             [ ( "name", Json.string "StopAutomatically" )
             , ( "value", Json.bool stopAutomatically )
+            ]
+
+        ToggledMobber id ->
+            [ ( "name", Json.string "ToggledMobber" )
+            , ( "id", Json.string <| Mobber.idAsString id )
             ]
 
 

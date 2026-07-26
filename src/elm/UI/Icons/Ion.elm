@@ -16,6 +16,7 @@ module UI.Icons.Ion exposing
     , people
     , play
     , plus
+    , powerOn
     , questionMark
     , rotate
     , settings
@@ -178,6 +179,11 @@ questionMark =
 speedometer : Icon msg
 speedometer =
     display Ionicon.speedometer
+
+
+powerOn : Icon msg
+powerOn =
+    display Ionicon.power
 
 
 display :

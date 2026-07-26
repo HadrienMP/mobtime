@@ -6,7 +6,7 @@ import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Evts
 import Lib.ListExtras
 import Lib.StringExtra
-import Model.Mobber
+import Model.Mobber exposing (MobberId)
 import Model.Mobbers
 import Model.Role as Role exposing (Role)
 import UI.Button.Link
@@ -31,6 +31,7 @@ type alias Props msg =
     , onSettings : msg
     , onAdd : msg
     , onOrderChange : Model.Mobbers.Mobbers -> msg
+    , onToggle : MobberId -> msg
     }
 
 
@@ -50,6 +51,41 @@ view props =
         [ header props
         , displayMobbersWithRoles props
         , displayOtherMobbers props
+        , Html.div
+            [ Attr.id "team-off" ]
+            [ Html.h3
+                [ Attr.css
+                    [ Css.paddingTop <| Size.toElmCss Space.xs
+                    , Css.paddingBottom <| Size.toElmCss Space.xs
+                    , Css.borderTop3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
+                    , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
+                    ]
+                ]
+                [ Html.text "Off" ]
+            , Html.div []
+                (props.people
+                    |> List.filter (not << .isOn)
+                    |> List.map
+                        (\a ->
+                            displayMobber
+                                { role = Nothing
+                                , mobber = a
+                                , on = False
+                                , emphasis = False
+                                , props = props
+                                }
+                        )
+                    |> Lib.ListExtras.withDefault
+                        [ Html.div
+                            [ Attr.css
+                                [ Css.fontWeight Css.lighter
+                                , Css.padding2 (Css.rem 0.4) Css.zero
+                                ]
+                            ]
+                            [ Html.text "Everyone's in!" ]
+                        ]
+                )
+            ]
         ]
 
 
@@ -115,6 +151,7 @@ displayMobbersWithRoles : Props msg -> Html.Html msg
 displayMobbersWithRoles props =
     Html.div []
         (props.people
+            |> List.filter .isOn
             |> Lib.ListExtras.zip props.roles
             |> List.map
                 (\( role, mobber ) ->
@@ -123,6 +160,7 @@ displayMobbersWithRoles props =
                         , mobber = mobber
                         , emphasis = True
                         , props = props
+                        , on = True
                         }
                 )
         )
@@ -134,7 +172,11 @@ displayMobbersWithRoles props =
 
 displayOtherMobbers : Props msg -> Html.Html msg
 displayOtherMobbers props =
-    case props.people |> List.drop (List.length props.roles) of
+    case
+        props.people
+            |> List.filter .isOn
+            |> List.drop (List.length props.roles)
+    of
         nextUp :: mobbers ->
             let
                 lastSpecialRole =
@@ -146,6 +188,7 @@ displayOtherMobbers props =
                     , mobber = nextUp
                     , emphasis = False
                     , props = props
+                    , on = True
                     }
                     :: (mobbers
                             |> List.map
@@ -155,6 +198,7 @@ displayOtherMobbers props =
                                         , mobber = mobber
                                         , emphasis = False
                                         , props = props
+                                        , on = True
                                         }
                                 )
                        )
@@ -173,9 +217,10 @@ displayMobber :
     , mobber : Model.Mobber.Mobber
     , emphasis : Bool
     , props : Props msg
+    , on : Bool
     }
     -> Html.Html msg
-displayMobber { role, mobber, emphasis, props } =
+displayMobber { role, mobber, emphasis, props, on } =
     Html.div
         [ Attr.class "mobber"
         , Attr.css
@@ -228,29 +273,48 @@ displayMobber { role, mobber, emphasis, props } =
             , role |> Maybe.map displayRoleName |> Maybe.withDefault none
             ]
         , Html.div [ Attr.css [ Css.displayFlex, Css.marginLeft Css.auto ] ]
-            [ Html.button
-                [ Attr.css
-                    [ Css.transform <| Css.rotate <| Css.deg -90
-                    , Css.backgroundColor Css.transparent
-                    , Css.padding Css.zero
-                    , Css.hover [ Css.backgroundColor Css.transparent ]
+            [ if on then
+                Html.button
+                    [ Attr.css
+                        [ Css.transform <| Css.rotate <| Css.deg -90
+                        , Css.backgroundColor Css.transparent
+                        , Css.padding Css.zero
+                        , Css.hover [ Css.backgroundColor Css.transparent ]
+                        ]
+                    , Attr.title "Move up"
+                    , Evts.onClick <| props.onOrderChange <| Model.Mobbers.moveUp mobber props.people
                     ]
-                , Attr.title "Move up"
-                , Evts.onClick <| props.onOrderChange <| Model.Mobbers.moveUp mobber props.people
-                ]
-                [ UI.Icons.Ion.play { size = Size.rem 1, color = Color.black }
-                ]
+                    [ UI.Icons.Ion.play { size = Size.rem 1, color = Color.black }
+                    ]
+
+              else
+                Html.text ""
+            , if on then
+                Html.button
+                    [ Attr.css
+                        [ Css.transform <| Css.rotate <| Css.deg 90
+                        , Css.backgroundColor Css.transparent
+                        , Css.padding Css.zero
+                        , Css.hover [ Css.backgroundColor Css.transparent ]
+                        ]
+                    , Attr.title "Move down"
+                    , Evts.onClick <| props.onOrderChange <| Model.Mobbers.moveDown mobber props.people
+                    ]
+                    [ UI.Icons.Ion.play { size = Size.rem 1, color = Color.black }
+                    ]
+
+              else
+                Html.text ""
             , Html.button
                 [ Attr.css
-                    [ Css.transform <| Css.rotate <| Css.deg 90
-                    , Css.backgroundColor Css.transparent
+                    [ Css.backgroundColor Css.transparent
                     , Css.padding Css.zero
                     , Css.hover [ Css.backgroundColor Css.transparent ]
                     ]
-                , Attr.title "Move down"
-                , Evts.onClick <| props.onOrderChange <| Model.Mobbers.moveDown mobber props.people
+                , Attr.title "Toggle On/Off"
+                , Evts.onClick <| props.onToggle mobber.id
                 ]
-                [ UI.Icons.Ion.play { size = Size.rem 1, color = Color.black }
+                [ UI.Icons.Ion.powerOn { size = Size.rem 1, color = Color.black }
                 ]
             ]
         ]

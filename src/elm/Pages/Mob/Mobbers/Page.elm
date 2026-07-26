@@ -121,7 +121,7 @@ view mob model =
     , modal = Nothing
     , body =
         Pages.Mob.Mobbers.PageView.view
-            { people = mob.mobbers |> Model.Mobbers.toList
+            { people = mob.mobbers
             , roles = mob.roles
             , onShuffle = Shuffle
             , onRotate = Rotate

@@ -1,4 +1,4 @@
-module Model.Mobber exposing (Mobber, MobberId, idFromString, jsonDecoder, toJson)
+module Model.Mobber exposing (Mobber, MobberId, idAsString, idFromString, jsonDecoder, toJson)
 
 import Json.Decode as Decode
 import Json.Encode as Json

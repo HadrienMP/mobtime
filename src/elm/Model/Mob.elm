@@ -142,6 +142,11 @@ evolve_ event ( state, previousCommand ) =
             , previousCommand
             )
 
+        Events.ToggledMobber id ->
+            ( { state | mobbers = Mobbers.toggle id state.mobbers }
+            , previousCommand
+            )
+
 
 evolveMany : List Events.Event -> Mob -> ( Mob, Cmd msg )
 evolveMany events model =

@@ -1,4 +1,13 @@
-module Lib.ListExtras exposing (rotate, uncons, zip)
+module Lib.ListExtras exposing (rotate, uncons, withDefault, zip)
+
+
+withDefault : List a -> List a -> List a
+withDefault default list =
+    if List.isEmpty list then
+        default
+
+    else
+        list
 
 
 rotate : List a -> List a

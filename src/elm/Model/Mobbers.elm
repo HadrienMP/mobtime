@@ -11,13 +11,13 @@ module Model.Mobbers exposing
     , rotate
     , shuffle
     , toJson
-    , toList
+    , toggle
     )
 
 import Json.Decode as Decode
 import Json.Encode as Json
 import Lib.ListExtras as ListExtras
-import Model.Mobber as Mobber exposing (Mobber)
+import Model.Mobber as Mobber exposing (Mobber, MobberId)
 import Model.Role as Role exposing (Role)
 import Model.Roles exposing (Roles)
 import Random
@@ -89,12 +89,21 @@ assignRoles roles mobbers =
 
 rotate : Mobbers -> Mobbers
 rotate =
-    ListExtras.rotate
+    onlyForOn ListExtras.rotate
+
+
+onlyForOn : (Mobbers -> Mobbers) -> Mobbers -> Mobbers
+onlyForOn onlyForOnF all =
+    let
+        ( on, off ) =
+            all |> List.partition .isOn
+    in
+    onlyForOnF on ++ off
 
 
 moveUp : Mobber -> Mobbers -> Mobbers
-moveUp target all =
-    moveUpRec target { seen = [], toSee = all }
+moveUp target =
+    onlyForOn (\on -> moveUpRec target { seen = [], toSee = on })
 
 
 moveUpRec : Mobber -> { seen : List Mobber, toSee : List Mobber } -> List Mobber
@@ -115,8 +124,8 @@ moveUpRec target { seen, toSee } =
 
 
 moveDown : Mobber -> Mobbers -> Mobbers
-moveDown target all =
-    moveDownRec target { seen = [], toSee = all }
+moveDown target =
+    onlyForOn (\on -> moveDownRec target { seen = [], toSee = on })
 
 
 moveDownRec : Mobber -> { seen : List Mobber, toSee : List Mobber } -> List Mobber
@@ -139,6 +148,31 @@ moveDownRec target { seen, toSee } =
 shuffle : Mobbers -> Random.Generator Mobbers
 shuffle =
     Random.List.shuffle
+
+
+toggle : MobberId -> Mobbers -> Mobbers
+toggle id mobbers =
+    mobbers
+        |> List.map
+            (\a ->
+                if a.id == id then
+                    { a | isOn = not a.isOn }
+
+                else
+                    a
+            )
+        |> List.sortBy
+            (\a ->
+                if a.isOn then
+                    0
+
+                else
+                    1
+            )
+
+
+
+-- JSON
 
 
 decoder : Decode.Decoder Mobbers

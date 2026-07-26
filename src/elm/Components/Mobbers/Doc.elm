@@ -5,7 +5,7 @@ import ElmBook
 import ElmBook.Actions exposing (logAction, logActionWith)
 import ElmBook.Chapter exposing (chapter, render, withComponentList)
 import ElmBook.ElmCSS exposing (Chapter)
-import Model.Mobber
+import Model.Mobber as Mobber
 import Model.Role as Role
 
 
@@ -18,6 +18,7 @@ props =
     , onSettings = logAction "Go to Settings"
     , onAdd = logAction "Add"
     , onOrderChange = logActionWith (always "") "Order changed"
+    , onToggle = logActionWith Mobber.idAsString "Toggled"
     }
 
 
@@ -97,12 +98,12 @@ doc =
 """
 
 
-toMobbers : List String -> List Model.Mobber.Mobber
+toMobbers : List String -> List Mobber.Mobber
 toMobbers =
     List.indexedMap Tuple.pair
         >> List.map
             (\( i, n ) ->
-                { id = Model.Mobber.idFromString <| String.fromInt i
+                { id = Mobber.idFromString <| String.fromInt i
                 , name = n
                 , isOn = True
                 }
