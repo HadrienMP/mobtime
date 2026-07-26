@@ -15,7 +15,7 @@ import Shared exposing (Shared)
 type Msg
     = Rotate
     | Shuffe
-    | Shuffled Model.Mobbers.Mobbers
+    | ChangedOrder Model.Mobbers.Mobbers
     | GoToSettings
 
 
@@ -24,11 +24,11 @@ update shared mob msg =
     case msg of
         Shuffe ->
             Effect.fromCmd <|
-                Random.generate Shuffled <|
+                Random.generate ChangedOrder <|
                     Model.Mobbers.shuffle mob.mobbers
 
-        Shuffled mobbers ->
-            Effect.share <| Model.Events.MobEvent mob.name <| Model.Events.ShuffledMobbers mobbers
+        ChangedOrder mobbers ->
+            Effect.share <| Model.Events.MobEvent mob.name <| Model.Events.ChangedMobbersOrder mobbers
 
         Rotate ->
             Effect.share <| Model.Events.MobEvent mob.name <| Model.Events.RotatedMobbers

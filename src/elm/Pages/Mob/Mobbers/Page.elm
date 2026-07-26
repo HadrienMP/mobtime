@@ -35,7 +35,7 @@ type Msg
     = Back
     | Rotate
     | Shuffle
-    | Shuffled Model.Mobbers.Mobbers
+    | ChangedOrder Model.Mobbers.Mobbers
     | Delete Mobber
     | Add
     | Created Mobber
@@ -65,15 +65,15 @@ update shared mob msg model =
         Shuffle ->
             ( model
             , Model.Mobbers.shuffle mob.mobbers
-                |> Random.generate Shuffled
+                |> Random.generate ChangedOrder
                 |> Effect.fromCmd
             )
 
-        Shuffled mobbers ->
+        ChangedOrder mobbers ->
             ( model
             , Effect.share
                 { mob = mob.name
-                , content = Model.Events.ShuffledMobbers mobbers
+                , content = Model.Events.ChangedMobbersOrder mobbers
                 }
             )
 

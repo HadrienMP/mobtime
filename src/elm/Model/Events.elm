@@ -38,7 +38,7 @@ type Event
     | AddedMobber Mobber
     | DeletedMobber Mobber
     | RotatedMobbers
-    | ShuffledMobbers Mobbers
+    | ChangedMobbersOrder Mobbers
     | TurnLengthChanged Duration
     | SelectedPlaylists Playlists
     | Unknown Decode.Value
@@ -88,8 +88,8 @@ eventFromNameDecoder eventName =
         "DeletedMobber" ->
             Decode.map DeletedMobber (Decode.field "mobber" Mobber.jsonDecoder)
 
-        "ShuffledMobbers" ->
-            Decode.map ShuffledMobbers (Decode.field "mobbers" Mobbers.decoder)
+        "ChangedMobbersOrder" ->
+            Decode.map ChangedMobbersOrder (Decode.field "mobbers" Mobbers.decoder)
 
         "TurnLengthChanged" ->
             Decode.int
@@ -176,8 +176,8 @@ eventToJson event =
             , ( "mobber", Mobber.toJson mobber )
             ]
 
-        ShuffledMobbers mobbers ->
-            [ ( "name", Json.string "ShuffledMobbers" )
+        ChangedMobbersOrder mobbers ->
+            [ ( "name", Json.string "ChangedMobbersOrder" )
             , ( "mobbers", Mobbers.toJson mobbers )
             ]
 

@@ -102,7 +102,7 @@ evolve_ event ( state, previousCommand ) =
             , previousCommand
             )
 
-        Events.ShuffledMobbers mobbers ->
+        Events.ChangedMobbersOrder mobbers ->
             ( { state | mobbers = Mobbers.merge mobbers state.mobbers }
             , previousCommand
             )
