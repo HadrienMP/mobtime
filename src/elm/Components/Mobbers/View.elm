@@ -9,7 +9,6 @@ import Model.Mobber
 import Model.Role as Role exposing (Role)
 import UI.Button.Link
 import UI.Color as Color
-import UI.Column as Column
 import UI.Css
 import UI.Icons.Captain
 import UI.Icons.Common exposing (Icon)
@@ -17,7 +16,6 @@ import UI.Icons.Ion
 import UI.Icons.Keyboard
 import UI.Icons.Microphone
 import UI.Palettes as Palettes
-import UI.Row as Row
 import UI.Size as Size
 import UI.Space as Space
 import UI.Typography as Typography
@@ -35,10 +33,10 @@ type alias Props msg =
 
 view : Props msg -> Html.Html msg
 view props =
-    Column.column2
-        [ Attr.css
-            [ Css.paddingBottom <| Size.toElmCss Space.s
-            , Css.width <| Css.pct 100
+    Html.section
+        [ Attr.id "team"
+        , Attr.css
+            [ Css.width <| Css.pct 70
             , if List.isEmpty props.people then
                 Css.borderBottom Css.zero
 
@@ -47,21 +45,20 @@ view props =
             ]
         ]
         [ header props
-        , displaySpecials props
-        , separator props
-        , displayRealMobbers props
+        , displayMobbersWithRoles props
+        , displayOtherMobbers props
         ]
 
 
 header : Props msg -> Html.Html msg
 header props =
-    Row.row
+    Html.div
         [ Attr.css
             [ UI.Css.gap Space.s
             , Css.alignItems Css.center
-            , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
             , Css.paddingBottom <| Size.toElmCss Space.xs
-            , Css.marginBottom <| Size.toElmCss Space.s
+            , Css.borderBottom3 (Css.px 1) Css.solid (Color.toElmCss <| Palettes.monochrome.on.background)
+            , Css.displayFlex
             ]
         ]
         [ Html.h3
@@ -107,35 +104,13 @@ header props =
         ]
 
 
-separator : Props msg -> Html.Html msg
-separator props =
-    if List.isEmpty props.roles || List.length props.people <= List.length props.roles then
-        none
-
-    else
-        Html.hr
-            [ Attr.css
-                [ Css.border Css.zero
-                , Css.borderTop3 (Css.px 1) Css.dashed <| Color.toElmCss <| Palettes.monochrome.on.background
-                , Css.width <| Css.pct 100
-                ]
-            ]
-            []
-
-
 
 -- With Role
 
 
-displaySpecials : Props msg -> Html.Html msg
-displaySpecials props =
-    Row.row
-        [ Attr.css
-            [ Css.justifyContent Css.spaceBetween
-            , Css.flexWrap Css.wrap
-            , UI.Css.gap Space.m
-            ]
-        ]
+displayMobbersWithRoles : Props msg -> Html.Html msg
+displayMobbersWithRoles props =
+    Html.div []
         (props.people
             |> Lib.ListExtras.zip props.roles
             |> List.map
@@ -153,22 +128,15 @@ displaySpecials props =
 -- Mobbers
 
 
-displayRealMobbers : Props msg -> Html.Html msg
-displayRealMobbers props =
+displayOtherMobbers : Props msg -> Html.Html msg
+displayOtherMobbers props =
     case props.people |> List.drop (List.length props.roles) of
         nextUp :: mobbers ->
             let
                 lastSpecialRole =
                     props.roles |> List.reverse |> List.head
             in
-            Row.row
-                [ Attr.css
-                    [ Css.justifyContent Css.spaceBetween
-                    , Css.alignItems Css.flexEnd
-                    , Css.flexWrap Css.wrap
-                    , UI.Css.gap Space.s
-                    ]
-                ]
+            Html.div []
                 (displayMobber
                     { role = lastSpecialRole |> Maybe.map Role.toNextUp
                     , mobber = nextUp
@@ -201,28 +169,40 @@ displayMobber :
     }
     -> Html.Html msg
 displayMobber { role, mobber, emphasis } =
-    Row.row
-        [ Attr.css
+    Html.div
+        [ Attr.class "mobber"
+        , Attr.css
             [ Css.alignItems Css.center
-            , UI.Css.gap <| Size.rem 0.7
+            , UI.Css.gap <| Size.rem 0.4
             , Css.maxWidth <| Css.pct 100
+            , Css.displayFlex
+            , Css.borderTop3 (Css.px 1) Css.solid (Color.toElmCss <| Color.fromHex "ccc")
+            , Css.padding2 (Css.px 4) Css.zero
             ]
         ]
-        [ role
-            |> Maybe.andThen iconForRole
-            |> Maybe.map
-                (\icon ->
-                    Html.div [ Attr.css [ Css.flexShrink Css.zero, Css.height <| Css.rem 3 ] ]
-                        [ icon
-                            { size = Size.rem 3
-                            , color = Palettes.monochrome.on.background
-                            }
-                        ]
-                )
-            |> Maybe.withDefault none
+        [ Html.div
+            [ Attr.class "avatar-wrapper"
+            , Attr.css
+                [ Css.height <|
+                    Css.rem <|
+                        if role == Nothing then
+                            2
+
+                        else
+                            3
+                , Css.property "aspect-ratio" "1"
+                , Css.overflow Css.hidden
+                ]
+            ]
+            [ Html.img
+                [ Attr.src <| "https://api.dicebear.com/10.x/big-smile/svg?seed=" ++ mobber.name
+                , Attr.alt "Avatar"
+                , Attr.css []
+                ]
+                []
+            ]
         , Html.div [ Attr.css [ Css.overflow Css.hidden ] ]
-            [ role |> Maybe.map displayRoleName |> Maybe.withDefault none
-            , Html.div
+            [ Html.div
                 [ Attr.css <|
                     ((if emphasis then
                         [ Typography.fontSize Typography.l
@@ -238,6 +218,7 @@ displayMobber { role, mobber, emphasis } =
                     )
                 ]
                 [ Html.text <| Lib.StringExtra.capitalize mobber.name ]
+            , role |> Maybe.map displayRoleName |> Maybe.withDefault none
             ]
         ]
 
